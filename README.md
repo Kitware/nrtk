@@ -1,4 +1,4 @@
-# Natural Robustness Integrations
+# Natural Robustness Toolkit (NRTK)
 
 ## Description
 TODO
@@ -21,4 +21,5 @@ TODO
 ...
 
 **POC**: Brian Hu @brian.hu
-**DPOC**: Matt Brown @matt.brown
+
+**DPOC**: Brandon RichardWebster @b.richardwebster
