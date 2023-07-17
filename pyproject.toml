@@ -1,0 +1,79 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+###############################################################################
+[tool.poetry]
+name = "nrtk"
+# REMEMBER: `distutils.version.*Version` types can be used to compare versions
+# from strings like this.
+# This package prefers to use the strict numbering standard when possible.
+version = "0.0.1"
+description = ""
+authors = ["Kitware, Inc. <TODO>"]
+readme = "README.md"
+packages = [{include = "nrtk"}]
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Operating System :: MacOS :: MacOS X',
+    'Operating System :: Unix',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+
+[tool.poetry.extras]
+
+[tool.poetry.group.dev.dependencies]
+# Linting
+flake8 = ">=6"
+flake8-mutable = ">=1.2.0"
+# Type checking
+mypy = ">=0.991"
+types-setuptools = ">=65.6.0.1"
+# Testing
+coverage = ">=6.5.0"
+pytest = ">=7.2.0"
+pytest-cov = ">=4.0.0"
+# Jupyter notebook testing
+jupyter = ">=1.0.0"
+papermill = ">=2.4.0"
+# Docs
+Sphinx = ">=5.3.0"
+sphinx-rtd-theme = ">=1.1.1"
+sphinx-prompt = ">=1.5.0"
+livereload = ">=2.6.3"
+# Utility
+ipython = ">=8.6.0"
+
+[tool.poetry.scripts]
+
+[tool.poetry.plugins."smqtk_plugins"]
+
+
+###############################################################################
+[tool.pytest.ini_options]
+addopts = [
+    "-lv",                              # Show local in trace-backs.
+    "--doctest-modules",                # Increased verbosity.
+    "--tb=long",                        # Trace-back print mode.
+    "--cov=./nrtk",                     # Cover our package specifically
+    "--cov=./tests",                    # Also cover our tests for dead spots
+    "--cov-report=term",                # Coverage report to terminal
+    "--cov-report=xml:coverage.xml",    # for external tool reporting
+]
+testpaths = [
+    "tests",
+    "nrtk",
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+]
