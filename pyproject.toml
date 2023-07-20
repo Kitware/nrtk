@@ -28,6 +28,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
+smqtk-detection = ">=0.19.0"
 
 [tool.poetry.extras]
 
@@ -38,6 +39,16 @@ flake8-mutable = ">=1.2.0"
 # Type checking
 mypy = ">=0.991"
 types-setuptools = ">=65.6.0.1"
+# JATIC Toolbox's static checking tools are (possibly inadvertently?)
+# requiring torch, so we're specifying that here to get static checking
+# functioning. Additionally, the "torch" extra provided by the toolbox
+# does not currenltly avoid 2.0.1, so we're also specifying that here.
+# TODO: At a minimumn, remove torch specification once torch 2.0.1 can
+#       safely be avoided as the most recent, compatible version.
+#       If the depedency on torch can be avoided altogether, the extra
+#       specification should additionally be removed.
+jatic-toolbox = { git = "git@gitlab.jatic.net:jatic/cdao/jatic-toolbox.git", tag = "v0.1.0", extras = ["test", "torch"] }
+torch = "!=2.0.1"
 # Testing
 coverage = ">=6.5.0"
 pytest = ">=7.2.0"
@@ -52,6 +63,7 @@ sphinx-prompt = ">=1.5.0"
 livereload = ">=2.6.3"
 # Utility
 ipython = ">=8.6.0"
+
 
 [tool.poetry.scripts]
 

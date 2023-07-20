@@ -176,12 +176,11 @@ test-notebooks:
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
-      - NOTEBOOK_DIR: "examples/dummy"
-        NOTEBOOK_FILE: [ "dummy-torch.ipynb" ]
+      - NOTEBOOK_DIR: "examples/jatic_toolbox"
+        NOTEBOOK_FILE: [ "augmentations.ipynb" ]
   # Using default container image defined above
   script:
     - cd "${NOTEBOOK_DIR}"
     - poetry run papermill
         --progress-bar -k python3 --stdout-file - --stderr-file -
         "${NOTEBOOK_FILE}" /dev/null
-
