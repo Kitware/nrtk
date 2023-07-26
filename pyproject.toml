@@ -31,6 +31,7 @@ python = "^3.8.1"
 numpy = ">=1.18"
 smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
+scikit-image = ">=0.21"
 
 [tool.poetry.extras]
 
