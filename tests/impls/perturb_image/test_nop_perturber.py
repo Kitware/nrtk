@@ -12,6 +12,7 @@ def test_perturb() -> None:
     inst = NOPPerturber()
     out_image = inst.perturb(dummy_image)
 
+    assert dummy_image.dtype == out_image.dtype
     assert np.array_equal(dummy_image, out_image)
 
 
@@ -24,6 +25,7 @@ def test_callable() -> None:
     inst = NOPPerturber()
     out_image = inst(dummy_image)
 
+    assert dummy_image.dtype == out_image.dtype
     assert np.array_equal(dummy_image, out_image)
 
 
@@ -34,10 +36,10 @@ def test_side_effects() -> None:
     dummy_image = np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8)
     dummy_image_copy = np.copy(dummy_image)
     inst = NOPPerturber()
-    _ = inst(dummy_image)
+    out_image = inst(dummy_image)
 
     assert np.array_equal(dummy_image, dummy_image_copy)
-    assert not np.shares_memory(dummy_image, dummy_image_copy)
+    assert not np.shares_memory(dummy_image, out_image)
 
 
 def test_config() -> None:

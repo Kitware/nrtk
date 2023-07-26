@@ -16,8 +16,20 @@ Interfaces
 
 Implementations
 
-* Added a ``PerturbImage`` implementations, ``NOPPerturber``, which
-  serves as a pass-through NOP perturber to test interface functionality.
+* Added several ``PerturbImage`` implementations
+
+  * ``SaltPerturber``, ``PepperPerturber``, ``SaltAndPepperPerturber``: Adds
+    salt and/or pepper noise to given image stimulus.
+
+  * ``GaussianPerturber``: Adds Gaussian-distributed additive noise to given
+    image stimulus.
+
+  * ``SpecklePerturber``: Adds multiplicative (Gaussian) noise to given image
+    stimulus.
+
+  * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
+    functionality.
+
 
 Fixes
 -----
