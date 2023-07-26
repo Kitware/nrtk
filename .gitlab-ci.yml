@@ -176,6 +176,8 @@ test-notebooks:
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
+      - NOTEBOOK_DIR: "examples"
+        NOTEBOOK_FILE: [ "perturbers.ipynb" ]
       - NOTEBOOK_DIR: "examples/jatic_toolbox"
         NOTEBOOK_FILE: [ "augmentations.ipynb" ]
   # Using default container image defined above
