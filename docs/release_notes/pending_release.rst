@@ -14,6 +14,9 @@ Interfaces
 * Added a ``PerturbImage`` interface for taking an image stimulus and
   generating a perturbed image.
 
+* Added a ``ScoreDetection`` interface that takes in ground-truth and predicted
+  BBox-label pairs and generates scores based on a given metric.
+
 Implementations
 
 * Added several ``PerturbImage`` implementations
@@ -30,6 +33,8 @@ Implementations
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
 
+* Added a ``ScoreDetection`` implementation, ``NOPScorer`` which serves
+  as a pass-through NOP scorer to test interface functionality.
 
 Fixes
 -----
