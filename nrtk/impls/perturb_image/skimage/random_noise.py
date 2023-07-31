@@ -6,7 +6,7 @@ import skimage.util  # type:ignore
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
-class _SKImagePerturber(PerturbImage):
+class _SKImageNoisePerturber(PerturbImage):
     def __init__(
         self,
         rng: Optional[Union[np.random.Generator, int]] = None
@@ -66,7 +66,7 @@ class _SKImagePerturber(PerturbImage):
         }
 
 
-class _SPPerturber(_SKImagePerturber):
+class _SPNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
         rng: Optional[Union[np.random.Generator, int]] = None,
@@ -90,7 +90,7 @@ class _SPPerturber(_SKImagePerturber):
         return cfg
 
 
-class SaltPerturber(_SPPerturber):
+class SaltNoisePerturber(_SPNoisePerturber):
     """
     Adds salt noise to image stimulus.
     """
@@ -106,7 +106,7 @@ class SaltPerturber(_SPPerturber):
         return self._perturb(image, mode="salt", amount=self.amount)
 
 
-class PepperPerturber(_SPPerturber):
+class PepperNoisePerturber(_SPNoisePerturber):
     """
     Adds pepper noise to image stimulus.
     """
@@ -122,7 +122,7 @@ class PepperPerturber(_SPPerturber):
         return self._perturb(image, mode="pepper", amount=self.amount)
 
 
-class SaltAndPepperPerturber(_SPPerturber):
+class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     """
     Adds salt & pepper noise to image stimulus.
     """
@@ -162,7 +162,7 @@ class SaltAndPepperPerturber(_SPPerturber):
         return cfg
 
 
-class _GSPerturber(_SKImagePerturber):
+class _GSNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
         rng: Optional[Union[np.random.Generator, int]] = None,
@@ -190,7 +190,7 @@ class _GSPerturber(_SKImagePerturber):
         return cfg
 
 
-class GaussianPerturber(_GSPerturber):
+class GaussianNoisePerturber(_GSNoisePerturber):
     """
     Adds Gaussian-distributed additive noise to image stimulus.
     """
@@ -206,7 +206,7 @@ class GaussianPerturber(_GSPerturber):
         return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean)
 
 
-class SpecklePerturber(_GSPerturber):
+class SpeckleNoisePerturber(_GSNoisePerturber):
     """
     Adds multiplicative noise to image stimulus. Noise is Gaussian-based.
     """
