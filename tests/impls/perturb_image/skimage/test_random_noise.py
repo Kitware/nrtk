@@ -2,50 +2,21 @@ import numpy as np
 import pytest
 from contextlib import nullcontext as does_not_raise
 from smqtk_core.configuration import configuration_test_helper
-from typing import Any, Callable, ContextManager, Dict, Optional, Type, Union
+from typing import Any, ContextManager, Dict, Type, Union
 
 from nrtk.impls.perturb_image.skimage.random_noise import (
-    GaussianPerturber,
-    PepperPerturber,
-    SaltAndPepperPerturber,
-    SaltPerturber,
-    SpecklePerturber,
-    _SKImagePerturber
+    GaussianNoisePerturber,
+    PepperNoisePerturber,
+    SaltAndPepperNoisePerturber,
+    SaltNoisePerturber,
+    SpeckleNoisePerturber,
+    _SKImageNoisePerturber
 )
 
-
-def blanket_assertions(
-    perturb: Callable[[np.ndarray], np.ndarray],
-    image: np.ndarray,
-    expected: Optional[np.ndarray] = None
-) -> None:
-    """
-    Test the blanket assertions for perturbers that
-    1) Input should remain unchanged
-    2) Output should not share memory with input (e.g no clones, etc)
-    3) Output should have the same shape as input
-    4) Output should have the same dtype as input
-    Additionally, if ``expected`` is provided
-    5) Output should match expected
-
-    :param perturb: Interface with which to generate the perturbation.
-    :param image: Input image as numpy array.
-    :param expected: (Optional) Expected return value of the perturbation.
-    """
-    shape = image.shape
-    dtype = image.dtype
-    copy = np.copy(image)
-
-    out_image = perturb(image)
-    assert np.array_equal(image, copy)
-    assert not np.shares_memory(image, out_image)
-    assert out_image.shape == shape
-    assert out_image.dtype == dtype
-    if expected is not None:
-        assert np.array_equal(out_image, expected)
+from ..test_perturber_utils import perturber_assertions
 
 
-def rng_assertions(perturber: Type[_SKImagePerturber], rng: int) -> None:
+def rng_assertions(perturber: Type[_SKImageNoisePerturber], rng: int) -> None:
     """
     Test that output is reproducible if a rng or seed is provided.
 
@@ -76,29 +47,24 @@ def rng_assertions(perturber: Type[_SKImagePerturber], rng: int) -> None:
     assert np.array_equal(out3B, out4B)
 
 
-class TestSaltPerturber:
-    @pytest.mark.parametrize("image, rng, amount, expected", [
-        (np.zeros((3, 3), dtype=np.uint8), 42, 0.5, np.array([[0, 255, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8))
-    ])
-    def test_consistency(
-        self,
-        image: np.ndarray,
-        rng: Union[np.random.Generator, int],
-        amount: float,
-        expected: np.ndarray
-    ) -> None:
+class TestSaltNoisePerturber:
+    def test_consistency(self) -> None:
         """
         Run on a dummy image to ensure output matches precomputed results.
         """
+        image = np.zeros((3, 3), dtype=np.uint8)
+        rng = 42
+        amount = 0.5
+
         # Test perturb interface directly
-        inst = SaltPerturber(amount=amount, rng=rng)
-        blanket_assertions(perturb=inst.perturb, image=image, expected=expected)
+        inst = SaltNoisePerturber(amount=amount, rng=rng)
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SALT)
 
         # Test callable
-        blanket_assertions(
-            perturb=SaltPerturber(amount=amount, rng=rng),
+        perturber_assertions(
+            perturb=SaltNoisePerturber(amount=amount, rng=rng),
             image=image,
-            expected=expected
+            expected=EXPECTED_SALT
         )
 
     @pytest.mark.parametrize("image, expectation", [
@@ -118,14 +84,14 @@ class TestSaltPerturber:
         from external calls to the extent that is possible.
         """
         with expectation:
-            blanket_assertions(perturb=SaltPerturber(amount=0), image=image, expected=image)
+            perturber_assertions(perturb=SaltNoisePerturber(amount=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """
         Ensure results are reproducible.
         """
-        rng_assertions(perturber=SaltPerturber, rng=rng)
+        rng_assertions(perturber=SaltNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize("rng, amount", [
         (42, 0.8),
@@ -133,9 +99,9 @@ class TestSaltPerturber:
     ])
     def test_configuration(self, rng: Union[np.random.Generator, int], amount: float) -> None:
         """
-        Test configuration stability
+        Test configuration stability.
         """
-        inst = SaltPerturber(rng=rng, amount=amount)
+        inst = SaltNoisePerturber(rng=rng, amount=amount)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
@@ -144,41 +110,35 @@ class TestSaltPerturber:
         ({"amount": 0.5}, does_not_raise()),
         ({"amount": 0}, does_not_raise()),
         ({"amount": 1}, does_not_raise()),
-        ({"amount": 2.}, pytest.raises(ValueError, match=r"SaltPerturber invalid amount")),
-        ({"amount": -3.}, pytest.raises(ValueError, match=r"SaltPerturber invalid amount"))
+        ({"amount": 2.}, pytest.raises(ValueError, match=r"SaltNoisePerturber invalid amount")),
+        ({"amount": -3.}, pytest.raises(ValueError, match=r"SaltNoisePerturber invalid amount"))
     ])
     def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """
         Test that an exception is properly raised (or not) based on argument value.
         """
         with expectation:
-            SaltPerturber(**kwargs)
+            SaltNoisePerturber(**kwargs)
 
 
-class TestPepperPerturber:
-    @pytest.mark.parametrize("image, rng, amount, expected", [
-        (np.ones((3, 3), dtype=np.uint8) * 255, 42, 0.5,
-            np.array([[255, 0, 255], [255, 0, 255], [255, 255, 0]], dtype=np.uint8))
-    ])
-    def test_consistency(
-        self,
-        image: np.ndarray,
-        rng: Union[np.random.Generator, int],
-        amount: float,
-        expected: np.ndarray
-    ) -> None:
+class TestPepperNoisePerturber:
+    def test_consistency(self) -> None:
         """
         Run on a dummy image to ensure output matches precomputed results.
         """
+        image = np.ones((3, 3), dtype=np.uint8) * 255
+        rng = 42
+        amount = 0.5
+
         # Test perturb interface directly
-        inst = PepperPerturber(amount=amount, rng=rng)
-        blanket_assertions(perturb=inst.perturb, image=image, expected=expected)
+        inst = PepperNoisePerturber(amount=amount, rng=rng)
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_PEPPER)
 
         # Test callable
-        blanket_assertions(
-            perturb=PepperPerturber(amount=amount, rng=rng),
+        perturber_assertions(
+            perturb=PepperNoisePerturber(amount=amount, rng=rng),
             image=image,
-            expected=expected
+            expected=EXPECTED_PEPPER
         )
 
     @pytest.mark.parametrize("image, expectation", [
@@ -198,14 +158,14 @@ class TestPepperPerturber:
         from external calls to the extent that is possible.
         """
         with expectation:
-            blanket_assertions(perturb=PepperPerturber(amount=0), image=image, expected=image)
+            perturber_assertions(perturb=PepperNoisePerturber(amount=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """
         Ensure results are reproducible.
         """
-        rng_assertions(perturber=PepperPerturber, rng=rng)
+        rng_assertions(perturber=PepperNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize("rng, amount", [
         (42, 0.8),
@@ -213,9 +173,9 @@ class TestPepperPerturber:
     ])
     def test_configuration(self, rng: Union[np.random.Generator, int], amount: float) -> None:
         """
-        Test configuration stability
+        Test configuration stability.
         """
-        inst = PepperPerturber(rng=rng, amount=amount)
+        inst = PepperNoisePerturber(rng=rng, amount=amount)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
@@ -224,42 +184,36 @@ class TestPepperPerturber:
         ({"amount": 0.25}, does_not_raise()),
         ({"amount": 0}, does_not_raise()),
         ({"amount": 1}, does_not_raise()),
-        ({"amount": 2.5}, pytest.raises(ValueError, match=r"PepperPerturber invalid amount")),
-        ({"amount": -4.2}, pytest.raises(ValueError, match=r"PepperPerturber invalid amount"))
+        ({"amount": 2.5}, pytest.raises(ValueError, match=r"PepperNoisePerturber invalid amount")),
+        ({"amount": -4.2}, pytest.raises(ValueError, match=r"PepperNoisePerturber invalid amount"))
     ])
     def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """
         Test that an exception is properly raised (or not) based on argument value.
         """
         with expectation:
-            PepperPerturber(**kwargs)
+            PepperNoisePerturber(**kwargs)
 
 
-class TestSaltAndPepperPerturber:
-    @pytest.mark.parametrize("image, rng, amount, salt_vs_pepper, expected", [
-        (np.zeros((3, 3), dtype=np.uint8), 42, 0.5, 0.5,
-            np.array([[0, 255, 0], [0, 0, 0], [0, 0, 255]], dtype=np.uint8))
-    ])
-    def test_consistency(
-        self,
-        image: np.ndarray,
-        rng: Union[np.random.Generator, int],
-        amount: float,
-        salt_vs_pepper: float,
-        expected: np.ndarray
-    ) -> None:
+class TestSaltAndPepperNoisePerturber:
+    def test_consistency(self) -> None:
         """
         Run on a dummy image to ensure output matches precomputed results.
         """
+        image = np.zeros((3, 3), dtype=np.uint8)
+        rng = 42
+        amount = 0.5
+        salt_vs_pepper = 0.5
+
         # Test perturb interface directly
-        inst = SaltAndPepperPerturber(amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng)
-        blanket_assertions(perturb=inst.perturb, image=image, expected=expected)
+        inst = SaltAndPepperNoisePerturber(amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng)
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SP)
 
         # Test callable
-        blanket_assertions(
-            perturb=SaltAndPepperPerturber(amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng),
+        perturber_assertions(
+            perturb=SaltAndPepperNoisePerturber(amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng),
             image=image,
-            expected=expected
+            expected=EXPECTED_SP
         )
 
     @pytest.mark.parametrize("image, expectation", [
@@ -279,14 +233,14 @@ class TestSaltAndPepperPerturber:
         from external calls to the extent that is possible.
         """
         with expectation:
-            blanket_assertions(perturb=SaltAndPepperPerturber(amount=0), image=image, expected=image)
+            perturber_assertions(perturb=SaltAndPepperNoisePerturber(amount=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """
         Ensure results are reproducible.
         """
-        rng_assertions(perturber=SaltAndPepperPerturber, rng=rng)
+        rng_assertions(perturber=SaltAndPepperNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize("rng, amount, salt_vs_pepper", [
         (42, 0.8, 0.25),
@@ -294,9 +248,9 @@ class TestSaltAndPepperPerturber:
     ])
     def test_configuration(self, rng: Union[np.random.Generator, int], amount: float, salt_vs_pepper: float) -> None:
         """
-        Test configuration stability
+        Test configuration stability.
         """
-        inst = SaltAndPepperPerturber(rng=rng, amount=amount, salt_vs_pepper=salt_vs_pepper)
+        inst = SaltAndPepperNoisePerturber(rng=rng, amount=amount, salt_vs_pepper=salt_vs_pepper)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
@@ -306,46 +260,41 @@ class TestSaltAndPepperPerturber:
         ({"amount": 0.45}, does_not_raise()),
         ({"amount": 0}, does_not_raise()),
         ({"amount": 1}, does_not_raise()),
-        ({"amount": 1.2}, pytest.raises(ValueError, match=r"SaltAndPepperPerturber invalid amount")),
-        ({"amount": -0.2}, pytest.raises(ValueError, match=r"SaltAndPepperPerturber invalid amount")),
+        ({"amount": 1.2}, pytest.raises(ValueError, match=r"SaltAndPepperNoisePerturber invalid amount")),
+        ({"amount": -0.2}, pytest.raises(ValueError, match=r"SaltAndPepperNoisePerturber invalid amount")),
         ({"salt_vs_pepper": 0.2}, does_not_raise()),
         ({"salt_vs_pepper": 0}, does_not_raise()),
         ({"salt_vs_pepper": 1}, does_not_raise()),
-        ({"salt_vs_pepper": 5}, pytest.raises(ValueError, match=r"SaltAndPepperPerturber invalid salt_vs_pepper")),
-        ({"salt_vs_pepper": -3}, pytest.raises(ValueError, match=r"SaltAndPepperPerturber invalid salt_vs_pepper"))
+        ({"salt_vs_pepper": 5}, pytest.raises(ValueError, match=r"SaltAndPepperNoisePerturber invalid salt_vs_pepper")),
+        ({"salt_vs_pepper": -3}, pytest.raises(ValueError, match=r"SaltAndPepperNoisePerturber invalid salt_vs_pepper"))
     ])
     def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """
         Test that an exception is properly raised (or not) based on argument value.
         """
         with expectation:
-            SaltAndPepperPerturber(**kwargs)
+            SaltAndPepperNoisePerturber(**kwargs)
 
 
-class TestGaussianPerturber:
-    @pytest.mark.parametrize("image, rng, mean, var, expected", [
-        (np.zeros((3, 3), dtype=np.uint8), 42, 0, 0.05, np.array([[17, 0, 43], [54, 0, 0], [7, 0, 0]], dtype=np.uint8))
-    ])
-    def test_consistency(
-        self,
-        image: np.ndarray,
-        rng: Union[np.random.Generator, int],
-        mean: float,
-        var: float,
-        expected: np.ndarray
-    ) -> None:
+class TestGaussianNoisePerturber:
+    def test_consistency(self) -> None:
         """
         Run on a dummy image to ensure output matches precomputed results.
         """
+        image = np.zeros((3, 3), dtype=np.uint8)
+        rng = 42
+        mean = 0
+        var = 0.05
+
         # Test perturb interface directly
-        inst = GaussianPerturber(mean=mean, var=var, rng=rng)
-        blanket_assertions(perturb=inst.perturb, image=image, expected=expected)
+        inst = GaussianNoisePerturber(mean=mean, var=var, rng=rng)
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_GAUSSIAN)
 
         # Test callable
-        blanket_assertions(
-            perturb=GaussianPerturber(mean=mean, var=var, rng=rng),
+        perturber_assertions(
+            perturb=GaussianNoisePerturber(mean=mean, var=var, rng=rng),
             image=image,
-            expected=expected
+            expected=EXPECTED_GAUSSIAN
         )
 
     @pytest.mark.parametrize("image, expectation", [
@@ -365,14 +314,14 @@ class TestGaussianPerturber:
         from external calls to the extent that is possible.
         """
         with expectation:
-            blanket_assertions(perturb=GaussianPerturber(mean=0, var=0), image=image, expected=image)
+            perturber_assertions(perturb=GaussianNoisePerturber(mean=0, var=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """
         Ensure results are reproducible.
         """
-        rng_assertions(perturber=GaussianPerturber, rng=rng)
+        rng_assertions(perturber=GaussianNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize("rng, mean, var", [
         (42, 0.8, 0.25),
@@ -380,9 +329,9 @@ class TestGaussianPerturber:
     ])
     def test_configuration(self, rng: Union[np.random.Generator, int], mean: float, var: float) -> None:
         """
-        Test configuration stability
+        Test configuration stability.
         """
-        inst = GaussianPerturber(rng=rng, mean=mean, var=var)
+        inst = GaussianNoisePerturber(rng=rng, mean=mean, var=var)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.mean == mean
@@ -391,41 +340,35 @@ class TestGaussianPerturber:
     @pytest.mark.parametrize("kwargs, expectation", [
         ({"var": 0.75}, does_not_raise()),
         ({"var": 0}, does_not_raise()),
-        ({"var": -10}, pytest.raises(ValueError, match=r"GaussianPerturber invalid var"))
+        ({"var": -10}, pytest.raises(ValueError, match=r"GaussianNoisePerturber invalid var"))
     ])
     def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """
         Test that an exception is properly raised (or not) based on argument value.
         """
         with expectation:
-            GaussianPerturber(**kwargs)
+            GaussianNoisePerturber(**kwargs)
 
 
-class TestSpecklePerturber:
-    @pytest.mark.parametrize("image, rng, mean, var, expected", [
-        (np.ones((3, 3), dtype=np.uint8) * 255, 42, 0, 0.05,
-            np.array([[255, 196, 255], [255, 144, 181], [255, 237, 254]]))
-    ])
-    def test_consistency(
-        self,
-        image: np.ndarray,
-        rng: Union[np.random.Generator, int],
-        mean: float,
-        var: float,
-        expected: np.ndarray
-    ) -> None:
+class TestSpeckleNoisePerturber:
+    def test_consistency(self) -> None:
         """
         Run on a dummy image to ensure output matches precomputed results.
         """
+        image = np.ones((3, 3), dtype=np.uint8) * 255
+        rng = 42
+        mean = 0
+        var = 0.05
+
         # Test perturb interface directly
-        inst = SpecklePerturber(mean=mean, var=var, rng=rng)
-        blanket_assertions(perturb=inst.perturb, image=image, expected=expected)
+        inst = SpeckleNoisePerturber(mean=mean, var=var, rng=rng)
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SPECKLE)
 
         # Test callable
-        blanket_assertions(
-            perturb=SpecklePerturber(mean=mean, var=var, rng=rng),
+        perturber_assertions(
+            perturb=SpeckleNoisePerturber(mean=mean, var=var, rng=rng),
             image=image,
-            expected=expected
+            expected=EXPECTED_SPECKLE
         )
 
     @pytest.mark.parametrize("image, expectation", [
@@ -445,14 +388,14 @@ class TestSpecklePerturber:
         from external calls to the extent that is possible.
         """
         with expectation:
-            blanket_assertions(perturb=SpecklePerturber(mean=0, var=0), image=image, expected=image)
+            perturber_assertions(perturb=SpeckleNoisePerturber(mean=0, var=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """
         Ensure results are reproducible.
         """
-        rng_assertions(perturber=SpecklePerturber, rng=rng)
+        rng_assertions(perturber=SpeckleNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize("rng, mean, var", [
         (42, 0.8, 0.25),
@@ -460,9 +403,9 @@ class TestSpecklePerturber:
     ])
     def test_configuration(self, rng: Union[np.random.Generator, int], mean: float, var: float) -> None:
         """
-        Test configuration stability
+        Test configuration stability.
         """
-        inst = SpecklePerturber(rng=rng, mean=mean, var=var)
+        inst = SpeckleNoisePerturber(rng=rng, mean=mean, var=var)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.mean == mean
@@ -471,11 +414,18 @@ class TestSpecklePerturber:
     @pytest.mark.parametrize("kwargs, expectation", [
         ({"var": 0.123}, does_not_raise()),
         ({"var": 0}, does_not_raise()),
-        ({"var": -10}, pytest.raises(ValueError, match=r"SpecklePerturber invalid var"))
+        ({"var": -10}, pytest.raises(ValueError, match=r"SpeckleNoisePerturber invalid var"))
     ])
     def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """
         Test that an exception is properly raised (or not) based on argument value.
         """
         with expectation:
-            SpecklePerturber(**kwargs)
+            SpeckleNoisePerturber(**kwargs)
+
+
+EXPECTED_SALT = np.array([[0, 255, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
+EXPECTED_PEPPER = np.array([[255, 0, 255], [255, 0, 255], [255, 255, 0]], dtype=np.uint8)
+EXPECTED_SP = np.array([[0, 255, 0], [0, 0, 0], [0, 0, 255]], dtype=np.uint8)
+EXPECTED_GAUSSIAN = np.array([[17, 0, 43], [54, 0, 0], [7, 0, 0]], dtype=np.uint8)
+EXPECTED_SPECKLE = np.array([[255, 196, 255], [255, 144, 181], [255, 237, 254]], dtype=np.uint8)

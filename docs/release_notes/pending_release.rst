@@ -9,8 +9,7 @@ Examples
 * Added an example notebook exploring the current state of several augmentation
   tools as well as the usability of the JATIC Toolbox augmentation protocol.
 
-* Added an example notebook demonstrating NRTK ``skimage`` perturber
-  functionality.
+* Added an example notebook demonstrating NRTK perturber functionality.
 
 Interfaces
 
@@ -22,16 +21,30 @@ Interfaces
 
 Implementations
 
-* Added several ``PerturbImage`` implementations
+* Added several ``PerturbImage`` implementations:
 
-  * ``SaltPerturber``, ``PepperPerturber``, ``SaltAndPepperPerturber``: Adds
-    salt and/or pepper noise to given image stimulus.
+  * From ``opencv``:
 
-  * ``GaussianPerturber``: Adds Gaussian-distributed additive noise to given
-    image stimulus.
+    * ``AverageBlurPerturber``: Applies average blurring to the given image
+      stimulus.
 
-  * ``SpecklePerturber``: Adds multiplicative (Gaussian) noise to given image
-    stimulus.
+    * ``GaussianBlurPerturber``: Applies Gaussian blurring to the given image
+      stimulus.
+
+    * ``MedianBlurPerturber``: Applies median blurring to the given image
+      stimulus.
+
+  * From ``skimage``:
+
+    * ``SaltNoisePerturber``, ``PepperNoisePerturber``,
+      ``SaltAndPepperNoisePerturber``: Adds salt and/or pepper noise to given
+      image stimulus.
+
+    * ``GaussianNoisePerturber``: Adds Gaussian-distributed additive noise to
+      given image stimulus.
+
+    * ``SpeckleNoisePerturber``: Adds multiplicative (Gaussian) noise to given
+      image stimulus.
 
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
