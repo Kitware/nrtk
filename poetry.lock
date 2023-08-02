@@ -3724,6 +3724,17 @@ tests = ["autopep8", "flake8", "isort", "numpy", "pytest", "scipy (>=1.7.1)"]
 tutorials = ["matplotlib", "pandas", "tabulate"]
 
 [[package]]
+name = "types-pillow"
+version = "10.0.0.2"
+description = "Typing stubs for Pillow"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-Pillow-10.0.0.2.tar.gz", hash = "sha256:fe09380ab22d412ced989a067e9ee4af719fa3a47ba1b53b232b46514a871042"},
+    {file = "types_Pillow-10.0.0.2-py3-none-any.whl", hash = "sha256:29d51a3ce6ef51fabf728a504d33b4836187ff14256b2e86996d55c91ab214b1"},
+]
+
+[[package]]
 name = "types-setuptools"
 version = "68.0.0.3"
 description = "Typing stubs for setuptools"
@@ -3872,4 +3883,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "94ef79e1790240ae3e7a0f9f184b2be5b9ea0abc6eb338e02e3450e69f24c0f7"
+content-hash = "71e4edab305ff6c12c533968970b0c7537bb7a9136dc14e401a5fa333f154bc0"

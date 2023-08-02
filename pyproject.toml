@@ -30,6 +30,7 @@ classifiers = [
 python = "^3.8.1"
 numpy = ">=1.18"
 opencv-python-headless = ">=4.6"
+Pillow = ">=9"
 scikit-image = ">=0.21"
 smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
@@ -44,6 +45,7 @@ flake8-mutable = ">=1.2.0"
 # Type checking
 mypy = ">=0.991"
 types-setuptools = ">=65.6.0.1"
+types-Pillow = ">=9.0"
 # JATIC Toolbox's static checking tools are (possibly inadvertently?)
 # requiring torch, so we're specifying that here to get static checking
 # functioning. Additionally, the "torch" extra provided by the toolbox
