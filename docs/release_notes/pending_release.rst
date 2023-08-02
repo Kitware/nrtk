@@ -46,6 +46,16 @@ Implementations
     * ``SpeckleNoisePerturber``: Adds multiplicative (Gaussian) noise to given
       image stimulus.
 
+  * From ``PIL``:
+
+    * ``BrightnessPerturber``: Adjusts given image stimulus brightness.
+
+    * ``ColorPerturber``: Adjusts given image stimulus color balance.
+
+    * ``ContrastPerturber``: Adjust given image stimulus contrast.
+
+    * ``SharpnessPerturber``: Adjust given image stimulus sharpness.
+
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
 

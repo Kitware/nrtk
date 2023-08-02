@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from smqtk_core.configuration import configuration_test_helper
 
 from nrtk.impls.perturb_image.nop_perturber import NOPPerturber
 
@@ -24,9 +25,8 @@ def test_perturber_assertions(image: np.ndarray) -> None:
 
 
 def test_config() -> None:
+    """
+    Test configuration stability.
+    """
     inst = NOPPerturber()
-    config = inst.get_config()
-
-    # Config should be empty, but not None
-    assert config is not None
-    assert not config
+    configuration_test_helper(inst)
