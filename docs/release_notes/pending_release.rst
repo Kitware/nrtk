@@ -59,8 +59,13 @@ Implementations
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
 
-* Added a ``ScoreDetection`` implementation, ``NOPScorer`` which serves
-  as a pass-through NOP scorer to test interface functionality.
+* Added ``ScoreDetection`` implementations
+  
+  * ``NOPScorer``: Serves as a pass-through NOP scorer to test interface
+    functionality.
+  
+  * ``RandomScorer``: Generates random score values and serves as a test for
+    reproducibility.
 
 Fixes
 -----
