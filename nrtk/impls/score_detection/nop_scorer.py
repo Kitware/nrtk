@@ -27,10 +27,10 @@ class NOPScorer(ScoreDetection):
         Return list of zeros equal to the length of the ground truth input.
         """
         if len(actual) != len(predicted):
-            raise Exception("Size mismatch between actual and predicted data")
+            raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise Exception("Actual bounding boxes must have detections and can't be empty.")
+                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
 
         return [0 for actual_det in actual]
 
