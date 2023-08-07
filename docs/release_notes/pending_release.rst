@@ -16,6 +16,9 @@ Interfaces
 * Added a ``PerturbImage`` interface for taking an image stimulus and
   generating a perturbed image.
 
+* Added a ``PerturbImageFactory`` interface for generating ``PerturbImage``
+  instances of specified type and configuration while varying one parameter.
+
 * Added a ``ScoreDetection`` interface that takes in ground-truth and predicted
   BBox-label pairs and generates scores based on a given metric.
 
@@ -59,11 +62,15 @@ Implementations
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
 
+* Added a ``PerturbImageFactory`` implementation, ``StepPerturbImageFactory``,
+  which is a simple implementation that varies a chosen parameter from
+  ``start`` to ``stop`` by the given ``step`` value.
+
 * Added ``ScoreDetection`` implementations
-  
+
   * ``NOPScorer``: Serves as a pass-through NOP scorer to test interface
     functionality.
-  
+
   * ``RandomScorer``: Generates random score values and serves as a test for
     reproducibility.
 
