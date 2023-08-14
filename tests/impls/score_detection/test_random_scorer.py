@@ -32,7 +32,7 @@ class TestRandomScorer:
                        match=r"Actual bounding boxes must have detections and can't be empty."))
     ])
     def test_basic_assertions_and_exceptions(self,
-                                             actual: List[List[Tuple[AxisAlignedBoundingBox, str]]],
+                                             actual: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
                                              predicted: List[List[Tuple[AxisAlignedBoundingBox,
                                                                         Dict[Hashable, float]]]],
                                              expectation: ContextManager) -> None:
@@ -55,7 +55,7 @@ class TestRandomScorer:
     ])
     def test_reproducibility(self,
                              random_seed: int,
-                             actual: List[List[Tuple[AxisAlignedBoundingBox, str]]],
+                             actual: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
                              predicted: List[List[Tuple[AxisAlignedBoundingBox,
                                                         Dict[Hashable, float]]]]) -> None:
         """

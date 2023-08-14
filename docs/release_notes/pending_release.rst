@@ -13,6 +13,9 @@ Examples
 
 Interfaces
 
+* Added a ``GenerateObjectDetectorBlackboxResponse`` interface for generating
+  response curves with given perturber factories, detector, and scorer.
+
 * Added a ``PerturbImage`` interface for taking an image stimulus and
   generating a perturbed image.
 
@@ -23,6 +26,9 @@ Interfaces
   BBox-label pairs and generates scores based on a given metric.
 
 Implementations
+
+* Add an example ``GenerateObjectDetectorBlackboxResponse`` implementation,
+  ``SimpleGenerator`` which takes takes input data directly as Sequences.
 
 * Added several ``PerturbImage`` implementations:
 

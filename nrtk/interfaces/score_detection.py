@@ -1,7 +1,7 @@
 import abc
 from typing import Dict
 from typing import Hashable
-from typing import List
+from typing import Sequence
 from typing import Tuple
 
 from smqtk_core import Plugfigurable
@@ -19,11 +19,11 @@ class ScoreDetection(Plugfigurable):
     @abc.abstractmethod
     def score(
         self,
-        actual: List[List[Tuple[AxisAlignedBoundingBox, str]]],
-        predicted: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
-    ) -> List[float]:
+        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
+    ) -> Sequence[float]:
         """
-        Generate a list of scores corresponding to a specific metric.
+        Generate a sequence of scores corresponding to a specific metric.
 
         :param actual:
             Ground truth bbox and class label pairs.
@@ -32,15 +32,15 @@ class ScoreDetection(Plugfigurable):
             class-wise confidence scores.
 
         :return:
-            Metric score values as a float-type list with the length matching
+            Metric score values as a float-type sequence with the length matching
             the number of samples in the ground truth input.
         """
 
     def __call__(
         self,
-        actual: List[List[Tuple[AxisAlignedBoundingBox, str]]],
-        predicted: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
-    ) -> List[float]:
+        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
+    ) -> Sequence[float]:
         """
         Alias for :meth:`.ScoreDetection.score`.
         """

@@ -1,7 +1,7 @@
 from typing import Any
 from typing import Dict
 from typing import Hashable
-from typing import List
+from typing import Sequence
 from typing import Tuple
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -20,11 +20,11 @@ class NOPScorer(ScoreDetection):
     """
     def score(
         self,
-        actual: List[List[Tuple[AxisAlignedBoundingBox, str]]],
-        predicted: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
-    ) -> List[float]:
+        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
+    ) -> Sequence[float]:
         """
-        Return list of zeros equal to the length of the ground truth input.
+        Return sequence of zeros equal to the length of the ground truth input.
         """
         if len(actual) != len(predicted):
             raise ValueError("Size mismatch between actual and predicted data")
