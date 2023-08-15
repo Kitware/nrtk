@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Hashable, Sequence, Tuple
+from typing import Any, Dict, Tuple
+from typing import Sequence, Hashable, Callable
 import copy
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -15,12 +16,15 @@ def _class_map(classes: Sequence, scores: Sequence) -> Dict[Hashable, float]:
     return d
 
 
-def scorer_assertions(
-    scorer: Callable[[Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-                      Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]], Sequence[float]],
-    actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-    predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
-) -> None:
+def scorer_assertions(scorer: Callable[[Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                Dict[Hashable, Any]]]],
+                                        Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                Dict[Hashable, float]]]]],
+                                       Sequence[float]],
+                      actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                      Dict[Hashable, Any]]]],
+                      predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                         Dict[Hashable, float]]]]) -> None:
     """
     Basic scorer assertions:
     1) Test to make sure the scorer implementation does not

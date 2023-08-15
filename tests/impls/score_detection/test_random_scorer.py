@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Hashable, ContextManager
+from typing import Any, Sequence, Tuple, Dict, Hashable, ContextManager
 from contextlib import nullcontext as does_not_raise
 import pytest
 
@@ -12,13 +12,15 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 class TestRandomScorer:
 
-    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), "dummy_class_1")]]
+    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category": "dummy_class_1"})]]
     dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
     dummy_pred_class = _class_map(classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1])
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
-    dummy_actual_test_len_mismatch = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), "dummy_class_1")],
-                                      [(AxisAlignedBoundingBox([2, 2], [3, 3]), "dummy_class_2")]]
+    dummy_actual_test_len_mismatch = [[(AxisAlignedBoundingBox([1, 1], [2, 2]),
+                                        {"category": "dummy_class_1"})],
+                                      [(AxisAlignedBoundingBox([2, 2], [3, 3]),
+                                        {"category": "dummy_class_2"})]]
 
     dummy_empty = [[]]  # type: ignore
 
@@ -32,9 +34,10 @@ class TestRandomScorer:
                        match=r"Actual bounding boxes must have detections and can't be empty."))
     ])
     def test_basic_assertions_and_exceptions(self,
-                                             actual: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-                                             predicted: List[List[Tuple[AxisAlignedBoundingBox,
-                                                                        Dict[Hashable, float]]]],
+                                             actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                             Dict[Hashable, Any]]]],
+                                             predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                                Dict[Hashable, float]]]],
                                              expectation: ContextManager) -> None:
         """
         Test basic scorer assertions and exceptions using the helper function
@@ -55,20 +58,21 @@ class TestRandomScorer:
     ])
     def test_reproducibility(self,
                              random_seed: int,
-                             actual: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-                             predicted: List[List[Tuple[AxisAlignedBoundingBox,
-                                                        Dict[Hashable, float]]]]) -> None:
+                             actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                             Dict[Hashable, Any]]]],
+                             predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                Dict[Hashable, float]]]]) -> None:
         """
-        Test if the returned random list is the same for a particular random_seed
+        Test if the returned random sequence is the same for a particular random_seed
         when used on two different object method calls of the scorer.
         """
         scorer_1 = RandomScorer(random_seed)
-        scores_list_1 = scorer_1(actual=actual, predicted=predicted)
+        scores_sequence_1 = scorer_1(actual=actual, predicted=predicted)
 
         scorer_2 = RandomScorer(random_seed)
-        scores_list_2 = scorer_2(actual=actual, predicted=predicted)
+        scores_sequence_2 = scorer_2(actual=actual, predicted=predicted)
 
-        assert scores_list_1 == scores_list_2
+        assert scores_sequence_1 == scores_sequence_2
 
     @pytest.mark.parametrize("random_seed", [10, 234, 5678])
     def test_config(self, random_seed: int) -> None:

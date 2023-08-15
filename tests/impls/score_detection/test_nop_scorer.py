@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Hashable, ContextManager
+from typing import Any, Sequence, Tuple, Dict, Hashable, ContextManager
 from contextlib import nullcontext as does_not_raise
 import pytest
 
@@ -12,13 +12,15 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 class TestNOPScorer:
 
-    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), "dummy_class_1")]]
+    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category": "dummy_class_1"})]]
     dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
     dummy_pred_class = _class_map(classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1])
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
-    dummy_actual_test_len_mismatch = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), "dummy_class_1")],
-                                      [(AxisAlignedBoundingBox([2, 2], [3, 3]), "dummy_class_2")]]
+    dummy_actual_test_len_mismatch = [[(AxisAlignedBoundingBox([1, 1], [2, 2]),
+                                        {"category": "dummy_class_1"})],
+                                      [(AxisAlignedBoundingBox([2, 2], [3, 3]),
+                                        {"category": "dummy_class_2"})]]
 
     dummy_empty = [[]]  # type: ignore
 
@@ -32,9 +34,10 @@ class TestNOPScorer:
                        match=r"Actual bounding boxes must have detections and can't be empty."))
     ])
     def test_basic_assertions_and_exceptions(self,
-                                             actual: List[List[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-                                             predicted: List[List[Tuple[AxisAlignedBoundingBox,
-                                                                        Dict[Hashable, float]]]],
+                                             actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                             Dict[Hashable, Any]]]],
+                                             predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
+                                                                                Dict[Hashable, float]]]],
                                              expectation: ContextManager) -> None:
         """
         Test basic scorer assertions and exceptions using the helper function
