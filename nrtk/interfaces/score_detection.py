@@ -1,4 +1,5 @@
 import abc
+from typing import Any
 from typing import Dict
 from typing import Hashable
 from typing import Sequence
@@ -19,7 +20,7 @@ class ScoreDetection(Plugfigurable):
     @abc.abstractmethod
     def score(
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
     ) -> Sequence[float]:
         """
@@ -38,7 +39,7 @@ class ScoreDetection(Plugfigurable):
 
     def __call__(
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]
     ) -> Sequence[float]:
         """

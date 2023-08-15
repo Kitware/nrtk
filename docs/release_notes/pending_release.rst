@@ -80,5 +80,8 @@ Implementations
   * ``RandomScorer``: Generates random score values and serves as a test for
     reproducibility.
 
+  * ``COCOScorer``: Generates detection scores for a specific statistic index
+    using the converted COCO format data.
+
 Fixes
 -----
