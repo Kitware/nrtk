@@ -83,5 +83,8 @@ Implementations
   * ``COCOScorer``: Generates detection scores for a specific statistic index
     using the converted COCO format data.
 
+  * ``ClassAgnosticPixelwiseIoUScorer``: Generates pixelwise IoU scores in a
+    class agnostic way.
+
 Fixes
 -----

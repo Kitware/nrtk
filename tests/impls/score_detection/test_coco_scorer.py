@@ -8,7 +8,7 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from smqtk_core.configuration import configuration_test_helper
 
-from nrtk.impls.score_detection.COCO_scorer import COCOScorer
+from nrtk.impls.score_detection.coco_scorer import COCOScorer
 
 from .test_scorer_utils import _class_map, scorer_assertions
 
