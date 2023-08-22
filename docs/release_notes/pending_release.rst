@@ -11,6 +11,8 @@ Examples
 
 * Added an example notebook demonstrating NRTK perturber functionality.
 
+* Added an example notebook demonstrating NRTK generator functionality.
+
 Interfaces
 
 * Added a ``GenerateObjectDetectorBlackboxResponse`` interface for generating
