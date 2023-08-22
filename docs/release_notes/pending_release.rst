@@ -70,6 +70,13 @@ Implementations
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
 
+  * From ``pyBSM``:
+
+    * ``StoreSensor``: Holds sensor parameters for pyBSM pertubation.
+
+    * ``StoreScenario``: Holds target and environment parameters for pyBSM
+      pertubation.
+
 * Added a ``PerturbImageFactory`` implementation, ``StepPerturbImageFactory``,
   which is a simple implementation that varies a chosen parameter from
   ``start`` to ``stop`` by the given ``step`` value.
