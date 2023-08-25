@@ -139,5 +139,5 @@ dmypy.json
 cython_debug/
 
 # Example notebooks
-examples/data/downloads
+examples/data
 examples/jatic_toolbox/data
