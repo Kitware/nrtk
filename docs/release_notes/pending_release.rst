@@ -13,6 +13,8 @@ Examples
 
 * Added an example notebook demonstrating NRTK generator functionality.
 
+* Added an example notebook demonstrating NRTK ``COCOScorer`` functionality.
+
 Interfaces
 
 * Added a ``GenerateObjectDetectorBlackboxResponse`` interface for generating
