@@ -58,7 +58,7 @@ types-tqdm = ">=4.64"
 #       If the depedency on torch can be avoided altogether, the extra
 #       specification should additionally be removed.
 jatic-toolbox = { git = "git@gitlab.jatic.net:jatic/cdao/jatic-toolbox.git", tag = "v0.1.0", extras = ["test", "torch"] }
-pybsm = { git = "git@gitlab.jatic.net:jatic/kitware/pybsm.git", tag = "v0.0.1"}
+pybsm = { git = "git@gitlab.jatic.net:jatic/kitware/pybsm.git", tag = "v0.0.1", develop = true }
 torch = "!=2.0.1"
 # Testing
 coverage = ">=6.5.0"

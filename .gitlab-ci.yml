@@ -51,6 +51,15 @@ default:
 
 # For internal git dependencies
 .setup_ci_git: &setup_ci_git
+  # pyBSM has a series of .bin files saved as git-lfs objects,
+  # when installing from a repo directly poetry uses dulwich
+  # by default to install git repos. Dulwich does not currently
+  # support git-lfs, so instead we install git-lfs here and
+  # include a local poetry.toml in the repo. The purpose for
+  # including it in the repo rather than as a command here is
+  # so that it is the default used when developing locally.
+  - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+  - apt-get install -y git-lfs
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net".insteadof "ssh://git@gitlab.jatic.net"
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net/".insteadOf "git@gitlab.jatic.net:"
 
@@ -68,6 +77,7 @@ default:
       - $PIP_CACHE_DIR
       - $POETRY_CACHE_DIR
   before_script:
+    - *setup_ci_git
     - export PATH=${HOME}/.local/bin:${PATH}
     # Will make use of .cache/pip
     - pip install --user -U poetry
@@ -78,7 +88,6 @@ default:
     - command -v poetry
     - poetry -V
     - poetry config --local virtualenvs.in-project true
-    - *setup_ci_git
     # Will make use of .cache/poetry
     - poetry install --sync
 

@@ -99,3 +99,5 @@ Implementations
 
 Fixes
 -----
+
+* Changed the default git client poetry uses from dulwich to system installed git.
