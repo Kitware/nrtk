@@ -189,8 +189,9 @@ test-notebooks:
       - NOTEBOOK_DIR: "examples"
         NOTEBOOK_FILE: [
           "coco_scorer.ipynb",
-          "generator.ipynb",
-          "perturbers.ipynb"
+          "perturbers.ipynb",
+          "simple_generic_generator.ipynb",
+          "simple_pybsm_generator.ipynb"
         ]
       - NOTEBOOK_DIR: "examples/jatic_toolbox"
         NOTEBOOK_FILE: [ "augmentations.ipynb" ]

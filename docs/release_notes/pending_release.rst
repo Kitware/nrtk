@@ -11,7 +11,9 @@ Examples
 
 * Added an example notebook demonstrating NRTK perturber functionality.
 
-* Added an example notebook demonstrating NRTK generator functionality.
+* Added an example notebook demonstrating NRTK generic generator functionality.
+
+* Added an example notebook demonstrating NRTK pybsm generator functionality.
 
 * Added an example notebook demonstrating NRTK ``COCOScorer`` functionality.
 
@@ -32,7 +34,7 @@ Interfaces
 Implementations
 
 * Add an example ``GenerateObjectDetectorBlackboxResponse`` implementation,
-  ``SimpleGenerator`` which takes takes input data directly as Sequences.
+  ``SimpleGenericGenerator`` which takes takes input data directly as Sequences.
 
 * Added several ``PerturbImage`` implementations:
 
@@ -72,18 +74,24 @@ Implementations
   * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
     functionality.
 
-  * From ``pyBSM``:
+  * From ``xaitk-irt``:
 
-    * ``StoreSensor``: Holds sensor parameters for pyBSM pertubation.
+    * ``PybsmSensor``: Holds sensor parameters for pyBSM pertubation.
 
-    * ``StoreScenario``: Holds target and environment parameters for pyBSM
+    * ``PybsmScenario``: Holds target and environment parameters for pyBSM
       pertubation.
+
+    * ``PybsmPerturber``: Matches PerturbImage interface and is used by pybsm factories.
+
+    * ``_PybsmPerturbImageFactory``: Base PyBSM perturber factory.
+
+    * ``CustomPybsmPerturbImageFactory``: Original "custom" pybsm perturber factory.
 
 * Added a ``PerturbImageFactory`` implementation, ``StepPerturbImageFactory``,
   which is a simple implementation that varies a chosen parameter from
   ``start`` to ``stop`` by the given ``step`` value.
 
-* Added ``ScoreDetection`` implementations
+* Added ``ScoreDetections`` implementations
 
   * ``NOPScorer``: Serves as a pass-through NOP scorer to test interface
     functionality.

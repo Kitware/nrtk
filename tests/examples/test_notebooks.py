@@ -6,7 +6,8 @@ from jatic_toolbox.testing.pyright import list_error_messages, pyright_analyze
 @pytest.mark.filterwarnings("ignore:Jupyter is migrating its paths")
 @pytest.mark.parametrize("filepath, expected_num_errors", [
     ("examples/coco_scorer.ipynb", 0),
-    ("examples/generator.ipynb", 0),
+    ("examples/simple_generic_generator.ipynb", 0),
+    ("examples/simple_pybsm_generator.ipynb", 0),
     ("examples/perturbers.ipynb", 0),
     ("examples/jatic_toolbox/augmentations.ipynb", 0)
 ])
