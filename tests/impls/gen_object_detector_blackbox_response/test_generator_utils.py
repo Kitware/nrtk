@@ -5,7 +5,7 @@ from smqtk_detection import DetectImageObjects
 from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from nrtk.interfaces.score_detection import ScoreDetection
+from nrtk.interfaces.score_detections import ScoreDetections
 from nrtk.interfaces.gen_object_detector_blackbox_response import GenerateObjectDetectorBlackboxResponse
 
 
@@ -13,7 +13,7 @@ def generator_assertions(
     generator: GenerateObjectDetectorBlackboxResponse,
     perturber_factories: Sequence[PerturbImageFactory],
     detector: DetectImageObjects,
-    scorer: ScoreDetection,
+    scorer: ScoreDetections,
     batch_size: int,
     verbose: bool
 ) -> None:

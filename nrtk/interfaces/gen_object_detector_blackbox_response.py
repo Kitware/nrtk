@@ -2,7 +2,7 @@ import abc
 import numpy as np
 from contextlib import nullcontext
 from tqdm import tqdm
-from typing import Dict, Hashable, List, Sequence, Tuple
+from typing import Any, Dict, Hashable, List, Sequence, Tuple
 
 from smqtk_core import Plugfigurable
 from smqtk_detection import DetectImageObjects
@@ -10,7 +10,7 @@ from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from nrtk.interfaces.score_detection import ScoreDetection
+from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class GenerateObjectDetectorBlackboxResponse(Plugfigurable):
@@ -65,17 +65,17 @@ class GenerateObjectDetectorBlackboxResponse(Plugfigurable):
     def __getitem__(
         self,
         idx: int
-    ) -> Tuple[np.ndarray, Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]]:
+    ) -> Tuple[np.ndarray, Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]], Dict[str, Any]]:
         """ Get the ``idx``th image and groundtruth pair. """
 
     def generate(
         self,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_detector:            DetectImageObjects,
-        blackbox_scorer:              ScoreDetection,
+        blackbox_scorer:              ScoreDetections,
         img_batch_size:               int,
         verbose:                      bool = False
-    ) -> Tuple[Sequence[Tuple[Tuple[float, ...], float]], Sequence[Sequence[float]]]:
+    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
         """
         Generate item-response curves for given parameters.
 
@@ -88,8 +88,8 @@ class GenerateObjectDetectorBlackboxResponse(Plugfigurable):
         :return: Item-response curve
         :return: Scores for each input stimuli
         """
-        curve = list()
-        full = list()
+        curve: List[Tuple[Dict[str, Any], float]] = list()
+        full: List[Sequence[float]] = list()
 
         def process(perturbers: Sequence[PerturbImage]) -> None:
             """
@@ -106,11 +106,11 @@ class GenerateObjectDetectorBlackboxResponse(Plugfigurable):
                 batch_images = list()
                 batch_gt = list()
                 for j in range(i, min(i + img_batch_size, len(self))):
-                    image, actual = self[j]
+                    image, actual, extra = self[j]
                     perturbed = image.copy()
 
                     for perturber in perturbers:
-                        perturbed = perturber(perturbed)
+                        perturbed = perturber(perturbed, extra)
 
                     batch_images.append(perturbed)
                     batch_gt.append(actual)
@@ -124,14 +124,14 @@ class GenerateObjectDetectorBlackboxResponse(Plugfigurable):
                 image_scores.extend(scores)
 
             # Get theta values for each perturber in set as independent variables of item-response curve
-            x = [
-                getattr(perturbers[idx], factory.theta_key)
+            x = {
+                factory.theta_key: getattr(perturbers[idx], factory.theta_key)
                 for idx, factory in enumerate(blackbox_perturber_factories)
-            ]
+            }
 
             # Add item-response values (summary and individual) to results
             curve.append(
-                (tuple(x), float(np.mean(image_scores)))
+                (x, float(np.mean(image_scores)))
             )
             full.append(image_scores)
 
@@ -153,10 +153,10 @@ class GenerateObjectDetectorBlackboxResponse(Plugfigurable):
         self,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_detector:            DetectImageObjects,
-        blackbox_scorer:              ScoreDetection,
+        blackbox_scorer:              ScoreDetections,
         img_batch_size:               int,
         verbose:                      bool = False
-    ) -> Tuple[Sequence[Tuple[Tuple[float, ...], float]], Sequence[Sequence[float]]]:
+    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
         """
         Alias for :meth: ``.GenerateObjectDetectorBlackboxResponse.generate``.
         """

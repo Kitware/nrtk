@@ -1,6 +1,5 @@
 import abc
-import numpy as np
-from typing import Any, Dict, Iterator, Sequence, Type, Union
+from typing import Any, Dict, Iterator, Sequence, Type
 
 from smqtk_core import Plugfigurable
 
@@ -29,17 +28,22 @@ class PerturbImageFactory(Plugfigurable):
 
         :raises TypeError: Given a perturber instance instead of type.
         """
-        self.theta_key = theta_key
+        self._theta_key = theta_key
 
-        if not isinstance(perturber, type):
+        if not isinstance(perturber, type):  # TODO: this is an incorrect isinstance check
             raise TypeError("Passed a perturber instance, expected type")
         self.perturber = perturber
         self.n = -1
 
     @property
     @abc.abstractmethod
-    def thetas(self) -> Union[Sequence, np.ndarray]:
+    def thetas(self) -> Sequence[Any]:
         """ Get the sequence of theta values this factory will iterate over. """
+
+    @property
+    def theta_key(self) -> str:
+        """ Get the perturber parameter to vary between instances."""
+        return self._theta_key
 
     def __len__(self) -> int:
         """
