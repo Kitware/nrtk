@@ -49,7 +49,7 @@ mypy = ">=0.991"
 types-Pillow = ">=9.0"
 types-setuptools = ">=65.6.0.1"
 types-tqdm = ">=4.64"
-jatic-toolbox = { git = "git@gitlab.jatic.net:jatic/cdao/jatic-toolbox.git", tag = "v0.2.1", extras = ["test"] }
+jatic-toolbox = { git = "git@gitlab.jatic.net:jatic/cdao/jatic-toolbox.git", tag = "v0.2.2", extras = ["test"] }
 pybsm = { git = "git@gitlab.jatic.net:jatic/kitware/pybsm.git", tag = "v0.0.1", develop = true }
 # Testing
 coverage = ">=6.5.0"

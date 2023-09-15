@@ -1060,7 +1060,7 @@ arrow = ">=0.15.0"
 
 [[package]]
 name = "jatic-toolbox"
-version = "0.2.1"
+version = "0.2.2"
 description = "Utilities for developing test suites for JATIC-related projects."
 optional = false
 python-versions = ">=3.8"
@@ -1094,8 +1094,8 @@ transformers = ["transformers (>=4.25.1)"]
 [package.source]
 type = "git"
 url = "git@gitlab.jatic.net:jatic/cdao/jatic-toolbox.git"
-reference = "v0.2.1"
-resolved_reference = "c40fce890fbe3ddb032dbc626182d06c3339513a"
+reference = "v0.2.2"
+resolved_reference = "15dfeaf8e22b25267e63634eb294fe6257f00e02"
 
 [[package]]
 name = "jedi"
@@ -3856,4 +3856,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "384664aaefcf3c59030a338ebb886769f1f3b4897dbdb3e0709df0d0befe45fd"
+content-hash = "879efe36338e5430ae87255e03d4c2fb96467376bf7dfabd33756566c2007f57"
