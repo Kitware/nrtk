@@ -140,4 +140,3 @@ cython_debug/
 
 # Example notebooks
 examples/data
-examples/jatic_toolbox/data
