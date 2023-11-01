@@ -6,9 +6,6 @@ Updates / New Features
 
 Examples
 
-* Added an example notebook exploring the current state of several augmentation
-  tools as well as the usability of the JATIC Toolbox augmentation protocol.
-
 * Added an example notebook demonstrating NRTK perturber functionality.
 
 * Added an example notebook demonstrating NRTK generic generator functionality.
