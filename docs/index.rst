@@ -13,6 +13,7 @@ Welcome to nrtk's documentation!
    installation
    interfaces
    implementations
+   review_process
    releasing
    miscellaneous
 

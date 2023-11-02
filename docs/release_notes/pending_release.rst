@@ -8,6 +8,9 @@ Documentation
 
 * Added baseline interface and implementation documentation sections
 
+* Updated and added relevant documents detailing the components of our Open
+  Source Strategy.
+
 Examples
 
 * Added an example notebook demonstrating NRTK perturber functionality.

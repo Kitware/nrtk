@@ -5,8 +5,10 @@ Three types of releases are expected to occur:
   - minor
   - patch
 
-See the ``CONTRIBUTING.md`` file for information on how to contribute features
+See the :file:`CONTRIBUTING.md` file for information on how to contribute features
 and patches.
+See the :file:`docs/review_process.rst` for information about how to, and what
+is involved in, reviewing contributions.
 
 The following process should apply when any release that changes the version
 number occurs.
@@ -63,7 +65,7 @@ and functionalities.
       $ git merge --log --no-ff upstream/release
       $ git push upstream master
 
-8. `Draft a new release on GitHub`_ for the new version.
+8. `Draft a new release on GitLab`_ for the new version.
 
 Patch Release
 ^^^^^^^^^^^^^
@@ -119,22 +121,24 @@ If a patch release for an older release version is being created, see the
       $ git merge --log --no-ff upstream/release
       $ git push upstream master
 
-8. `Draft a new release on GitHub`_ for the new version.
+8. `Draft a new release on GitLab`_ for the new version.
 
 Patching an Older Release
 """""""""""""""""""""""""
-When patching a major/minor release that is not the latest pair, a branch needs
-to be created based on the release version being patched to integrate the
+When patching a major/minor release that is not the latest version, a branch
+needs to be created based on the release version being patched to integrate the
 specific patches into.
 This branch should be prefixed with ``release-`` to denote that it is a release
-integration branch.
-Patch topic-branches should be based on this branch.
+integration branch, e.g. ``release-v1.2.19`` (where ``19`` is the incremented
+patch version number).
+Patch topic-branches should be based on this ``release-...`` branch.
 When all fix branches have been integrated, follow the `Patch Release`_ section
 above, replacing ``release`` branch references (merge target) to be the
 ``release-...`` integration branch.
 Step 6 should be to merge this release integration branch into ``release``
-first, and *then* ``release`` into ``master``, if applicable (some patches may
-only make sense for specific versions).
+first, and *then* ``release`` into ``master``, if applicable (some exceptional
+patches may only make sense for specific versions and don't warrant integration
+into upstream master).
 
 Tag new version
 ---------------
@@ -151,7 +155,7 @@ above described ``update-to-v{NEW_VERSION}`` topic-branch ("the release").
 See the example commands below, replacing ``HASH`` with the appropriate git
 commit hash, and ``UPSTREAM`` with the appropriate remote name.
 We also show how to use `Poetry's version command`_ to consistently access the
-current package version.
+current, just-updated package version.
 
 .. code-block:: bash
 
@@ -168,7 +172,7 @@ made.
 a. Navigate to the GitLab `Releases page`_ for the nrtk repository.
 
 b. Click the "Create a new release" button (or go `here
-   <https://gitlab.jatic.net/jatic/kitware/nrtk/-/releases/new>`_).
+   <gitlab-new-release-page_>`_).
 
 c. Select from the "Tag name" dropdown the tag version just created and
    pushed
@@ -182,6 +186,12 @@ f. Copy and paste the release notes for this version into the release notes
 
 g. Click the "Create Release" button to create the GitLab release!
 
+In the future, this may be automated.
+See the `appropriate GitLab documentation <gitlab-release-using-cicd_>`_ for
+more details.
+
 
 .. _Poetry's version command: https://python-poetry.org/docs/cli/#version
 .. _Releases page: https://gitlab.jatic.net/jatic/kitware/nrtk/-/releases
+.. _gitlab-new-release-page: https://gitlab.jatic.net/jatic/kitware/nrtk/-/releases/new
+.. _gitlab-release-using-cicd: https://docs.gitlab.com/ee/user/project/releases/#creating-a-release-by-using-a-cicd-job
