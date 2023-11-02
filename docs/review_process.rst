@@ -91,6 +91,13 @@ pytest``.
 
 Passage of these checks is strictly required.
 
+Code Coverage (``test-coverage-percent``)
+-----------------------------------------
+This job checks that the lines of code covered by our Unit Tests checks meet or
+exceed certain thresholds.
+
+Passage of this check is not strictly required but highly encouraged.
+
 Release Notes Check (``test-release-notes-check``)
 --------------------------------------------------
 Checks that the current branch's release notes has modifications relative to
