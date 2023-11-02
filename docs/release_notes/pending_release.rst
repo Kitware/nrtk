@@ -17,6 +17,8 @@ Documentation
 * Updated and added relevant documents detailing the components of our Open
   Source Strategy.
 
+* Added ability to render documentation on Gitlab Pages
+
 Examples
 
 * Updated and added relevant documents detailing the components of our Open
