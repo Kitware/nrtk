@@ -4,6 +4,10 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+Documentation
+
+* Added baseline interface and implementation documentation sections
+
 Examples
 
 * Added an example notebook demonstrating NRTK perturber functionality.
