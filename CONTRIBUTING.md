@@ -107,4 +107,28 @@ naming.
 For example, `PerturbImage` vs. `PerturbVideo` share the same verb, "perturb",
 but the subject that is to be perturbed is noted as the differentiator.
 
-Some concrete examples...TODO.
+Some concrete examples as can be found in this repository are:
+* [`PerturbImage`](nrtk/interfaces/perturb_image.py)
+    * verb: `Perturb`
+    * noun: `Image` (input and output)
+* [`GenerateObjectDetectorBlackboxResponse`](nrtk/interfaces/gen_object_detector_blackbox_response.py)
+    * verb: `Generate`
+    * noun(s): `ObjectDetector` (input) and `BlackboxResponse` (output)
+
+## Non-public Contributions
+It is reasonable to expect that some extensions to this package may not be
+desired to be released into the public scope.
+This package makes use of a plugin framework to allow for derivative packages
+to define their own interface implementations, such that they are discoverable
+when such a package is present in the same python environment as this package.
+SMQTK-Core documentation found [here][smqtk_plugin_reference] describes how
+such a derivative package would expose their implementations such that they
+would be discoverable by the plugin framework.
+
+If such originally non-public contributions ever do become publicly
+releasable, they may continue to live in their original homes, or may be
+contributed into this codebase via a pull request (see [above](
+#Making-a-Contribution) and [our review process](docs/review_process.rst)).
+
+
+[smqtk_plugin_reference]: https://smqtk-core.readthedocs.io/en/stable/plugins_configuration.html#creating-an-interface-and-exposing-implementations

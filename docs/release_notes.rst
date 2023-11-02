@@ -7,4 +7,4 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
-   ../release_notes/pending_release.rst
+   release_notes/pending_release.rst
