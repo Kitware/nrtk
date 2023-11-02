@@ -2,6 +2,7 @@
 # to configure the job to run in a specific stage.
 stages:
   - test
+  - docs
 
 # Global default environment variables set for all jobs unless overridden by
 # job-specific configuration.
@@ -129,6 +130,9 @@ test-docs-build:
   script:
     - cd docs
     - poetry run make html
+  artifacts:
+    paths:
+    - docs/_build/html/
 
 # Job to run unittests via pytest
 test-pytest:
@@ -249,3 +253,18 @@ test-notebooks:
     - poetry run papermill
         --progress-bar -k python3 --stdout-file - --stderr-file -
         "${NOTEBOOK_FILE}" /dev/null
+
+pages:
+  stage: docs
+  needs:
+    - job: test-docs-build
+      artifacts: true
+  script:
+    - mv docs/_build/html/ public/
+  artifacts:
+    paths:
+    - public
+  rules:
+    # Only run this rule if on main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
