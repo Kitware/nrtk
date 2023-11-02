@@ -17,6 +17,12 @@ class PybsmPerturber(PerturbImage):
             reflectance_range: np.ndarray = np.array([.05, .5]),
             **kwargs: Any
             ) -> None:
+
+        """
+        :param sensor: pyBSM sensor object.
+        :param scenario: pyBSM scenario object.
+        :param reflectance_range: Array of reflectances that correspond to pixel values.
+        """
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 

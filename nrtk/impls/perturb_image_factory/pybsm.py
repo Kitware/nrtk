@@ -26,6 +26,12 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         theta_keys: Iterable[str],
         thetas: Sequence[Any]
     ) -> None:
+        """
+        :param sensor: pyBSM sensor object.
+        :param scenario: pyBSM scenario object.
+        :param theta_keys: Perturber parameter(s) to vary between instances.
+        :param theta_keys: Perturber parameter(s) values to vary between instances.
+        """
         self.sensor = sensor
         self.scenario = scenario
         self.theta_keys = theta_keys
@@ -33,8 +39,6 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
         top = [len(entry) for entry in self.thetas]
         self.sets = _PybsmPerturbImageFactory._build_set_list(0, top)
-    """
-    """
 
     def __len__(self) -> int:
         return len(self.sets)
