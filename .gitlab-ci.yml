@@ -105,6 +105,12 @@ default:
     - .test_preamble
     - .poetry_install
 
+.test_coverage:
+  extends:
+    - .test_preamble
+  before_script:
+    - export PATH=${HOME}/.local/bin:${PATH}
+    - pip install --user coverage
 
 # Job to lint python code
 test-py-lint:
@@ -130,9 +136,53 @@ test-pytest:
   parallel:
     matrix:
       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11" ]
+  variables:
+    COVERAGE_TARGET: ".coverage-py${PY_VERSION}"
+    JUNIT_TARGET: ".junit-py${PY_VERSION}.xml"
   image: python:${PY_VERSION}
   script:
-    - poetry run pytest
+    - poetry run pytest --junit-xml="${JUNIT_TARGET}"
+    # Rename out coverage database files appropriately
+    - mv .coverage "${COVERAGE_TARGET}"
+  artifacts:
+    paths:
+      - ${COVERAGE_TARGET}
+    reports:
+      junit: "${JUNIT_TARGET}"
+    expire_in: 1 day
+
+# Job to combine test coverage report into a single one for reporting to GitLab
+test-coverage-report:
+  extends: .test_coverage
+  needs:
+    - job: test-pytest
+      artifacts: true
+  script:
+    # Combine all the coverage reports from the pytest matrix into a single
+    # database file.
+    - coverage combine ./.coverage*
+    # This converts the now combined `.coverage` database file into a single
+    # `coverage.xml` file
+    - coverage xml
+  artifacts:
+    paths:
+      - ".coverage"
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    expire_in: 1 day
+
+test-coverage-percent:
+  extends: .test_coverage
+  needs:
+    - job: test-coverage-report
+      artifacts: true
+  allow_failure: true
+  script:
+    # TODO: Read required percentages from config file?
+    - coverage report --include 'nrtk/*' --precision=2 --fail-under=99
+    - coverage report --include 'tests/*' --precision=2 --fail-under=100
 
 # Job to check the release notes folder
 test-release-notes-check:

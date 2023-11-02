@@ -4,9 +4,20 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+CI/CD
+
+* Added code unit-test and coverage reporting.
+
+* Added code coverage minimum coverage soft check (allows failure).
+
 Documentation
 
 * Added baseline interface and implementation documentation sections
+
+* Updated and added relevant documents detailing the components of our Open
+  Source Strategy.
+
+Examples
 
 * Updated and added relevant documents detailing the components of our Open
   Source Strategy.
