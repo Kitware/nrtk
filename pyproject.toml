@@ -50,7 +50,7 @@ mypy = ">=0.991"
 types-Pillow = ">=9.0"
 types-setuptools = ">=65.6.0.1"
 types-tqdm = ">=4.64"
-pybsm = { git = "git@gitlab.jatic.net:jatic/kitware/pybsm.git", tag = "v0.0.1", develop = true }
+pybsm = { git = "git@gitlab.jatic.net:jatic/kitware/pybsm.git", tag = "v0.1.0", develop = true }
 # Testing
 coverage = ">=6.5.0"
 pytest = ">=7.2.0"
