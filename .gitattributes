@@ -1,0 +1,2 @@
+*.rst conflict-marker-size=79
+*.tiff filter=lfs diff=lfs merge=lfs -text
