@@ -1,0 +1,130 @@
+v0.1.0
+======
+
+Initial release of the Natural Robustness Toolkit originally ported from prior work.
+
+Updates / New Features
+----------------------
+
+CI/CD
+
+* Added code unit-test and coverage reporting.
+
+* Added code coverage minimum coverage soft check (allows failure).
+
+Documentation
+
+* Added baseline interface and implementation documentation sections
+
+* Updated and added relevant documents detailing the components of our Open
+  Source Strategy.
+
+* Added ability to render documentation on Gitlab Pages
+
+Examples
+
+* Updated and added relevant documents detailing the components of our Open
+  Source Strategy.
+
+Examples
+
+* Added an example notebook demonstrating NRTK perturber functionality.
+
+* Added an example notebook demonstrating NRTK generic generator functionality.
+
+* Added an example notebook demonstrating NRTK pybsm generator functionality.
+
+* Added an example notebook demonstrating NRTK ``COCOScorer`` functionality.
+
+Interfaces
+
+* Added a ``GenerateObjectDetectorBlackboxResponse`` interface for generating
+  response curves with given perturber factories, detector, and scorer.
+
+* Added a ``PerturbImage`` interface for taking an image stimulus and
+  generating a perturbed image.
+
+* Added a ``PerturbImageFactory`` interface for generating ``PerturbImage``
+  instances of specified type and configuration while varying one parameter.
+
+* Added a ``ScoreDetection`` interface that takes in ground-truth and predicted
+  BBox-label pairs and generates scores based on a given metric.
+
+Implementations
+
+* Add an example ``GenerateObjectDetectorBlackboxResponse`` implementation,
+  ``SimpleGenericGenerator`` which takes takes input data directly as Sequences.
+
+* Added several ``PerturbImage`` implementations:
+
+  * From ``opencv``:
+
+    * ``AverageBlurPerturber``: Applies average blurring to the given image
+      stimulus.
+
+    * ``GaussianBlurPerturber``: Applies Gaussian blurring to the given image
+      stimulus.
+
+    * ``MedianBlurPerturber``: Applies median blurring to the given image
+      stimulus.
+
+  * From ``skimage``:
+
+    * ``SaltNoisePerturber``, ``PepperNoisePerturber``,
+      ``SaltAndPepperNoisePerturber``: Adds salt and/or pepper noise to given
+      image stimulus.
+
+    * ``GaussianNoisePerturber``: Adds Gaussian-distributed additive noise to
+      given image stimulus.
+
+    * ``SpeckleNoisePerturber``: Adds multiplicative (Gaussian) noise to given
+      image stimulus.
+
+  * From ``PIL``:
+
+    * ``BrightnessPerturber``: Adjusts given image stimulus brightness.
+
+    * ``ColorPerturber``: Adjusts given image stimulus color balance.
+
+    * ``ContrastPerturber``: Adjust given image stimulus contrast.
+
+    * ``SharpnessPerturber``: Adjust given image stimulus sharpness.
+
+  * ``NOPPerturber``: Serves as a pass-through NOP perturber to test interface
+    functionality.
+
+  * From ``xaitk-irt``:
+
+    * ``PybsmSensor``: Holds sensor parameters for pyBSM pertubation.
+
+    * ``PybsmScenario``: Holds target and environment parameters for pyBSM
+      pertubation.
+
+    * ``PybsmPerturber``: Matches PerturbImage interface and is used by pybsm factories.
+
+    * ``_PybsmPerturbImageFactory``: Base PyBSM perturber factory.
+
+    * ``CustomPybsmPerturbImageFactory``: Original "custom" pybsm perturber factory.
+
+* Added a ``PerturbImageFactory`` implementation, ``StepPerturbImageFactory``,
+  which is a simple implementation that varies a chosen parameter from
+  ``start`` to ``stop`` by the given ``step`` value.
+
+* Added ``ScoreDetections`` implementations
+
+  * ``NOPScorer``: Serves as a pass-through NOP scorer to test interface
+    functionality.
+
+  * ``RandomScorer``: Generates random score values and serves as a test for
+    reproducibility.
+
+  * ``COCOScorer``: Generates detection scores for a specific statistic index
+    using the converted COCO format data.
+
+  * ``ClassAgnosticPixelwiseIoUScorer``: Generates pixelwise IoU scores in a
+    class agnostic way.
+
+Fixes
+-----
+
+* Changed the default git client poetry uses from dulwich to system installed git.

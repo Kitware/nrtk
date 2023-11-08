@@ -8,3 +8,4 @@ Release Notes
    :maxdepth: 1
 
    release_notes/pending_release.rst
+   release_notes/v0.1.0
