@@ -1,0 +1,86 @@
+digraph api_v0_3 {
+// Options
+//size="12,4"; ratio=fill;
+labeljust=left;
+rankdir=LR;
+newrank=true;  // Required to not "unbox" things out of subclusters.
+
+// Gridding -- Used to vertically align nodes to separate clusters as desired.
+node [style=invis]
+edge [style=invis]
+A -> B -> C -> D -> E;
+
+// Interfaces
+node [style=solid]
+edge [style=solid; dir=back; arrowtail=empty];
+Pluggable -> Plugfigurable;
+Configurable -> Plugfigurable;
+Plugfigurable -> PerturbImage;
+Plugfigurable -> PerturbImageFactory;
+Plugfigurable -> GenerateBlackboxResponse;
+Plugfigurable -> ScoreDetections;
+Plugfigurable -> ScoreClassifications;
+
+subgraph cluster_smqtk {
+  label="Package: SMQTK-Core";
+  Pluggable; Configurable; Plugfigurable;
+}
+subgraph cluster_nrtk {
+  label="Package: nrtk";
+  subgraph cluster_interfaces {
+    label="Abstract Interfaces";
+    subgraph cluster_perturb {
+      label="Perturbation";
+      PerturbImage;
+      PerturbImageFactory;
+    }
+    subgraph cluster_generation {
+      label="Item-Response Curve (IRC) Generation";
+      GenerateBlackboxResponse;
+      GenerateObjectDetectorBlackboxResponse;
+      GenerateClassifierBlackboxResponse;
+    }
+    subgraph cluster_scoring {
+      label="Scoring";
+      ScoreDetections;
+      ScoreClassifications;
+    }
+
+    PerturbImageFactory -> PerturbImage [arrowtail=diamond, constraint=false];
+    GenerateBlackboxResponse -> GenerateObjectDetectorBlackboxResponse;
+    GenerateBlackboxResponse -> GenerateClassifierBlackboxResponse;
+  }
+  subgraph cluster_impls {
+    label="Implementation Examples";
+    SimplePybsmGenerator;
+    GenerateObjectDetectorBlackboxResponse -> SimplePybsmGenerator;
+    SimplePybsmGenerator -> PerturbImageFactory [arrowtail=odiamond, constraint=false];
+    SimplePybsmGenerator -> ScoreDetections [arrowtail=odiamond, constraint=false];
+  }
+}
+
+// Gridding pt. 2
+{ rank=same; A; Pluggable; Configurable; }
+{ rank=same; B; Plugfigurable; }
+{ rank=same; C; GenerateBlackboxResponse; }
+{ rank=same; D; PerturbImage;
+                GenerateObjectDetectorBlackboxResponse;
+                GenerateClassifierBlackboxResponse;
+                PerturbImageFactory;
+                ScoreDetections;
+                ScoreClassifications; }
+{ rank=same; E; SimplePybsmGenerator; }
+
+}
+
+// dot concept.dot -Tpng -o concept.png
+//
+// inotifywait -e close_write -m . |
+//   while read -r directory events filename
+//   do
+//     if [[ "$filename" = "concept.dot" ]]
+//     then
+//       echo "Regenerating PNG"
+//       dot concept.dot -Tpng -o concept.png
+//     fi
+//   done;
