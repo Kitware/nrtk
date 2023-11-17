@@ -4,6 +4,11 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+Documentation
+
+* Added an inheritance diagram which visualizes the layout of ``nrtk`` interfaces and
+  implementations.
+
 Interfaces
 
 * Added a ``GenerateClassifierBlackboxResponse`` interface for generating response
