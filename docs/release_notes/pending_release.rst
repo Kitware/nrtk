@@ -16,3 +16,7 @@ Interfaces
 
 * Added a ``ScoreClassification`` interface that takes in ground-truth and predicted
   classifications and generates scores based on a given metric.
+
+Security
+
+* Upgraded ``Pillow>=10.0``
