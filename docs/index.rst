@@ -11,6 +11,7 @@ Welcome to nrtk's documentation!
    :caption: Contents:
 
    installation
+   getting_started
    interfaces
    implementations
    review_process

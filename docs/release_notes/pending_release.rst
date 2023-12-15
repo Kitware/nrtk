@@ -9,6 +9,8 @@ Documentation
 * Added an inheritance diagram which visualizes the layout of ``nrtk`` interfaces and
   implementations and included in interface documentation page.
 
+* Added ``Getting Started`` page.
+
 Interfaces
 
 * Added a ``GenerateClassifierBlackboxResponse`` interface for generating response

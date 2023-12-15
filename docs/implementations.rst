@@ -103,7 +103,7 @@ Class: CustomPybsmPerturbImageFactory
    :special-members:
 
 Class: StepPerturbImageFactory
--------------------------------------
+------------------------------
 .. autoclass:: nrtk.impls.perturb_image_factory.generic.step.StepPerturbImageFactory
    :members:
    :special-members:
