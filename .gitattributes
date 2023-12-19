@@ -2,5 +2,6 @@
 *.tiff filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
-docs/figures/* !filter !diff !merge text
-docs/images/* !filter !diff !merge text
+docs/figures/*.png binary
+docs/figures/*.jpg binary
+docs/figures/*.tiff binary
