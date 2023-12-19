@@ -1,0 +1,2 @@
+# Additional requirements for building our documentation in read-the-docs build
+sphinx-prompt
