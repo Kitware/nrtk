@@ -3,6 +3,7 @@
 stages:
   - test
   - docs
+  - publish
 
 # Global default environment variables set for all jobs unless overridden by
 # job-specific configuration.
@@ -16,6 +17,8 @@ variables:
 default:
   image: python:3.8
   interruptible: true
+  tags:
+    - kitware
 
 ###############################################################################
 # Run Conditions
@@ -41,6 +44,17 @@ default:
       when: on_success
     - when: never  # explicit fail-exclude terminal condition.
 
+# Run rule to trigger on a tag push/update that matches our expected release
+# versioning pattern.
+.run_on_upstream_version_tag:
+  rules:
+    # If changes are pushed for a tag and the tag matching the release version
+    # pattern. Also checking that the repository is the official upstream
+    # source.
+    - if: $CI_COMMIT_TAG =~ /^v\d+(\.\d+)*$/ && $CI_SERVER_HOST == "gitlab.jatic.net" && $CI_PROJECT_NAMESPACE == "jatic/kitware"
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+
 ###############################################################################
 # Jobs -- Testing
 #
@@ -56,27 +70,27 @@ default:
   # when installing from a repo directly poetry uses dulwich
   # by default to install git repos. Dulwich does not currently
   # support git-lfs, so instead we install git-lfs here and
-  # include a local poetry.toml in the repo. The purpose for
-  # including it in the repo rather than as a command here is
-  # so that it is the default used when developing locally.
+  # include a local poetry.toml in the repo to enable the use of the
+  # system-installed git (to which this git-lfs install applies) within
+  # poetry's internals instead of Dulwich. The purpose for including the
+  # poetry.toml in the repo rather than as a command here is so that it is the
+  # default used when developing locally.
   - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
   - apt-get install -y git-lfs
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net".insteadof "ssh://git@gitlab.jatic.net"
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net/".insteadOf "git@gitlab.jatic.net:"
 
-.poetry_install:
+.setup_poetry:
   variables:
     # Change pip's cache directory to be inside the project directory since we
     # can only cache local items. Same for poetry cache
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
-  # We are only caching the pip/poetry caches, NOT THE VENV. Caches should be
-  # python version agnostic.
   cache:
-    key: py-package-cache
-    paths:
-      - $PIP_CACHE_DIR
-      - $POETRY_CACHE_DIR
+    # We are only caching the pip cache, NOT THE VENV. Caches should be
+    # python version agnostic.
+    - key: py-package-cache
+      paths:
+        - $PIP_CACHE_DIR
   before_script:
     - *setup_ci_git
     - export PATH=${HOME}/.local/bin:${PATH}
@@ -89,6 +103,23 @@ default:
     - command -v poetry
     - poetry -V
     - poetry config --local virtualenvs.in-project true
+
+.poetry_install:
+  extends:
+    - .setup_poetry
+  variables:
+    # Change poetry's cache directory to be inside the project directory since
+    # we can only cache local items. Same for poetry cache
+    POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
+  cache:
+    # We are only caching the poetry cache, NOT THE VENV. Caches should be
+    # python version agnostic.
+    - !reference [.setup_poetry, cache]
+    - key: py-poetry-cache
+      paths:
+        - $POETRY_CACHE_DIR
+  before_script:
+    - !reference [.setup_poetry, before_script]
     # Will make use of .cache/poetry
     - poetry install --sync
 
@@ -96,10 +127,7 @@ default:
   extends:
     - .run_automatically
   stage: test
-  image: python:3.8
-  interruptible: true
-  tags:
-    - kitware
+  # Note: usage of default image/interruptible/tags
 
 .test_defaults:
   extends:
@@ -189,6 +217,11 @@ test-coverage-percent:
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
 
 # Job to check the release notes folder
+#
+# We only want to run this when a "run_automatically" rule is true, except for
+# when the latest commit is a merge commit (assuming standard merge commit
+# text).
+#
 test-release-notes-check:
   extends: .test_preamble
   allow_failure: true
@@ -225,10 +258,9 @@ test-release-notes-check:
 #   the associated "NOTEBOOK_DIR" to create a job parameterization instance.
 test-notebooks:
   extends: .test_defaults
+  # Note: usage of default image/interruptible/tags
   variables:
     TORCH_HOME: "${CI_PROJECT_DIR}/.cache/torch"
-  tags:
-    - kitware
   # Merge inherited caches
   cache:
     - !reference [.test_defaults, cache]
@@ -268,3 +300,41 @@ pages:
     # Only run this rule if on main branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+###############################################################################
+# Jobs -- Publishing
+#
+# Jobs related to automation around publishing our package.
+#
+
+# When a tag is created matching the release pattern, build and publish our
+# package to PYPI.
+publish-on-tag:
+  extends:
+    - .run_on_upstream_version_tag
+    - .setup_poetry
+  # Note: using of default image/interruptable/tags
+  stage: publish
+  script:
+    # Ensure there is alignment with the tag reference and the reported
+    # version of the package
+    - |
+      PACKAGE_VERSION="v$(poetry version -s)"
+      if [[ "${CI_COMMIT_TAG}" != "${PACKAGE_VERSION}" ]]
+      then
+        echo "ERROR: Git tag reference and package version are NOT synonymous."
+        echo "       Package version: ${PACKAGE_VERSION}"
+        echo "       Git ref name   : ${CI_COMMIT_TAG}"
+        exit 1
+      fi
+    # Ensure that we have token
+    - |
+      if [[ -z "${PYPI_PUBLISH_TOKEN}" ]]
+      then
+        echo "ERROR: Expected PYPI token variable was blank."
+        echo "       Did you forget to set the appropriate PYPI_PUBLISH_TOKEN secret?"
+        exit 1
+      fi
+    # Actually publish
+    - |
+      export POETRY_PYPI_TOKEN_PYPI="${PYPI_PUBLISH_TOKEN}"
+      poetry publish --build
