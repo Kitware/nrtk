@@ -13,6 +13,7 @@ description = ""
 authors = ["Kitware, Inc. <TODO>"]
 readme = "README.md"
 packages = [{include = "nrtk"}]
+documentation = "https://nrtk.readthedocs.io/"
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
