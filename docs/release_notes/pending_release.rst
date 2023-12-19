@@ -11,6 +11,8 @@ Documentation
 
 * Added ``Getting Started`` page.
 
+* Added Read the Docs configuration files
+
 Interfaces
 
 * Added a ``GenerateClassifierBlackboxResponse`` interface for generating response
