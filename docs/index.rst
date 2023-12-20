@@ -10,6 +10,7 @@ Welcome to nrtk's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
    installation
    getting_started
    interfaces

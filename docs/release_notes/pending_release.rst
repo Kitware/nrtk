@@ -6,6 +6,8 @@ Updates / New Features
 
 Documentation
 
+* Added an Introduction section to provide background and conceptual information about ``nrtk``.
+
 * Added an inheritance diagram which visualizes the layout of ``nrtk`` interfaces and
   implementations and included in interface documentation page.
 
