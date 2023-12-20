@@ -1,7 +1,4 @@
 *.rst conflict-marker-size=79
-*.tiff filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
-docs/figures/*.png binary
-docs/figures/*.jpg binary
-docs/figures/*.tiff binary
+examples/*.tiff filter=lfs diff=lfs merge=lfs -text
+examples/*.png filter=lfs diff=lfs merge=lfs -text
+examples/*.jpg filter=lfs diff=lfs merge=lfs -text
