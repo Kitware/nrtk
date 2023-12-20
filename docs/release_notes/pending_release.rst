@@ -15,6 +15,9 @@ Documentation
 
 * Added Read the Docs configuration files
 
+* Added a style sheet to guide future documentation and text updates.
+
+
 Interfaces
 
 * Added a ``GenerateClassifierBlackboxResponse`` interface for generating response
