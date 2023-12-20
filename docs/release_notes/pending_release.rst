@@ -26,6 +26,16 @@ Interfaces
 * Added a ``ScoreClassification`` interface that takes in ground-truth and predicted
   classifications and generates scores based on a given metric.
 
+Package
+
+* Updated pybsm dependency to no longer refer to a specific repository and
+  defer to the configured index (PYPI).
+
+* Added license metadata to reference Apache 2.0.
+
+* Updated locked versions for a couple packages that had their previously-locked
+  versions yanked from PYPI.
+
 Security
 
 * Upgraded ``Pillow>=10.0``
