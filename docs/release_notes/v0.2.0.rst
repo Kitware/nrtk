@@ -1,5 +1,8 @@
 v0.2.0
 ======
+This minor release adds interfaces related to classification operations,
+additions to the documentation, and updates to abstract and pinned
+dependencies.
 
 Updates / New Features
 ----------------------
