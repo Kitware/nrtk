@@ -8,11 +8,13 @@ name = "nrtk"
 # REMEMBER: `distutils.version.*Version` types can be used to compare versions
 # from strings like this.
 # This package prefers to use the strict numbering standard when possible.
-version = "0.1.0"
+version = "0.2.0"
 description = ""
+license = "Apache-2.0"
 authors = ["Kitware, Inc. <TODO>"]
 readme = "README.md"
 packages = [{include = "nrtk"}]
+documentation = "https://nrtk.readthedocs.io/"
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
@@ -31,13 +33,16 @@ classifiers = [
 python = "^3.8.1"
 numpy = ">=1.18"
 opencv-python-headless = ">=4.6"
-Pillow = ">=9"
+Pillow = ">=10.0"
 scikit-image = ">=0.21"
+smqtk-classifier = ">=0.19.0"
 smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
+pybsm = "^0.1.1"
 pycocotools = ">=2.0.6"
+setuptools = ">=65.6.1"
 
 [tool.poetry.extras]
 
@@ -50,7 +55,6 @@ mypy = ">=0.991"
 types-Pillow = ">=9.0"
 types-setuptools = ">=65.6.0.1"
 types-tqdm = ">=4.64"
-pybsm = { git = "git@gitlab.jatic.net:jatic/kitware/pybsm.git", tag = "v0.1.0", develop = true }
 # Testing
 coverage = ">=6.5.0"
 pytest = ">=7.2.0"

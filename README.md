@@ -19,13 +19,16 @@ Alternatively, [Poetry](https://python-poetry.org/) can also be used:
 poetry install
 ```
 
+See [here for more installation documentation](
+https://nrtk.readthedocs.io/en/latest/installation.html).
+
 ## Getting Started
 We provide a number of examples based on Jupyter notebooks in the `./examples/` directory to show usage
 of the `nrtk` package in a number of different contexts.
 
 ## Documentation
 Documentation snapshots for releases as well as the latest master are hosted on
-ReadTheDocs.
+[ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
 
 The sphinx-based documentation may also be built locally for the most
 up-to-date reference:
@@ -50,5 +53,5 @@ firefox _build/html/index.html
 ## License
 Apache 2.0
 
-**POC**: Brian Hu @brian.hu  
+**POC**: Brian Hu @brian.hu
 **DPOC**: Brandon RichardWebster @b.richardwebster
