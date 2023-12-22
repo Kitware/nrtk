@@ -4,5 +4,6 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
-Fixes
------
+Documentation
+
+* Updated README.md under ``examples``.
