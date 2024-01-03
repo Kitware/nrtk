@@ -11,7 +11,7 @@ name = "nrtk"
 version = "0.2.0"
 description = ""
 license = "Apache-2.0"
-authors = ["Kitware, Inc. <TODO>"]
+authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
 packages = [{include = "nrtk"}]
 documentation = "https://nrtk.readthedocs.io/"
