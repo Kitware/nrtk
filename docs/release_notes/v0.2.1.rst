@@ -1,5 +1,5 @@
-Pending Release Notes
-=====================
+v0.2.1
+======
 This patch release adds a valid email address to be attributed to the author
 of the package.
 
