@@ -16,9 +16,9 @@ from nrtk.interfaces.score_detections import ScoreDetections
 class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
     """
     This interface describes the generation of item-response curves and scores for
-    object detections with respect to the given blackbox object detector after
-    input images are perturbed via the blackbox perturber factory. Scoring of
-    these detections is computed with the given blackbox scorer.
+    object detections with respect to the given black-box object detector after
+    input images are perturbed via the black-box perturber factory. Scoring of
+    these detections is computed with the given black-box scorer.
     """
     @abc.abstractmethod
     def __getitem__(

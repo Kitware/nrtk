@@ -2,7 +2,8 @@
 Interfaces
 ##########
 
-The ``nrtk`` API consists of a number of object-oriented functor interfaces for item-response curve (IRC) generation,
+The NRTK API consists of a number of object-oriented functor interfaces for item-response curve
+(IRC) generation,
 namely for assessing model response to perturbations on given input data. These interfaces focus on black-box IRC
 generation. In addition to the driver, or *generator*, of this task, there are two other main components: reference
 image perturbation in preparation for black-box testing and black-box scoring for model outputs. The
@@ -15,7 +16,8 @@ algorithmic use cases, one for object detection and one for image classification
 We explicitly do not require an abstraction for the black-box operations to fit inside. This is intended to allow for
 applications using these interfaces while leveraging existing functionality, which only need to perform data formatting
 to fit the input defined here. Note, however, some interfaces are defined for certain black-box concepts as part of the
-SMQTK ecosystem (e.g in `SMQTK-Classifier <https://github.com/Kitware/SMQTK-Classifier>`_, `SMQTK-Detection
+SMQTK ecosystem (e.g. in `SMQTK-Classifier <https://github.com/Kitware/SMQTK-Classifier>`_,
+`SMQTK-Detection
 <https://github.com/Kitware/SMQTK-Detection>`_, and other SMQTK-* modules).
 
 
