@@ -120,6 +120,7 @@ default:
         - $POETRY_CACHE_DIR
   before_script:
     - !reference [.setup_poetry, before_script]
+    - apt update && apt install -y libgl1
     # Will make use of .cache/poetry
     - poetry install --sync
 
