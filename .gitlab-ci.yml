@@ -279,6 +279,10 @@ test-notebooks:
           "simple_generic_generator.ipynb",
           "simple_pybsm_generator.ipynb"
         ]
+      - NOTEBOOK_DIR: "examples/pybsm"
+        NOTEBOOK_FILE: [
+          "pybsm_test.ipynb"
+        ]
   # Using default container image defined above
   script:
     - cd "${NOTEBOOK_DIR}"
