@@ -22,6 +22,8 @@ to use within this repository's documentation and examples for consistency purpo
 
 •	*please* - do not use
 
+•	release notes - use sentences with end punctuation
+
 •	*set up* (verb) or *setup* (noun/adj); *not* set-up
 
 •	*TOC* include a table of contents (TOC) for each Jupyter notebook

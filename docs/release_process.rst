@@ -16,7 +16,8 @@ number occurs.
 Create and Merge Version Update Branch
 --------------------------------------
 
-This step of release process depends on whether the release is considered to be major or minor, or
+This step of the release process depends on whether the release is considered to be major or
+minor, or
 if it is a patch release.
 
 Major and Minor Releases
