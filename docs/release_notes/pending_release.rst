@@ -7,3 +7,12 @@ Updates / New Features
 Documentation
 
 * Updated README.md under ``examples``.
+
+CI/CD
+
+* Added a conditional case of ``opencv-python-headless`` installation.
+
+Package
+
+* Updated main opencv dependency from ``opencv-python-headless`` to
+  ``opencv-python``.
