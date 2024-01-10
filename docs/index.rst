@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to nrtk's documentation!
+Welcome to NRTK's documentation!
 ================================
 
 .. toctree::
@@ -21,7 +21,7 @@ Welcome to nrtk's documentation!
 
 
 
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

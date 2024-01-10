@@ -14,12 +14,12 @@ CI/CD
 
 Documentation
 
-* Added baseline interface and implementation documentation sections
+* Added baseline interface and implementation documentation sections.
 
 * Updated and added relevant documents detailing the components of our Open
   Source Strategy.
 
-* Added ability to render documentation on Gitlab Pages
+* Added ability to render documentation on GitLab Pages.
 
 Examples
 
@@ -95,10 +95,10 @@ Implementations
 
   * From ``xaitk-irt``:
 
-    * ``PybsmSensor``: Holds sensor parameters for pyBSM pertubation.
+    * ``PybsmSensor``: Holds sensor parameters for pyBSM perturbation.
 
     * ``PybsmScenario``: Holds target and environment parameters for pyBSM
-      pertubation.
+      perturbation.
 
     * ``PybsmPerturber``: Matches PerturbImage interface and is used by pybsm factories.
 
@@ -127,4 +127,4 @@ Implementations
 Fixes
 -----
 
-* Changed the default git client poetry uses from dulwich to system installed git.
+* Changed the default git client poetry uses from dulwich to system-installed git.

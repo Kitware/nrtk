@@ -1,10 +1,11 @@
 Installation
 ============
 
-There are two ways to obtain the NRTK package.
+There are two ways to obtain the nrtk package.
 The simplest is to install via the :command:`pip` command.
-Alternatively, the source tree can be acquired and be locally developed using
-`Poetry`_ (`installation`_ and `usage`_).
+Alternatively, you can use `Poetry`_ (`installation`_ and `usage`_) to acquire the source tree and
+develop locally.
+
 
 .. _installation: Poetry-installation_
 .. _usage: Poetry-usage_
@@ -44,7 +45,7 @@ Quick Start
 Installing Python Dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This project uses `Poetry`_ for dependency management, environment consistency,
-package building, version management, and publishing to PYPI.
+package building, version management, and publishing to PyPI.
 Dependencies are `abstractly defined`_ in the :file:`pyproject.toml` file, as
 well as `specifically pinned versions`_ in the :file:`poetry.lock` file, both
 of which can be found in the root of the source tree.
