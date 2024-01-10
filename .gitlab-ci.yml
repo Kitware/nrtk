@@ -120,7 +120,6 @@ default:
         - $POETRY_CACHE_DIR
   before_script:
     - !reference [.setup_poetry, before_script]
-    - apt update && apt install -y libgl1
     # Will make use of .cache/poetry
     - poetry install --sync
 
@@ -142,6 +141,22 @@ default:
     - export PATH=${HOME}/.local/bin:${PATH}
     - pip install --user coverage
 
+.opencv_headless_install:
+  extends:
+    - .test_defaults
+  script:
+    - |
+      export PIP_LIST="$(poetry run pip list --format=json)"
+      if (echo "$PIP_LIST" | poetry run ./scripts/pycv2_is_installed.py)
+      then
+        echo "OpenCV-Python installed, replacing with equivalent headless version."
+        VERSION="$(echo "$PIP_LIST" | poetry run  ./scripts/pycv2_installed_version.py)"
+        poetry run pip uninstall -y opencv-python opencv-python-headless
+        poetry run pip install --no-deps opencv-python-headless=="$VERSION"
+      else
+        echo "OpenCV-Python NOT installed, skipping."
+      fi
+
 # Job to lint python code
 test-py-lint:
   extends: .test_defaults
@@ -157,6 +172,7 @@ test-py-typecheck:
 test-docs-build:
   extends: .test_defaults
   script:
+    - !reference [.opencv_headless_install, script]
     - cd docs
     - poetry run make html
   artifacts:
@@ -174,6 +190,7 @@ test-pytest:
     JUNIT_TARGET: ".junit-py${PY_VERSION}.xml"
   image: python:${PY_VERSION}
   script:
+    - !reference [.opencv_headless_install, script]
     - poetry run pytest --junit-xml="${JUNIT_TARGET}"
     # Rename out coverage database files appropriately
     - mv .coverage "${COVERAGE_TARGET}"
