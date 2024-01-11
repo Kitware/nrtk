@@ -32,7 +32,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8.1"
 numpy = ">=1.18"
-opencv-python-headless = ">=4.6"
+opencv-python = ">=4.6"
 Pillow = ">=10.0"
 scikit-image = ">=0.21"
 smqtk-classifier = ">=0.19.0"

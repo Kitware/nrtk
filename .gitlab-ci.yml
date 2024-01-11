@@ -141,6 +141,23 @@ default:
     - export PATH=${HOME}/.local/bin:${PATH}
     - pip install --user coverage
 
+.test_headless:
+  extends: 
+    - .test_defaults
+  before_script:
+    - !reference [.test_defaults, before_script]
+    - |
+      export PIP_LIST="$(poetry run pip list --format=json)"
+      if (echo "$PIP_LIST" | poetry run ./scripts/pycv2_is_installed.py)
+      then
+        echo "OpenCV-Python installed, replacing with equivalent headless version."
+        VERSION="$(echo "$PIP_LIST" | poetry run  ./scripts/pycv2_installed_version.py)"
+        poetry run pip uninstall -y opencv-python opencv-python-headless
+        poetry run pip install --no-deps opencv-python-headless=="$VERSION"
+      else
+        echo "OpenCV-Python NOT installed, skipping."
+      fi
+
 # Job to lint python code
 test-py-lint:
   extends: .test_defaults
@@ -154,7 +171,7 @@ test-py-typecheck:
     - poetry run mypy
 
 test-docs-build:
-  extends: .test_defaults
+  extends: .test_headless
   script:
     - cd docs
     - poetry run make html
@@ -164,7 +181,7 @@ test-docs-build:
 
 # Job to run unittests via pytest
 test-pytest:
-  extends: .test_defaults
+  extends: .test_headless
   parallel:
     matrix:
       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11" ]
