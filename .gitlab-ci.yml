@@ -141,10 +141,11 @@ default:
     - export PATH=${HOME}/.local/bin:${PATH}
     - pip install --user coverage
 
-.opencv_headless_install:
-  extends:
+.test_headless:
+  extends: 
     - .test_defaults
-  script:
+  before_script:
+    - !reference [.test_defaults, before_script]
     - |
       export PIP_LIST="$(poetry run pip list --format=json)"
       if (echo "$PIP_LIST" | poetry run ./scripts/pycv2_is_installed.py)
@@ -170,9 +171,8 @@ test-py-typecheck:
     - poetry run mypy
 
 test-docs-build:
-  extends: .test_defaults
+  extends: .test_headless
   script:
-    - !reference [.opencv_headless_install, script]
     - cd docs
     - poetry run make html
   artifacts:
@@ -181,7 +181,7 @@ test-docs-build:
 
 # Job to run unittests via pytest
 test-pytest:
-  extends: .test_defaults
+  extends: .test_headless
   parallel:
     matrix:
       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11" ]
@@ -190,7 +190,6 @@ test-pytest:
     JUNIT_TARGET: ".junit-py${PY_VERSION}.xml"
   image: python:${PY_VERSION}
   script:
-    - !reference [.opencv_headless_install, script]
     - poetry run pytest --junit-xml="${JUNIT_TARGET}"
     # Rename out coverage database files appropriately
     - mv .coverage "${COVERAGE_TARGET}"
