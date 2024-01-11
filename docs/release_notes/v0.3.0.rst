@@ -1,5 +1,8 @@
 v0.3.0
 ======
+This minor release updates the main opencv dependency of the package to
+``opencv-python`` and adds a conditional ``opencv-python-headless``
+installation job to CI.
 
 Updates / New Features
 ----------------------
