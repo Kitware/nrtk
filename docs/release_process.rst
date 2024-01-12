@@ -1,4 +1,4 @@
-Steps of the nrtk Release Process
+Steps of the NRTK Release Process
 =================================
 Three types of releases are expected to occur:
   - major
@@ -15,6 +15,10 @@ number occurs.
 
 Create and Merge Version Update Branch
 --------------------------------------
+
+This step of the release process depends on whether the release is considered to be major or
+minor, or
+if it is a patch release.
 
 Major and Minor Releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -140,7 +144,7 @@ first, and *then* ``release`` into ``main``, if applicable (some exceptional
 patches may only make sense for specific versions and don't warrant integration
 into upstream main).
 
-Tag new version
+Tag New Version
 ---------------
 Release branches are tagged in order to record where in the git tree a
 particular release refers to.
@@ -164,7 +168,7 @@ current, just-updated package version.
    $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
    $ git push UPSTREAM "$VERSION"
 
-Draft a new release on GitLab
+Draft a New Release on GitLab
 -----------------------------
 After creating and pushing a new version tag, a GitLab "release" should be
 made.

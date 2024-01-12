@@ -1,15 +1,15 @@
 Getting Started
 ===============
 
-See :ref:`Installation` if NRTK needs to be installed.
+Note: If you need to install NRTK, see :ref:`Installation`.
 
-There are three main parts to NRTK:
+NRTK consists of three main parts:
 
 #. :ref:`Image Perturbation`
 #. :ref:`Perturbation Factories`
 #. :ref:`Model Evaluation`
 
-The following section will guide the user through setting up and using an example pertuber.
+The following sections will guide you through setting up and using an example perturber.
 
 Image Perturbation
 ^^^^^^^^^^^^^^^^^^
@@ -19,14 +19,14 @@ images. `scikit-image <https://scikit-image.org/>`_, `Pillow <https://pillow.rea
 `openCV <https://pypi.org/project/opencv-python/#documentation-for-opencv-python>`_, and 
 `pyBSM  <https://gitlab.jatic.net/jatic/kitware/pybsm>`_ are used for various types of perturbation. The 
 perturbation classes take an image and perform a transformation based on input parameters. The examples 
-shown below focus on a `pyBSM` based perturber. In order to see examples of other perturbations, the 
+shown below focus on a `pyBSM` based perturber. To see examples of other perturbations, the
 `perturbers <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/perturbers.ipynb?ref_type=heads>`_ 
 notebook shows initialization and use of `scikit-image`, `Pillow`, and `openCV` perturbers.
 
 For this example, we are going to use the :ref:`PybsmPerturber <Class: PybsmPerturber>` from `pyBSM`. This 
-pertuber is useful for creating new images based on existing parameters. The 
+perturber is useful for creating new images based on existing parameters. The
 :ref:`PybsmSensor <Class: PybsmSensor>` and :ref:`PybsmScenario <Class: PybsmScenario>` classes contain the 
-parameters for an existing sensor and environment respectively.
+parameters for an existing sensor and environment, respectively.
 
 .. code-block::
 	:caption: pyBSM Perturber Initialization
@@ -120,9 +120,10 @@ multiple perturbations. The `scikit-image`, `Pillow`, and `openCV` perturbers us
 :ref:`StepPerturbImageFactory <Class: StepPerturbImageFactory>` and the `pyBSM` perturber uses the :ref:`CustomPybsmPerturbImageFactory <Class: CustomPybsmPerturbImageFactory>`.
 
 Continuing on from the previous example, the snippet below shows the initialization of a 
-`CustomPybsmPerturbImageFactory`. The `theta_keys` variable controls which paramerter(s) we are modifying 
+`CustomPybsmPerturbImageFactory`. The `theta_keys` variable controls which parameter(s) we are modifying
 and `thetas` are the actual values of the parameter(s). In this example, we are modifying the 
-focal length (`f`) with the values of 1, 2, and 3. The modified images are display below the code block.
+focal length (`f`) with the values of 1, 2, and 3. The modified images are displayed below the
+code block.
 
 .. code-block::
 	:caption: CustomPybsmPerturbImageFactory Initialization and Execution
@@ -158,9 +159,8 @@ focal length (`f`) with the values of 1, 2, and 3. The modified images are displ
 	
 	Image of a tank with focal length of 3m.
 
-Not only can you modify multiple values on one parameter, you can also modify multiple parameters at 
-the same time. The code block below shows the focal length and ground range variables being modified. 
-The resulting images are displayed below the code block.
+Not only can you modify multiple values on one parameter, but you can also modify multiple
+parameters at the same time. The code block below shows the focal length and ground range variables being modified. The resulting images are displayed below the code block.
 
 .. code-block::
 	:caption: CustomPybsmPerturbImageFactory with Multiple Parameters
@@ -206,6 +206,8 @@ sweep of parameters in order to test model response to varying severity of image
 
 To see examples of image classification and object detection, the `coco_scorer <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/coco_scorer.ipynb?ref_type=heads>`_ notebook from the `examples` directory shows 
 different scoring techniques. For examples of model response to image degradations, there are two 
-notebooks to check out. The `simple_generic_generator <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/simple_generic_generator.ipynb?ref_type=heads>`_ notebook shows model response to image degredation 
-through `scikit-image`, `Pillow`, and `openCV` based perturbers. The `simple_pybsm_generator <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/simple_pybsm_generator.ipynb?ref_type=heads>`_ notebook shows model 
-response to image degredation through `pyBSM` based perturbers.
+notebooks to check out. The `simple_generic_generator <https://gitlab.jatic
+.net/jatic/kitware/nrtk/-/blob/main/examples/simple_generic_generator.ipynb?ref_type=heads>`_ notebook shows model response to image degradation
+through perturbers based on `scikit-image`, `Pillow`, and `openCV`. The
+`simple_pybsm_generator <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/simple_pybsm_generator.ipynb?ref_type=heads>`_ notebook shows model
+response to image degradation through `pyBSM`-based perturbers.

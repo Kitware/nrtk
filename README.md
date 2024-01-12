@@ -7,14 +7,14 @@ diameter, etc. Functionality is provided through [Strategy](https://en.wikipedia
 into systems and applications.
 
 ## Installation
-The following steps assumes the source tree has been acquired locally.
+The following steps assume the source tree has been acquired locally.
 
 Install the current version via pip:
 ```bash
-pip install .
+pip install nrtk
 ```
 
-Alternatively, [Poetry](https://python-poetry.org/) can also be used:
+Alternatively, you can also use [Poetry](https://python-poetry.org/):
 ```bash
 poetry install
 ```
@@ -46,7 +46,7 @@ firefox _build/html/index.html
 ## Contributing
 - We follow the general guidelines outlined in the
 [JATIC Software Development Plan](https://gitlab.jatic.net/jatic/docs/sdp/-/blob/main/Branch,%20Merge,%20Release%20Strategy.md).
-- The Git Flow branching strategy is used.
+- We use the Git Flow branching strategy.
 - See [docs/release_process.rst](./docs/release_process.rst) for detailed release information.
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) for additional contributing information.
 
