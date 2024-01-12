@@ -1,0 +1,21 @@
+v0.3.0
+======
+This minor release updates the main opencv dependency of the package to
+``opencv-python`` and adds a conditional ``opencv-python-headless``
+installation job to CI.
+
+Updates / New Features
+----------------------
+
+Documentation
+
+* Updated README.md under ``examples``.
+
+CI/CD
+
+* Added a conditional case of ``opencv-python-headless`` installation.
+
+Package
+
+* Updated main opencv dependency from ``opencv-python-headless`` to
+  ``opencv-python``.
