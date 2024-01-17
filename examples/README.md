@@ -1,25 +1,24 @@
 # Examples
-This directory hosts the nrtk examples.
+This directory hosts the NRTK examples.
 
 ### Implementation Guide
 Example notebooks should have an "Open in Colab" button.
-See other example notebooks on how to add a Colab cell.
+See other example notebooks for information on how to add a Colab cell.
 
-Example notebooks that download or generate data should place it into the
-`data` sub-directory.
+Example notebooks that download or generate data should place that data in the `data` sub-directory.
 
 ### Requirements
 Most of the examples require [Jupyter Notebook](https://jupyter.org/) and
 [PyTorch](https://pytorch.org/).
 
-These can be installed manually using `pip` or with the following command:
+Install these manually using `pip` or with the following command:
 
 ```bash
 poetry install -E example_deps
 ```
 
 Some notebooks may require additional dependencies.
-See the first cell of each notebook ("Set Up Environment") on how to install
+See the first cell of each notebook ("Set Up the Environment") for instructions on how to install
 the relevant packages.
 
 ### Run the Notebooks from Colab
@@ -30,9 +29,9 @@ page with the corresponding notebook content.
 To use GPU resources through Colab, remember to change the runtime type to
 `GPU`:
 
-1. From the `Runtime` menu select `Change runtime type`
-1. Choose `GPU` from the drop-down menu
-1. Click `SAVE`
+1. From the `Runtime` menu select `Change runtime type`.
+1. Choose `GPU` from the drop-down menu.
+1. Click `SAVE`.
 
 This will reset the notebook and may ask you if you are a robot (these
 instructions assume you are not).
@@ -46,8 +45,8 @@ Running:
 in a cell will verify this has worked and show you what kind of hardware you
 have access to.
 
-**Please note that after setting up the environment, you may need to "Restart**
-**Runtime" in order to resolve package version conflicts.**
+**Note that after setting up the environment, you may need to "Restart**
+**Runtime" to resolve package version conflicts.**
 
 ### Data
 
@@ -56,7 +55,7 @@ running the notebook.
 
 ### Encountering Issues
 
-For issues relating to nrtk functionality or running of an example, please
+For issues relating to NRTK functionality or running an example, 
 create an issue on the [repository](https://github.com/Kitware/nrtk/issues).
 
 ---
