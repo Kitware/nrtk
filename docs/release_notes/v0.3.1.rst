@@ -1,0 +1,18 @@
+v0.3.1
+======
+
+A couple bug fixes, a CI optimization, and updated text.
+
+Updates / New Features
+----------------------
+
+* Optimized `opencv-python-headless` usage in `.gitlab-ci.yml`.
+
+* Text updated to properly reflect style guide.
+
+Fixes
+-----
+
+* Capped `pybsm` to `<0.2.0` to prevent incompatible package breaking changes.
+
+* Added py.typed to the source directory.

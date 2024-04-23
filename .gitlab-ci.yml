@@ -147,11 +147,10 @@ default:
   before_script:
     - !reference [.test_defaults, before_script]
     - |
-      export PIP_LIST="$(poetry run pip list --format=json)"
-      if (echo "$PIP_LIST" | poetry run ./scripts/pycv2_is_installed.py)
+      VERSION="$(poetry run pip list --format=json | poetry run ./scripts/pycv2_installed_version.py)"
+      if [[ "$?" -eq 0 ]]
       then
         echo "OpenCV-Python installed, replacing with equivalent headless version."
-        VERSION="$(echo "$PIP_LIST" | poetry run  ./scripts/pycv2_installed_version.py)"
         poetry run pip uninstall -y opencv-python opencv-python-headless
         poetry run pip install --no-deps opencv-python-headless=="$VERSION"
       else

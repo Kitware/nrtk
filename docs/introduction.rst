@@ -58,7 +58,7 @@ length, aperture diameter, etc. Functionality is provided through `Strategy <htt
 patterns to allow for modular integration into systems and applications.
 
 The toolkit includes several types of general image perturbations, as well as sensor-based
-perturbations based on the open source library PyBSM [3]. pyBSM rigorously models radiative
+perturbations based on the open source library pyBSM [3]. pyBSM rigorously models radiative
 transfer and imaging-sensor physics, allowing a user to provide source images, ideally with
 minimal corruptions to start. These source images are then rendered to emulate pre-sensor,
 in-sensor, and post-sensor corruptions that would have been incurred by another sensor with precise
