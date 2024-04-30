@@ -113,7 +113,7 @@ class TestStepPerturbImageFactory:
     @pytest.mark.parametrize("theta_keys, thetas, idx, expected_val, expectation", [
         (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 0, (1000, 10000), does_not_raise()),
         (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 3, (2000, 20000), does_not_raise()),
-        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 4, (-1, -1), pytest.raises(AssertionError)),
+        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 4, (-1, -1), pytest.raises(IndexError)),
         (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], -1, (2000, 20000), does_not_raise())
     ], ids=["first idx", "last idx", "idx == len", "neg idx"])
     def test_indexing(

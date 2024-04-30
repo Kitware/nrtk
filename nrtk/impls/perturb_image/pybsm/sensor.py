@@ -23,7 +23,7 @@ class PybsmSensor(Plugfigurable):
         detector center-to-center spacings (pitch) in the x and y directions (m)
     optTransWavelengths :
         numpy array specifying the spectral bandpass of the camera (m).  At
-        minimum, and start and end wavelength should be specified.
+        minimum, start and end wavelength should be specified.
     opticsTransmission :
         full system in-band optical transmission (unitless).  Loss due to any
         telescope obscuration should *not* be included in with this optical transmission
@@ -87,6 +87,10 @@ class PybsmSensor(Plugfigurable):
          the kernel is assumed to sum to one.
     framestacks:
          the number of frames to be added together for improved SNR.
+
+    :raises: ValueError if optTransWavelengths length < 2
+    :raises: ValueError if optTransWavelengths is not ascending
+    :raises: ValueError if optTransWavelengths and (if provided) opticsTransmission lengths are different
     """
     def __init__(self,
                  name: str,
@@ -111,8 +115,11 @@ class PybsmSensor(Plugfigurable):
                  qewavelengths: Optional[np.ndarray] = None,
                  qe: Optional[np.ndarray] = None
                  ):
-        assert optTransWavelengths.shape[0] >= 2
-        assert optTransWavelengths[0] < optTransWavelengths[-1]
+        if optTransWavelengths.shape[0] < 2:
+            raise ValueError("At minimum, at least the start and end wavelengths"
+                             " must be specified for optTransWavelengths")
+        if optTransWavelengths[0] >= optTransWavelengths[-1]:
+            raise ValueError("optTransWavelengths must be ascending")
 
         # required parameters
         self.name = name
@@ -125,7 +132,8 @@ class PybsmSensor(Plugfigurable):
         if opticsTransmission is None:
             self.opticsTransmission = np.ones(optTransWavelengths.shape[0])
         else:
-            assert opticsTransmission.shape[0] == optTransWavelengths.shape[0]
+            if opticsTransmission.shape[0] != optTransWavelengths.shape[0]:
+                raise ValueError("opticsTransmission and optTransWavelengths must have the same length")
             self.opticsTransmission = opticsTransmission
         self.eta = eta
         self.py = px

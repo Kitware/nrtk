@@ -22,6 +22,9 @@ class PybsmPerturber(PerturbImage):
         :param sensor: pyBSM sensor object.
         :param scenario: pyBSM scenario object.
         :param reflectance_range: Array of reflectances that correspond to pixel values.
+
+        :raises: ValueError if reflectance_range length != 2
+        :raises: ValueError if reflectance_range not strictly ascending
         """
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
@@ -34,8 +37,10 @@ class PybsmPerturber(PerturbImage):
 
         self.metrics = pybsm.niirs(self.sensor, self.scenario)
 
-        assert reflectance_range.shape[0] == 2
-        assert reflectance_range[0] < reflectance_range[1]
+        if reflectance_range.shape[0] != 2:
+            raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
+        if reflectance_range[0] >= reflectance_range[1]:
+            raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
         self.reflectance_range = reflectance_range
 
         # this is key:value record of the thetas use for perturbing
@@ -50,7 +55,11 @@ class PybsmPerturber(PerturbImage):
             image: np.ndarray,
             additional_params: Dict[str, Any] = {}
             ) -> np.ndarray:
-        assert 'img_gsd' in additional_params
+        """
+        :raises: ValueError if 'img_gsd' not present in additional_params
+        """
+        if 'img_gsd' not in additional_params:
+            raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
         perturbed = pybsm.metrics2image(
                     self.metrics,

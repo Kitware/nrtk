@@ -83,8 +83,8 @@ class BrightnessPerturber(_PILEnhancePerturber):
         """
 
         enhancement = ImageEnhance.Brightness
-        if TYPE_CHECKING:  # pragma: no cover
-            assert isinstance(enhancement, _Enhancement)
+        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+            raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
 
 
@@ -103,8 +103,8 @@ class ColorPerturber(_PILEnhancePerturber):
         """
 
         enhancement = ImageEnhance.Color
-        if TYPE_CHECKING:  # pragma: no cover
-            assert isinstance(enhancement, _Enhancement)
+        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+            raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
 
 
@@ -123,8 +123,8 @@ class ContrastPerturber(_PILEnhancePerturber):
         """
 
         enhancement = ImageEnhance.Contrast
-        if TYPE_CHECKING:  # pragma: no cover
-            assert isinstance(enhancement, _Enhancement)
+        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+            raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
 
 
@@ -156,6 +156,6 @@ class SharpnessPerturber(_PILEnhancePerturber):
         """
 
         enhancement = ImageEnhance.Sharpness
-        if TYPE_CHECKING:  # pragma: no cover
-            assert isinstance(enhancement, _Enhancement)
+        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+            raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
