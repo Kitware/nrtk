@@ -1,6 +1,7 @@
 # Use stages to define stages that contain groups of jobs. Use stage in a job
 # to configure the job to run in a specific stage.
 stages:
+  - scan
   - test
   - docs
   - publish
@@ -19,6 +20,29 @@ default:
   interruptible: true
   tags:
     - kitware
+
+include:
+- template: Jobs/SAST.latest.gitlab-ci.yml
+- template: Jobs/Dependency-Scanning.latest.gitlab-ci.yml
+
+# CDAO imposed scanning
+sast:
+  stage: scan
+  artifacts:
+    paths: 
+      - gl-sast-report.json
+    reports:
+      sast: gl-sast-report.json
+    when: always
+dependency_scanning:
+  stage: scan
+  artifacts:
+    paths:
+    - gl-dependency-scanning-report.json
+    reports:
+      dependency_scanning:
+        - gl_dependency-scanning-report.json
+    when: always
 
 ###############################################################################
 # Run Conditions
