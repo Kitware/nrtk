@@ -1,6 +1,8 @@
 v0.3.2
 ======
 
+Addresses numerous vulnerabilities and adds automated SAST scanning to CI/CD.
+
 Updates / New Features
 ----------------------
 
