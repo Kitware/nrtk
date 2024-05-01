@@ -37,6 +37,10 @@ class PybsmScenario(Plugfigurable):
     cn2at1m:
         the refractive index structure parameter "near the ground" (e.g. at h = 1 m).
         Used to calculate the turbulence profile.
+
+    :raises: ValueError if ihaze not in acceptable ihaze values
+    :raises: ValueError if altitude not in acceptable altitude values
+    :raises: ValueError if ground range not in acceptable ground range values
     """
 
     ihaze_values = [1, 2]
@@ -62,9 +66,12 @@ class PybsmScenario(Plugfigurable):
                  haWindspeed: Optional[float] = 21.0,
                  cn2at1m: Optional[float] = 1.7e-14
                  ):
-        assert ihaze in PybsmScenario.ihaze_values
-        assert altitude in PybsmScenario.altitude_values
-        assert groundRange in PybsmScenario.groundRange_values
+        if ihaze not in PybsmScenario.ihaze_values:
+            raise ValueError(f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}")
+        if altitude not in PybsmScenario.altitude_values:
+            raise ValueError(f"Invalid altitude value ({altitude})")
+        if groundRange not in PybsmScenario.groundRange_values:
+            raise ValueError(f"Invalid ground range value ({groundRange})")
 
         # required parameters
         self.name = name

@@ -3,7 +3,7 @@ import pytest
 import pybsm
 from PIL import Image
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Tuple
+from typing import Any, Dict, ContextManager, Tuple
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -146,8 +146,10 @@ class TestPyBSMPerturber:
     @pytest.mark.parametrize("reflectance_range, expectation", [
         (np.array([.05, .5]), does_not_raise()),
         (np.array([.01, .5]), does_not_raise()),
-        (np.array([.05]), pytest.raises(AssertionError)),
-        (np.array([.5, .05]), pytest.raises(AssertionError))
+        (np.array([.05]),
+            pytest.raises(ValueError, match=r"Reflectance range array must have length of 2")),
+        (np.array([.5, .05]),
+            pytest.raises(ValueError, match=r"Reflectance range array values must be strictly ascending"))
     ])
     def test_configuration_bounds(self, reflectance_range: np.ndarray, expectation: ContextManager) -> None:
         """
@@ -156,3 +158,17 @@ class TestPyBSMPerturber:
         sensor, scenario = self.createSampleSensorandScenario()
         with expectation:
             PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=reflectance_range)
+
+    @pytest.mark.parametrize("additional_params, expectation", [
+        ({"img_gsd": 3.19/160.}, does_not_raise()),
+        ({}, pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata for this perturber"))
+    ])
+    def test_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+        """
+        Test variations of additional params.
+        """
+        sensor, scenario = self.createSampleSensorandScenario()
+        perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([.05, .5]))
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        with expectation:
+            _ = perturber(image, additional_params)

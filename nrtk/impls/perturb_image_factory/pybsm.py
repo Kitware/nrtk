@@ -60,7 +60,8 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
             raise StopIteration
 
     def __getitem__(self, idx: int) -> PerturbImage:
-        assert idx < len(self.sets)
+        if idx >= len(self.sets):
+            raise IndexError("Index out of range")
         kwargs = {
             k: self.thetas[i][self.sets[idx][i]]
             for i, k in enumerate(self.theta_keys)
