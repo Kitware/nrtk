@@ -4,17 +4,5 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
-CI/CD
-
-* Added SAST scanning to CI/CD.
-
-Dependency Vulnerabilities
-
-* Upgraded `Pillow` to `Pillow>=10.2.0`
-
-* Replaced `jupyter` and `ipython` with `notebook>=7.0.7`, which also future proofed `jupyter notebook` to current package name.
-
 Fixes
 -----
-
-* Replaced asserts with appropriate exceptions.
