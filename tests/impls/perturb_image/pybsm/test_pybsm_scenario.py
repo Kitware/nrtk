@@ -1,5 +1,7 @@
 import pytest
 import pybsm
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager
 from smqtk_core.configuration import configuration_test_helper
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 
@@ -24,24 +26,34 @@ def test_scenario_call() -> None:
     assert type(scenario()) == pybsm.scenario
 
 
-def test_verify_parameters() -> None:
-    ihaze = 1
-    altitude = 2
-    groundRange = 0
-    name = "test"
-    scenario = PybsmScenario(name, ihaze, altitude, groundRange)
+@pytest.mark.parametrize("ihaze, altitude, groundRange, name, expectation", [
+    (1, 2., 0., "test", does_not_raise()),
+    (3, 2., 0., "bad-ihaze", pytest.raises(ValueError, match=r"Invalid ihaze value")),
+    (1, 101.3, 0., "bad-alt", pytest.raises(ValueError, match=r"Invalid altitude value")),
+    (2, 2., -1.2, "bad-groundrange", pytest.raises(ValueError, match=r"Invalid ground range value"))
+])
+def test_verify_parameters(
+    ihaze: int,
+    altitude: float,
+    groundRange: float,
+    name: str,
+    expectation: ContextManager
+) -> None:
 
-    # testing PybsmScenario call
-    assert scenario().ihaze == ihaze
-    assert scenario().altitude == altitude
-    assert scenario().name == name
-    assert scenario().groundRange == groundRange
+    with expectation:
+        scenario = PybsmScenario(name, ihaze, altitude, groundRange)
 
-    # testing PybsmScenario.create_scenario directly
-    assert scenario.create_scenario().ihaze == ihaze
-    assert scenario.create_scenario().altitude == altitude
-    assert scenario.create_scenario().name == name
-    assert scenario.create_scenario().groundRange == groundRange
+        # testing PybsmScenario call
+        assert scenario().ihaze == ihaze
+        assert scenario().altitude == altitude
+        assert scenario().name == name
+        assert scenario().groundRange == groundRange
+
+        # testing PybsmScenario.create_scenario directly
+        assert scenario.create_scenario().ihaze == ihaze
+        assert scenario.create_scenario().altitude == altitude
+        assert scenario.create_scenario().name == name
+        assert scenario.create_scenario().groundRange == groundRange
 
 
 def test_config() -> None:

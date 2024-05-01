@@ -10,3 +10,5 @@ CI/CD
 
 Fixes
 -----
+
+* Replaced asserts with appropriate exceptions.
