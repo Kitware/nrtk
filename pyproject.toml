@@ -33,7 +33,7 @@ classifiers = [
 python = "^3.8.1"
 numpy = ">=1.18"
 opencv-python = ">=4.6"
-Pillow = ">=10.0"
+Pillow = ">=10.2.0"
 scikit-image = ">=0.21"
 smqtk-classifier = ">=0.19.0"
 smqtk-core = ">=0.19"
@@ -60,15 +60,13 @@ coverage = ">=6.5.0"
 pytest = ">=7.2.0"
 pytest-cov = ">=4.0.0"
 # Jupyter notebook testing
-jupyter = ">=1.0.0"
+notebook = ">=7.0.7"
 papermill = ">=2.4.0"
 # Docs
 Sphinx = ">=5.3.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 livereload = ">=2.6.3"
-# Utility
-ipython = ">=8.6.0"
 
 
 [tool.poetry.scripts]
