@@ -5,6 +5,8 @@ from PIL import Image
 from contextlib import nullcontext as does_not_raise
 from typing import Any, Dict, ContextManager, Tuple
 
+from smqtk_core.configuration import configuration_test_helper
+
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -138,10 +140,42 @@ class TestPyBSMPerturber:
         """
         sensor, scenario = self.createSampleSensorandScenario()
         inst = PybsmPerturber(sensor=sensor, scenario=scenario)
-        inst_config = inst.get_config()
-        assert inst_config['scenario'] == scenario.get_config()
-        np.testing.assert_equal(inst_config['sensor'], sensor.get_config())
-        np.testing.assert_equal(inst_config['reflectance_range'], np.array([.05, .5]))
+        for i in configuration_test_helper(inst):
+            assert i.sensor.name == sensor.name
+            assert i.sensor.D == sensor.D
+            assert i.sensor.f == sensor.f
+            assert i.sensor.px == sensor.px
+            assert np.array_equal(i.sensor.optTransWavelengths, sensor.optTransWavelengths)
+            assert np.array_equal(i.sensor.opticsTransmission, sensor.opticsTransmission)
+            assert i.sensor.eta == sensor.eta
+            assert i.sensor.wx == sensor.wx
+            assert i.sensor.wy == sensor.wy
+            assert i.sensor.intTime == sensor.intTime
+            assert i.sensor.darkCurrent == sensor.darkCurrent
+            assert i.sensor.readNoise == sensor.readNoise
+            assert i.sensor.maxN == sensor.maxN
+            assert i.sensor.bitdepth == sensor.bitdepth
+            assert i.sensor.maxWellFill == sensor.maxWellFill
+            assert i.sensor.sx == sensor.sx
+            assert i.sensor.sy == sensor.sy
+            assert i.sensor.dax == sensor.dax
+            assert i.sensor.day == sensor.day
+            assert np.array_equal(i.sensor.qewavelengths, sensor.qewavelengths)
+            assert np.array_equal(i.sensor.qe, sensor.qe)
+
+            assert i.scenario.name == scenario.name
+            assert i.scenario.ihaze == scenario.ihaze
+            assert i.scenario.altitude == scenario.altitude
+            assert i.scenario.groundRange == scenario.groundRange
+            assert i.scenario.aircraftSpeed == scenario.aircraftSpeed
+            assert i.scenario.targetReflectance == scenario.targetReflectance
+            assert i.scenario.targetTemperature == scenario.targetTemperature
+            assert i.scenario.backgroundReflectance == scenario.backgroundReflectance
+            assert i.scenario.backgroundTemperature == scenario.backgroundTemperature
+            assert i.scenario.haWindspeed == scenario.haWindspeed
+            assert i.scenario.cn2at1m == scenario.cn2at1m
+
+            assert np.array_equal(i.reflectance_range, inst.reflectance_range)
 
     @pytest.mark.parametrize("reflectance_range, expectation", [
         (np.array([.05, .5]), does_not_raise()),

@@ -75,7 +75,20 @@ livereload = ">=2.6.3"
 [tool.poetry.scripts]
 
 [tool.poetry.plugins."smqtk_plugins"]
-
+# Add implementation sub-module exposure here.
+"impls.gen_object_detector_blackbox_response.simple_generic_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator"
+"impls.gen_object_detector_blackbox_response.simple_pybsm_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator"
+"impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
+"impls.perturb_image.generic.PIL.enhance" = "nrtk.impls.perturb_image.generic.PIL.enhance"
+"impls.perturb_image.generic.cv2.blur" = "nrtk.impls.perturb_image.generic.cv2.blur"
+"impls.perturb_image.generic.skimage.random_noise" = "nrtk.impls.perturb_image.generic.skimage.random_noise"
+"impls.perturb_image.pybsm.perturber" = "nrtk.impls.perturb_image.pybsm.perturber"
+"impls.perturb_image_factory.generic.step" = "nrtk.impls.perturb_image_factory.generic.step"
+"impls.perturb_image_factory.pybsm" = "nrtk.impls.perturb_image_factory.pybsm"
+"impls.score_detections.class_agnostic_pixelwise_iou_scorer" = "nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer"
+"impls.score_detections.coco_scorer" = "nrtk.impls.score_detections.coco_scorer"
+"impls.score_detections.nop_scorer" = "nrtk.impls.score_detections.nop_scorer"
+"impls.score_detections.random_scorer" = "nrtk.impls.score_detections.random_scorer"
 
 ###############################################################################
 [tool.pytest.ini_options]

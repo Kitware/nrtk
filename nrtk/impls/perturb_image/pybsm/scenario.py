@@ -2,10 +2,10 @@ from typing import Any
 from typing import Dict, Optional
 
 from pybsm.simulation.scenario import Scenario
-from smqtk_core import Plugfigurable
+from smqtk_core import Configurable
 
 
-class PybsmScenario(Plugfigurable):
+class PybsmScenario(Configurable):
     """
     Wrapper for pybsm.scenario.
 
