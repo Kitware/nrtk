@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-import pybsm
+from pybsm.simulation.sensor import Sensor
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Optional
 from smqtk_core.configuration import configuration_test_helper
@@ -21,11 +21,11 @@ def test_sensor_string_rep(name: str) -> None:
 def test_sensor_call() -> None:
     D = 0
     f = 0
-    px = 0
+    px = 0.1
     optTransWavelengths = np.array([0.58-.08, 0.58+.08])*1.0e-6
     name = "test"
     sensor = PybsmSensor(name, D, f, px, optTransWavelengths)
-    assert type(sensor()) == pybsm.sensor
+    assert isinstance(sensor(), Sensor)
 
 
 @pytest.mark.parametrize("optTransWavelengths, opticsTransmission, name, expectation", [
@@ -44,7 +44,7 @@ def test_verify_parameters(
 ) -> None:
     D = 0
     f = 0
-    px = 0
+    px = 0.1
     with expectation:
         sensor = PybsmSensor(name, D, f, px, optTransWavelengths, opticsTransmission=opticsTransmission)
 

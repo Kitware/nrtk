@@ -3,7 +3,7 @@ from typing import Any
 from typing import Dict, Optional
 
 import numpy as np
-import pybsm
+from pybsm.simulation.sensor import Sensor
 from smqtk_core import Plugfigurable
 
 
@@ -181,8 +181,8 @@ class PybsmSensor(Plugfigurable):
     def __repr__(self) -> str:
         return self.name
 
-    def create_sensor(self) -> pybsm.sensor:
-        S = pybsm.sensor(self.name, self.D, self.f, self.px, self.optTransWavelengths)
+    def create_sensor(self) -> Sensor:
+        S = Sensor(self.name, self.D, self.f, self.px, self.optTransWavelengths)
         S.opticsTransmission = self.opticsTransmission
         S.eta = self.eta
         S.py = self.py
@@ -200,7 +200,7 @@ class PybsmSensor(Plugfigurable):
 
     def __call__(
         self
-    ) -> pybsm.sensor:
+    ) -> Sensor:
         """
         Alias for :meth:`.StoreSensor.sensor`.
         """
