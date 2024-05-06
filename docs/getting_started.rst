@@ -37,7 +37,7 @@ parameters for an existing sensor and environment, respectively.
 	from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 	from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 
-	optTransWavelengths = np.array([0.85-.15,0.85+.15])*1.0e-6
+	optTransWavelengths = np.array([0.58-.08,0.58+.08])*1.0e-6
 	f = 4 #telescope focal length (m)
 	p = .008e-3	# detector pitch (m)
 	sensor = PybsmSensor(
