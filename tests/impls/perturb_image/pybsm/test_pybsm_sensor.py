@@ -72,5 +72,26 @@ def test_config() -> None:
     px = 0
     optTransWavelengths = np.array([0.58-.08, 0.58+.08])*1.0e-6
     name = "test"
-    sensor = PybsmSensor(name, D, f, px, optTransWavelengths)
-    configuration_test_helper(sensor)
+    inst = PybsmSensor(name, D, f, px, optTransWavelengths)
+    for i in configuration_test_helper(inst):
+        assert i.name == inst.name
+        assert i.D == inst.D
+        assert i.f == inst.f
+        assert i.px == inst.px
+        assert np.array_equal(i.optTransWavelengths, inst.optTransWavelengths)
+        assert np.array_equal(i.opticsTransmission, inst.opticsTransmission)
+        assert i.eta == inst.eta
+        assert i.wx == inst.wx
+        assert i.wy == inst.wy
+        assert i.intTime == inst.intTime
+        assert i.darkCurrent == inst.darkCurrent
+        assert i.readNoise == inst.readNoise
+        assert i.maxN == inst.maxN
+        assert i.bitdepth == inst.bitdepth
+        assert i.maxWellFill == inst.maxWellFill
+        assert i.sx == inst.sx
+        assert i.sy == inst.sy
+        assert i.dax == inst.dax
+        assert i.day == inst.day
+        assert np.array_equal(i.qewavelengths, inst.qewavelengths)
+        assert np.array_equal(i.qe, inst.qe)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import Any
-from typing import Dict, Optional
+from typing import Dict, Optional, Type
 
 import numpy as np
 from pybsm.simulation.sensor import Sensor
-from smqtk_core import Plugfigurable
+from smqtk_core import Configurable
 
 
-class PybsmSensor(Plugfigurable):
+class PybsmSensor(Configurable):
     """
     Wrapper for pybsm.sensor.
 
@@ -206,14 +206,38 @@ class PybsmSensor(Plugfigurable):
         """
         return self.create_sensor()
 
+    @classmethod
+    def from_config(
+        cls: Type[PybsmSensor],
+        config_dict: Dict,
+        merge_default: bool = True
+    ) -> PybsmSensor:
+        config_dict = dict(config_dict)
+
+        # Convert input data to expected constructor types
+        config_dict["optTransWavelengths"] = np.array(config_dict["optTransWavelengths"])
+
+        # Non-JSON type arguments with defaults (so they might not be there)
+        opticsTransmission = config_dict.get("opticsTransmission", None)
+        if opticsTransmission is not None:
+            config_dict["opticsTransmission"] = np.array(config_dict["opticsTransmission"])
+        qewavelengths = config_dict.get("qewavelengths", None)
+        if qewavelengths is not None:
+            config_dict["qewavelengths"] = np.array(config_dict["qewavelengths"])
+        qe = config_dict.get("qe", None)
+        if qe is not None:
+            config_dict["qe"] = np.array(config_dict["qe"])
+
+        return super().from_config(config_dict, merge_default=merge_default)
+
     def get_config(self) -> Dict[str, Any]:
         return {
             'name': self.name,
             'D': self.D,
             'f': self.f,
             'px': self.px,
-            'optTransWavelengths': self.optTransWavelengths,
-            'opticsTransmission': self.opticsTransmission,
+            'optTransWavelengths': self.optTransWavelengths.tolist(),
+            'opticsTransmission': self.opticsTransmission.tolist(),
             'eta': self.eta,
             'wx': self.wx,
             'wy': self.wy,
@@ -227,6 +251,6 @@ class PybsmSensor(Plugfigurable):
             'sy': self.sy,
             'dax': self.dax,
             'day': self.day,
-            'qewavelengths': self.qewavelengths,
-            'qe': self.qe,
+            'qewavelengths': self.qewavelengths.tolist(),
+            'qe': self.qe.tolist(),
         }

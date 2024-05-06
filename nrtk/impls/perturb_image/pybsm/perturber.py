@@ -1,8 +1,10 @@
+from __future__ import annotations
 import copy
-from typing import Any, Dict
-
 import numpy as np
 from pybsm.simulation import RefImage, simulate_image
+from typing import Any, Dict, Type
+
+from smqtk_core.configuration import to_config_dict, from_config_dict, make_default_config
 
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -94,16 +96,42 @@ class PybsmPerturber(PerturbImage):
     def __repr__(self) -> str:
         return self.sensor.name + " " + self.scenario.name
 
+    @classmethod
+    def get_default_config(cls) -> Dict[str, Any]:
+        cfg = super().get_default_config()
+        cfg["sensor"] = make_default_config([PybsmSensor])
+        cfg["scenario"] = make_default_config([PybsmScenario])
+        cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
+
+        return cfg
+
+    @classmethod
+    def from_config(
+        cls: Type[PybsmPerturber],
+        config_dict: Dict,
+        merge_default: bool = True
+    ) -> PybsmPerturber:
+        config_dict = dict(config_dict)
+
+        config_dict["sensor"] = from_config_dict(
+            config_dict["sensor"],
+            [PybsmSensor]
+        )
+        config_dict["scenario"] = from_config_dict(
+            config_dict["scenario"],
+            [PybsmScenario]
+        )
+
+        # Convert input data to expected constructor types
+        config_dict["reflectance_range"] = np.array(config_dict["reflectance_range"])
+
+        return super().from_config(config_dict, merge_default=merge_default)
+
     def get_config(self) -> Dict[str, Any]:
         config = {
-            'sensor': self.sensor.get_config(),
-            'scenario': self.scenario.get_config(),
-            'reflectance_range': self.reflectance_range
+            'sensor': to_config_dict(self.sensor),
+            'scenario': to_config_dict(self.scenario),
+            'reflectance_range': self.reflectance_range.tolist()
         }
-
-        for k in self.sensor.__dict__:
-            config[k] = getattr(self.sensor, k)
-        for k in self.scenario.__dict__:
-            config[k] = getattr(self.scenario, k)
 
         return config
