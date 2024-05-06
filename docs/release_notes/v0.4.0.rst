@@ -1,5 +1,5 @@
-Pending Release Notes
-=====================
+v0.4.0
+======
 
 Updates / New Features
 ----------------------
