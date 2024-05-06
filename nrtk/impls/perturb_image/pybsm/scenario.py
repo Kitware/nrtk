@@ -1,7 +1,7 @@
 from typing import Any
 from typing import Dict, Optional
 
-import pybsm
+from pybsm.simulation.scenario import Scenario
 from smqtk_core import Plugfigurable
 
 
@@ -94,8 +94,8 @@ class PybsmScenario(Plugfigurable):
     def __repr__(self) -> str:
         return self.name
 
-    def create_scenario(self) -> pybsm.scenario:
-        S = pybsm.scenario(self.name, self.ihaze, self.altitude, self.groundRange)
+    def create_scenario(self) -> Scenario:
+        S = Scenario(self.name, self.ihaze, self.altitude, self.groundRange)
         S.aircraftSpeed = self.aircraftSpeed
         S.targetReflectance = self.targetReflectance
         S.targetTemperature = self.targetTemperature
@@ -107,7 +107,7 @@ class PybsmScenario(Plugfigurable):
 
     def __call__(
         self
-    ) -> pybsm.scenario:
+    ) -> Scenario:
         """
         Alias for :meth:`.StoreScenario.create_scenario`.
         """

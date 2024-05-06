@@ -2,7 +2,7 @@ import copy
 from typing import Any, Dict
 
 import numpy as np
-import pybsm
+from pybsm.simulation import RefImage, simulate_image
 
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -35,8 +35,6 @@ class PybsmPerturber(PerturbImage):
             elif hasattr(self.scenario, k):
                 setattr(self.scenario, k, kwargs[k])
 
-        self.metrics = pybsm.niirs(self.sensor, self.scenario)
-
         if reflectance_range.shape[0] != 2:
             raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
         if reflectance_range[0] >= reflectance_range[1]:
@@ -61,12 +59,16 @@ class PybsmPerturber(PerturbImage):
         if 'img_gsd' not in additional_params:
             raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
-        perturbed = pybsm.metrics2image(
-                    self.metrics,
+        ref_img = RefImage(
                     image,
                     additional_params['img_gsd'],
                     np.array([image.min(), image.max()]),
-                    self.reflectance_range)[-1]
+                    self.reflectance_range)
+
+        perturbed = simulate_image(
+                    ref_img,
+                    self.sensor(),
+                    self.scenario())[-1]
 
         min = perturbed.min()
         den = perturbed.max()-min
@@ -87,10 +89,10 @@ class PybsmPerturber(PerturbImage):
         return self.perturb(image, additional_params)
 
     def __str__(self) -> str:
-        return self.metrics.name
+        return self.sensor.name + " " + self.scenario.name
 
     def __repr__(self) -> str:
-        return self.metrics.name
+        return self.sensor.name + " " + self.scenario.name
 
     def get_config(self) -> Dict[str, Any]:
         config = {
