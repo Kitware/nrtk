@@ -31,7 +31,10 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
-numpy = ">=1.18"
+numpy = [
+    {version = ">=1.23.1,<1.25", python = ">=3.8,<3.12"},
+    {version = ">=1.26", python = "^3.12"}
+]
 opencv-python = ">=4.6"
 Pillow = ">=10.2.0"
 scikit-image = ">=0.21"
@@ -40,7 +43,7 @@ smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
-pybsm = "<0.2.0"
+pybsm = ">=0.2.0"
 pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 

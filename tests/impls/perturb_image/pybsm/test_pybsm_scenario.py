@@ -1,5 +1,5 @@
 import pytest
-import pybsm
+from pybsm.simulation.scenario import Scenario
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager
 from smqtk_core.configuration import configuration_test_helper
@@ -23,7 +23,7 @@ def test_scenario_call() -> None:
     groundRange = 0
     name = "test"
     scenario = PybsmScenario(name, ihaze, altitude, groundRange)
-    assert type(scenario()) == pybsm.scenario
+    assert isinstance(scenario(), Scenario)
 
 
 @pytest.mark.parametrize("ihaze, altitude, groundRange, name, expectation", [
@@ -41,19 +41,19 @@ def test_verify_parameters(
 ) -> None:
 
     with expectation:
-        scenario = PybsmScenario(name, ihaze, altitude, groundRange)
+        pybsm_scenario = PybsmScenario(name, ihaze, altitude, groundRange)
 
         # testing PybsmScenario call
-        assert scenario().ihaze == ihaze
-        assert scenario().altitude == altitude
-        assert scenario().name == name
-        assert scenario().groundRange == groundRange
+        assert pybsm_scenario().ihaze == ihaze
+        assert pybsm_scenario().altitude == altitude
+        assert pybsm_scenario().name == name
+        assert pybsm_scenario().ground_range == groundRange
 
         # testing PybsmScenario.create_scenario directly
-        assert scenario.create_scenario().ihaze == ihaze
-        assert scenario.create_scenario().altitude == altitude
-        assert scenario.create_scenario().name == name
-        assert scenario.create_scenario().groundRange == groundRange
+        assert pybsm_scenario.create_scenario().ihaze == ihaze
+        assert pybsm_scenario.create_scenario().altitude == altitude
+        assert pybsm_scenario.create_scenario().name == name
+        assert pybsm_scenario.create_scenario().ground_range == groundRange
 
 
 def test_config() -> None:
