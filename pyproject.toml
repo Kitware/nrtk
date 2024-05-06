@@ -9,7 +9,7 @@ name = "nrtk"
 # from strings like this.
 # This package prefers to use the strict numbering standard when possible.
 version = "0.4.0"
-description = ""
+description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
 license = "Apache-2.0"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
