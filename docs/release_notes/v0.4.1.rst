@@ -1,0 +1,14 @@
+v0.4.1
+======
+
+Created a few fixes required for downstream `nrtk-cdao` entrypoint.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Corrected configuration semantics for pyBSM implementations.
+
+* Exposed all plugins for discoverability.
