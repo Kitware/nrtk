@@ -4,6 +4,8 @@ from pybsm.otf import darkCurrentFromDensity
 from contextlib import nullcontext as does_not_raise
 from typing import Any, ContextManager, Tuple, Sequence
 
+from smqtk_core.configuration import configuration_test_helper
+
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
@@ -86,8 +88,8 @@ class TestStepPerturbImageFactory:
 
     @pytest.mark.parametrize("theta_keys, thetas, expected", [
         (["altitude"], [[1000, 2000, 3000, 4000]], ((1000,), (2000,), (3000,), (4000,))),
-        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]],
-            ((1000, 10000), (1000, 20000), (2000, 10000), (2000, 20000)))
+        (["altitude", "D"], [[1000, 2000], [0.5, 0.75]],
+            ((1000, 0.5), (1000, 0.75), (2000, 0.5), (2000, 0.75)))
     ])
     def test_iteration(
         self,
@@ -108,13 +110,24 @@ class TestStepPerturbImageFactory:
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
             for count, _ in enumerate(theta_keys):
-                assert p.get_config()[theta_keys[count]] == expected[idx][count]
+                perturb_cfg = p.get_config()
+                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"]
+                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"]
+
+                if theta_keys[count] in sensor_cfg:
+                    assert sensor_cfg[theta_keys[count]] == expected[idx][count]
+                elif theta_keys[count] in sce_cfg:
+                    assert sce_cfg[theta_keys[count]] == expected[idx][count]
+                # elif theta_keys[count] in perturb_cfg:  # reflectance_range
+                #    assert perturb_cfg[theta_keys[count]] == expected[idx][count]
+                else:  # pragma: no cover
+                    assert False, "Parameter not found in config"
 
     @pytest.mark.parametrize("theta_keys, thetas, idx, expected_val, expectation", [
-        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 0, (1000, 10000), does_not_raise()),
-        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 3, (2000, 20000), does_not_raise()),
-        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], 4, (-1, -1), pytest.raises(IndexError)),
-        (["altitude", "groundRange"], [[1000, 2000], [10000, 20000]], -1, (2000, 20000), does_not_raise())
+        (["altitude", "D"], [[1000, 2000], [0.5, 0.75]], 0, (1000, 0.5), does_not_raise()),
+        (["altitude", "D"], [[1000, 2000], [10000, 20000]], 3, (2000, 20000), does_not_raise()),
+        (["altitude", "D"], [[1000, 2000], [10000, 20000]], 4, (-1, -1), pytest.raises(IndexError)),
+        (["altitude", "D"], [[1000, 2000], [10000, 20000]], -1, (2000, 20000), does_not_raise())
     ], ids=["first idx", "last idx", "idx == len", "neg idx"])
     def test_indexing(
         self,
@@ -136,7 +149,18 @@ class TestStepPerturbImageFactory:
         )
         with expectation:
             for count, _ in enumerate(theta_keys):
-                assert factory[idx].get_config()[theta_keys[count]] == expected_val[count]
+                perturb_cfg = factory[idx].get_config()
+                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"]
+                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"]
+
+                if theta_keys[count] in sensor_cfg:
+                    assert sensor_cfg[theta_keys[count]] == expected_val[count]
+                elif theta_keys[count] in sce_cfg:
+                    assert sce_cfg[theta_keys[count]] == expected_val[count]
+                # elif theta_keys[count] in perturb_cfg:  # reflectance_range
+                #     assert perturb_cfg[theta_keys[count]] == expected_val[count]
+                else:  # pragma: no cover
+                    assert False, "Parameter not found in config"
 
     @pytest.mark.parametrize("theta_keys, thetas, expected_sets", [
         (["altitude"], [[1000, 2000, 3000, 4000]], [[0], [1], [2], [3]]),
@@ -158,9 +182,43 @@ class TestStepPerturbImageFactory:
             theta_keys=theta_keys,
             thetas=thetas
         )
-        inst_config = inst.get_config()
-        assert inst_config['theta_keys'] == theta_keys
-        assert inst_config['thetas'] == thetas
-        assert inst_config['sensor'] == sensor.get_config()
-        assert inst_config['scenario'] == scenario.get_config()
-        assert inst_config['sets'] == expected_sets
+
+        for i in configuration_test_helper(inst):
+            assert i.theta_keys == theta_keys
+            assert i.thetas == thetas
+
+            assert i.sensor.name == sensor.name
+            assert i.sensor.D == sensor.D
+            assert i.sensor.f == sensor.f
+            assert i.sensor.px == sensor.px
+            assert np.array_equal(i.sensor.optTransWavelengths, sensor.optTransWavelengths)
+            assert np.array_equal(i.sensor.opticsTransmission, sensor.opticsTransmission)
+            assert i.sensor.eta == sensor.eta
+            assert i.sensor.wx == sensor.wx
+            assert i.sensor.wy == sensor.wy
+            assert i.sensor.intTime == sensor.intTime
+            assert i.sensor.darkCurrent == sensor.darkCurrent
+            assert i.sensor.readNoise == sensor.readNoise
+            assert i.sensor.maxN == sensor.maxN
+            assert i.sensor.bitdepth == sensor.bitdepth
+            assert i.sensor.maxWellFill == sensor.maxWellFill
+            assert i.sensor.sx == sensor.sx
+            assert i.sensor.sy == sensor.sy
+            assert i.sensor.dax == sensor.dax
+            assert i.sensor.day == sensor.day
+            assert np.array_equal(i.sensor.qewavelengths, sensor.qewavelengths)
+            assert np.array_equal(i.sensor.qe, sensor.qe)
+
+            assert i.scenario.name == scenario.name
+            assert i.scenario.ihaze == scenario.ihaze
+            assert i.scenario.altitude == scenario.altitude
+            assert i.scenario.groundRange == scenario.groundRange
+            assert i.scenario.aircraftSpeed == scenario.aircraftSpeed
+            assert i.scenario.targetReflectance == scenario.targetReflectance
+            assert i.scenario.targetTemperature == scenario.targetTemperature
+            assert i.scenario.backgroundReflectance == scenario.backgroundReflectance
+            assert i.scenario.backgroundTemperature == scenario.backgroundTemperature
+            assert i.scenario.haWindspeed == scenario.haWindspeed
+            assert i.scenario.cn2at1m == scenario.cn2at1m
+
+            assert i.sets == expected_sets

@@ -1,4 +1,7 @@
-from typing import Iterable, Iterator, Dict, Any, Sequence, List
+from __future__ import annotations
+from typing import Iterable, Iterator, Dict, Any, Sequence, List, Type
+
+from smqtk_core.configuration import to_config_dict, from_config_dict, make_default_config
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -77,13 +80,39 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     def theta_key(self) -> str:
         return "params"
 
+    @classmethod
+    def get_default_config(cls) -> Dict[str, Any]:
+        cfg = super().get_default_config()
+        cfg["sensor"] = make_default_config([PybsmSensor])
+        cfg["scenario"] = make_default_config([PybsmScenario])
+
+        return cfg
+
+    @classmethod
+    def from_config(
+        cls: Type[_PybsmPerturbImageFactory],
+        config_dict: Dict,
+        merge_default: bool = True
+    ) -> _PybsmPerturbImageFactory:
+        config_dict = dict(config_dict)
+
+        config_dict["sensor"] = from_config_dict(
+            config_dict["sensor"],
+            [PybsmSensor]
+        )
+        config_dict["scenario"] = from_config_dict(
+            config_dict["scenario"],
+            [PybsmScenario]
+        )
+
+        return super().from_config(config_dict, merge_default=merge_default)
+
     def get_config(self) -> Dict[str, Any]:
         return {
             'theta_keys':   self.theta_keys,
-            'sensor':       self.sensor.get_config(),
-            'scenario':     self.scenario.get_config(),
+            'sensor':       to_config_dict(self.sensor),
+            'scenario':     to_config_dict(self.scenario),
             'thetas':       self.thetas,
-            'sets':         self.sets
         }
 
 

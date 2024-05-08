@@ -64,5 +64,16 @@ def test_config() -> None:
     altitude = 2
     groundRange = 0
     name = "test"
-    scenario = PybsmScenario(name, ihaze, altitude, groundRange)
-    configuration_test_helper(scenario)
+    inst = PybsmScenario(name, ihaze, altitude, groundRange)
+    for i in configuration_test_helper(inst):
+        assert i.name == inst.name
+        assert i.ihaze == inst.ihaze
+        assert i.altitude == inst.altitude
+        assert i.groundRange == inst.groundRange
+        assert i.aircraftSpeed == inst.aircraftSpeed
+        assert i.targetReflectance == inst.targetReflectance
+        assert i.targetTemperature == inst.targetTemperature
+        assert i.backgroundReflectance == inst.backgroundReflectance
+        assert i.backgroundTemperature == inst.backgroundTemperature
+        assert i.haWindspeed == inst.haWindspeed
+        assert i.cn2at1m == inst.cn2at1m
