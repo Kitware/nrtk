@@ -1,0 +1,18 @@
+v0.4.2
+======
+
+Added support for `Python 3.12 `.
+
+Updates / New Features
+----------------------
+
+Python Version Support
+
+* Added support for `py3.12`
+
+CI/CD
+
+* Updated CI test matrix to support `py3.12`
+
+Fixes
+-----
