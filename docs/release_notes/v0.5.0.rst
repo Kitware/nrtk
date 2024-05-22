@@ -1,6 +1,8 @@
 v0.5.0
 ======
 
+Updated to use newer version of `pybsm` which included an improvement to Fourier sampling.
+
 Updates / New Features
 ----------------------
 
