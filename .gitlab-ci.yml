@@ -382,3 +382,22 @@ publish-on-tag:
     - |
       export POETRY_PYPI_TOKEN_PYPI="${PYPI_PUBLISH_TOKEN}"
       poetry publish --build
+
+branch_pages:
+    extends: 
+      - .run_automatically
+    stage: docs
+    needs:
+      - test-docs-build
+    artifacts:
+        paths:
+          - docs/_build/html/
+    environment:
+        name: Sphinx
+        url: "https://jatic.pages.jatic.net/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/index.html"
+    script: |
+      # Just need something for script 
+    variables:
+        PUBLIC_URL: "/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/"
+    tags:
+      - kitware
