@@ -20,3 +20,4 @@ Release Notes
    release_notes/v0.5.0
    release_notes/v0.5.1
    release_notes/v0.5.2
+   release_notes/v0.5.3
