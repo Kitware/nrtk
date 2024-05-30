@@ -1,6 +1,8 @@
 v0.5.1
 ======
 
+Hotfix to address a `numpy` dependency resolution issue.
+
 Updates / New Features
 ----------------------
 
