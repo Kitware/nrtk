@@ -1,0 +1,14 @@
+v0.5.2
+======
+
+A hotfix to correct a `numpy` dependency resolution issue.
+
+Updates / New Features
+----------------------
+
+* Updated to use `pybsm>=0.4.1`.
+
+Fixes
+-----
+
+* Fixed `numpy` dependency versions for downstream resolution.
