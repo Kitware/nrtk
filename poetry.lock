@@ -2421,9 +2421,9 @@ numpy = [
     {version = ">=1.21.0", markers = "python_version <= \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\" and python_version >= \"3.8\""},
     {version = ">=1.19.3", markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and python_version >= \"3.8\" and python_version < \"3.10\" or python_version > \"3.9\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_system != \"Darwin\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
     {version = ">=1.17.3", markers = "(platform_system != \"Darwin\" and platform_system != \"Linux\") and python_version >= \"3.8\" and python_version < \"3.9\" or platform_system != \"Darwin\" and python_version >= \"3.8\" and python_version < \"3.9\" and platform_machine != \"aarch64\" or platform_machine != \"arm64\" and python_version >= \"3.8\" and python_version < \"3.9\" and platform_system != \"Linux\" or (platform_machine != \"arm64\" and platform_machine != \"aarch64\") and python_version >= \"3.8\" and python_version < \"3.9\""},
+    {version = ">=1.23.5", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
     {version = ">=1.21.4", markers = "python_version >= \"3.10\" and platform_system == \"Darwin\" and python_version < \"3.11\""},
     {version = ">=1.21.2", markers = "platform_system != \"Darwin\" and python_version >= \"3.10\" and python_version < \"3.11\""},
-    {version = ">=1.23.5", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
     {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 
@@ -2746,25 +2746,25 @@ tests = ["pytest"]
 
 [[package]]
 name = "pybsm"
-version = "0.4.1"
+version = "0.4.2"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 optional = false
 python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "pybsm-0.4.1-py3-none-any.whl", hash = "sha256:a812a6195f37ae87ee3782f1bcbfb5f1e7c03ed1f7f237dea6db85e091e5f74c"},
-    {file = "pybsm-0.4.1.tar.gz", hash = "sha256:f891ced233cdf3cf9c4a4f2bc29da633245b96f86bcfdaafb7055c3dfa52afaf"},
+    {file = "pybsm-0.4.2-py3-none-any.whl", hash = "sha256:7d97af8ea531199c842b8573b3a2befc5d13762b3e89440171efa73e06636869"},
+    {file = "pybsm-0.4.2.tar.gz", hash = "sha256:8b485bc4fa0bd5016c0fa1fce98539e631298984995cf122eac01248f74fc569"},
 ]
 
 [package.dependencies]
 matplotlib = ">=3.5.2"
 numpy = [
-    {version = ">=1.23.1,<1.25", markers = "python_full_version >= \"3.8.1\" and python_version < \"3.9\""},
-    {version = ">=1.25", markers = "python_version >= \"3.9\" and python_version < \"3.13\""},
+    {version = ">=1.22,<1.25", markers = "python_full_version >= \"3.8.1\" and python_version < \"3.9\""},
+    {version = ">=1.25,<2.0", markers = "python_version >= \"3.9\" and python_version < \"3.13\""},
 ]
 opencv-python = ">=4.6"
 scipy = [
-    {version = ">=1.8.1,<1.11.1", markers = "python_full_version >= \"3.8.1\" and python_version < \"3.9\""},
-    {version = ">=1.8.1,<1.14", markers = "python_version >= \"3.9\""},
+    {version = "<1.11.1", markers = "python_full_version >= \"3.8.1\" and python_version < \"3.9\""},
+    {version = ">=1.10.0,<1.14", markers = "python_version >= \"3.9\""},
 ]
 setuptools = ">=65.6.1"
 
@@ -4298,4 +4298,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "27cf2e3e2e0a909e2ee4c79bdb494e9cfce14afa55ce65faa79c5f3b424d497c"
+content-hash = "b7ccd1cc8e1068bcb166bb7a9c435e7c4b7e7ca4137c43dd38352502944a601b"

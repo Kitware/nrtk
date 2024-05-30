@@ -32,13 +32,14 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
+# Python capped to <3.13 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.23.1,<1.25", python = "~3.8.1"},
-    {version = ">=1.25", python = ">=3.9,<3.13" }
+    {version = ">=1.22,<1.25", python = "~3.8.1"}, # CVE-2021-34141
+    {version = ">=1.22,^1.25", python = ">=3.9,<3.13" } # CVE-2021-34141
 ]
 opencv-python = ">=4.6"
-Pillow = ">=10.2.0"
+Pillow = ">=10.3.0" # CVE-2024-28219
 scikit-image = [
     {version = ">=0.21,<0.22", python = ">=3.8,<3.12"},
     {version = ">=0.22", python = ">=3.12"}
@@ -48,7 +49,7 @@ smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
-pybsm = ">=0.4.1"
+pybsm = ">=0.4.2"
 pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 
