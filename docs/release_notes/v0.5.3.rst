@@ -1,0 +1,14 @@
+v0.5.3
+======
+
+Attempting to patch downstream dependency resolution issues.
+
+Updates / New Features
+----------------------
+
+* Updated to use `pybsm>=0.4.2` to support wider range of dependencies.
+
+* Lowered the minimum `numpy` allowed to `1.22`.
+
+Fixes
+-----

@@ -4,9 +4,5 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
-* Updated to use `pybsm>=0.4.2` to support wider range of dependencies.
-
-* Lowered the minimum `numpy` allowed to `1.22`.
-
 Fixes
 -----
