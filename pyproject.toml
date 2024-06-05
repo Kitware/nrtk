@@ -35,8 +35,9 @@ python = "^3.8.1"
 # Python capped to <3.13 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.22,<1.25", python = "~3.8.1"}, # CVE-2021-34141
-    {version = ">=1.22,^1.25", python = ">=3.9,<3.13" } # CVE-2021-34141
+    {version = ">=1.22,<1.25", python = "~3.8"}, # CVE-2021-34141
+    {version = ">=1.22,^1.25", python = ">=3.9,<3.12" }, # CVE-2021-34141
+    {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
 opencv-python = ">=4.6"
 Pillow = ">=10.3.0" # CVE-2024-28219
@@ -49,7 +50,7 @@ smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
-pybsm = ">=0.4.2"
+pybsm = ">=0.4.3"
 pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 
