@@ -32,6 +32,8 @@ class PybsmSensor(Configurable):
         relative linear obscuration (unitless)
     wx and wy :
         detector width in the x and y directions (m)
+    intTime :
+        maximum integration time (s)
     qe :
         quantum efficiency as a function of wavelength (e-/photon)
     qewavelengths :
