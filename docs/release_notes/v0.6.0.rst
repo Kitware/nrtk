@@ -1,6 +1,8 @@
 v0.6.0
 ======
 
+Added a new pyBSM perturber to nrtk from pyBSM's JitterOTF.
+
 Updates / New Features
 ----------------------
 Added implementation of JitterOTF perturber
