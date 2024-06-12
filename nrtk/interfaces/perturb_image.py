@@ -18,14 +18,15 @@ class PerturbImage(Plugfigurable):
         additional_params: Dict[str, Any] = {}
     ) -> np.ndarray:
         """
-        Generate a perturbed image for the given image stimulus.
+        Generate a perturbed image for the given image stimulus. Note perturbers that resize, rotate, or similarly
+        affect the dimensions of an image may impact scoring if bounding boxes are not similarly
+        transformed.
 
         :param image: Input image as a numpy array.
-        :param additional_oarams: A dictionary containing perturber implementation-specific input param-values pairs.
+        :param additional_params: A dictionary containing perturber implementation-specific input param-values pairs.
 
-        :return: Peturbed image as numpy array, including matching shape and dtype.
-            Implementations should impart no side effects upon the input
-            image.
+        :return: Perturbed image as numpy array, including matching dtype. Implementations should impart no side
+            effects upon the input image.
         """
 
     def __call__(

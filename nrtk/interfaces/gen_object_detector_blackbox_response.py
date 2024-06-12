@@ -19,6 +19,8 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
     object detections with respect to the given black-box object detector after
     input images are perturbed via the black-box perturber factory. Scoring of
     these detections is computed with the given black-box scorer.
+
+    Note that dimension transformations are not currently accounted for and may impact scoring.
     """
     @abc.abstractmethod
     def __getitem__(

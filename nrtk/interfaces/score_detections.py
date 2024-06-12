@@ -15,6 +15,9 @@ class ScoreDetections(Plugfigurable):
     detections and computing the corresponding metric scores.
 
     Implementations should verify the validity of the input data.
+
+    Note that current implementations are not required to verify nor correct dimension
+    (in)consistency, which may impact scoring.
     """
 
     @abc.abstractmethod
