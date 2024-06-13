@@ -1,6 +1,8 @@
 v0.7.0
 ======
 
+Added support for JitterOTFPerturber Plugfigurability rehydration and dehydration.
+
 Updates / New Features
 ----------------------
 
