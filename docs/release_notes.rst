@@ -22,3 +22,4 @@ Release Notes
    release_notes/v0.5.2
    release_notes/v0.5.3
    release_notes/v0.6.0
+   release_notes/v0.7.0

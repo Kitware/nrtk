@@ -6,7 +6,7 @@ from pybsm.otf.functional import jitterOTF, otf2psf, resample2D
 from pybsm.utils import loadDatabaseAtmosphere
 from typing import Any, Dict, Type, Optional
 
-from smqtk_core.configuration import from_config_dict
+from smqtk_core.configuration import from_config_dict, to_config_dict, make_default_config
 
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -18,10 +18,29 @@ class JitterOTFPerturber(PerturbImage):
                  name: str,
                  sensor: Optional[PybsmSensor] = None,
                  scenario: Optional[PybsmScenario] = None,
-                 sx: Optional[float] = 1.0,
-                 sy: Optional[float] = 1.0,
-                 **kwargs: Any
+                 sx: Optional[float] = None,
+                 sy: Optional[float] = None
                  ) -> None:
+        '''
+        :param name: string representation of object
+        :param sensor: pyBSM sensor object.
+        :param scenario: pyBSM scenario object
+        :param sx: root-mean-squared jitter amplitudes in the x direction (rad).
+        :param sy: root-mean-squared jitter amplitudes in the y direction (rad).
+
+        If both sensor and scenario parameters are not present, then default values
+        will be used for their parameters
+
+        If neither sx, sy, sensor or scenario parameters are provided, the values
+        of sx and sy will be the default of 1.0
+
+        If sensor and scenario parameters are provided, but not sx and sy, the
+        values of sx and sy will come from the sensor and scenario objects.
+
+        If sx and sy are ever provided by the user, those values will be used
+        in the otf caluclattion
+        '''
+
         if sensor and scenario:
             atm = loadDatabaseAtmosphere(scenario.altitude,
                                          scenario.groundRange,
@@ -41,13 +60,15 @@ class JitterOTFPerturber(PerturbImage):
             mtfwavelengths = wavelengths[weights > 0.0]
 
             D = sensor.D
-            sx = sensor.sx
-            sy = sensor.sy
+            self.sx = sx if sx is not None else sensor.sx
+            self.sy = sy if sy is not None else sensor.sy
+
             self.slant_range = np.sqrt(scenario.altitude**2 +
                                        scenario.groundRange**2)
             self.ifov = (sensor.px + sensor.py) / 2 / sensor.f
-
         else:
+            self.sx = sx if sx is not None else 1.0
+            self.sy = sy if sy is not None else 1.0
             # Assume visible spectrum of light
             self.ifov = -1
             self.slant_range = -1
@@ -64,8 +85,11 @@ class JitterOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(urng, vrng)
+        self.sensor = sensor
+        self.scenario = scenario
+
         self.df = (abs(urng[1] - urng[0]) + abs(vrng[0] - vrng[1]))/2
-        self.jitOTF = jitterOTF(uu, vv, sx, sy)
+        self.jitOTF = jitterOTF(uu, vv, self.sx, self.sy)
         self.name = name
 
     def perturb(
@@ -73,6 +97,9 @@ class JitterOTFPerturber(PerturbImage):
             image: np.ndarray,
             additional_params: Dict[str, Any] = {}
             ) -> np.ndarray:
+        """
+        :raises: ValueError if 'img_gsd' not present in additional_params
+        """
         if self.ifov >= 0 and self.slant_range >= 0:
             if 'img_gsd' not in additional_params:
                 raise ValueError("'img_gsd' must be present in image metadata\
@@ -114,27 +141,38 @@ class JitterOTFPerturber(PerturbImage):
         return self.name
 
     @classmethod
+    def get_default_config(cls) -> Dict[str, Any]:
+        cfg = super().get_default_config()
+        cfg["sensor"] = make_default_config([PybsmSensor])
+        cfg["scenario"] = make_default_config([PybsmScenario])
+        return cfg
+
+    @classmethod
     def from_config(
         cls: Type[JitterOTFPerturber],
         config_dict: Dict,
         merge_default: bool = True
     ) -> JitterOTFPerturber:
         config_dict = dict(config_dict)
-
-        config_dict["sensor"] = from_config_dict(
-            config_dict["sensor"],
-            [PybsmSensor]
-        )
-        config_dict["scenario"] = from_config_dict(
-            config_dict["scenario"],
-            [PybsmScenario]
-        )
+        sensor = config_dict.get("sensor", None)
+        if sensor is not None:
+            config_dict["sensor"] = from_config_dict(sensor, [PybsmSensor])
+        scenario = config_dict.get("scenario", None)
+        if scenario is not None:
+            config_dict["scenario"] = from_config_dict(scenario, [PybsmScenario])
 
         return super().from_config(config_dict, merge_default=merge_default)
 
     def get_config(self) -> Dict[str, Any]:
+        sensor = to_config_dict(self.sensor) if self.sensor else None
+        scenario = to_config_dict(self.scenario) if self.scenario else None
+
         config = {
-            'otf': self.jitOTF.tolist()
+            'name': self.name,
+            'sensor': sensor,
+            'scenario': scenario,
+            'sx': self.sx,
+            'sy': self.sy
         }
 
         return config
