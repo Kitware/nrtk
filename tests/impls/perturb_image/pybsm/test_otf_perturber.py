@@ -5,6 +5,8 @@ from PIL import Image
 from contextlib import nullcontext as does_not_raise
 from typing import Any, Dict, ContextManager, Tuple
 
+from smqtk_core.configuration import configuration_test_helper
+
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -19,7 +21,6 @@ EXPECTED_PROVIDED_IMG_FILE = './tests/impls/perturb_image/pybsm/data/jitter_otf_
 class TestOTFPerturber:
     def createSampleSensorandScenario(self) -> Tuple[PybsmSensor,
                                                      PybsmScenario]:
-
         name = 'L32511x'
 
         # telescope focal length (m)
@@ -136,16 +137,11 @@ class TestOTFPerturber:
             expected=expected
         )
 
-    @pytest.mark.parametrize("param_name, param_value", [
-        ('groundRange', 10000),
-        ('groundRange', 20000),
-        ('groundRange', 30000),
-        ('altitude', 10000),
-        ('ihaze', 2)
-    ])
+    @pytest.mark.parametrize("sx", [0.5, 1.5])
+    @pytest.mark.parametrize("sy", [0.5, 1.5])
     def test_provided_reproducibility(self,
-                                      param_name: str,
-                                      param_value: Any) -> None:
+                                      sx: float,
+                                      sy: float) -> None:
         """
         Ensure results are reproducible.
         """
@@ -153,8 +149,11 @@ class TestOTFPerturber:
         name = "test_name"
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = self.createSampleSensorandScenario()
-        inst = JitterOTFPerturber(name, sensor=sensor, scenario=scenario,
-                                  **{param_name: param_value})
+        inst = JitterOTFPerturber(name,
+                                  sensor=sensor,
+                                  scenario=scenario,
+                                  sx=sx,
+                                  sy=sy)
         img_gsd = 3.19/160.0
         out_image = pybsm_perturber_assertions(perturb=inst.perturb,
                                                image=image,
@@ -190,8 +189,7 @@ class TestOTFPerturber:
         """
         name = "test_name"
         sensor, scenario = self.createSampleSensorandScenario()
-        perturber = JitterOTFPerturber(name, sensor=sensor, scenario=scenario,
-                                       reflectance_range=np.array([.05, .5]))
+        perturber = JitterOTFPerturber(name, sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
             _ = perturber(image, additional_params)
@@ -232,3 +230,115 @@ class TestOTFPerturber:
         pybsm_perturber_assertions(perturb=inst.perturb, image=image,
                                    expected=out_image,
                                    additional_params={'img_gsd': img_gsd})
+
+    @pytest.mark.parametrize("sx", [0.5])
+    @pytest.mark.parametrize("sy", [0.5])
+    def test_sx_sy_configuration(self,
+                                 sx: float,
+                                 sy: float,
+                                 ) -> None:
+        """
+        Test configuration stability.
+        """
+        inst = JitterOTFPerturber("test_otf",
+                                  sx=sx,
+                                  sy=sy)
+        for i in configuration_test_helper(inst):
+            assert i.sx == sx
+            assert i.sy == sy
+
+    def test_sensor_scenario_configuration(self) -> None:
+        """
+        Test configuration stability.
+        """
+        sensor, scenario = self.createSampleSensorandScenario()
+        inst = JitterOTFPerturber("test_otf",
+                                  sensor=sensor,
+                                  scenario=scenario)
+        for i in configuration_test_helper(inst):
+            if i.sensor:
+                assert i.sensor.name == sensor.name
+                assert i.sensor.D == sensor.D
+                assert i.sensor.f == sensor.f
+                assert i.sensor.px == sensor.px
+                assert np.array_equal(i.sensor.optTransWavelengths, sensor.optTransWavelengths)
+                assert np.array_equal(i.sensor.opticsTransmission, sensor.opticsTransmission)
+                assert i.sensor.eta == sensor.eta
+                assert i.sensor.wx == sensor.wx
+                assert i.sensor.wy == sensor.wy
+                assert i.sensor.intTime == sensor.intTime
+                assert i.sensor.darkCurrent == sensor.darkCurrent
+                assert i.sensor.readNoise == sensor.readNoise
+                assert i.sensor.maxN == sensor.maxN
+                assert i.sensor.bitdepth == sensor.bitdepth
+                assert i.sensor.maxWellFill == sensor.maxWellFill
+                assert i.sensor.sx == sensor.sx
+                assert i.sensor.sy == sensor.sy
+                assert i.sensor.dax == sensor.dax
+                assert i.sensor.day == sensor.day
+                assert np.array_equal(i.sensor.qewavelengths, sensor.qewavelengths)
+                assert np.array_equal(i.sensor.qe, sensor.qe)
+            if i.scenario:
+                assert i.scenario.name == scenario.name
+                assert i.scenario.ihaze == scenario.ihaze
+                assert i.scenario.altitude == scenario.altitude
+                assert i.scenario.groundRange == scenario.groundRange
+                assert i.scenario.aircraftSpeed == scenario.aircraftSpeed
+                assert i.scenario.targetReflectance == scenario.targetReflectance
+                assert i.scenario.targetTemperature == scenario.targetTemperature
+                assert i.scenario.backgroundReflectance == scenario.backgroundReflectance
+                assert i.scenario.backgroundTemperature == scenario.backgroundTemperature
+                assert i.scenario.haWindspeed == scenario.haWindspeed
+                assert i.scenario.cn2at1m == scenario.cn2at1m
+
+    @pytest.mark.parametrize("sx", [0.5])
+    @pytest.mark.parametrize("sy", [0.5])
+    def test_overall_configuration(self,
+                                   sx: float,
+                                   sy: float,) -> None:
+        """
+        Test configuration stability.
+        """
+        sensor, scenario = self.createSampleSensorandScenario()
+        inst = JitterOTFPerturber("test_otf",
+                                  sensor=sensor,
+                                  scenario=scenario,
+                                  sx=sx,
+                                  sy=sy)
+        for i in configuration_test_helper(inst):
+            assert i.sx == sx
+            assert i.sy == sy
+            if i.sensor:
+                assert i.sensor.name == sensor.name
+                assert i.sensor.D == sensor.D
+                assert i.sensor.f == sensor.f
+                assert i.sensor.px == sensor.px
+                assert np.array_equal(i.sensor.optTransWavelengths, sensor.optTransWavelengths)
+                assert np.array_equal(i.sensor.opticsTransmission, sensor.opticsTransmission)
+                assert i.sensor.eta == sensor.eta
+                assert i.sensor.wx == sensor.wx
+                assert i.sensor.wy == sensor.wy
+                assert i.sensor.intTime == sensor.intTime
+                assert i.sensor.darkCurrent == sensor.darkCurrent
+                assert i.sensor.readNoise == sensor.readNoise
+                assert i.sensor.maxN == sensor.maxN
+                assert i.sensor.bitdepth == sensor.bitdepth
+                assert i.sensor.maxWellFill == sensor.maxWellFill
+                assert i.sensor.sx == sensor.sx
+                assert i.sensor.sy == sensor.sy
+                assert i.sensor.dax == sensor.dax
+                assert i.sensor.day == sensor.day
+                assert np.array_equal(i.sensor.qewavelengths, sensor.qewavelengths)
+                assert np.array_equal(i.sensor.qe, sensor.qe)
+            if i.scenario:
+                assert i.scenario.name == scenario.name
+                assert i.scenario.ihaze == scenario.ihaze
+                assert i.scenario.altitude == scenario.altitude
+                assert i.scenario.groundRange == scenario.groundRange
+                assert i.scenario.aircraftSpeed == scenario.aircraftSpeed
+                assert i.scenario.targetReflectance == scenario.targetReflectance
+                assert i.scenario.targetTemperature == scenario.targetTemperature
+                assert i.scenario.backgroundReflectance == scenario.backgroundReflectance
+                assert i.scenario.backgroundTemperature == scenario.backgroundTemperature
+                assert i.scenario.haWindspeed == scenario.haWindspeed
+                assert i.scenario.cn2at1m == scenario.cn2at1m

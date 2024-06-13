@@ -10,5 +10,7 @@ Updates / New Features
 
 * Updated git lfs to properly track large files in any directory
 
+* Added functionality to dehydrate and rehydrate JitterOTFPerturber objects with config files
+
 Fixes
 -----
