@@ -70,6 +70,13 @@ Class: PybsmSensor
 .. autoclass:: nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor
    :members:
 
+.. _jitter:
+
+Class: JitterOTFPerturber
+-------------------------
+.. autoclass:: nrtk.impls.perturb_image.pybsm.jitter_otf_perturber.JitterOTFPerturber
+   :members:
+
 Class: SaltAndPepperNoisePerturber
 ----------------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.skimage.random_noise.SaltAndPepperNoisePerturber
@@ -147,4 +154,3 @@ Class: SimplePybsmGenerator
 .. autoclass:: nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator.SimplePybsmGenerator
    :members:
    :special-members:
-
