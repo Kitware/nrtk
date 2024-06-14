@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Sequence, Tuple
 from smqtk_classifier import ClassifyImage
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
 
+from nrtk.interfaces.gen_blackbox_response import gen_perturber_combinations
 from nrtk.interfaces.gen_blackbox_response import GenerateBlackboxResponse
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -96,7 +97,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
 
         # Generate results for each combination of perturbers
         # Note: order of factories is preserved when applying pertubations
-        pert_combos = GenerateBlackboxResponse._gen_perturber_combinations(
+        pert_combos = gen_perturber_combinations(
             factories=blackbox_perturber_factories
         )
         with tqdm(total=len(pert_combos)) if verbose else nullcontext() as progress_bar:  # type: ignore
