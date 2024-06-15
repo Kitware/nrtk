@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 ###############################################################################
@@ -54,32 +54,39 @@ pybsm = ">=0.4.3"
 pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 
-[tool.poetry.extras]
-
-[tool.poetry.group.dev.dependencies]
 # Linting
+[tool.poetry.group.dev-linting]
+optional = true
+
+[tool.poetry.group.dev-linting.dependencies]
 flake8 = ">=6"
 flake8-mutable = ">=1.2.0"
-# Type checking
 mypy = ">=0.991"
 types-Pillow = ">=9.0"
 types-setuptools = ">=65.6.0.1"
 types-tqdm = ">=4.64"
+
+# Docs
+[tool.poetry.group.dev-docs]
+optional = true
+
+[tool.poetry.group.dev-docs.dependencies]
+Sphinx = ">=5.3.0"
+sphinx-rtd-theme = ">=1.1.1"
+sphinx-prompt = ">=1.5.0"
+livereload = ">=2.6.3"
+
 # Testing
+[tool.poetry.group.dev-testing]
+optional = true
+
+[tool.poetry.group.dev-testing.dependencies]
 coverage = ">=6.5.0"
 pytest = ">=7.2.0"
 pytest-cov = ">=4.0.0"
 # Jupyter notebook testing
 notebook = ">=7.0.7"
 papermill = ">=2.4.0"
-# Docs
-Sphinx = ">=5.3.0"
-sphinx-rtd-theme = ">=1.1.1"
-sphinx-prompt = ">=1.5.0"
-livereload = ">=2.6.3"
-
-
-[tool.poetry.scripts]
 
 [tool.poetry.plugins."smqtk_plugins"]
 # Add implementation sub-module exposure here.
