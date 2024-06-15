@@ -36,7 +36,8 @@ class RandomScorer(ScoreDetections):
                     "Actual bounding boxes must have detections and can't be empty."
                 )
 
-        return [random.random() for actual_det in actual]
+        # we include nosemgrep because random.random() is sufficient for our need
+        return [random.random() for actual_det in actual]  # nosemgrep
 
     def get_config(self) -> Dict[str, Any]:
         return {"rng": self.rng}
