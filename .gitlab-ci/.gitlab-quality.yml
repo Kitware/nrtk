@@ -36,3 +36,16 @@ typecheck:
   extends: .quality-setup
   script:
     - poetry run mypy
+
+# Job to typecheck python code
+black:
+  extends: .quality-setup
+  allow_failure: true
+  script:
+    - poetry run black --config pyproject.toml src/ tests/
+
+ruff:
+  extends: .quality-setup
+  allow_failure: true
+  script:
+    - poetry run ruff check src/ tests/
