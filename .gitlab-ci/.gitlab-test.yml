@@ -1,0 +1,115 @@
+###############################################################################
+# Stage -- Unit Testing
+###############################################################################
+
+.test-setup:
+  extends: .shared-setup
+  stage: test
+  needs: [] # Don't wait for previous stages/jobs
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry install --sync --with dev-testing
+
+# Job to run unittests via pytest
+pytest:
+  extends: .test-setup
+  parallel:
+    matrix:
+      - PYTHON_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+  variables:
+    COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}"
+    JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
+  image: python:${PYTHON_VERSION}
+  before_script:
+    - !reference [.test-setup, before_script]
+    - !reference [.needs-headless-opencv, before_script]
+  script:
+    - poetry run pytest --junit-xml="${JUNIT_TARGET}"
+    # Rename out coverage database files appropriately
+    - mv .coverage "${COVERAGE_TARGET}"
+  artifacts:
+    paths:
+      - ${COVERAGE_TARGET}
+    reports:
+      junit: "${JUNIT_TARGET}"
+    expire_in: 1 day
+
+# Job to test-run the example jupyter notebooks
+#
+# This job has a parallel matrix to parameterize different working-directories
+# and notebooks within to run. Each parallel instance of this job should only
+# run a single notebook. !reference:
+#
+# See GitLab docs for parallel-matrix functionality:
+#   https://docs.gitlab.com/ee/ci/yaml/#parallelmatrix
+#
+# The parallel-matrix list may have multiple items, and each entry should have
+# a pair of keys: "NOTEBOOK_DIR" and "NOTEBOOK_FILE". (Given the documentation
+# for the parallel-matrix functionality, combinatorics are only applied within
+# an item, not across items.)
+# * "NOTEBOOK_DIR" should be a single string that notes the directory in which
+#   notebook files should be run in (basically the working directory, generally
+#   the directory the notebook lives in). This path should be relative to the
+#   root of the repository.
+# * "NOTEBOOK_FILE" should be a list of strings that denote the notebook files
+#   to be run. These paths path should be relative to the "NOTEBOOK_DIR". Files
+#   in this list will be combinatorially combined with the path provided in
+#   the associated "NOTEBOOK_DIR" to create a job parameterization instance.
+notebooks:
+  extends: .test-setup
+  needs: [pytest] # if unit tests don't pass, don't run the notebooks
+  dependencies: []
+  # Specifying the various notebooks that we want to be tested. Each invocation
+  # of this job should try to execute only one notebook via papermill.
+  parallel:
+    matrix:
+      # Sequences combinatorically combine within a list entry
+      - NOTEBOOK_DIR: "examples"
+        NOTEBOOK_FILE: [
+          "coco_scorer.ipynb",
+          "perturbers.ipynb",
+          "simple_generic_generator.ipynb",
+          "simple_pybsm_generator.ipynb"
+        ]
+      - NOTEBOOK_DIR: "examples/pybsm"
+        NOTEBOOK_FILE: [
+          "pybsm_test.ipynb"
+        ]
+  # Using default container image defined above
+  script:
+    - cd "${NOTEBOOK_DIR}"
+    - poetry run papermill
+        --progress-bar -k python3 --stdout-file - --stderr-file -
+        "${NOTEBOOK_FILE}" /dev/null
+
+coverage:
+  extends: .test-setup
+  needs:
+    - job: pytest
+      artifacts: true
+  allow_failure: true
+  before_script:
+    # Overwrite but do not extend .test-setup before_script
+    # because we don't need poetry and dependencies installed
+    - export PATH=${HOME}/.local/bin:${PATH}
+    - pip install --upgrade pip
+    - pip install --user -U coverage
+  script:
+    # Combine all the coverage reports from the pytest matrix into a single
+    # database file.
+    - coverage combine ./.coverage*
+    # This converts the now combined `.coverage` database file into a single
+    # `coverage.xml` file
+    - coverage xml
+    # TODO: Read required percentages from config file?
+    - coverage report --include 'nrtk/*' --precision=2 --fail-under=99
+    - coverage report --include 'tests/*' --precision=2 --fail-under=100
+  artifacts:
+    when: always
+    paths:
+      - ".coverage"
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    expire_in: 1 day

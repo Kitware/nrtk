@@ -1,0 +1,41 @@
+###############################################################################
+# Stage -- Documentation
+###############################################################################
+
+.docs-setup:
+  extends: .shared-setup
+  stage: docs
+  needs: [] # Don't wait for previous stages/jobs
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry install --sync --with dev-docs,dev-testing
+    - !reference [.needs-headless-opencv, before_script]
+
+pages-branch:
+  extends: .docs-setup
+  artifacts:
+      paths:
+        - docs/_build/html/
+  environment:
+      name: Sphinx
+      url: "https://jatic.pages.jatic.net/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/index.html"
+  script:
+    - cd docs
+    - poetry run make html
+  variables:
+      PUBLIC_URL: "/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/"
+
+pages:
+  extends: .docs-setup
+  stage: docs
+  needs:
+    - job: pages-branch
+      artifacts: true
+  script:
+    - mv docs/_build/html/ public/
+  artifacts:
+    paths:
+    - public
+  rules:
+    # Only run this rule if on main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

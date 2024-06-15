@@ -1,0 +1,37 @@
+###############################################################################
+# Stage -- Security Scanning
+###############################################################################
+
+include:
+- template: Jobs/SAST.latest.gitlab-ci.yml
+- template: Jobs/Dependency-Scanning.latest.gitlab-ci.yml
+- template: Jobs/Secret-Detection.latest.gitlab-ci.yml
+
+sast:
+  stage: security
+  dependencies: []
+  artifacts:
+    paths: 
+      - gl-sast-report.json
+    reports:
+      sast: gl-sast-report.json
+
+dependency_scanning:
+  stage: security
+  dependencies: []
+  artifacts:
+    paths:
+    - gl-dependency-scanning-report.json
+    reports:
+      dependency_scanning:
+        - gl_dependency-scanning-report.json
+
+secret_detection:
+  stage: security
+  dependencies: []
+  artifacts:
+    paths:
+    - gl-secret-detection-report.json
+    reports:
+      secret_detection:
+        - gl-secret-detection-report.json
