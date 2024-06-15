@@ -141,3 +141,6 @@ cython_debug/
 # Example notebooks
 examples/data
 examples/pybsm/data
+
+# ruff
+.ruff_cache

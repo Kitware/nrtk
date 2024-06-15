@@ -2,7 +2,6 @@ stages:
   - security
   - quality
   - test
-  - notebooks
   - docs
   - publish
 
