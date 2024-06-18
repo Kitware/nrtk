@@ -15,6 +15,8 @@ CI/CD
 
 * Added `ruff` and `black` check to CI/CD (currently optional).
 
+* Updated coverage to look at `src/nrtk` rather than `nrtk`.
+
 Other
 
 * Added `git pre-hook` to assist in linting.
