@@ -7,7 +7,8 @@ Overview
 
 The Jitter OTF simulates the wideband jitter of an optical sensor's line of sight. This is approximated as a Gaussian blur effect caused by minor, rapid movements of the sensor or camera, quantified by variance in the jitter intensity.
 
-The following code snippet shows how to implement the Jitter OTF (see :ref:`jitter`), which you can use to simulate different levels of sensor jitter and study their effects on image quality.
+The following code snippet shows how to implement the :ref:`JitterOTFPerturber <Class: JitterOTFPerturber>`, which you can use to simulate different levels of sensor jitter and study their effects on image quality.
+
 
 
 Input Image
@@ -34,6 +35,9 @@ Below is some example code that applies a Jitter OTF transformation::
 
     otf = JitterOTFPerturber(name="test_name")
     out_image = otf.perturb(image)
+
+Note: This code uses default values and provides a sample input image. However, you can adjust
+the parameters and use your own image to visualize the perturbation.
 
 Resulting Image
 ---------------

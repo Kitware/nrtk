@@ -70,8 +70,6 @@ Class: PybsmSensor
 .. autoclass:: nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor
    :members:
 
-.. _jitter:
-
 Class: JitterOTFPerturber
 -------------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.jitter_otf_perturber.JitterOTFPerturber
