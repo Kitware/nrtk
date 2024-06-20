@@ -27,7 +27,7 @@ Other
 
 * Refactored package into `src/nrtk` instead of `nrtk`.
 
-* Add `prefer-active-python=true` to `poetry.toml` to use system `Python`.ormed.
+* Add `prefer-active-python=true` to `poetry.toml` to use system `Python`.
 
 * Updated git lfs to properly track large files in any directory.
 
