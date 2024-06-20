@@ -14,11 +14,13 @@
 pages-branch:
   extends: .docs-setup
   artifacts:
+      expose_as: 'Documentation Build'
       paths:
         - docs/_build/html/
   environment:
-      name: Sphinx
+      name: docs-preview/$CI_MERGE_REQUEST_IID
       url: "https://jatic.pages.jatic.net/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/index.html"
+      auto_stop_in: 1 week
   script:
     - cd docs
     - poetry run make html

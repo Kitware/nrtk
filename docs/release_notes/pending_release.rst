@@ -21,6 +21,8 @@ CI/CD
 
 * Updated coverage to look at `src/nrtk` rather than `nrtk`.
 
+* Create MR-specific environments for documentation preview.
+
 Other
 
 * Added `git pre-hook` to assist in linting.
