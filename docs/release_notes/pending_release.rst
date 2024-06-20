@@ -9,6 +9,10 @@ Code Updates
 
 * Removed gen_perturber_combinations from GenerateBlackboxResponse class, so it is now a standalone function.
 
+* Removed perturber interface restriction which required that input image dimensions be maintained.
+  Note perturbers which modify image dimensions (including rotations) should be used with caution as
+  scoring can be impacted if ground truth isn't similarly transformed.
+
 CI/CD
 
 * Major overhaul of pipeline to improve efficiency and `yml` readability.
@@ -25,6 +29,8 @@ Other
 
 * Add `prefer-active-python=true` to `poetry.toml` to use system `Python`.
 
+* Updated git lfs to properly track large files in any directory.
+
 Dependencies
 
 * Added new linting `black` and `ruff`.
@@ -32,6 +38,10 @@ Dependencies
 Documentation
 
 * Updated documents to reflect new refactor.
+
+* Added Jitter OTF perturber code doc.
+
+* Added a section that shows visual examples of perturbations based on pyBSM OTF parameters, starting with the Jitter OTF perturber, along with corresponding code snippets to generate these perturbations.
 
 Fixes
 -----
