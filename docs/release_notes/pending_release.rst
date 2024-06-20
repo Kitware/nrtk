@@ -11,7 +11,7 @@ Code Updates
 
 * Removed perturber interface restriction which required that input image dimensions be maintained.
   Note perturbers which modify image dimensions (including rotations) should be used with caution as
-  scoring can be impacted if ground truth isn't similarly transf
+  scoring can be impacted if ground truth isn't similarly transformed.
 
 CI/CD
 
