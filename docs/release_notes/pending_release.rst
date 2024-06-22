@@ -23,6 +23,8 @@ CI/CD
 
 * Create MR-specific environments for documentation preview.
 
+* Fixed a publish docs bug on `main`.
+
 Other
 
 * Added `git pre-hook` to assist in linting.
