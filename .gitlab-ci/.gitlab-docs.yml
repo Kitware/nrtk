@@ -33,10 +33,11 @@ pages-branch:
     - !reference [.docs-setup, rules]
 
 pages-main:
-  extends: pages-branch
+  extends: .docs-setup
   script:
-    - !reference [pages-branch, script]
-    - mv docs/_build/html/ public/
+    - cd docs
+    - poetry run make html
+    - mv _build/html/ ../public/
   artifacts:
     paths:
     - public
