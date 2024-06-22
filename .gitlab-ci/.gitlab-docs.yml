@@ -26,14 +26,16 @@ pages-branch:
     - poetry run make html
   variables:
       PUBLIC_URL: "/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/"
+  rules:
+    # Don't run this rule if on main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - !reference [.docs-setup, rules]
 
-pages:
-  extends: .docs-setup
-  stage: docs
-  needs:
-    - job: pages-branch
-      artifacts: true
+pages-main:
+  extends: pages-branch
   script:
+    - !reference [pages-branch, script]
     - mv docs/_build/html/ public/
   artifacts:
     paths:
@@ -41,3 +43,5 @@ pages:
   rules:
     # Only run this rule if on main branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
