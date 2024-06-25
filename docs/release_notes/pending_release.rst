@@ -13,6 +13,8 @@ Code Updates
   Note perturbers which modify image dimensions (including rotations) should be used with caution as
   scoring can be impacted if ground truth isn't similarly transformed.
 
+* Removed `name` parameter from Jitter OTF.
+
 CI/CD
 
 * Major overhaul of pipeline to improve efficiency and `yml` readability.

@@ -21,7 +21,6 @@ from nrtk.interfaces.perturb_image import PerturbImage
 class JitterOTFPerturber(PerturbImage):
     def __init__(
         self,
-        name: str,
         sensor: Optional[PybsmSensor] = None,
         scenario: Optional[PybsmScenario] = None,
         sx: Optional[float] = None,
@@ -91,7 +90,6 @@ class JitterOTFPerturber(PerturbImage):
 
         self.df = (abs(urng[1] - urng[0]) + abs(vrng[0] - vrng[1])) / 2
         self.jitOTF = jitterOTF(uu, vv, self.sx, self.sy)
-        self.name = name
 
     def perturb(
         self, image: np.ndarray, additional_params: Dict[str, Any] = {}
@@ -128,12 +126,6 @@ class JitterOTFPerturber(PerturbImage):
         """Alias for :meth:`.NIIRS.apply`."""
         return self.perturb(image, additional_params)
 
-    def __str__(self) -> str:
-        return self.name
-
-    def __repr__(self) -> str:
-        return self.name
-
     @classmethod
     def get_default_config(cls) -> Dict[str, Any]:
         cfg = super().get_default_config()
@@ -160,7 +152,6 @@ class JitterOTFPerturber(PerturbImage):
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
         config = {
-            "name": self.name,
             "sensor": sensor,
             "scenario": scenario,
             "sx": self.sx,
