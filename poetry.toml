@@ -1,2 +1,3 @@
 [experimental]
 system-git-client = true
+prefer-active-python = true

@@ -16,7 +16,7 @@ pip install nrtk
 
 Alternatively, you can also use [Poetry](https://python-poetry.org/):
 ```bash
-poetry install
+poetry install --sync --with dev-linting,dev-testing,dev-docs
 ```
 
 See [here for more installation documentation](

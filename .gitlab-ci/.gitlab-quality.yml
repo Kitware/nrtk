@@ -1,0 +1,51 @@
+###############################################################################
+# Stage -- Quality Assurance
+###############################################################################
+
+.quality-setup:
+  extends: .shared-setup
+  stage: quality
+  needs: [] # Don't wait for previous stages/jobs
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry install --sync --with dev-linting,dev-testing
+
+# Job to check the release notes folder
+release-notes:
+  extends: .quality-setup
+  allow_failure: true
+  before_script: [] # We don't need poetry, git, or git-lfs
+  script:
+    - git fetch
+    - scripts/check_for_release_notes.sh origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TITLE =~ /Merge branch.*/
+      when: never
+    - if: $CI_COMMIT_BRANCH == "release" && $CI_COMMIT_TITLE =~ /Merge branch.*/
+      when: never
+    - !reference [.quality-setup, rules] # Don't overwrite normal rules
+
+# Job to lint python code
+linting:
+  extends: .quality-setup
+  script:
+    - poetry run flake8
+
+# Job to typecheck python code
+typecheck:
+  extends: .quality-setup
+  script:
+    - poetry run mypy
+
+# Job to typecheck python code
+black:
+  extends: .quality-setup
+  allow_failure: true
+  script:
+    - poetry run black --config pyproject.toml src/ tests/
+
+ruff:
+  extends: .quality-setup
+  allow_failure: true
+  script:
+    - poetry run ruff check src/ tests/

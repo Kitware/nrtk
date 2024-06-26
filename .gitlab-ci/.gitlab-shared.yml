@@ -1,0 +1,60 @@
+###############################################################################
+# Contains shared job information for the CI/CD Stages
+###############################################################################
+
+.shared-setup:
+  image: python:3.8
+  interruptible: true
+  allow_failure: false
+  rules:
+    # If changes are make to an active merge request.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    # If changes are pushed for a tag.
+    - if: $CI_COMMIT_TAG
+      when: on_success
+    # If changes are pushed to the default branch.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+  before_script:
+    # pyBSM has a series of .bin files saved as git-lfs objects,
+    # when installing from a repo directly poetry uses dulwich
+    # by default to install git repos. Dulwich does not currently
+    # support git-lfs, so instead we install git-lfs here and
+    # include a local poetry.toml in the repo to enable the use of the
+    # system-installed git (to which this git-lfs install applies) within
+    # poetry's internals instead of Dulwich. The purpose for including the
+    # poetry.toml in the repo rather than as a command here is so that it is the
+    # default used when developing locally.
+    - apt-get update
+    - apt-get install -y git-lfs
+
+    # For internal git dependencies
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net".insteadof "ssh://git@gitlab.jatic.net"
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net/".insteadOf "git@gitlab.jatic.net:"
+
+    # Setup poetry
+    - export PATH=${HOME}/.local/bin:${PATH}
+    - pip install --upgrade pip
+    - pip install --user -U poetry
+    - poetry config --local virtualenvs.in-project true
+    - poetry config --local virtualenvs.prefer-active-python true
+    - python --version
+    - pip --version
+    - poetry --version
+    - poetry check
+    - poetry install --only dev-testing
+
+.needs-headless-opencv:
+  before_script:
+    - |
+      VERSION="$(poetry run pip list --format=json | poetry run ./scripts/pycv2_installed_version.py)"
+      if [[ "$?" -eq 0 ]]
+      then
+        echo "OpenCV-Python installed, replacing with equivalent headless version."
+        poetry run pip uninstall -y opencv-python opencv-python-headless
+        poetry run pip install --no-deps opencv-python-headless=="$VERSION"
+      else
+        echo "OpenCV-Python NOT installed, skipping."
+      fi
