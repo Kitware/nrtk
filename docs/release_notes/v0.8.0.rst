@@ -1,6 +1,7 @@
 v0.8.0
 ======
 
+Major refactoring of CI/CD and commit process, a few minor code updates, and updated documentation.
 
 Updates / New Features
 ----------------------
