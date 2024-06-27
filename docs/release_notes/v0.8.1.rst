@@ -1,0 +1,12 @@
+v0.8.1
+======
+
+Patched the CI/CD publish pipeline which prevented `v0.8.0` from being released to `PyPi`.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Fixed `pages` rendering when CI/CD with `publish`.
