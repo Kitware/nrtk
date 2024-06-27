@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from pybsm.otf import darkCurrentFromDensity
+from pybsm.otf import dark_current_from_density
 from PIL import Image
 from contextlib import nullcontext as does_not_raise
 from typing import Any, Dict, ContextManager, Tuple
@@ -31,67 +31,67 @@ class TestOTFPerturber:
         # detector pitch (m)
         p = .008e-3
 
-        # Optical system transmission, red  band first (m)
-        optTransWavelengths = np.array([0.58-.08, 0.58+.08])*1.0e-6
-        # guess at the full system optical transmission (excluding obscuration)
-        opticsTransmission = 0.5*np.ones(optTransWavelengths.shape[0])
+        # Optical s_ystem transmission, red  band first (m)
+        opt_trans_wavelengths = np.array([0.58-.08, 0.58+.08])*1.0e-6
+        # guess at the full s_ystem optical transmission (excluding obscuration)
+        optics_transmission = 0.5*np.ones(opt_trans_wavelengths.shape[0])
 
         # Relative linear telescope obscuration
         eta = 0.4  # guess
 
         # detector width is assumed to be equal to the pitch
-        wx = p
-        wy = p
+        w_x = p
+        w_y = p
         # integration time (s) - this is a maximum, the actual integration
         # time will be determined by the well fill percentage
-        intTime = 30.0e-3
+        int_time = 30.0e-3
 
         # dark current density of 1 nA/cm2 guess, guess mid range for a
         # silicon camera
-        darkCurrent = darkCurrentFromDensity(1e-5, wx, wy)
+        dark_current = dark_current_from_density(1e-5, w_x, w_y)
 
         # rms read noise (rms electrons)
-        readNoise = 25.0
+        read_noise = 25.0
 
         # maximum ADC level (electrons)
-        maxN = 96000.0
+        max_n = 96000.0
 
         # bit depth
-        bitdepth = 11.9
+        bit_depth = 11.9
 
         # maximum allowable well fill (see the paper for the logic behind this)
-        maxWellFill = .6
+        max_well_fill = .6
 
         # jitter (radians) - The Olson paper says that its "good"
         # so we'll guess 1/4 ifov rms
-        sx = 0.25*p/f
-        sy = sx
+        s_x = 0.25*p/f
+        s_y = s_x
 
         # drift (radians/s) - again, we'll guess that it's really good
-        dax = 100e-6
-        day = dax
+        da_x = 100e-6
+        da_y = da_x
 
         # etector quantum efficiency as a function of wavelength (microns)
         # for a generic high quality back-illuminated silicon array
         # https://www.photometrics.com/resources/learningzone/quantumefficiency.php
-        qewavelengths = np.array([.3, .4, .5, .6, .7, .8, .9, 1.0, 1.1])*1.0e-6
+        qe_wavelengths = np.array([.3, .4, .5, .6, .7, .8, .9, 1.0, 1.1])*1.0e-6
         qe = np.array([0.05, 0.6, 0.75, 0.85, .85, .75, .5, .2, 0])
 
-        sensor = PybsmSensor(name, D, f, p, optTransWavelengths,
-                             opticsTransmission, eta, wx, wy,
-                             intTime, darkCurrent, readNoise,
-                             maxN, bitdepth, maxWellFill, sx, sy,
-                             dax, day, qewavelengths, qe)
+        sensor = PybsmSensor(name, D, f, p, opt_trans_wavelengths,
+                             optics_transmission, eta, w_x, w_y,
+                             int_time, dark_current, read_noise,
+                             max_n, bit_depth, max_well_fill, s_x, s_y,
+                             da_x, da_y, qe_wavelengths, qe)
 
         altitude = 9000.0
         # range to target
-        groundRange = 60000.0
+        ground_range = 60000.0
 
-        scenario_name = 'niceday'
+        scenario_name = 'niceda_y'
         # weather model
         ihaze = 1
-        scenario = PybsmScenario(scenario_name, ihaze, altitude, groundRange)
-        scenario.aircraftSpeed = 100.0
+        scenario = PybsmScenario(scenario_name, ihaze, altitude, ground_range)
+        scenario.aircraft_speed = 100.0
 
         return sensor, scenario
 
@@ -135,11 +135,11 @@ class TestOTFPerturber:
             expected=expected
         )
 
-    @pytest.mark.parametrize("sx", [0.5, 1.5])
-    @pytest.mark.parametrize("sy", [0.5, 1.5])
+    @pytest.mark.parametrize("s_x", [0.5, 1.5])
+    @pytest.mark.parametrize("s_y", [0.5, 1.5])
     def test_provided_reproducibility(self,
-                                      sx: float,
-                                      sy: float) -> None:
+                                      s_x: float,
+                                      s_y: float) -> None:
         """
         Ensure results are reproducible.
         """
@@ -148,8 +148,8 @@ class TestOTFPerturber:
         sensor, scenario = self.createSampleSensorandScenario()
         inst = JitterOTFPerturber(sensor=sensor,
                                   scenario=scenario,
-                                  sx=sx,
-                                  sy=sy)
+                                  s_x=s_x,
+                                  s_y=s_y)
         img_gsd = 3.19/160.0
         out_image = pybsm_perturber_assertions(perturb=inst.perturb,
                                                image=image,
@@ -201,11 +201,13 @@ class TestOTFPerturber:
         with expectation:
             _ = perturber(image, additional_params)
 
-    @pytest.mark.parametrize("sx", [0.5, 1.5])
-    @pytest.mark.parametrize("sy", [0.5, 1.5])
-    def test_provided_sx_sy_reproducibility(self,
-                                            sx: float,
-                                            sy: float,) -> None:
+    @pytest.mark.parametrize("s_x", [0.5, 1.5])
+    @pytest.mark.parametrize("s_y", [0.5, 1.5])
+    def test_provided_s_x_s_y_reproducibility(
+        self,
+        s_x: float,
+        s_y: float
+    ) -> None:
         """
         Ensure results are reproducible.
         """
@@ -213,7 +215,7 @@ class TestOTFPerturber:
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = self.createSampleSensorandScenario()
         inst = JitterOTFPerturber(sensor=sensor, scenario=scenario,
-                                  sx=sx, sy=sy)
+                                  s_x=s_x, s_y=s_y)
         img_gsd = 3.19/160.0
         out_image = pybsm_perturber_assertions(perturb=inst.perturb,
                                                image=image,
@@ -223,20 +225,21 @@ class TestOTFPerturber:
                                    expected=out_image,
                                    additional_params={'img_gsd': img_gsd})
 
-    @pytest.mark.parametrize("sx", [0.5])
-    @pytest.mark.parametrize("sy", [0.5])
-    def test_sx_sy_configuration(self,
-                                 sx: float,
-                                 sy: float,
-                                 ) -> None:
+    @pytest.mark.parametrize("s_x", [0.5])
+    @pytest.mark.parametrize("s_y", [0.5])
+    def test_s_x_s_y_configuration(
+        self,
+        s_x: float,
+        s_y: float,
+    ) -> None:
         """
         Test configuration stability.
         """
-        inst = JitterOTFPerturber(sx=sx,
-                                  sy=sy)
+        inst = JitterOTFPerturber(s_x=s_x,
+                                  s_y=s_y)
         for i in configuration_test_helper(inst):
-            assert i.sx == sx
-            assert i.sy == sy
+            assert i.s_x == s_x
+            assert i.s_y == s_y
 
     def test_sensor_scenario_configuration(self) -> None:
         """
@@ -250,84 +253,84 @@ class TestOTFPerturber:
                 assert i.sensor.name == sensor.name
                 assert i.sensor.D == sensor.D
                 assert i.sensor.f == sensor.f
-                assert i.sensor.px == sensor.px
-                assert np.array_equal(i.sensor.optTransWavelengths, sensor.optTransWavelengths)
-                assert np.array_equal(i.sensor.opticsTransmission, sensor.opticsTransmission)
+                assert i.sensor.p_x == sensor.p_x
+                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
+                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
-                assert i.sensor.wx == sensor.wx
-                assert i.sensor.wy == sensor.wy
-                assert i.sensor.intTime == sensor.intTime
-                assert i.sensor.darkCurrent == sensor.darkCurrent
-                assert i.sensor.readNoise == sensor.readNoise
-                assert i.sensor.maxN == sensor.maxN
-                assert i.sensor.bitdepth == sensor.bitdepth
-                assert i.sensor.maxWellFill == sensor.maxWellFill
-                assert i.sensor.sx == sensor.sx
-                assert i.sensor.sy == sensor.sy
-                assert i.sensor.dax == sensor.dax
-                assert i.sensor.day == sensor.day
-                assert np.array_equal(i.sensor.qewavelengths, sensor.qewavelengths)
+                assert i.sensor.w_x == sensor.w_x
+                assert i.sensor.w_y == sensor.w_y
+                assert i.sensor.int_time == sensor.int_time
+                assert i.sensor.dark_current == sensor.dark_current
+                assert i.sensor.read_noise == sensor.read_noise
+                assert i.sensor.max_n == sensor.max_n
+                assert i.sensor.bit_depth == sensor.bit_depth
+                assert i.sensor.max_well_fill == sensor.max_well_fill
+                assert i.sensor.s_x == sensor.s_x
+                assert i.sensor.s_y == sensor.s_y
+                assert i.sensor.da_x == sensor.da_x
+                assert i.sensor.da_y == sensor.da_y
+                assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
                 assert np.array_equal(i.sensor.qe, sensor.qe)
             if i.scenario:
                 assert i.scenario.name == scenario.name
                 assert i.scenario.ihaze == scenario.ihaze
                 assert i.scenario.altitude == scenario.altitude
-                assert i.scenario.groundRange == scenario.groundRange
-                assert i.scenario.aircraftSpeed == scenario.aircraftSpeed
-                assert i.scenario.targetReflectance == scenario.targetReflectance
-                assert i.scenario.targetTemperature == scenario.targetTemperature
-                assert i.scenario.backgroundReflectance == scenario.backgroundReflectance
-                assert i.scenario.backgroundTemperature == scenario.backgroundTemperature
-                assert i.scenario.haWindspeed == scenario.haWindspeed
-                assert i.scenario.cn2at1m == scenario.cn2at1m
+                assert i.scenario.ground_range == scenario.ground_range
+                assert i.scenario.aircraft_speed == scenario.aircraft_speed
+                assert i.scenario.target_reflectance == scenario.target_reflectance
+                assert i.scenario.target_temperature == scenario.target_temperature
+                assert i.scenario.background_reflectance == scenario.background_reflectance
+                assert i.scenario.background_temperature == scenario.background_temperature
+                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
+                assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
-    @pytest.mark.parametrize("sx", [0.5])
-    @pytest.mark.parametrize("sy", [0.5])
+    @pytest.mark.parametrize("s_x", [0.5])
+    @pytest.mark.parametrize("s_y", [0.5])
     def test_overall_configuration(self,
-                                   sx: float,
-                                   sy: float,) -> None:
+                                   s_x: float,
+                                   s_y: float,) -> None:
         """
         Test configuration stability.
         """
         sensor, scenario = self.createSampleSensorandScenario()
         inst = JitterOTFPerturber(sensor=sensor,
                                   scenario=scenario,
-                                  sx=sx,
-                                  sy=sy)
+                                  s_x=s_x,
+                                  s_y=s_y)
         for i in configuration_test_helper(inst):
-            assert i.sx == sx
-            assert i.sy == sy
+            assert i.s_x == s_x
+            assert i.s_y == s_y
             if i.sensor:
                 assert i.sensor.name == sensor.name
                 assert i.sensor.D == sensor.D
                 assert i.sensor.f == sensor.f
-                assert i.sensor.px == sensor.px
-                assert np.array_equal(i.sensor.optTransWavelengths, sensor.optTransWavelengths)
-                assert np.array_equal(i.sensor.opticsTransmission, sensor.opticsTransmission)
+                assert i.sensor.p_x == sensor.p_x
+                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
+                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
-                assert i.sensor.wx == sensor.wx
-                assert i.sensor.wy == sensor.wy
-                assert i.sensor.intTime == sensor.intTime
-                assert i.sensor.darkCurrent == sensor.darkCurrent
-                assert i.sensor.readNoise == sensor.readNoise
-                assert i.sensor.maxN == sensor.maxN
-                assert i.sensor.bitdepth == sensor.bitdepth
-                assert i.sensor.maxWellFill == sensor.maxWellFill
-                assert i.sensor.sx == sensor.sx
-                assert i.sensor.sy == sensor.sy
-                assert i.sensor.dax == sensor.dax
-                assert i.sensor.day == sensor.day
-                assert np.array_equal(i.sensor.qewavelengths, sensor.qewavelengths)
+                assert i.sensor.w_x == sensor.w_x
+                assert i.sensor.w_y == sensor.w_y
+                assert i.sensor.int_time == sensor.int_time
+                assert i.sensor.dark_current == sensor.dark_current
+                assert i.sensor.read_noise == sensor.read_noise
+                assert i.sensor.max_n == sensor.max_n
+                assert i.sensor.bit_depth == sensor.bit_depth
+                assert i.sensor.max_well_fill == sensor.max_well_fill
+                assert i.sensor.s_x == sensor.s_x
+                assert i.sensor.s_y == sensor.s_y
+                assert i.sensor.da_x == sensor.da_x
+                assert i.sensor.da_y == sensor.da_y
+                assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
                 assert np.array_equal(i.sensor.qe, sensor.qe)
             if i.scenario:
                 assert i.scenario.name == scenario.name
                 assert i.scenario.ihaze == scenario.ihaze
                 assert i.scenario.altitude == scenario.altitude
-                assert i.scenario.groundRange == scenario.groundRange
-                assert i.scenario.aircraftSpeed == scenario.aircraftSpeed
-                assert i.scenario.targetReflectance == scenario.targetReflectance
-                assert i.scenario.targetTemperature == scenario.targetTemperature
-                assert i.scenario.backgroundReflectance == scenario.backgroundReflectance
-                assert i.scenario.backgroundTemperature == scenario.backgroundTemperature
-                assert i.scenario.haWindspeed == scenario.haWindspeed
-                assert i.scenario.cn2at1m == scenario.cn2at1m
+                assert i.scenario.ground_range == scenario.ground_range
+                assert i.scenario.aircraft_speed == scenario.aircraft_speed
+                assert i.scenario.target_reflectance == scenario.target_reflectance
+                assert i.scenario.target_temperature == scenario.target_temperature
+                assert i.scenario.background_reflectance == scenario.background_reflectance
+                assert i.scenario.background_temperature == scenario.background_temperature
+                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
+                assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
