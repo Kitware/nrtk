@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import random
-from pybsm.otf import darkCurrentFromDensity
+from pybsm.otf import dark_current_from_density
 from PIL import Image
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Dict, Hashable, Sequence, Tuple
@@ -49,7 +49,7 @@ def createSampleSensor() -> PybsmSensor:
     intTime = 30.0e-3
 
     # dark current density of 1 nA/cm2 guess, guess mid range for a silicon camera
-    darkCurrent = darkCurrentFromDensity(1e-5, wx, wy)
+    darkCurrent = dark_current_from_density(1e-5, wx, wy)
 
     # rms read noise (rms electrons)
     readNoise = 25.0
@@ -95,7 +95,7 @@ def createSampleScenario() -> PybsmScenario:
     # weather model
     ihaze = 1
     scenario = PybsmScenario(scenario_name, ihaze, altitude, groundRange)
-    scenario.aircraftSpeed = 100.0
+    scenario.aircraft_speed = 100.0
 
     return scenario
 
