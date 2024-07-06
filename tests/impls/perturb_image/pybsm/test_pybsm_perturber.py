@@ -1,17 +1,25 @@
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Sequence, Tuple
+from typing import Any, ContextManager, Dict, Tuple
 
 import numpy as np
 import pytest
+from PIL import Image
 from pybsm.otf import dark_current_from_density
 from smqtk_core.configuration import configuration_test_helper
 
+from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
-from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
+
+from ..test_perturber_utils import pybsm_perturber_assertions
+
+INPUT_IMG_FILE = (
+    "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+)
+EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
 
 
-class TestStepPerturbImageFactory:
+class TestPyBSMPerturber:
     def create_sample_sensor_and_scenario(self) -> Tuple[PybsmSensor, PybsmScenario]:
 
         name = "L32511x"
@@ -106,145 +114,68 @@ class TestStepPerturbImageFactory:
 
         return sensor, scenario
 
-    @pytest.mark.parametrize(
-        ("theta_keys", "thetas", "expected"),
-        [
-            (
-                ["altitude"],
-                [[1000, 2000, 3000, 4000]],
-                ((1000,), (2000,), (3000,), (4000,)),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [0.5, 0.75]],
-                ((1000, 0.5), (1000, 0.75), (2000, 0.5), (2000, 0.75)),
-            ),
-        ],
-    )
-    def test_iteration(
-        self,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        expected: Tuple[Tuple[int, ...]],
-    ) -> None:
-        """Ensure factory can be iterated upon and the varied parameter matches expectations."""
+    def test_consistency(self) -> None:
+        """Run on a dummy image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        expected = np.array(Image.open(EXPECTED_IMG_FILE))
+        img_gsd = 3.19 / 160.0
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        factory = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
+        # Test perturb interface directly
+        inst = PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000)
+        pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=expected,
+            additional_params={"img_gsd": img_gsd},
         )
-        assert len(expected) == len(factory)
-        for idx, p in enumerate(factory):
-            for count, _ in enumerate(theta_keys):
-                perturb_cfg = p.get_config()
-                sensor_cfg = perturb_cfg["sensor"][
-                    "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"
-                ]
-                sce_cfg = perturb_cfg["scenario"][
-                    "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"
-                ]
 
-                if theta_keys[count] in sensor_cfg:
-                    assert sensor_cfg[theta_keys[count]] == expected[idx][count]
-                elif theta_keys[count] in sce_cfg:
-                    assert sce_cfg[theta_keys[count]] == expected[idx][count]
-                # elif theta_keys[count] in perturb_cfg:  # reflectance_range
-                #    assert perturb_cfg[theta_keys[count]] == expected[idx][count]
-                else:  # pragma: no cover
-                    pytest.fail("Parameter not found in config")
+        # Test callable
+        pybsm_perturber_assertions(
+            perturb=PybsmPerturber(
+                sensor=sensor, scenario=scenario, ground_range=10000
+            ),
+            image=image,
+            expected=expected,
+            additional_params={"img_gsd": img_gsd},
+        )
 
     @pytest.mark.parametrize(
-        ("theta_keys", "thetas", "idx", "expected_val", "expectation"),
+        ("param_name", "param_value"),
         [
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [0.5, 0.75]],
-                0,
-                (1000, 0.5),
-                does_not_raise(),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [10000, 20000]],
-                3,
-                (2000, 20000),
-                does_not_raise(),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [10000, 20000]],
-                4,
-                (-1, -1),
-                pytest.raises(IndexError),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [10000, 20000]],
-                -1,
-                (2000, 20000),
-                does_not_raise(),
-            ),
+            ("ground_range", 10000),
+            ("ground_range", 20000),
+            ("ground_range", 30000),
+            ("altitude", 10000),
+            ("ihaze", 2),
         ],
-        ids=["first idx", "last idx", "idx == len", "neg idx"],
     )
-    def test_indexing(
-        self,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        idx: int,
-        expected_val: Tuple[int, ...],
-        expectation: ContextManager,
-    ) -> None:
-        """Ensure it is possible to access a perturber instance via indexing."""
+    def test_reproducibility(self, param_name: str, param_value: Any) -> None:
+        """Ensure results are reproducible."""
+        # Test perturb interface directly
+        image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        factory = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
+        inst = PybsmPerturber(
+            sensor=sensor, scenario=scenario, **{param_name: param_value}
         )
-        with expectation:
-            for count, _ in enumerate(theta_keys):
-                perturb_cfg = factory[idx].get_config()
-                sensor_cfg = perturb_cfg["sensor"][
-                    "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"
-                ]
-                sce_cfg = perturb_cfg["scenario"][
-                    "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"
-                ]
+        img_gsd = 3.19 / 160.0
+        out_image = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            additional_params={"img_gsd": img_gsd},
+        )
+        pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+            additional_params={"img_gsd": img_gsd},
+        )
 
-                if theta_keys[count] in sensor_cfg:
-                    assert sensor_cfg[theta_keys[count]] == expected_val[count]
-                elif theta_keys[count] in sce_cfg:
-                    assert sce_cfg[theta_keys[count]] == expected_val[count]
-                # elif theta_keys[count] in perturb_cfg:  # reflectance_range
-                #     assert perturb_cfg[theta_keys[count]] == expected_val[count]
-                else:  # pragma: no cover
-                    pytest.fail("Parameter not found in config")
-
-    @pytest.mark.parametrize(
-        ("theta_keys", "thetas", "expected_sets"),
-        [
-            (["altitude"], [[1000, 2000, 3000, 4000]], [[0], [1], [2], [3]]),
-            (
-                ["altitude", "ground_range"],
-                [[1000, 2000], [10000, 20000]],
-                [[0, 0], [0, 1], [1, 0], [1, 1]],
-            ),
-        ],
-    )
-    def test_configuration(
-        self,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        expected_sets: Sequence[Sequence[int]],
-    ) -> None:
+    def test_configuration(self) -> None:
         """Test configuration stability."""
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        inst = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
-        )
-
+        inst = PybsmPerturber(sensor=sensor, scenario=scenario)
         for i in configuration_test_helper(inst):
-            assert i.theta_keys == theta_keys
-            assert i.thetas == thetas
-
             assert i.sensor.name == sensor.name
             assert i.sensor.D == sensor.D
             assert i.sensor.f == sensor.f
@@ -283,4 +214,59 @@ class TestStepPerturbImageFactory:
             assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
             assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
-            assert i.sets == expected_sets
+            assert np.array_equal(i.reflectance_range, inst.reflectance_range)
+
+    @pytest.mark.parametrize(
+        ("reflectance_range", "expectation"),
+        [
+            (np.array([0.05, 0.5]), does_not_raise()),
+            (np.array([0.01, 0.5]), does_not_raise()),
+            (
+                np.array([0.05]),
+                pytest.raises(
+                    ValueError, match=r"Reflectance range array must have length of 2"
+                ),
+            ),
+            (
+                np.array([0.5, 0.05]),
+                pytest.raises(
+                    ValueError,
+                    match=r"Reflectance range array values must be strictly ascending",
+                ),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self, reflectance_range: np.ndarray, expectation: ContextManager
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        sensor, scenario = self.create_sample_sensor_and_scenario()
+        with expectation:
+            PybsmPerturber(
+                sensor=sensor, scenario=scenario, reflectance_range=reflectance_range
+            )
+
+    @pytest.mark.parametrize(
+        ("additional_params", "expectation"),
+        [
+            ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
+            (
+                {},
+                pytest.raises(
+                    ValueError,
+                    match=r"'img_gsd' must be present in image metadata for this perturber",
+                ),
+            ),
+        ],
+    )
+    def test_additional_params(
+        self, additional_params: Dict[str, Any], expectation: ContextManager
+    ) -> None:
+        """Test variations of additional params."""
+        sensor, scenario = self.create_sample_sensor_and_scenario()
+        perturber = PybsmPerturber(
+            sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5])
+        )
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        with expectation:
+            _ = perturber(image, additional_params)

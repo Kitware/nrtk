@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-"""This module is designed to used with _livereload to
-make it a little easier to write Sphinx documentation.
+"""This module is designed to used with _livereload to make it a little easier to write Sphinx documentation.
+
 Simply run the command::
     python sphinx_server.py
 

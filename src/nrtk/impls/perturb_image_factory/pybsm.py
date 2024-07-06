@@ -34,7 +34,9 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         theta_keys: Iterable[str],
         thetas: Sequence[Any],
     ) -> None:
-        """:param sensor: pyBSM sensor object.
+        """Initializes the PybsmPerturbImageFactory.
+
+        :param sensor: pyBSM sensor object.
         :param scenario: pyBSM scenario object.
         :param theta_keys: Perturber parameter(s) to vary between instances.
         :param theta_keys: Perturber parameter(s) values to vary between instances.

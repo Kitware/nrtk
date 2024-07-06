@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import sys
 from pathlib import Path
+from typing import List
 
 # -- Path setup --------------------------------------------------------------
 
@@ -21,7 +22,7 @@ import nrtk  # noqa: E402
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "nrtk"
-copyright = "2023, Kitware, Inc."
+copyright = "2023, Kitware, Inc."  # noqa: A001
 author = "Kitware, Inc."
 release = nrtk.__version__
 
@@ -43,7 +44,7 @@ suppress_warnings = [
     "autosectionlabel.*",
 ]
 
-templates_path = []  # ['_templates']
+templates_path: List[str] = list()  # ['_templates']
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
@@ -51,4 +52,4 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
-html_static_path = []  # ['_static']
+html_static_path: List[str] = list()  # ['_static']

@@ -7,13 +7,13 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class PerturbImageFactory(Plugfigurable):
-    """Factory class for producing PerturbImage instances of a specified type
-    and configuration.
-    """
+    """Factory class for producing PerturbImage instances of a specified type and configuration."""
 
     def __init__(self, perturber: Type[PerturbImage], theta_key: str):
-        """Initialize the factory to produce PerturbImage instances of the given type,
-        varying the given ``theta_key`` parameter.
+        """Initialize the factory to produce PerturbImage instances of the given type.
+
+        Initialize the factory to produce PerturbImage instances of the given type,
+        varying the given `theta_key` parameter.
 
         :param perturber: Python implementation type of the PerturbImage interface
             to produce.

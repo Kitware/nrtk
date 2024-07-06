@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict, Type
+from typing import Any, Dict, Optional, Type
 
 import numpy as np
 from pybsm.simulation import RefImage, simulate_image
@@ -15,16 +15,22 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 
+DEFAULT_REFLECTANCE_RANGE = np.array(
+    [0.05, 0.5]
+)  # It is bad standards to call np.array within argument defaults
+
 
 class PybsmPerturber(PerturbImage):
     def __init__(
         self,
         sensor: PybsmSensor,
         scenario: PybsmScenario,
-        reflectance_range: np.ndarray = np.array([0.05, 0.5]),
+        reflectance_range: np.ndarray = DEFAULT_REFLECTANCE_RANGE,
         **kwargs: Any,
     ) -> None:
-        """:param sensor: pyBSM sensor object.
+        """Initializes the PybsmPerturber.
+
+        :param sensor: pyBSM sensor object.
         :param scenario: pyBSM scenario object.
         :param reflectance_range: Array of reflectances that correspond to pixel values.
 
@@ -58,9 +64,13 @@ class PybsmPerturber(PerturbImage):
         return self.thetas
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
+        if (
+            additional_params is None
+        ):  # Cannot have mutable data structure in argument default
+            additional_params = dict()
         if "img_gsd" not in additional_params:
             raise ValueError(
                 "'img_gsd' must be present in image metadata for this perturber"
@@ -75,18 +85,20 @@ class PybsmPerturber(PerturbImage):
 
         perturbed = simulate_image(ref_img, self.sensor(), self.scenario())[-1]
 
-        min = perturbed.min()
-        den = perturbed.max() - min
-        perturbed -= min
+        min_perturbed_val = perturbed.min()
+        den = perturbed.max() - min_perturbed_val
+        perturbed -= min_perturbed_val
         perturbed /= den
         perturbed *= 255
 
         return perturbed.astype(np.uint8)
 
     def __call__(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Alias for :meth:`.NIIRS.apply`."""
+        if additional_params is None:
+            additional_params = dict()
         return self.perturb(image, additional_params)
 
     def __str__(self) -> str:

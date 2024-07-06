@@ -6,8 +6,10 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 
 class ScoreDetections(Plugfigurable):
-    """Interface abstracting the behavior of taking the actual and predicted
-    detections and computing the corresponding metric scores.
+    """Interface abstracting the behavior of taking detections and computing the corresponding metric scores.
+
+    Interface abstracting the behavior of taking the actual and predicted detections and
+    computing the corresponding metric scores.
 
     Implementations should verify the validity of the input data.
 
