@@ -1,13 +1,14 @@
-import pytest
-from pybsm.simulation.scenario import Scenario
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager
+
+import pytest
+from pybsm.simulation.scenario import Scenario
 from smqtk_core.configuration import configuration_test_helper
+
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 
 
-@pytest.mark.parametrize("name",
-                         ["clear", "cloudy", "hurricane"])
+@pytest.mark.parametrize("name", ["clear", "cloudy", "hurricane"])
 def test_scenario_string_rep(name: str) -> None:
     ihaze = 1
     altitude = 2
@@ -26,18 +27,39 @@ def test_scenario_call() -> None:
     assert isinstance(scenario(), Scenario)
 
 
-@pytest.mark.parametrize("ihaze, altitude, ground_range, name, expectation", [
-    (1, 2., 0., "test", does_not_raise()),
-    (3, 2., 0., "bad-ihaze", pytest.raises(ValueError, match=r"Invalid ihaze value")),
-    (1, 101.3, 0., "bad-alt", pytest.raises(ValueError, match=r"Invalid altitude value")),
-    (2, 2., -1.2, "bad-ground_range", pytest.raises(ValueError, match=r"Invalid ground range value"))
-])
+@pytest.mark.parametrize(
+    ("ihaze", "altitude", "ground_range", "name", "expectation"),
+    [
+        (1, 2.0, 0.0, "test", does_not_raise()),
+        (
+            3,
+            2.0,
+            0.0,
+            "bad-ihaze",
+            pytest.raises(ValueError, match=r"Invalid ihaze value"),
+        ),
+        (
+            1,
+            101.3,
+            0.0,
+            "bad-alt",
+            pytest.raises(ValueError, match=r"Invalid altitude value"),
+        ),
+        (
+            2,
+            2.0,
+            -1.2,
+            "bad-ground_range",
+            pytest.raises(ValueError, match=r"Invalid ground range value"),
+        ),
+    ],
+)
 def test_verify_parameters(
     ihaze: int,
     altitude: float,
     ground_range: float,
     name: str,
-    expectation: ContextManager
+    expectation: ContextManager,
 ) -> None:
 
     with expectation:
@@ -57,9 +79,7 @@ def test_verify_parameters(
 
 
 def test_config() -> None:
-    """
-    Test configuration stability.
-    """
+    """Test configuration stability."""
     ihaze = 1
     altitude = 2
     ground_range = 0

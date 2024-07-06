@@ -10,9 +10,9 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
-    """An implementation of the ``ScoreDetection`` interface that computes the
-    Pixelwise IoU scores in a Class-Agnostic manner. The call to the scorer
-    method returns a sequence of float values containing the Pixelwise IoU
+    """Implementation of `ScoreDetection` interface that computes the Pixelwise IoU scores in a Class-Agnostic manner.
+
+    The call to the scorer method returns a sequence of float values containing the Pixelwise IoU
     scores for the specified ground truth and predictions inputs.
     """
 
@@ -23,9 +23,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
             Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
         ],
     ) -> Sequence[float]:
-        """Computes pixelwise IoU scores and returns sequence of float values equal
-        to the length of the input data.
-        """
+        """Computes pixelwise IoU scores and returns sequence of float values equal to the length of the input data."""
         if len(actual) != len(predicted):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
@@ -53,14 +51,19 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
             predicted_mask = np.zeros((height, width), dtype=bool)
 
             for act_bbox, _ in act:
-                x1, y1 = act_bbox.min_vertex
-                x2, y2 = act_bbox.max_vertex
-                actual_mask[int(y1): int(y2), int(x1): int(x2)] = 1
+                x_1, y_1 = act_bbox.min_vertex
+                x_2, y_2 = act_bbox.max_vertex
+                actual_mask[int(y_1) : int(y_2), int(x_1) : int(x_2)] = 1  # noqa: E203
 
             for pred_bbox, _ in pred:
-                x1, y1 = pred_bbox.min_vertex
-                x2, y2 = pred_bbox.max_vertex
-                predicted_mask[int(y1): int(y2), int(x1): int(x2)] = 1
+                x_1, y_1 = pred_bbox.min_vertex
+                x_2, y_2 = pred_bbox.max_vertex
+                # Black formatting keeps moving the noqa comment down a line, which causes flake8 error
+                # fmt: off
+                predicted_mask[int(y_1) : int(y_2), int(x_1) : int(x_2)] = (  # noqa: E203
+                    1
+                )
+                # fmt: on
 
             intersection = np.logical_and(actual_mask, predicted_mask)
             union = np.logical_or(actual_mask, predicted_mask)

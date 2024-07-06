@@ -12,37 +12,35 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
-    """Example implementation of the ``GenerateObjectDetectorBlackboxResponse``
-    interface.
-    """
+    """Example implementation of the ``GenerateObjectDetectorBlackboxResponse`` interface."""
 
     def __init__(
         self,
         images: Sequence[np.ndarray],
-        imggsds: Sequence[float],
-        groundtruth: Sequence[
+        img_gsds: Sequence[float],
+        ground_truth: Sequence[
             Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
         ],
     ):
-        """Generate response curve for given images and groundtruth.
+        """Generate response curve for given images and ground_truth.
 
         :param images: Sequence of images to generate responses for.
-        :param groundtruth: Sequence of sequences of detections corresponsing to each image.
+        :param ground_truth: Sequence of sequences of detections corresponsing to each image.
 
-        :raises ValueError: Images and groundtruth data have a size mismatch.
+        :raises ValueError: Images and ground_truth data have a size mismatch.
         """
-        if len(images) != len(groundtruth):
+        if len(images) != len(ground_truth):
             raise ValueError(
-                "Size mismatch. Groundtruth must be provided for each image."
+                "Size mismatch. ground_truth must be provided for each image."
             )
-        if len(images) != len(imggsds):
+        if len(images) != len(img_gsds):
             raise ValueError("Size mismatch. imggsd must be provided for each image.")
         self.images = images
-        self.imggsds = imggsds
-        self.groundtruth = groundtruth
+        self.img_gsds = img_gsds
+        self.ground_truth = ground_truth
 
     def __len__(self) -> int:
-        """:return: Number of image/groundtruth pairs this generator holds."""
+        """:return: Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
     def __getitem__(self, idx: int) -> Tuple[
@@ -50,7 +48,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
         Dict[str, Any],
     ]:
-        """Get the image and groundtruth pair for a specific index.
+        """Get the image and ground_truth pair for a specific index.
 
         :param idx: Index of desired data pair.
 
@@ -60,13 +58,13 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         """
         if idx < 0 or idx >= len(self):
             raise IndexError
-        return self.images[idx], self.groundtruth[idx], {"img_gsd": self.imggsds[idx]}
+        return self.images[idx], self.ground_truth[idx], {"img_gsd": self.img_gsds[idx]}
 
     def get_config(self) -> Dict[str, Any]:
         return {
             "images": self.images,
-            "imggsds": self.imggsds,
-            "groundtruth": self.groundtruth,
+            "img_gsds": self.img_gsds,
+            "ground_truth": self.ground_truth,
         }
 
     def generate(

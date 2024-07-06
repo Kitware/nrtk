@@ -15,7 +15,9 @@ class StepPerturbImageFactory(PerturbImageFactory):
         stop: int,
         step: int = 1,
     ):
-        """Initialize the factory to produce PerturbImage instances of the given type,
+        """Initialize the factory to produce PerturbImage instances of the given type.
+
+        Initialize the factory to produce PerturbImage instances of the given type,
         varying the given ``theta_key`` parameter from start to stop with given step.
 
         :param perturber: Python implementation type of the PerturbImage interface

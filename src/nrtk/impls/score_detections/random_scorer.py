@@ -7,13 +7,12 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class RandomScorer(ScoreDetections):
-    """An implementation of the ``ScoreDetection`` interface that serves as a
-    simple test for reproduciblity. An instance of this class acts as a
-    functor to generate scores for a specific metric based on a given set
+    """An implementation of the ``ScoreDetection`` interface that serves as a simple test for reproduciblity.
+
+    An instance of this class acts as a functor to generate scores for a specific metric based on a given set
     of ground truth and predicted detections.
 
-    This class, in particular, implements a random scorer that returns random
-    float values.
+    This class, in particular, implements a random scorer that returns random float values.
     """
 
     def __init__(self, rng: Optional[int] = None):

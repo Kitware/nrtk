@@ -37,7 +37,7 @@ parameters for an existing sensor and environment, respectively.
 	from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 	from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 
-	optTransWavelengths = np.array([0.58-.08,0.58+.08])*1.0e-6
+	opt_trans_wavelengths = np.array([0.58-.08,0.58+.08])*1.0e-6
 	f = 4 #telescope focal length (m)
 	p = .008e-3	# detector pitch (m)
 	sensor = PybsmSensor(
@@ -45,24 +45,24 @@ parameters for an existing sensor and environment, respectively.
 	    name                = 'L32511x',
 	    D                   = 275e-3, # Telescope diameter (m)
 	    f = f,
-	    px = p,
-	    optTransWavelengths = optTransWavelengths, #Optical system transmission, red  band first (m)
+	    p_x = p,
+	    opt_trans_wavelengths = opt_trans_wavelengths, #Optical system transmission, red  band first (m)
 	    # optional
-	    opticsTransmission  = 0.5*np.ones(optTransWavelengths.shape[0]), #guess at the full system optical transmission (excluding obscuration)
+	    optics_transmission = 0.5*np.ones(opt_trans_wavelengths.shape[0]), #guess at the full system optical transmission (excluding obscuration)
 	    eta                 = 0.4, #guess
-	    wx                  = p, #detector width is assumed to be equal to the pitch
-	    wy                  = p, #detector width is assumed to be equal to the pitch
-	    intTime             = 30.0e-3, #integration time (s) - this is a maximum, the actual integration time will be, determined by the well fill percentage
-	    darkCurrent         = pybsm.darkCurrentFromDensity(1e-5,p,p), #dark current density of 1 nA/cm2 guess, guess mid range for a silicon camera
-	    readNoise           = 25.0, #rms read noise (rms electrons)
-	    maxN                = 96000.0, #maximum ADC level (electrons)
+	    w_x                  = p, #detector width is assumed to be equal to the pitch
+	    w_y                  = p, #detector width is assumed to be equal to the pitch
+	    int_time            = 30.0e-3, #integration time (s) - this is a maximum, the actual integration time will be, determined by the well fill percentage
+	    dark_current        = pybsm.dark_current_from_density(1e-5,p,p), #dark current density of 1 nA/cm2 guess, guess mid range for a silicon camera
+	    read_noise          = 25.0, #rms read noise (rms electrons)
+	    max_n               = 96000.0, #maximum ADC level (electrons)
 	    bitdepth            = 11.9, #bit depth
-	    maxWellFill         = .6, #maximum allowable well fill (see the paper for the logic behind this)
+	    max_well_fill       = .6, #maximum allowable well fill (see the paper for the logic behind this)
 	    sx                  = 0.25*p/f, #jitter (radians) - The Olson paper says that its "good" so we'll guess 1/4 ifov rms
 	    sy                  = 0.25*p/f, #jitter (radians) - The Olson paper says that its "good" so we'll guess 1/4 ifov rms
 	    dax                 = 100e-6, #drift (radians/s) - again, we'll guess that it's really good
 	    day                 = 100e-6, #drift (radians/s) - again, we'll guess that it's really good
-	    qewavelengths       = np.array([.3, .4, .5, .6, .7, .8, .9, 1.0, 1.1])*1.0e-6,
+	    qe_wavelengths       = np.array([.3, .4, .5, .6, .7, .8, .9, 1.0, 1.1])*1.0e-6,
 	    qe                  = np.array([0.05, 0.6, 0.75, 0.85, .85, .75, .5, .2, 0])
 	)
 
@@ -70,13 +70,13 @@ parameters for an existing sensor and environment, respectively.
 	        name='niceday',
 	        ihaze=1, #weather model
 	        altitude=9000.0, #sensor altitude
-	        groundRange=0.0, #range to target
-	        aircraftSpeed=100.0
+	        ground_range=0.0, #range to target
+	        aircraft_speed=100.0
 	)
 
-	perturber=PybsmPerturber(sensor=sensor, scenario=scenario, groundRange=10000)
+	perturber=PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000)
 
-In the example above, we have created a `pyBSM` perturber where the output image will have a groundRange of 10000m 
+In the example above, we have created a `pyBSM` perturber where the output image will have a ground_range of 10000m 
 instead of 0m. The image below is the original image we will use for future perturbations.
 
 .. figure:: images/original_image.jpg

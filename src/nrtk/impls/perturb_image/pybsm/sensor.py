@@ -24,7 +24,7 @@ class PybsmSensor(Configurable):
         numpy array specifying the spectral bandpass of the camera (m).  At
         minimum, start and end wavelength should be specified.
     optics_transmission :
-        full s_ystem in-band optical transmission (unitless).  Loss due to any
+        full system in-band optical transmission (unitless).  Loss due to any
         telescope obscuration should *not* be included in with this optical transmission
         array.
     eta :
@@ -97,7 +97,7 @@ class PybsmSensor(Configurable):
     def __init__(
         self,
         name: str,
-        D: float,
+        D: float,  # noqa:N803
         f: float,
         p_x: float,
         opt_trans_wavelengths: np.ndarray,
@@ -189,7 +189,9 @@ class PybsmSensor(Configurable):
         return self.name
 
     def create_sensor(self) -> Sensor:
-        S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)
+        S = Sensor(  # noqa:N806
+            self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths
+        )
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta
         S.p_y = self.p_y

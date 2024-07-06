@@ -100,7 +100,9 @@ class PybsmScenario(Configurable):
         return self.name
 
     def create_scenario(self) -> Scenario:
-        S = Scenario(self.name, self.ihaze, self.altitude, self.ground_range)
+        S = Scenario(  # noqa:N806
+            self.name, self.ihaze, self.altitude, self.ground_range
+        )
         S.aircraft_speed = self.aircraft_speed
         S.target_reflectance = self.target_reflectance
         S.target_temperature = self.target_temperature

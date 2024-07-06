@@ -6,8 +6,9 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class NOPScorer(ScoreDetections):
-    """Example implementation of the ``ScoreDetection`` interface. An instance
-    of this class acts as a functor to generate scores for a specific metric
+    """Example implementation of the ``ScoreDetection`` interface.
+
+    An instance of this class acts as a functor to generate scores for a specific metric
     based on a given set of ground truth and predicted detections.
 
     This class, in particular, serves as a pass-through "no operation" (NOP)

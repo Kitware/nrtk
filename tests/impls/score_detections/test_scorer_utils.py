@@ -1,14 +1,11 @@
-from typing import Any, Dict, Tuple
-from typing import Sequence, Hashable, Callable
 import copy
+from typing import Any, Callable, Dict, Hashable, Sequence, Tuple
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 
 def _class_map(classes: Sequence, scores: Sequence) -> Dict[Hashable, float]:
-    """
-    Mapping function that returns the class-wise scores dict.
-    """
+    """Mapping function that returns the class-wise scores dict."""
     d = {}
     for i, c in enumerate(classes):
         d[c] = scores[i]
@@ -16,17 +13,19 @@ def _class_map(classes: Sequence, scores: Sequence) -> Dict[Hashable, float]:
     return d
 
 
-def scorer_assertions(scorer: Callable[[Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
-                                                                Dict[Hashable, Any]]]],
-                                        Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
-                                                                Dict[Hashable, float]]]]],
-                                       Sequence[float]],
-                      actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
-                                                      Dict[Hashable, Any]]]],
-                      predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox,
-                                                         Dict[Hashable, float]]]]) -> None:
-    """
-    Basic scorer assertions:
+def scorer_assertions(
+    scorer: Callable[
+        [
+            Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
+            Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        ],
+        Sequence[float],
+    ],
+    actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
+    predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+) -> None:
+    """Basic scorer assertions.
+
     1) Test to make sure the scorer implementation does not
     modify the input data.
     2) Test to make sure the inputs are 2D sequences.
@@ -41,7 +40,12 @@ def scorer_assertions(scorer: Callable[[Sequence[Sequence[Tuple[AxisAlignedBound
     assert actual == actual_copy
     assert predicted == predicted_copy
 
-    assert (isinstance(actual, Sequence) and len(actual) > 0 and isinstance(actual[0], Sequence))
-    assert (isinstance(predicted, Sequence) and len(predicted) > 0 and isinstance(predicted[0], Sequence))
+    assert isinstance(actual, Sequence)
+    assert len(actual) > 0
+    assert isinstance(actual[0], Sequence)
+
+    assert isinstance(predicted, Sequence)
+    assert len(predicted) > 0
+    assert isinstance(predicted[0], Sequence)
 
     assert len(scores_sequence) == len(actual)

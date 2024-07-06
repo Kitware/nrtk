@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import cv2
 import numpy as np
@@ -11,19 +11,21 @@ class AverageBlurPerturber(PerturbImage):
 
     def __init__(self, ksize: int = 1):
         """:param ksize: Blurring kernel size."""
-        min_ksize = 1
-        if ksize < min_ksize:
+        min_k_size = 1
+        if ksize < min_k_size:
             raise ValueError(
                 f"{type(self).__name__} invalid ksize ({ksize})."
-                f" Must be >= {min_ksize}"
+                f" Must be >= {min_k_size}"
             )
 
         self.ksize = ksize
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus after applying average blurring."""
+        if additional_params is None:
+            additional_params = dict()
         return cv2.blur(image, ksize=(self.ksize, self.ksize))
 
     def get_config(self) -> Dict[str, Any]:
@@ -35,19 +37,21 @@ class GaussianBlurPerturber(PerturbImage):
 
     def __init__(self, ksize: int = 1):
         """:param ksize: Blurring kernel size."""
-        min_ksize = 1
-        if ksize < min_ksize or ksize % 2 == 0:
+        min_k_size = 1
+        if ksize < min_k_size or ksize % 2 == 0:
             raise ValueError(
                 f"{type(self).__name__} invalid ksize ({ksize})."
-                f" Must be >= {min_ksize} and odd."
+                f" Must be >= {min_k_size} and odd."
             )
 
         self.ksize = ksize
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus after applying Gaussian blurring."""
+        if additional_params is None:
+            additional_params = dict()
         return cv2.GaussianBlur(image, ksize=(self.ksize, self.ksize), sigmaX=0)
 
     def get_config(self) -> Dict[str, Any]:
@@ -59,19 +63,21 @@ class MedianBlurPerturber(PerturbImage):
 
     def __init__(self, ksize: int = 1):
         """:param ksize: Blurring kernel size."""
-        min_ksize = 3
-        if ksize < min_ksize or ksize % 2 == 0:
+        min_k_size = 3
+        if ksize < min_k_size or ksize % 2 == 0:
             raise ValueError(
                 f"{type(self).__name__} invalid ksize ({ksize})."
-                f" Must be >= {min_ksize} and odd."
+                f" Must be >= {min_k_size} and odd."
             )
 
         self.ksize = ksize
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus after applying Gaussian blurring."""
+        if additional_params is None:
+            additional_params = dict()
         return cv2.medianBlur(image, ksize=self.ksize)
 
     def get_config(self) -> Dict[str, Any]:

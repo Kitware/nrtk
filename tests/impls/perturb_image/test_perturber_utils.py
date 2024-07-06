@@ -1,15 +1,16 @@
-import numpy as np
 from typing import Any, Callable, Dict, Optional
+
+import numpy as np
 
 
 def perturber_assertions(
     perturb: Callable[[np.ndarray, Dict[str, Any]], np.ndarray],
     image: np.ndarray,
     expected: Optional[np.ndarray] = None,
-    additional_params: Dict[str, Any] = {}
+    additional_params: Optional[Dict[str, Any]] = None,
 ) -> np.ndarray:
-    """
-    Test the blanket assertions for perturbers that
+    """Test several blanket assertions for perturbers.
+
     1) Input should remain unchanged
     2) Output should not share memory with input (e.g no clones, etc)
     3) Output should have the same dtype as input
@@ -21,6 +22,8 @@ def perturber_assertions(
     :param expected: (Optional) Expected return value of the perturbation.
     :param additional_oarams: A dictionary containing perturber implementation-specific input param-values pairs.
     """
+    if additional_params is None:
+        additional_params = dict()
     dtype = image.dtype
     copy = np.copy(image)
 
@@ -39,10 +42,10 @@ def pybsm_perturber_assertions(
     image: np.ndarray,
     expected: Optional[np.ndarray] = None,
     random_seed: int = 0,
-    additional_params: Dict[str, Any] = {}
+    additional_params: Optional[Dict[str, Any]] = None,
 ) -> np.ndarray:
-    """
-    Test the blanket assertions for perturbers that
+    """Test some blanket assertions for perturbers.
+
     1) Input should remain unchanged
     2) Output should not share memory with input (e.g no clones, etc)
     Additionally, if ``expected`` is provided
@@ -53,6 +56,8 @@ def pybsm_perturber_assertions(
     :param image: Input image as numpy array.
     :param expected: (Optional) Expected return value of the perturbation.
     """
+    if additional_params is None:
+        additional_params = dict()
     copy = np.copy(image)
     np.random.seed(random_seed)
     out_image = perturb(image, additional_params)

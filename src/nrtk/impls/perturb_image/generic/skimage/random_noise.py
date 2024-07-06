@@ -12,8 +12,7 @@ class _SKImageNoisePerturber(PerturbImage):
         self.rng = rng
 
     def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
-        """Call skimage.util.random_noise with appropriate arguments and convert
-        back to input dtype.
+        """Call skimage.util.random_noise with appropriate arguments and convert back to input dtype.
 
         :param image: Input image as a numpy array.
         :param kwargs: Keyword arguments for random_noise call. ``rng`` will be
@@ -55,7 +54,9 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
         rng: Optional[Union[np.random.Generator, int]] = None,
         amount: float = 0.05,
     ):
-        """:param rng: Pseudo-random number generator or seed.
+        """Initializes the SPNoisePerturber.
+
+        :param rng: Pseudo-random number generator or seed.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         """
         if amount < 0.0 or amount > 1.0:
@@ -78,9 +79,11 @@ class SaltNoisePerturber(_SPNoisePerturber):
     """Adds salt noise to image stimulus."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with salt noise."""
+        if additional_params is None:
+            additional_params = dict()
         return self._perturb(image, mode="salt", amount=self.amount)
 
 
@@ -88,9 +91,11 @@ class PepperNoisePerturber(_SPNoisePerturber):
     """Adds pepper noise to image stimulus."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with pepper noise."""
+        if additional_params is None:
+            additional_params = dict()
         return self._perturb(image, mode="pepper", amount=self.amount)
 
 
@@ -103,7 +108,9 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
     ):
-        """:param rng: Pseudo-random number generator or seed.
+        """Initializes the SaltAndPepperNoisePerturber.
+
+        :param rng: Pseudo-random number generator or seed.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         :param salt_vs_pepper: Proportion of salt vs. pepper noise on range [0, 1].
             Higher values represent more salt.
@@ -119,9 +126,11 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         self.salt_vs_pepper = salt_vs_pepper
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with S&P noise."""
+        if additional_params is None:
+            additional_params = dict()
         return self._perturb(
             image, mode="s&p", amount=self.amount, salt_vs_pepper=self.salt_vs_pepper
         )
@@ -139,7 +148,9 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         mean: float = 0.0,
         var: float = 0.05,
     ):
-        """:param rng: Pseudo-random number generator or seed.
+        """Initializes the GSNoisePerturber.
+
+        :param rng: Pseudo-random number generator or seed.
         :param mean: Mean of random distribution.
         :param var: Variance of random distribution.
         """
@@ -164,9 +175,11 @@ class GaussianNoisePerturber(_GSNoisePerturber):
     """Adds Gaussian-distributed additive noise to image stimulus."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with Gaussian noise."""
+        if additional_params is None:
+            additional_params = dict()
         return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean)
 
 
@@ -174,7 +187,9 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
     """Adds multiplicative noise to image stimulus. Noise is Gaussian-based."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with multiplicative noise."""
+        if additional_params is None:
+            additional_params = dict()
         return self._perturb(image, mode="speckle", var=self.var, mean=self.mean)

@@ -10,7 +10,7 @@ to use within this repository's documentation and examples for consistency purpo
 
 •	*GitLab* - use CamelCase; *not* Gitlab
 
-•	*ground truth* (noun) or *ground-truth* (adj); *not* groundtruth
+•	*ground truth* (noun) or *ground-truth* (adj); *not* ground_truth
 
 •	Headings - use Title Capitalization and succinct descriptions (e.g. "Example Notebook for the XYZ Implementation" *not* "Example Notebook to demonstrate the usage of the XYZ implementation") and follow with an intro sentence, at least between headings (i.e. don't stack headers)
 
