@@ -1,0 +1,14 @@
+v0.9.0
+======
+
+Updated `nrtk` to update `pybsm` references.
+
+Updates / New Features
+----------------------
+
+Code Updates
+
+* Update pybsm related references for new release.
+
+Fixes
+-----
