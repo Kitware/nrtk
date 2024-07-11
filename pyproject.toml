@@ -8,7 +8,7 @@ name = "nrtk"
 # REMEMBER: `distutils.version.*Version` types can be used to compare versions
 # from strings like this.
 # This package prefers to use the strict numbering standard when possible.
-version = "0.8.1"
+version = "0.9.0"
 description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
 license = "Apache-2.0"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
@@ -50,7 +50,7 @@ smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
-pybsm = ">=0.4.3"
+pybsm = ">=0.5.1"
 pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 
@@ -145,6 +145,8 @@ ignore = [
     # -- Ignore these rules, since they contradict our coding standards
     "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
     "C416",  # JATIC guidelines prefer "dict()", rather than "{}", to create an empty dict
+    # -- Ignoring these "Missing Docstring" errors for now, we will fix later
+    "D100", "D101", "D102", "D103", "D104", "D105", "D107"
 ]
 
 [tool.ruff.pydocstyle]
@@ -157,5 +159,5 @@ max-doc-length = 120
 known-first-party = ["nrtk"]
 
 [tool.ruff.per-file-ignores]
-# Add any files to be ignored here e.g. 
+# Add any files to be ignored here e.g.
 # "src/*.py" = ["D100"] # Missing docstring in public module

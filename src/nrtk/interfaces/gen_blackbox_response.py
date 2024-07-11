@@ -29,7 +29,7 @@ def gen_perturber_combinations(
             raise ValueError("Factory passed in with invald length of 0")
 
     def _gen(factory_id: int, factory_sizes: List[int]) -> List[List[int]]:
-        """Recursive method to build up list of lists of perturber combinations
+        """Recursive method to build up list of lists of perturber combinations.
 
         :param factory_id: Index of the factory to add to the combinations.
         :param factory_sizes: List of the number of perturbers per factory.
@@ -55,7 +55,9 @@ def gen_perturber_combinations(
 
 
 class GenerateBlackboxResponse(Plugfigurable):
-    """This interface describes the generation of item-response curves and scores for
+    """This interface describes generation of item-response curves & scores for detection/classification for blackbox.
+
+    This interface describes the generation of item-response curves and scores for
     object detections/classifications with respect to the given blackbox model after
     input images are perturbed via the blackbox perturber factory. Scoring of
     these results is computed with the given blackbox scorer.
@@ -74,4 +76,4 @@ class GenerateBlackboxResponse(Plugfigurable):
         ],
         Tuple[np.ndarray, CLASSIFICATION_DICT_T, Dict[str, Any]],
     ]:
-        """Get the ``idx``th image and groundtruth pair."""
+        """Get the ``idx``th image and ground_truth pair."""

@@ -6,8 +6,10 @@ from smqtk_core import Plugfigurable
 
 
 class ScoreClassifications(Plugfigurable):
-    """Interface abstracting the behavior of taking the actual and predicted
-    classifications and computing the corresponding metric scores.
+    """Interface abstracting the behavior of taking classifications and computing corresponding metric scores.
+
+    Interface abstracting the behavior of taking the actual and predicted classifications and
+    computing the corresponding metric scores.
 
     Implementations should verify the validity of the input data.
     """

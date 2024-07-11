@@ -17,7 +17,9 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
-    """This interface describes the generation of item-response curves and scores for
+    """This interface describes generation of item-response curves and scores for object detection w.r.t. a blackbox.
+
+    This interface describes the generation of item-response curves and scores for
     object detections with respect to the given black-box object detector after
     input images are perturbed via the black-box perturber factory. Scoring of
     these detections is computed with the given black-box scorer.
@@ -31,7 +33,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
         Dict[str, Any],
     ]:
-        """Get the ``idx``th image and groundtruth pair."""
+        """Get the ``idx``th image and ground_truth pair."""
 
     def generate(
         self,
@@ -56,8 +58,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         full: List[Sequence[float]] = list()
 
         def process(perturbers: Sequence[PerturbImage]) -> None:
-            """Generate item-response curve and individual stimuli scores for
-            this set of perturbers.
+            """Generate item-response curve and individual stimuli scores for this set of perturbers.
 
             :param perturbers: Set of perturbers to perturb image stimuli.
             """

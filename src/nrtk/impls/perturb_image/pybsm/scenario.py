@@ -14,25 +14,25 @@ class PybsmScenario(Configurable):
         sensor height above ground level in meters.  The database includes the following
         altitude options: 2 32.55 75 150 225 500 meters, 1000 to 12000 in 1000 meter steps,
         and 14000 to 20000 in 2000 meter steps, 24500
-    groundRange:
+    ground_range:
         distance *on the ground* between the target and sensor in meters.
         The following ground ranges are included in the database at each altitude
         until the ground range exceeds the distance to the spherical earth horizon:
         0 100 500 1000 to 20000 in 1000 meter steps, 22000 to 80000 in 2000 m steps,
         and  85000 to 300000 in 5000 meter steps.
-    aircraftSpeed:
+    aircraft_speed:
         ground speed of the aircraft (m/s)
-    targetReflectance:
+    target_reflectance:
         object reflectance (unitless)
-    targetTemperature:
+    target_temperature:
         object temperature (Kelvin)
-    backgroundReflectance:
+    background_reflectance:
         background reflectance (unitless)
-    backgroundTemperature:
+    background_temperature:
         background temperature (Kelvin)
-    haWindspeed:
+    ha_wind_speed:
         the high altitude windspeed (m/s).  Used to calculate the turbulence profile.
-    cn2at1m:
+    cn2_at_1m:
         the refractive index structure parameter "near the ground" (e.g. at h = 1 m).
         Used to calculate the turbulence profile.
 
@@ -48,7 +48,7 @@ class PybsmScenario(Configurable):
         + list(range(14000, 20001, 2000))
         + [24500]
     )
-    groundRange_values = (
+    ground_range_values = (
         [0, 100, 500]
         + list(range(1000, 20001, 1000))
         + list(range(22000, 80001, 2000))
@@ -60,14 +60,14 @@ class PybsmScenario(Configurable):
         name: str,
         ihaze: int,
         altitude: float,
-        groundRange: float,
-        aircraftSpeed: Optional[float] = 0.0,
-        targetReflectance: Optional[float] = 0.15,
-        targetTemperature: Optional[float] = 295.0,
-        backgroundReflectance: Optional[float] = 0.07,
-        backgroundTemperature: Optional[float] = 293.0,
-        haWindspeed: Optional[float] = 21.0,
-        cn2at1m: Optional[float] = 1.7e-14,
+        ground_range: float,
+        aircraft_speed: Optional[float] = 0.0,
+        target_reflectance: Optional[float] = 0.15,
+        target_temperature: Optional[float] = 295.0,
+        background_reflectance: Optional[float] = 0.07,
+        background_temperature: Optional[float] = 293.0,
+        ha_wind_speed: Optional[float] = 21.0,
+        cn2_at_1m: Optional[float] = 1.7e-14,
     ):
         if ihaze not in PybsmScenario.ihaze_values:
             raise ValueError(
@@ -75,23 +75,23 @@ class PybsmScenario(Configurable):
             )
         if altitude not in PybsmScenario.altitude_values:
             raise ValueError(f"Invalid altitude value ({altitude})")
-        if groundRange not in PybsmScenario.groundRange_values:
-            raise ValueError(f"Invalid ground range value ({groundRange})")
+        if ground_range not in PybsmScenario.ground_range_values:
+            raise ValueError(f"Invalid ground range value ({ground_range})")
 
         # required parameters
         self.name = name
         self.ihaze = ihaze
         self.altitude = altitude
-        self.groundRange = groundRange
+        self.ground_range = ground_range
 
         # optional parameters
-        self.aircraftSpeed = aircraftSpeed
-        self.targetReflectance = targetReflectance
-        self.targetTemperature = targetTemperature
-        self.backgroundReflectance = backgroundReflectance
-        self.backgroundTemperature = backgroundTemperature
-        self.haWindspeed = haWindspeed
-        self.cn2at1m = cn2at1m
+        self.aircraft_speed = aircraft_speed
+        self.target_reflectance = target_reflectance
+        self.target_temperature = target_temperature
+        self.background_reflectance = background_reflectance
+        self.background_temperature = background_temperature
+        self.ha_wind_speed = ha_wind_speed
+        self.cn2_at_1m = cn2_at_1m
 
     def __str__(self) -> str:
         return self.name
@@ -100,14 +100,16 @@ class PybsmScenario(Configurable):
         return self.name
 
     def create_scenario(self) -> Scenario:
-        S = Scenario(self.name, self.ihaze, self.altitude, self.groundRange)
-        S.aircraftSpeed = self.aircraftSpeed
-        S.targetReflectance = self.targetReflectance
-        S.targetTemperature = self.targetTemperature
-        S.backgroundReflectance = self.backgroundReflectance
-        S.backgroundTemperature = self.backgroundTemperature
-        S.haWindspeed = self.haWindspeed
-        S.cn2at1m = self.cn2at1m
+        S = Scenario(  # noqa:N806
+            self.name, self.ihaze, self.altitude, self.ground_range
+        )
+        S.aircraft_speed = self.aircraft_speed
+        S.target_reflectance = self.target_reflectance
+        S.target_temperature = self.target_temperature
+        S.background_reflectance = self.background_reflectance
+        S.background_temperature = self.background_temperature
+        S.ha_wind_speed = self.ha_wind_speed
+        S.cn2_at_1m = self.cn2_at_1m
         return S
 
     def __call__(self) -> Scenario:
@@ -119,12 +121,12 @@ class PybsmScenario(Configurable):
             "name": self.name,
             "ihaze": self.ihaze,
             "altitude": self.altitude,
-            "groundRange": self.groundRange,
-            "aircraftSpeed": self.aircraftSpeed,
-            "targetReflectance": self.targetReflectance,
-            "targetTemperature": self.targetTemperature,
-            "backgroundReflectance": self.backgroundReflectance,
-            "backgroundTemperature": self.backgroundTemperature,
-            "haWindspeed": self.haWindspeed,
-            "cn2at1m": self.cn2at1m,
+            "ground_range": self.ground_range,
+            "aircraft_speed": self.aircraft_speed,
+            "target_reflectance": self.target_reflectance,
+            "target_temperature": self.target_temperature,
+            "background_reflectance": self.background_reflectance,
+            "background_temperature": self.background_temperature,
+            "ha_wind_speed": self.ha_wind_speed,
+            "cn2_at_1m": self.cn2_at_1m,
         }

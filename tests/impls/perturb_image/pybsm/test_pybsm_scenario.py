@@ -1,79 +1,99 @@
-import pytest
-from pybsm.simulation.scenario import Scenario
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager
+
+import pytest
+from pybsm.simulation.scenario import Scenario
 from smqtk_core.configuration import configuration_test_helper
+
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 
 
-@pytest.mark.parametrize("name",
-                         ["clear", "cloudy", "hurricane"])
+@pytest.mark.parametrize("name", ["clear", "cloudy", "hurricane"])
 def test_scenario_string_rep(name: str) -> None:
     ihaze = 1
     altitude = 2
-    groundRange = 0
+    ground_range = 0
     print(name)
-    scenario = PybsmScenario(name, ihaze, altitude, groundRange)
+    scenario = PybsmScenario(name, ihaze, altitude, ground_range)
     assert name == str(scenario)
 
 
 def test_scenario_call() -> None:
     ihaze = 1
     altitude = 2
-    groundRange = 0
+    ground_range = 0
     name = "test"
-    scenario = PybsmScenario(name, ihaze, altitude, groundRange)
+    scenario = PybsmScenario(name, ihaze, altitude, ground_range)
     assert isinstance(scenario(), Scenario)
 
 
-@pytest.mark.parametrize("ihaze, altitude, groundRange, name, expectation", [
-    (1, 2., 0., "test", does_not_raise()),
-    (3, 2., 0., "bad-ihaze", pytest.raises(ValueError, match=r"Invalid ihaze value")),
-    (1, 101.3, 0., "bad-alt", pytest.raises(ValueError, match=r"Invalid altitude value")),
-    (2, 2., -1.2, "bad-groundrange", pytest.raises(ValueError, match=r"Invalid ground range value"))
-])
+@pytest.mark.parametrize(
+    ("ihaze", "altitude", "ground_range", "name", "expectation"),
+    [
+        (1, 2.0, 0.0, "test", does_not_raise()),
+        (
+            3,
+            2.0,
+            0.0,
+            "bad-ihaze",
+            pytest.raises(ValueError, match=r"Invalid ihaze value"),
+        ),
+        (
+            1,
+            101.3,
+            0.0,
+            "bad-alt",
+            pytest.raises(ValueError, match=r"Invalid altitude value"),
+        ),
+        (
+            2,
+            2.0,
+            -1.2,
+            "bad-ground_range",
+            pytest.raises(ValueError, match=r"Invalid ground range value"),
+        ),
+    ],
+)
 def test_verify_parameters(
     ihaze: int,
     altitude: float,
-    groundRange: float,
+    ground_range: float,
     name: str,
-    expectation: ContextManager
+    expectation: ContextManager,
 ) -> None:
 
     with expectation:
-        pybsm_scenario = PybsmScenario(name, ihaze, altitude, groundRange)
+        pybsm_scenario = PybsmScenario(name, ihaze, altitude, ground_range)
 
         # testing PybsmScenario call
         assert pybsm_scenario().ihaze == ihaze
         assert pybsm_scenario().altitude == altitude
         assert pybsm_scenario().name == name
-        assert pybsm_scenario().ground_range == groundRange
+        assert pybsm_scenario().ground_range == ground_range
 
         # testing PybsmScenario.create_scenario directly
         assert pybsm_scenario.create_scenario().ihaze == ihaze
         assert pybsm_scenario.create_scenario().altitude == altitude
         assert pybsm_scenario.create_scenario().name == name
-        assert pybsm_scenario.create_scenario().ground_range == groundRange
+        assert pybsm_scenario.create_scenario().ground_range == ground_range
 
 
 def test_config() -> None:
-    """
-    Test configuration stability.
-    """
+    """Test configuration stability."""
     ihaze = 1
     altitude = 2
-    groundRange = 0
+    ground_range = 0
     name = "test"
-    inst = PybsmScenario(name, ihaze, altitude, groundRange)
+    inst = PybsmScenario(name, ihaze, altitude, ground_range)
     for i in configuration_test_helper(inst):
         assert i.name == inst.name
         assert i.ihaze == inst.ihaze
         assert i.altitude == inst.altitude
-        assert i.groundRange == inst.groundRange
-        assert i.aircraftSpeed == inst.aircraftSpeed
-        assert i.targetReflectance == inst.targetReflectance
-        assert i.targetTemperature == inst.targetTemperature
-        assert i.backgroundReflectance == inst.backgroundReflectance
-        assert i.backgroundTemperature == inst.backgroundTemperature
-        assert i.haWindspeed == inst.haWindspeed
-        assert i.cn2at1m == inst.cn2at1m
+        assert i.ground_range == inst.ground_range
+        assert i.aircraft_speed == inst.aircraft_speed
+        assert i.target_reflectance == inst.target_reflectance
+        assert i.target_temperature == inst.target_temperature
+        assert i.background_reflectance == inst.background_reflectance
+        assert i.background_temperature == inst.background_temperature
+        assert i.ha_wind_speed == inst.ha_wind_speed
+        assert i.cn2_at_1m == inst.cn2_at_1m

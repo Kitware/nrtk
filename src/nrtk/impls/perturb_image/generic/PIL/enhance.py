@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, Protocol, Type, runtime_checkable
+from typing import TYPE_CHECKING, Any, Dict, Optional, Protocol, Type, runtime_checkable
 
 import numpy as np
 from PIL import Image, ImageEnhance
@@ -30,16 +30,17 @@ class _PILEnhancePerturber(PerturbImage):
         self,
         enhancement: Type[_Enhancement],
         image: np.ndarray,
-        additional_params: Dict[str, Any] = {},
+        additional_params: Optional[Dict[str, Any]] = None,
     ) -> np.ndarray:
-        """Call appropriate enhancement interface and perform any necessary data
-        type conversion.
+        """Call appropriate enhancement interface and perform any necessary data type conversion.
 
         :param enhancement: Ehancement to apply.
         :param image: Input image as a numpy array.
 
         :return: Peturbed image as numpy array, including matching shape and dtype.
         """
+        if additional_params is None:
+            additional_params = dict()
         dtype = image.dtype
         # PIL does not support RGB floating point images so we must do an
         # intermediary conversion
@@ -64,9 +65,11 @@ class BrightnessPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus brightness."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with adjusted brightness."""
+        if additional_params is None:
+            additional_params = dict()
         enhancement = ImageEnhance.Brightness
         if TYPE_CHECKING and not isinstance(
             enhancement, _Enhancement
@@ -79,9 +82,11 @@ class ColorPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus color balance."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with adjusted color balance."""
+        if additional_params is None:
+            additional_params = dict()
         enhancement = ImageEnhance.Color
         if TYPE_CHECKING and not isinstance(
             enhancement, _Enhancement
@@ -94,9 +99,11 @@ class ContrastPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus contrast."""
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with adjusted contrast."""
+        if additional_params is None:
+            additional_params = dict()
         enhancement = ImageEnhance.Contrast
         if TYPE_CHECKING and not isinstance(
             enhancement, _Enhancement
@@ -119,9 +126,11 @@ class SharpnessPerturber(_PILEnhancePerturber):
         super().__init__(factor=factor)
 
     def perturb(
-        self, image: np.ndarray, additional_params: Dict[str, Any] = {}
+        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
     ) -> np.ndarray:
         """Return image stimulus with adjusted sharpness."""
+        if additional_params is None:
+            additional_params = dict()
         enhancement = ImageEnhance.Sharpness
         if TYPE_CHECKING and not isinstance(
             enhancement, _Enhancement

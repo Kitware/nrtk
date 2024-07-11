@@ -10,8 +10,9 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class COCOScorer(ScoreDetections):
-    """An implementation of the ``ScoreDetection`` interface that conforms to the
-    COCO data formatting and metrics. An instance of this class reads in the
+    """An implementation of the ``ScoreDetection`` interface that conforms to the COCO data formatting and metrics.
+
+    An instance of this class reads in the
     path to the ground truth data and specifies a particular statistic index.
     Finally, the call to the scorer method returns a set of float metric values
     for the specified statistic index.
@@ -33,7 +34,9 @@ class COCOScorer(ScoreDetections):
             Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
         ],
     ) -> Sequence[float]:
-        """Computes scores for a particular statistic index and returns sequences of float values
+        """Computes scores for a particular statistic index.
+
+        Computes scores for a particular statistic index and returns sequences of float values
         equal to the length of the input data.
         """
         actual_entries = list()
