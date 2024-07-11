@@ -1,0 +1,10 @@
+{
+    "type": "nrtk.impls.perturb_image_factory.generic.step.StepPerturbImageFactory",
+    "nrtk.impls.perturb_image_factory.generic.step.StepPerturbImageFactory": {
+        "perturber": "not a perturber",
+        "theta_key": "ksize",
+        "start": 1,
+        "stop": 10,
+        "step": 1
+    }
+}

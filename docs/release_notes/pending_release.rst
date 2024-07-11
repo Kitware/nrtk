@@ -12,6 +12,10 @@ Updates / New Features
 
 * Updated scanning to properly scan used packages
 
+* Added `from_config` to `PerturbImageFactory` to solve issues hydrating a factory from a json file.
+
+CI/CD
+
 * Added caching of packages to pipeline.
 
 * Changed check release notes to only fetch last commit from main.
