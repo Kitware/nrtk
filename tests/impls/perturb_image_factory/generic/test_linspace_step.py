@@ -5,7 +5,7 @@ from smqtk_core.configuration import configuration_test_helper
 from typing import Any, ContextManager, Dict, Optional, Tuple, Type
 
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.impls.perturb_image_factory.generic.float_step import FloatStepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.generic.linspace_step import LinSpacePerturbImageFactory
 
 
 class DummyFloatPerturber(PerturbImage):
@@ -29,8 +29,8 @@ class DummyFloatPerturber(PerturbImage):
 
 class TestFloatStepPertubImageFactory:
     @pytest.mark.parametrize("perturber, theta_key, start, stop, step, expected", [
-        (DummyFloatPerturber, "param1", 1, 6, 2, (1, 3, 5)),
-        (DummyFloatPerturber, "param2", 3, 9, 3, (3, 6)),
+        (DummyFloatPerturber, "param1", 1, 3, 4, (1, 1.5, 2, 2.5)),
+        (DummyFloatPerturber, "param2", 3, 9, 2, (3, 6)),
         (DummyFloatPerturber, "param1", 4, 4, 1, ())
     ])
     def test_iteration(
@@ -45,7 +45,7 @@ class TestFloatStepPertubImageFactory:
         """
         Ensure factory can be iterated upon and the varied parameter matches expectations.
         """
-        factory = FloatStepPerturbImageFactory(
+        factory = LinSpacePerturbImageFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -54,11 +54,12 @@ class TestFloatStepPertubImageFactory:
         )
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
+            print(p.get_config(), expected)
             assert p.get_config()[theta_key] == expected[idx]
 
     @pytest.mark.parametrize("perturber, theta_key, start, stop, step, idx, expected_val, expectation", [
-        (DummyFloatPerturber, "param1", 1, 6, 0.5, 0, 1, does_not_raise()),
-        (DummyFloatPerturber, "param1", 1, 6, 0.5, 3, 2.5, does_not_raise()),
+        (DummyFloatPerturber, "param1", 1, 6, 10, 0, 1, does_not_raise()),
+        (DummyFloatPerturber, "param1", 1, 6, 10, 3, 2.5, does_not_raise()),
         (DummyFloatPerturber, "param1", 1, 6, 2, 3, -1, pytest.raises(IndexError)),
         (DummyFloatPerturber, "param1", 1, 6, 2, -1, -1, pytest.raises(IndexError)),
         (DummyFloatPerturber, "param1", 4, 4, 1, 0, -1, pytest.raises(IndexError))
@@ -77,7 +78,7 @@ class TestFloatStepPertubImageFactory:
         """
         Ensure it is possible to access a perturber instance via indexing.
         """
-        factory = FloatStepPerturbImageFactory(
+        factory = LinSpacePerturbImageFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -98,12 +99,12 @@ class TestFloatStepPertubImageFactory:
         theta_key: str,
         start: float,
         stop: float,
-        step: float
+        step: int
     ) -> None:
         """
         Test configuration stability.
         """
-        inst = FloatStepPerturbImageFactory(
+        inst = LinSpacePerturbImageFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -128,4 +129,4 @@ class TestFloatStepPertubImageFactory:
         Test that an exception is properly raised (or not) based on argument value.
         """
         with expectation:
-            FloatStepPerturbImageFactory(**kwargs)
+            LinSpacePerturbImageFactory(**kwargs)
