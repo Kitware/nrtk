@@ -51,5 +51,7 @@ Documentation
 
 * Added a section that shows visual examples of perturbations based on pyBSM OTF parameters, starting with the Jitter OTF perturber, along with corresponding code snippets to generate these perturbations.
 
+* Added a section to the README about using the pre-commit hooks
+
 Fixes
 -----
