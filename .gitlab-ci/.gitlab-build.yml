@@ -1,0 +1,14 @@
+###############################################################################
+# Stage -- Build
+###############################################################################
+
+build:cache:
+  extends: .shared-setup
+  stage: build
+  script:
+    - poetry install --sync --with dev-linting,dev-testing,dev-docs
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .cache
+    policy: push

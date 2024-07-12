@@ -1,14 +1,16 @@
 stages:
-  - security
+  - build
   - quality
   - test
+  - security
   - docs
   - publish
 
 include:
-- local: .gitlab-ci/.gitlab-shared.yml
-- local: .gitlab-ci/.gitlab-security.yml
-- local: .gitlab-ci/.gitlab-quality.yml
-- local: .gitlab-ci/.gitlab-test.yml
-- local: .gitlab-ci/.gitlab-docs.yml
-- local: .gitlab-ci/.gitlab-publish.yml
+  - local: .gitlab-ci/.gitlab-shared.yml
+  - local: .gitlab-ci/.gitlab-build.yml
+  - local: .gitlab-ci/.gitlab-quality.yml
+  - local: .gitlab-ci/.gitlab-test.yml
+  - local: .gitlab-ci/.gitlab-security.yml
+  - local: .gitlab-ci/.gitlab-docs.yml
+  - local: .gitlab-ci/.gitlab-publish.yml

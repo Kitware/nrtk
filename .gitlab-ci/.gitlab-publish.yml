@@ -6,7 +6,6 @@
 # package to PYPI.
 publish:
   extends: .shared-setup
-  # Note: using of default image/interruptable/tags
   stage: publish
   script:
     # Ensure there is alignment with the tag reference and the reported
