@@ -1,14 +1,24 @@
+import json
 from contextlib import nullcontext as does_not_raise
+from pathlib import Path
 from typing import Any, ContextManager, Sequence, Tuple
 
 import numpy as np
 import pytest
 from pybsm.otf import dark_current_from_density
-from smqtk_core.configuration import configuration_test_helper
+from smqtk_core.configuration import (
+    configuration_test_helper,
+    from_config_dict,
+    to_config_dict,
+)
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+
+DATA_DIR = Path(__file__).parents[3] / "data"
+NRTK_PYBSM_CONFIG = DATA_DIR / "nrtk_pybsm_config.json"
 
 
 class TestStepPerturbImageFactory:
@@ -284,3 +294,41 @@ class TestStepPerturbImageFactory:
             assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
             assert i.sets == expected_sets
+
+    @pytest.mark.parametrize(
+        ("theta_keys", "thetas"),
+        [
+            (
+                ["altitude"],
+                [[1000, 2000, 3000, 4000]],
+            ),
+            (
+                ["altitude", "D"],
+                [[1000, 2000], [0.5, 0.75]],
+            ),
+        ],
+    )
+    def test_hydration(
+        self,
+        tmp_path: Path,
+        theta_keys: Sequence[str],
+        thetas: Sequence[Any],
+    ) -> None:
+        """Test configuration hydration using from_config_dict."""
+        sensor, scenario = self.create_sample_sensor_and_scenario()
+        original_factory = CustomPybsmPerturbImageFactory(
+            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
+        )
+
+        original_factory_config = original_factory.get_config()
+
+        config_file_path = tmp_path / "config.json"
+        with open(str(config_file_path), "w") as f:
+            json.dump(to_config_dict(original_factory), f)
+
+        with open(str(config_file_path)) as config_file:
+            config = json.load(config_file)
+            hydrated_factory = from_config_dict(config, PerturbImageFactory.get_impls())
+            hydrated_factory_config = hydrated_factory.get_config()
+
+            assert original_factory_config == hydrated_factory_config

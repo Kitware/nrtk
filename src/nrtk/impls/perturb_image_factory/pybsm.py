@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, Iterator, List, Sequence, Type
+from typing import Any, Dict, Iterable, Iterator, List, Sequence, Type, TypeVar
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -13,6 +13,8 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+
+C = TypeVar("C", bound="_PybsmPerturbImageFactory")
 
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
@@ -88,6 +90,10 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @classmethod
     def get_default_config(cls) -> Dict[str, Any]:
         cfg = super().get_default_config()
+
+        # Remove perturber key if it exists
+        cfg.pop("perturber", None)
+
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
 
@@ -95,10 +101,10 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
     @classmethod
     def from_config(
-        cls: Type[_PybsmPerturbImageFactory],
+        cls: Type[C],
         config_dict: Dict,
         merge_default: bool = True,
-    ) -> _PybsmPerturbImageFactory:
+    ) -> C:
         config_dict = dict(config_dict)
 
         config_dict["sensor"] = from_config_dict(config_dict["sensor"], [PybsmSensor])

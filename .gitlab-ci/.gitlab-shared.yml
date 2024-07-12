@@ -10,13 +10,13 @@
     # If changes are make to an active merge request.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: on_success
-    # If changes are pushed for a tag.
-    - if: $CI_COMMIT_TAG
-      when: on_success
     # If changes are pushed to the default branch.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: never  # explicit fail-exclude terminal condition.
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
   before_script:
     # pyBSM has a series of .bin files saved as git-lfs objects,
     # when installing from a repo directly poetry uses dulwich
@@ -44,7 +44,11 @@
     - pip --version
     - poetry --version
     - poetry check
-    - poetry install --only dev-testing
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+    - .cache
+    policy: pull
 
 .needs-headless-opencv:
   before_script:
@@ -58,3 +62,8 @@
       else
         echo "OpenCV-Python NOT installed, skipping."
       fi
+
+.python-versions:
+  parallel:
+    matrix:
+      - PYTHON_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]

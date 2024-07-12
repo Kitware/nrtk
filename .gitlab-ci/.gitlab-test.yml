@@ -5,17 +5,16 @@
 .test-setup:
   extends: .shared-setup
   stage: test
-  needs: [] # Don't wait for previous stages/jobs
   before_script:
     - !reference [.shared-setup, before_script]
     - poetry install --sync --with dev-testing
 
 # Job to run unittests via pytest
 pytest:
-  extends: .test-setup
-  parallel:
-    matrix:
-      - PYTHON_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+  extends: [.test-setup, .python-versions]
+  needs:
+    - job: build:cache
+      artifacts: false
   variables:
     COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}"
     JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
@@ -57,7 +56,11 @@ pytest:
 #   the associated "NOTEBOOK_DIR" to create a job parameterization instance.
 notebooks:
   extends: .test-setup
-  needs: [pytest] # if unit tests don't pass, don't run the notebooks
+  needs:
+    - job: build:cache
+      artifacts: false
+    - job: pytest
+      artifacts: false
   dependencies: []
   # Specifying the various notebooks that we want to be tested. Each invocation
   # of this job should try to execute only one notebook via papermill.
@@ -85,6 +88,8 @@ notebooks:
 coverage:
   extends: .test-setup
   needs:
+    - job: build:cache
+      artifacts: false
     - job: pytest
       artifacts: true
   allow_failure: true
@@ -102,7 +107,7 @@ coverage:
     # `coverage.xml` file
     - coverage xml
     # TODO: Read required percentages from config file?
-    - coverage report --include 'src/nrtk/*' --precision=2 --fail-under=99
+    - coverage report --include 'src/pybsm/*' --precision=2 --fail-under=99
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
   artifacts:
     when: always

@@ -2,6 +2,8 @@
 # Stage -- Security Scanning
 ###############################################################################
 
+# These includes are pulling from public template files directly embedded in the gitlab source code.
+# https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates
 include:
 - template: Jobs/SAST.latest.gitlab-ci.yml
 - template: Jobs/Dependency-Scanning.latest.gitlab-ci.yml
@@ -9,29 +11,26 @@ include:
 
 sast:
   stage: security
+  needs: [pytest] # if unit tests don't pass, don't run
   dependencies: []
-  artifacts:
-    paths: 
-      - gl-sast-report.json
-    reports:
-      sast: gl-sast-report.json
 
 dependency_scanning:
   stage: security
-  dependencies: []
-  artifacts:
+  needs:
+    - job: build:cache # pulls in cached dependencies for scanning
+      artifacts: false
+    - job: pytest  # if unit tests don't pass, don't run
+      artifacts: false
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry install --sync --with dev-linting,dev-testing,dev-docs
+  cache:
+    key: $CI_COMMIT_REF_SLUG
     paths:
-    - gl-dependency-scanning-report.json
-    reports:
-      dependency_scanning:
-        - gl_dependency-scanning-report.json
+    - .cache
+    policy: pull
 
 secret_detection:
   stage: security
+  needs: [pytest] # if unit tests don't pass, don't run
   dependencies: []
-  artifacts:
-    paths:
-    - gl-secret-detection-report.json
-    reports:
-      secret_detection:
-        - gl-secret-detection-report.json
