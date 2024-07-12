@@ -34,3 +34,7 @@ class PerturbImage(Plugfigurable):
         if additional_params is None:
             additional_params = dict()
         return self.perturb(image, additional_params)
+
+    @classmethod
+    def get_type_string(cls) -> str:
+        return f"{cls.__module__}.{cls.__name__}"

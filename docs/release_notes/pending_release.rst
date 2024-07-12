@@ -4,6 +4,8 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+CI/CD
+
 * Optimized to not run anything but `publish` when `tag`.
 
 * Created a shared `python-version` job for `python` version matrices.
@@ -11,6 +13,9 @@ Updates / New Features
 * Updated scanning to properly report the vulnerabilities.
 
 * Updated scanning to properly scan used packages
+
+* Added `from_config` to `PerturbImageFactory` to solve issues hydrating a factory from a json file.
+
 
 * Added caching of packages to pipeline.
 

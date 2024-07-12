@@ -1,12 +1,17 @@
+import json
 from contextlib import nullcontext as does_not_raise
+from pathlib import Path
 from typing import Any, ContextManager, Dict, Optional, Tuple, Type
 
 import numpy as np
 import pytest
-from smqtk_core.configuration import configuration_test_helper
+from smqtk_core.configuration import configuration_test_helper, from_config_dict, to_config_dict
 
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+
+DATA_DIR = Path(__file__).parents[3] / "data"
 
 
 class DummyPerturber(PerturbImage):
@@ -143,3 +148,58 @@ class TestStepPerturbImageFactory:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             StepPerturbImageFactory(**kwargs)
+
+    @pytest.mark.parametrize(
+        ("perturber", "theta_key", "start", "stop", "step"),
+        [(DummyPerturber, "param_1", 1, 5, 2), (DummyPerturber, "param_2", 3, 9, 3)],
+    )
+    def test_hydration(
+        self,
+        tmp_path: Path,
+        perturber: Type[PerturbImage],
+        theta_key: str,
+        start: int,
+        stop: int,
+        step: int,
+    ) -> None:
+        """Test configuration hydration using from_config_dict."""
+        original_factory = StepPerturbImageFactory(
+            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+        )
+
+        original_factory_config = original_factory.get_config()
+
+        config_file_path = tmp_path / 'config.json'
+        with open(str(config_file_path), 'w') as f:
+            json.dump(to_config_dict(original_factory), f)
+
+        with open(str(config_file_path)) as config_file:
+            config = json.load(config_file)
+            hydrated_factory = from_config_dict(config, PerturbImageFactory.get_impls())
+            hydrated_factory_config = hydrated_factory.get_config()
+
+            assert original_factory_config == hydrated_factory_config
+
+    @pytest.mark.parametrize(
+        ("config_file_name", "expectation"),
+        [
+            (
+                "nrtk_blur_config.json",
+                does_not_raise(),
+            ),
+            (
+                "nrtk_bad_step_config.json",
+                pytest.raises(
+                    ValueError, match=r"not a perturber is not a valid perturber."
+                ),
+            ),
+        ],
+    )
+    def test_hyrdation_bounds(
+        self, config_file_name: str, expectation: ContextManager
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            with open(str(DATA_DIR / config_file_name)) as config_file:
+                config = json.load(config_file)
+                from_config_dict(config, PerturbImageFactory.get_impls())
