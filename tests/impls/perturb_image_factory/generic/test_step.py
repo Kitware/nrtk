@@ -5,7 +5,11 @@ from typing import Any, ContextManager, Dict, Optional, Tuple, Type
 
 import numpy as np
 import pytest
-from smqtk_core.configuration import configuration_test_helper, from_config_dict, to_config_dict
+from smqtk_core.configuration import (
+    configuration_test_helper,
+    from_config_dict,
+    to_config_dict,
+)
 
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -169,8 +173,8 @@ class TestStepPerturbImageFactory:
 
         original_factory_config = original_factory.get_config()
 
-        config_file_path = tmp_path / 'config.json'
-        with open(str(config_file_path), 'w') as f:
+        config_file_path = tmp_path / "config.json"
+        with open(str(config_file_path), "w") as f:
             json.dump(to_config_dict(original_factory), f)
 
         with open(str(config_file_path)) as config_file:

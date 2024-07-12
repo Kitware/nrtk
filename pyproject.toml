@@ -67,7 +67,7 @@ types-setuptools = ">=65.6.0.1"
 types-tqdm = ">=4.64"
 pre-commit = ">=2.20"
 ruff = "^0.1.0"
-black = ">=24.3.0"
+black = {version = ">=24.3.0", extras=["jupyter"]}
 
 # Docs
 [tool.poetry.group.dev-docs]
