@@ -20,7 +20,31 @@ Updates / New Features
 
 * Added `jupyter` notebook extra to `black`.
 
-* Modified security scanning to not use latest but instead the stable version.
+* Modified all code to be compliant with all `ruff` and `black` checks besides missing docstrings.
+
+Other
+
+* Added `git pre-hook` to assist in linting.
+
+* Refactored package into `src/nrtk` instead of `nrtk`.
+
+* Add `prefer-active-python=true` to `poetry.toml` to use system `Python`.
+
+* Updated git lfs to properly track large files in any directory.
+
+* Added LinSpacePerturbImageFactory for alternative method of generating pertubations
+
+Dependencies
+
+* Added new linting `black` and `ruff`.
+
+Documentation
+
+* Updated documents to reflect new refactor.
+
+* Added Jitter OTF perturber code doc.
+
+* Added a section that shows visual examples of perturbations based on pyBSM OTF parameters, starting with the Jitter OTF perturber, along with corresponding code snippets to generate these perturbations.
 
 Fixes
 -----
