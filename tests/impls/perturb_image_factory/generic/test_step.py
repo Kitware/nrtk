@@ -188,7 +188,7 @@ class TestStepPerturbImageFactory:
                 does_not_raise(),
             ),
             (
-                "nrtk_bad_config.json",
+                "nrtk_bad_step_config.json",
                 pytest.raises(
                     ValueError, match=r"not a perturber is not a valid perturber."
                 ),

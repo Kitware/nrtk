@@ -1,6 +1,8 @@
 from __future__ import annotations
+
+from typing import Any, Dict, Sequence, Type
+
 import numpy as np
-from typing import Any, Dict, Type, Sequence
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -17,7 +19,9 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
         stop: float,
         step: int = 1,
     ):
-        """Initialize the factory to produce PerturbImage instances of the given type,
+        """Initialize the factory to produce PerturbImage instances of the given type.
+
+        Initialize the factory to produce PerturbImage instances of the given type,
         varying the given ``theta_key`` parameter from start to stop with given step.
 
         :param perturber: Python implementation type of the PerturbImage interface
@@ -47,24 +51,7 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
 
     def get_config(self) -> Dict[str, Any]:
         cfg = super().get_config()
-        cfg["perturber"] = self.perturber.__name__
         cfg["start"] = self.start
         cfg["stop"] = self.stop
         cfg["step"] = self.step
         return cfg
-
-    @classmethod
-    def from_config(
-        cls: Type[LinSpacePerturbImageFactory], config_dict: Dict, merge_default: bool = True
-    ) -> LinSpacePerturbImageFactory:
-        config_dict = dict(config_dict)
-
-        perturber_impls = PerturbImage.get_impls()
-        type_dict = {
-            pert_impl.__name__: pert_impl
-            for pert_impl in perturber_impls
-        }
-
-        config_dict["perturber"] = type_dict[config_dict["perturber"]]
-
-        return super().from_config(config_dict, merge_default=merge_default)
