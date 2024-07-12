@@ -4,6 +4,8 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+CI/CD
+
 * Optimized to not run anything but `publish` when `tag`.
 
 * Created a shared `python-version` job for `python` version matrices.
@@ -14,7 +16,6 @@ Updates / New Features
 
 * Added `from_config` to `PerturbImageFactory` to solve issues hydrating a factory from a json file.
 
-CI/CD
 
 * Added caching of packages to pipeline.
 
