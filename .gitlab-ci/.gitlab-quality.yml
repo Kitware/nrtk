@@ -27,13 +27,13 @@ release-notes:
     - !reference [.quality-setup, rules] # Don't overwrite normal rules
 
 # Job to lint python code
-linting:
+flake8:
   extends: .quality-setup
   script:
     - poetry run flake8
 
 # Job to typecheck python code
-typecheck:
+mypy:
   extends: .quality-setup
   script:
     - poetry run mypy
