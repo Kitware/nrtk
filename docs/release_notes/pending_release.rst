@@ -10,5 +10,9 @@ CI/CD
 
 * Renamed `typing` job to `mypy`.
 
+Code Updates
+
+* Added a compute_image_metrics interface
+
 Fixes
 -----
