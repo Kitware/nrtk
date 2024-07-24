@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional, Type, TypeVar
 
 import numpy as np
 from pybsm.simulation import RefImage, simulate_image
@@ -14,6 +14,8 @@ from smqtk_core.configuration import (
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
+
+C = TypeVar("C", bound="PybsmPerturber")
 
 DEFAULT_REFLECTANCE_RANGE = np.array(
     [0.05, 0.5]
@@ -117,9 +119,7 @@ class PybsmPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(
-        cls: Type[PybsmPerturber], config_dict: Dict, merge_default: bool = True
-    ) -> PybsmPerturber:
+    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
         config_dict = dict(config_dict)
 
         config_dict["sensor"] = from_config_dict(config_dict["sensor"], [PybsmSensor])
