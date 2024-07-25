@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional, Type, TypeVar
 
 import numpy as np
 from pybsm.simulation.sensor import Sensor
 from smqtk_core import Configurable
+
+C = TypeVar("C", bound="PybsmSensor")
 
 
 class PybsmSensor(Configurable):
@@ -212,9 +214,7 @@ class PybsmSensor(Configurable):
         return self.create_sensor()
 
     @classmethod
-    def from_config(
-        cls: Type[PybsmSensor], config_dict: Dict, merge_default: bool = True
-    ) -> PybsmSensor:
+    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
         config_dict = dict(config_dict)
 
         # Convert input data to expected constructor types
