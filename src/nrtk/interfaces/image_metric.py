@@ -5,7 +5,7 @@ import numpy as np
 from smqtk_core import Plugfigurable
 
 
-class ComputeImageMetrics(Plugfigurable):
+class ImageMetric(Plugfigurable):
     """This interface outlines the computation of a given metric between up to two images."""
 
     @abc.abstractmethod
@@ -41,3 +41,7 @@ class ComputeImageMetrics(Plugfigurable):
                  should impart no side effects upon either input image or the additional parameters.
         """
         return self.compute(img_1, img_2, additional_params)
+
+    def get_config(self) -> Dict[str, Any]:
+        """Returns the config for the interface."""
+        return {}

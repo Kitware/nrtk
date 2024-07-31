@@ -10,9 +10,11 @@ CI/CD
 
 * Renamed `typing` job to `mypy`.
 
-Code Updates
+New Features
 
 * Added a compute_image_metrics interface
+
+* Implemented functionality for computing the Signal to Noise Ratio - compute_SNR
 
 * Added bound types for `from_config` definitions 
 

@@ -107,7 +107,7 @@ coverage:
     # `coverage.xml` file
     - coverage xml
     # TODO: Read required percentages from config file?
-    - coverage report --include 'src/pybsm/*' --precision=2 --fail-under=99
+    - coverage report --include 'src/nrtk/*' --precision=2 --fail-under=99
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
   artifacts:
     when: always
