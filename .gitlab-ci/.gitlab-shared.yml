@@ -53,14 +53,16 @@
 .needs-headless-opencv:
   before_script:
     - |
-      VERSION="$(poetry run pip list --format=json | poetry run ./scripts/pycv2_installed_version.py)"
-      if [[ "$?" -eq 0 ]]
+      EXIT_CODE=0
+      poetry show opencv-python || EXIT_CODE=$?
+      if [[ "$EXIT_CODE" -eq 0 ]]
       then
-        echo "OpenCV-Python installed, replacing with equivalent headless version."
-        poetry run pip uninstall -y opencv-python opencv-python-headless
-        poetry run pip install --no-deps opencv-python-headless=="$VERSION"
+          VERSION="$(poetry show opencv-python | awk '/version/ { print $3 }')"
+          echo "OpenCV-Python installed, replacing with equivalent headless version."
+          poetry run pip uninstall -y opencv-python opencv-python-headless
+          poetry run pip install --no-deps opencv-python-headless=="$VERSION"
       else
-        echo "OpenCV-Python NOT installed, skipping."
+          echo "OpenCV-Python NOT installed, skipping."
       fi
 
 .python-versions:

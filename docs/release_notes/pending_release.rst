@@ -10,6 +10,8 @@ CI/CD
 
 * Renamed `typing` job to `mypy`.
 
+* Numerous fixes to the pipeline brought in from `xaitk-jatic`.
+
 New Features
 
 * Added a compute_image_metrics interface

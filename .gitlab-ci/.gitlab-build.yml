@@ -6,7 +6,7 @@ build:cache:
   extends: .shared-setup
   stage: build
   script:
-    - poetry install --sync --with dev-linting,dev-testing,dev-docs
+    - poetry install --sync --with main,dev-linting,dev-testing,dev-docs --all-extras
   cache:
     key: $CI_COMMIT_REF_SLUG
     paths:
