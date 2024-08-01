@@ -8,7 +8,7 @@
   needs: [build:cache]
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --with dev-docs,dev-testing
+    - poetry install --sync --only main,dev-docs,dev-testing
     - !reference [.needs-headless-opencv, before_script]
 
 pages-branch:

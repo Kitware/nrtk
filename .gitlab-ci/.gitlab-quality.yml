@@ -8,7 +8,7 @@
   needs: [build:cache]
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --with dev-linting,dev-testing
+    - poetry install --sync --only main,dev-linting,dev-testing
 
 # Job to check the release notes folder
 release-notes:

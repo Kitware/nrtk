@@ -7,7 +7,7 @@
   stage: test
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --with dev-testing
+    - poetry install --sync --with main,dev-testing
 
 # Job to run unittests via pytest
 pytest:
@@ -15,6 +15,7 @@ pytest:
   needs:
     - job: build:cache
       artifacts: false
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   variables:
     COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}"
     JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
@@ -106,8 +107,9 @@ coverage:
     # This converts the now combined `.coverage` database file into a single
     # `coverage.xml` file
     - coverage xml
+    - SRC=`echo "src/$CI_PROJECT_NAME/*" | sed -r 's/\-/\_/g'`
     # TODO: Read required percentages from config file?
-    - coverage report --include 'src/nrtk/*' --precision=2 --fail-under=99
+    - coverage report --include $SRC --precision=2 --fail-under=99
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
   artifacts:
     when: always
