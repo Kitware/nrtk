@@ -53,6 +53,16 @@ Interface: PerturbImageFactory
    :members:
    :special-members:
 
+-------------
+Image Metrics
+-------------
+
+Interface: ImageMetric
+----------------------
+.. autoclass:: nrtk.interfaces.image_metric.ImageMetric
+   :members:
+   :special-members:
+
 -------
 Scoring
 -------

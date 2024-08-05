@@ -113,6 +113,22 @@ Class: StepPerturbImageFactory
    :members:
    :special-members:
 
+-------------
+Image Metrics
+-------------
+
+Class: NIIRSImageMetric
+---------------------
+.. autoclass:: nrtk.impls.image_metric.niirs_image_metric.NIIRSImageMetric
+   :members:
+   :special-members:
+
+Class: SNRImageMetric
+---------------------
+.. autoclass:: nrtk.impls.image_metric.snr_image_metric.SNRImageMetric
+   :members:
+   :special-members:
+
 -------
 Scoring
 -------
