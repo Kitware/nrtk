@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional, Type, TypeVar
 
 import cv2
 import numpy as np
@@ -16,6 +16,8 @@ from smqtk_core.configuration import (
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
+
+C = TypeVar("C", bound="JitterOTFPerturber")
 
 
 class JitterOTFPerturber(PerturbImage):
@@ -142,9 +144,7 @@ class JitterOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(
-        cls: Type[JitterOTFPerturber], config_dict: Dict, merge_default: bool = True
-    ) -> JitterOTFPerturber:
+    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
