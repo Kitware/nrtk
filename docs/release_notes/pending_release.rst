@@ -12,6 +12,12 @@ CI/CD
 
 * Numerous fixes to the pipeline brought in from `xaitk-jatic`.
 
+* Added a couple TODO notes to the gitlab ci scripts indicating future changes.
+
+* Replaced a `with` to an `only` to force further atomic job environments.
+
+* Swapped out pipeline to use a shared pipeline.
+
 New Features
 
 * Added a compute_image_metrics interface
