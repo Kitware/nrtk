@@ -1,6 +1,8 @@
 v0.11.0
 =======
 
+Numerous changes to CI/CD, added a new `ImageMetric` interface and implementation `SNRImageMetric`.
+
 Updates / New Features
 ----------------------
 
@@ -20,11 +22,11 @@ CI/CD
 
 New Features
 
-* Added a compute_image_metrics interface
+* Added a `ImageMetric` interface
 
-* Implemented functionality for computing the Signal to Noise Ratio - compute_SNR
+* Implemented functionality for computing the Signal to Noise Ratio - `SNRImageMetric`
 
-* Added bound types for `from_config` definitions 
+* Added bound types for `from_config` definitions
 
 Fixes
 -----
