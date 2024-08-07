@@ -7,10 +7,9 @@ stages:
   - publish
 
 include:
-  - local: .gitlab-ci/.gitlab-shared.yml
-  - local: .gitlab-ci/.gitlab-build.yml
-  - local: .gitlab-ci/.gitlab-quality.yml
+  - project: "jatic/kitware/devel"
+    ref: main
+    file: ".gitlab-ci.yml"
+
+  # job overrides specific to this repo
   - local: .gitlab-ci/.gitlab-test.yml
-  - local: .gitlab-ci/.gitlab-security.yml
-  - local: .gitlab-ci/.gitlab-docs.yml
-  - local: .gitlab-ci/.gitlab-publish.yml
