@@ -1,5 +1,5 @@
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Tuple
+from typing import Any, ContextManager, Dict, Sequence, Tuple
 
 import numpy as np
 import pytest
@@ -7,7 +7,9 @@ from PIL import Image
 from pybsm.otf import dark_current_from_density
 from smqtk_core.configuration import configuration_test_helper
 
-from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
+from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
+    CircularApertureOTFPerturber,
+)
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 
@@ -16,15 +18,13 @@ from ..test_perturber_utils import pybsm_perturber_assertions
 INPUT_IMG_FILE = (
     "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 )
-EXPECTED_DEFAULT_IMG_FILE = (
-    "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
-)
+EXPECTED_DEFAULT_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE = (
-    "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
+    "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_provided_expected_output.tiff"
 )
 
 
-class TestOTFPerturber:
+class TestCircularApertureOTFPerturber:
     def create_sample_sensor_and_scenario(self) -> Tuple[PybsmSensor, PybsmScenario]:
         name = "L32511x"
 
@@ -127,7 +127,7 @@ class TestOTFPerturber:
         img_gsd = 3.19 / 160.0
         sensor, scenario = self.create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario)
+        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -137,7 +137,7 @@ class TestOTFPerturber:
 
         # Test callable
         pybsm_perturber_assertions(
-            perturb=JitterOTFPerturber(sensor=sensor, scenario=scenario),
+            perturb=CircularApertureOTFPerturber(sensor=sensor, scenario=scenario),
             image=image,
             expected=expected,
             additional_params={"img_gsd": img_gsd},
@@ -148,22 +148,36 @@ class TestOTFPerturber:
         image = np.array(Image.open(INPUT_IMG_FILE))
         expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE))
         # Test perturb interface directly
-        inst = JitterOTFPerturber()
+        inst = CircularApertureOTFPerturber()
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
 
         # Test callable
         pybsm_perturber_assertions(
-            perturb=JitterOTFPerturber(), image=image, expected=expected
+            perturb=CircularApertureOTFPerturber(), image=image, expected=expected
         )
 
-    @pytest.mark.parametrize("s_x", [0.5, 1.5])
-    @pytest.mark.parametrize("s_y", [0.5, 1.5])
-    def test_provided_reproducibility(self, s_x: float, s_y: float) -> None:
+    @pytest.mark.parametrize(
+        ("mtf_wavelengths", "mtf_weights"),
+        [
+            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
+            ([0.2e-6, 0.4e-6, 0.6e-6], [1.0, 0.5, 1.0]),
+        ],
+    )
+    def test_provided_reproducibility(
+        self,
+        mtf_wavelengths: Sequence[float],
+        mtf_weights: Sequence[float],
+    ) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y)
+        inst = CircularApertureOTFPerturber(
+            sensor=sensor,
+            scenario=scenario,
+            mtf_wavelengths=mtf_wavelengths,
+            mtf_weights=mtf_weights,
+        )
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
@@ -182,7 +196,7 @@ class TestOTFPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
-        inst = JitterOTFPerturber()
+        inst = CircularApertureOTFPerturber()
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb, image=image, expected=None
         )
@@ -207,10 +221,46 @@ class TestOTFPerturber:
     ) -> None:
         """Test variations of additional params."""
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
+        perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
             _ = perturber(image, additional_params)
+
+    @pytest.mark.parametrize(
+        ("mtf_wavelengths", "mtf_weights", "expectation"),
+        [
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], does_not_raise()),
+            (
+                [0.5e-6, 0.6e-6],
+                [],
+                pytest.raises(ValueError, match=r"mtf_weights is empty"),
+            ),
+            (
+                [],
+                [0.5, 0.5],
+                pytest.raises(ValueError, match=r"mtf_wavelengths is empty"),
+            ),
+            (
+                [0.5e-6, 0.6e-6],
+                [0.5],
+                pytest.raises(
+                    ValueError,
+                    match=r"mtf_wavelengths and mtf_weights are not the same length",
+                ),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self,
+        mtf_wavelengths: Sequence[float],
+        mtf_weights: Sequence[float],
+        expectation: ContextManager,
+    ) -> None:
+        """Test variations of additional params."""
+        with expectation:
+            _ = CircularApertureOTFPerturber(
+                mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights
+            )
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -222,54 +272,34 @@ class TestOTFPerturber:
         self, additional_params: Dict[str, Any], expectation: ContextManager
     ) -> None:
         """Test variations of additional params."""
-        perturber = JitterOTFPerturber()
+        perturber = CircularApertureOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
             _ = perturber(image, additional_params)
 
-    @pytest.mark.parametrize("s_x", [0.5, 1.5])
-    @pytest.mark.parametrize("s_y", [0.5, 1.5])
-    def test_provided_sx_sy_reproducibility(
+    @pytest.mark.parametrize(
+        ("mtf_wavelengths", "mtf_weights"),
+        [
+            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
+        ],
+    )
+    def test_mtf_wavelength_and_weight_configuration(
         self,
-        s_x: float,
-        s_y: float,
-    ) -> None:
-        """Ensure results are reproducible."""
-        # Test perturb interface directly
-        image = np.array(Image.open(INPUT_IMG_FILE))
-        sensor, scenario = self.create_sample_sensor_and_scenario()
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y)
-        img_gsd = 3.19 / 160.0
-        out_image = pybsm_perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=None,
-            additional_params={"img_gsd": img_gsd},
-        )
-        pybsm_perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=out_image,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-    @pytest.mark.parametrize("s_x", [0.5])
-    @pytest.mark.parametrize("s_y", [0.5])
-    def test_sx_sy_configuration(
-        self,
-        s_x: float,
-        s_y: float,
+        mtf_wavelengths: Sequence[float],
+        mtf_weights: Sequence[float],
     ) -> None:
         """Test configuration stability."""
-        inst = JitterOTFPerturber(s_x=s_x, s_y=s_y)
+        inst = CircularApertureOTFPerturber(
+            mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights
+        )
         for i in configuration_test_helper(inst):
-            assert i.s_x == s_x
-            assert i.s_y == s_y
+            assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
+            assert np.array_equal(i.mtf_weights, mtf_weights)
 
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario)
+        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
         for i in configuration_test_helper(inst):
             if i.sensor:
                 assert i.sensor.name == sensor.name
@@ -314,19 +344,28 @@ class TestOTFPerturber:
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
-    @pytest.mark.parametrize("s_x", [0.5])
-    @pytest.mark.parametrize("s_y", [0.5])
+    @pytest.mark.parametrize(
+        ("mtf_wavelengths", "mtf_weights"),
+        [
+            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
+        ],
+    )
     def test_overall_configuration(
         self,
-        s_x: float,
-        s_y: float,
+        mtf_wavelengths: Sequence[float],
+        mtf_weights: Sequence[float],
     ) -> None:
         """Test configuration stability."""
         sensor, scenario = self.create_sample_sensor_and_scenario()
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y)
+        inst = CircularApertureOTFPerturber(
+            sensor=sensor,
+            scenario=scenario,
+            mtf_wavelengths=mtf_wavelengths,
+            mtf_weights=mtf_weights,
+        )
         for i in configuration_test_helper(inst):
-            assert i.s_x == s_x
-            assert i.s_y == s_y
+            assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
+            assert np.array_equal(i.mtf_weights, mtf_weights)
             if i.sensor:
                 assert i.sensor.name == sensor.name
                 assert i.sensor.D == sensor.D
