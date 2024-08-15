@@ -39,7 +39,8 @@ numpy = [
     {version = ">=1.22,^1.25", python = ">=3.9,<3.12" }, # CVE-2021-34141
     {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
-opencv-python = ">=4.6"
+opencv-python = {version = ">=4.6", optional=true}
+opencv-python-headless = {version = ">=4.6", optional=true}
 Pillow = ">=10.3.0" # CVE-2024-28219
 scikit-image = [
     {version = ">=0.21,<0.22", python = ">=3.8,<3.12"},
@@ -53,6 +54,10 @@ tqdm = ">=4.64"
 pybsm = ">=0.5.1"
 pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
+
+[tool.poetry.extras]
+cv2-graphics = ["opencv-python"] 
+cv2-headless = ["opencv-python-headless"] 
 
 # Linting
 [tool.poetry.group.dev-linting]
