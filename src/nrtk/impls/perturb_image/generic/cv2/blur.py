@@ -26,6 +26,11 @@ class AverageBlurPerturber(PerturbImage):
         """Return image stimulus after applying average blurring."""
         if additional_params is None:
             additional_params = dict()
+
+        # Check for channel last format
+        if image.ndim == 3 and image.shape[2] > 4:
+            raise ValueError("Image is not in expected format (H, W, C)")
+
         return cv2.blur(image, ksize=(self.ksize, self.ksize))
 
     def get_config(self) -> Dict[str, Any]:
@@ -52,6 +57,11 @@ class GaussianBlurPerturber(PerturbImage):
         """Return image stimulus after applying Gaussian blurring."""
         if additional_params is None:
             additional_params = dict()
+
+        # Check for channel last format
+        if image.ndim == 3 and image.shape[2] > 4:
+            raise ValueError("Image is not in expected format (H, W, C)")
+
         return cv2.GaussianBlur(image, ksize=(self.ksize, self.ksize), sigmaX=0)
 
     def get_config(self) -> Dict[str, Any]:
@@ -78,6 +88,11 @@ class MedianBlurPerturber(PerturbImage):
         """Return image stimulus after applying Gaussian blurring."""
         if additional_params is None:
             additional_params = dict()
+
+        # Check for channel last format
+        if image.ndim == 3 and image.shape[2] > 4:
+            raise ValueError("Image is not in expected format (H, W, C)")
+
         return cv2.medianBlur(image, ksize=self.ksize)
 
     def get_config(self) -> Dict[str, Any]:
