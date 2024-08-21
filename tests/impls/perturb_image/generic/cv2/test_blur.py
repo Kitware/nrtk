@@ -78,6 +78,26 @@ class TestAverageBlurPerturber:
         with expectation:
             AverageBlurPerturber(**kwargs)
 
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.ones((256, 256)), does_not_raise()),
+            (np.ones((256, 256, 3)), does_not_raise()),
+            (np.ones((256, 256, 4)), does_not_raise()),
+            (
+                np.ones((3, 256, 256)),
+                pytest.raises(ValueError, match=r"Image is not in expected format")
+            ),
+        ],
+    )
+    def test_perturb_bounds(
+        self, image: np.ndarray, expectation: ContextManager
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        inst = AverageBlurPerturber()
+        with expectation:
+            inst.perturb(image)
+
 
 class TestGaussianBlurPerturber:
     def test_consistency(self) -> None:
@@ -151,6 +171,26 @@ class TestGaussianBlurPerturber:
         with expectation:
             GaussianBlurPerturber(**kwargs)
 
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.ones((256, 256)), does_not_raise()),
+            (np.ones((256, 256, 3)), does_not_raise()),
+            (np.ones((256, 256, 4)), does_not_raise()),
+            (
+                np.ones((3, 256, 256)),
+                pytest.raises(ValueError, match=r"Image is not in expected format")
+            ),
+        ],
+    )
+    def test_perturb_bounds(
+        self, image: np.ndarray, expectation: ContextManager
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        inst = GaussianBlurPerturber()
+        with expectation:
+            inst.perturb(image)
+
 
 class TestMedianBlurPerturber:
     def test_consistency(self) -> None:
@@ -222,6 +262,26 @@ class TestMedianBlurPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             MedianBlurPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.ones((256, 256), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 4), dtype=np.float32), does_not_raise()),
+            (
+                np.ones((3, 256, 256)),
+                pytest.raises(ValueError, match=r"Image is not in expected format")
+            ),
+        ],
+    )
+    def test_perturb_bounds(
+        self, image: np.ndarray, expectation: ContextManager
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        inst = MedianBlurPerturber(ksize=5)
+        with expectation:
+            inst.perturb(image)
 
 
 EXPECTED_AVERAGE = np.array([[4, 4, 4], [5, 5, 5], [6, 6, 6]], dtype=np.uint8)

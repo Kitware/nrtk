@@ -10,5 +10,9 @@ New Features
 
 * Implemented Circular Aperture OTF perturber
 
+CI/CD
+
+* Added checks and tests for OpenCV perturbers to ensure image is in channel-last format.
+
 Fixes
 -----
