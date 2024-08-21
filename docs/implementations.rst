@@ -70,6 +70,11 @@ Class: PybsmSensor
 .. autoclass:: nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor
    :members:
 
+Class: CircleApertureOTFPerturber
+---------------------------------
+.. autoclass:: nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber.CircularApertureOTFPerturber
+   :members:
+
 Class: JitterOTFPerturber
 -------------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.jitter_otf_perturber.JitterOTFPerturber
