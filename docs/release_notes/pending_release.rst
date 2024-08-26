@@ -18,5 +18,7 @@ Documentation
 
 * Updated the readthedocs required packages.
 
+* Added a work-around to the `docs/conf.py` to install `git-lfs` when on `readthedocs`.
+
 Fixes
 -----
