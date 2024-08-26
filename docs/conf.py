@@ -27,23 +27,6 @@ copyright = "2023, Kitware, Inc."  # noqa: A001
 author = "Kitware, Inc."
 release = nrtk.__version__
 
-# -- Support git-lfs on RTD --------------------------------------------------
-# https://github.com/InfinniPlatform/InfinniPlatform.readthedocs.org.en/blob/6c13503ca9af83d23faaf2070b6b024046fe23e8/docs/source/conf.py#L18-L31
-DOC_SOURCES_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT_DIR = os.path.dirname(os.path.dirname(DOC_SOURCES_DIR))
-sys.path.insert(0, DOC_SOURCES_DIR)
-print("PROJECT_ROOT_DIR", PROJECT_ROOT_DIR)
-
-# If runs on ReadTheDocs environment
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-
-# Hack for lacking git-lfs support ReadTheDocs
-if on_rtd:
-    print("Fetching files with git_lfs")
-    from git_lfs import fetch
-
-    fetch(PROJECT_ROOT_DIR)
-
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
