@@ -14,5 +14,9 @@ CI/CD
 
 * Added checks and tests for OpenCV perturbers to ensure image is in channel-last format.
 
+Documentation
+
+* Updated the readthedocs required packages.
+
 Fixes
 -----
