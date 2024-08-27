@@ -1,4 +1,5 @@
 from typing import Any, Dict, Sequence, Type
+import math
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -11,9 +12,9 @@ class StepPerturbImageFactory(PerturbImageFactory):
         self,
         perturber: Type[PerturbImage],
         theta_key: str,
-        start: int,
-        stop: int,
-        step: int = 1,
+        start: float,
+        stop: float,
+        step: float = 1.0,
     ):
         """Initialize the factory to produce PerturbImage instances of the given type.
 
@@ -40,8 +41,8 @@ class StepPerturbImageFactory(PerturbImageFactory):
         self.step = step
 
     @property
-    def thetas(self) -> Sequence[int]:
-        return range(self.start, self.stop, self.step)
+    def thetas(self) -> Sequence[float]:
+        return [self.start + i*self.step for i in range(math.ceil((self.stop-self.start)/self.step))]
 
     @property
     def theta_key(self) -> str:
