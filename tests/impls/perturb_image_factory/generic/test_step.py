@@ -34,12 +34,12 @@ class DummyPerturber(PerturbImage):
 
 class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step", "expected"),
+        ("perturber", "theta_key", "start", "stop", "step", "to_int", "expected"),
         [
-            (DummyPerturber, "param_1", 1.0, 6.0, 2.0, (1.0, 3.0, 5.0)),
-            (DummyPerturber, "param_2", 3.0, 9.0, 3.0, (3.0, 6.0)),
-            (DummyPerturber, "param_1", 3.0, 9.0, 1.5, (3.0, 4.5, 6.0, 7.5)),
-            (DummyPerturber, "param_1", 4.0, 4.0, 1.0, ()),
+            (DummyPerturber, "param_1", 1.0, 6.0, 2.0, True, (1.0, 3.0, 5.0)),
+            (DummyPerturber, "param_2", 3.0, 9.0, 3.0, True, (3.0, 6.0)),
+            (DummyPerturber, "param_1", 3.0, 9.0, 1.5, False, (3.0, 4.5, 6.0, 7.5)),
+            (DummyPerturber, "param_1", 4.0, 4.0, 1.0, False, ()),
         ],
     )
     def test_iteration(
@@ -49,11 +49,12 @@ class TestStepPerturbImageFactory:
         start: float,
         stop: float,
         step: float,
+        to_int: bool,
         expected: Tuple[float, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
         factory = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step, to_int=to_int
         )
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
@@ -98,8 +99,8 @@ class TestStepPerturbImageFactory:
             assert factory[idx].get_config()[theta_key] == expected_val
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step"),
-        [(DummyPerturber, "param_1", 1.0, 5.0, 2.0), (DummyPerturber, "param_2", 3.0, 9.0, 3.0)],
+        ("perturber", "theta_key", "start", "stop", "step", "to_int"),
+        [(DummyPerturber, "param_1", 1.0, 5.0, 2.0, False), (DummyPerturber, "param_2", 3.0, 9.0, 3.0, True)],
     )
     def test_configuration(
         self,
@@ -108,10 +109,11 @@ class TestStepPerturbImageFactory:
         start: float,
         stop: float,
         step: float,
+        to_int: bool
     ) -> None:
         """Test configuration stability."""
         inst = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step, to_int=to_int
         )
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber

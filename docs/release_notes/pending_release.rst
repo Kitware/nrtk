@@ -10,6 +10,8 @@ New Features
 
 * Implemented Circular Aperture OTF perturber
 
+* Modified to optionally return thetas as floats or ints 
+
 CI/CD
 
 * Added checks and tests for OpenCV perturbers to ensure image is in channel-last format.
