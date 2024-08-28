@@ -14,6 +14,8 @@ CI/CD
 
 * Added checks and tests for OpenCV perturbers to ensure image is in channel-last format.
 
+* Added a mirroring job to replace builtin gitlab mirroring due to LFS issue.
+
 Documentation
 
 * Updated the readthedocs required packages.

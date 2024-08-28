@@ -4,6 +4,7 @@ stages:
   - test
   - security
   - docs
+  - mirror
   - publish
 
 include:
