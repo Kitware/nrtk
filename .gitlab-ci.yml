@@ -8,7 +8,7 @@ stages:
   - publish
 
 include:
-  - project: "jatic/kitware/devel"
+  - project: "jatic/kitware/devel-jatic"
     ref: main
     file: ".gitlab-ci.yml"
 
