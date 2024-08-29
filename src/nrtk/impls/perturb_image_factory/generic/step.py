@@ -1,4 +1,5 @@
-from typing import Any, Dict, Sequence, Type
+import math
+from typing import Any, Dict, Optional, Sequence, Type, Union
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -11,9 +12,10 @@ class StepPerturbImageFactory(PerturbImageFactory):
         self,
         perturber: Type[PerturbImage],
         theta_key: str,
-        start: int,
-        stop: int,
-        step: int = 1,
+        start: float,
+        stop: float,
+        step: float = 1.0,
+        to_int: Optional[bool] = True,
     ):
         """Initialize the factory to produce PerturbImage instances of the given type.
 
@@ -31,17 +33,24 @@ class StepPerturbImageFactory(PerturbImageFactory):
 
         :param step: Step value between instances.
 
+        :param to_int: Boolean variable determining whether the thetas are cast as
+                       ints or floats.
+
         :raises TypeError: Given a perturber instance instead of type.
         """
         super().__init__(perturber=perturber, theta_key=theta_key)
 
+        self.to_int = to_int
         self.start = start
         self.stop = stop
         self.step = step
 
     @property
-    def thetas(self) -> Sequence[int]:
-        return range(self.start, self.stop, self.step)
+    def thetas(self) -> Union[Sequence[float], Sequence[int]]:
+        if not self.to_int:
+            return [self.start + i*self.step for i in range(math.ceil((self.stop-self.start)/self.step))]
+        else:
+            return [int(self.start + i*self.step) for i in range(math.ceil((self.stop-self.start)/self.step))]
 
     @property
     def theta_key(self) -> str:
@@ -52,4 +61,5 @@ class StepPerturbImageFactory(PerturbImageFactory):
         cfg["start"] = self.start
         cfg["stop"] = self.stop
         cfg["step"] = self.step
+        cfg["to_int"] = self.to_int
         return cfg

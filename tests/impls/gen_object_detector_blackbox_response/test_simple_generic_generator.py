@@ -162,15 +162,17 @@ class TestSimpleGenerator:
                     StepPerturbImageFactory(
                         perturber=AverageBlurPerturber,
                         theta_key="ksize",
-                        start=1,
-                        stop=4,
+                        start=1.0,
+                        stop=4.0,
+                        to_int=True
                     ),
                     StepPerturbImageFactory(
                         perturber=MedianBlurPerturber,
                         theta_key="ksize",
-                        start=3,
-                        stop=8,
-                        step=2,
+                        start=3.0,
+                        stop=8.0,
+                        step=2.0,
+                        to_int=True
                     ),
                 ],
                 False,
@@ -190,6 +192,7 @@ class TestSimpleGenerator:
                         theta_key="ksize",
                         start=1,
                         stop=6,
+                        to_int=True
                     )
                 ],
                 True,
