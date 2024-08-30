@@ -12,7 +12,9 @@ New Features
 
 * Implemented Circular Aperture OTF perturber
 
-* Modified to optionally return thetas as floats or ints 
+* Modified to optionally return thetas as floats or ints
+
+* Implemented Detector OTF perturber
 
 CI/CD
 

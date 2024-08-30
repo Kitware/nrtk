@@ -88,6 +88,7 @@ optional = true
 coverage = ">=6.5.0"
 pytest = ">=7.2.0"
 pytest-cov = ">=4.0.0"
+syrupy = ">=4.0.0"
 # Jupyter notebook testing
 notebook = ">=7.0.7"
 papermill = ">=2.4.0"
