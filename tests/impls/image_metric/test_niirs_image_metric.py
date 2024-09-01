@@ -140,3 +140,8 @@ class TestSNRImageMetric:
             "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario": scenario.get_config(),
             "type": "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario",
         }
+
+    def test_classname(self) -> None:
+        sensor, scenario = self.create_sample_sensor_and_scenario()
+        niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
+        assert niirs_metric.name == "NIIRSImageMetric"

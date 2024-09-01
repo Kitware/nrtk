@@ -42,6 +42,10 @@ class ImageMetric(Plugfigurable):
         """
         return self.compute(img_1, img_2, additional_params)
 
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
+
     def get_config(self) -> Dict[str, Any]:
         """Returns the config for the interface."""
         return {}
