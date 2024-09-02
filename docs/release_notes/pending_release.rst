@@ -20,6 +20,8 @@ CI/CD
 
 * Added a mirroring job to replace builtin gitlab mirroring due to LFS issue.
 
+* Removed an old opencv version check script.
+
 Documentation
 
 * Updated the readthedocs required packages.
