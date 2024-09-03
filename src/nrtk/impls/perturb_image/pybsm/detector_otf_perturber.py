@@ -35,6 +35,7 @@ class DetectorOTFPerturber(PerturbImage):
         :param scenario: pyBSM scenario object.
         :param w_x: Detector width in the x direction (m).
         :param w_y: Detector width in the y direction (m).
+        :param f: Focal length (m).
 
         If a value is provided for w_x, w_y and/or f that value(s) will be used in
         the otf calculation.
@@ -47,7 +48,7 @@ class DetectorOTFPerturber(PerturbImage):
         below).
 
         If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
-        the absent value(s) will default to 4e-6m for w_x/w_y and 0.05m for f
+        the absent value(s) will default to 4um for w_x/w_y and 50mm for f
         """
         if sensor and scenario:
             atm = load_database_atmosphere(
@@ -75,7 +76,7 @@ class DetectorOTFPerturber(PerturbImage):
         else:
             self.w_x = w_x if w_x is not None else 4e-6
             self.w_y = w_y if w_y is not None else 4e-6
-            self.f = f if f is not None else 0.05
+            self.f = f if f is not None else 50e-3
 
             # Assume visible spectrum of light
             self.ifov = -1

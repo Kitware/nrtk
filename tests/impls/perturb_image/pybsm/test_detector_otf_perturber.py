@@ -22,7 +22,7 @@ class TestDetectorOTFPerturber:
         ("use_sensor_scenario", "w_x", "w_y", "f"),
         [
             (False, None, None, None),
-            (True, 3e-6, 2e-5, 0.03)
+            (True, 3e-6, 20e-6, 30e-3)
         ]
     )
     def test_reproducibility(
@@ -92,8 +92,8 @@ class TestDetectorOTFPerturber:
         [
             (False, None, None, None),
             (True, None, None, None),
-            (True, 3e-6, 2e-5, 0.03),
-            (False, 3e-6, 2e-5, 0.03)
+            (True, 3e-6, 20e-6, 30e-3),
+            (False, 3e-6, 20e-6, 30e-3)
         ]
     )
     def test_configuration(
@@ -136,7 +136,7 @@ class TestDetectorOTFPerturber:
             elif sensor is not None and scenario is not None:
                 assert i.f == sensor.f
             else:  # Default value
-                assert i.f == 0.05
+                assert i.f == 50e-3
 
             if i.sensor is not None and sensor is not None:
                 assert i.sensor.name == sensor.name
@@ -193,8 +193,8 @@ class TestDetectorOTFPerturber:
         [
             (False, None, None, None),
             (True, None, None, None),
-            (True, 3e-6, 2e-5, 0.03),
-            (False, 3e-6, 2e-5, 0.03)
+            (True, 3e-6, 20e-6, 30e-3),
+            (False, 3e-6, 20e-6, 30e-3)
         ]
     )
     def test_regression(
