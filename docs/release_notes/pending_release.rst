@@ -24,6 +24,8 @@ CI/CD
 
 * Removed an old opencv version check script.
 
+* Added `syrupy` dependency for snapshot-based regression testing.
+
 Documentation
 
 * Updated the readthedocs required packages.
