@@ -16,16 +16,19 @@ Class: BrightnessPerturber
 --------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.PIL.enhance.BrightnessPerturber
    :members:
+   :special-members:
 
 Class: ColorPerturber
 ---------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.PIL.enhance.ColorPerturber
    :members:
+   :special-members:
 
 Class: ContrastPerturber
 ------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.PIL.enhance.ContrastPerturber
    :members:
+   :special-members:
 
 Class: GaussianBlurPerturber
 ----------------------------
@@ -37,6 +40,7 @@ Class: GaussianNoisePerturber
 -----------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.skimage.random_noise.GaussianNoisePerturber
    :members:
+   :special-members:
 
 Class: MedianBlurPerturber
 --------------------------
@@ -48,11 +52,13 @@ Class: nop_perturber
 --------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.nop_perturber.NOPPerturber
    :members:
+   :special-members:
 
 Class: PepperNoisePerturber
 ---------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.skimage.random_noise.PepperNoisePerturber
    :members:
+   :special-members:
 
 Class: PybsmPerturber
 ---------------------
@@ -64,16 +70,19 @@ Class: PybsmScenario
 --------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario
    :members:
+   :special-members:
 
 Class: PybsmSensor
 ------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor
    :members:
+   :special-members:
 
 Class: CircleApertureOTFPerturber
 ---------------------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber.CircularApertureOTFPerturber
    :members:
+   :special-members:
    
 Class: DetectorOTFPerturber
 -------------------------
@@ -85,16 +94,19 @@ Class: JitterOTFPerturber
 -------------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.jitter_otf_perturber.JitterOTFPerturber
    :members:
+   :special-members:
 
 Class: SaltAndPepperNoisePerturber
 ----------------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.skimage.random_noise.SaltAndPepperNoisePerturber
    :members:
+   :special-members:
 
 Class: SaltNoisePerturber
 -------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.skimage.random_noise.SaltNoisePerturber
    :members:
+   :special-members:
 
 Class: SharpnessPerturber
 -------------------------
@@ -106,6 +118,7 @@ Class: SpeckleNoisePerturber
 ----------------------------
 .. autoclass:: nrtk.impls.perturb_image.generic.skimage.random_noise.SpeckleNoisePerturber
    :members:
+   :special-members:
 
 
 --------------------
@@ -148,21 +161,25 @@ Class: ClassAgnosticPixelwiseIoUScorer
 --------------------------------------
 .. autoclass:: nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer.ClassAgnosticPixelwiseIoUScorer
    :members:
+   :special-members:
 
 Class: COCOScorer
 -----------------
 .. autoclass:: nrtk.impls.score_detections.coco_scorer.COCOScorer
    :members:
+   :special-members:
 
 Class: NOPScorer
 ----------------
 .. autoclass:: nrtk.impls.score_detections.nop_scorer.NOPScorer
    :members:
+   :special-members:
 
 Class: RandomScorer
 -------------------
 .. autoclass:: nrtk.impls.score_detections.random_scorer.RandomScorer
    :members:
+   :special-members:
 
 ---------------------------------
 End-to-End Generation and Scoring
