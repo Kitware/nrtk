@@ -79,6 +79,7 @@ Class: DetectorOTFPerturber
 -------------------------
 .. autoclass:: nrtk.impls.perturb_image.pybsm.detector_otf_perturber.DetectorOTFPerturber
    :members:
+   :special-members:
 
 Class: JitterOTFPerturber
 -------------------------
