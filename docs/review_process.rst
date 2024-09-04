@@ -91,6 +91,15 @@ pytest``.
 
 Passage of these checks is strictly required.
 
+Regression Tests
+^^^^^^^^^^^^^^^^
+Regression test snapshots are generated using 
+`syrupy <https://github.com/syrupy-project/syrupy>`_. To generate new snapshots,
+run ``poetry run pytest --snapshot-update path/to/test_file.py``. Ensure the full
+filepath is included so that irrelevant snapshots are not erroneously updated.
+Once a snapshot is generated, regression test results will be included in the
+``test-pytest`` job.
+
 Code Coverage (``test-coverage-percent``)
 -----------------------------------------
 This job checks that the lines of code covered by our Unit Tests checks meet or

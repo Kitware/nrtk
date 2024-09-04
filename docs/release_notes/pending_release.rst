@@ -12,7 +12,9 @@ New Features
 
 * Implemented Circular Aperture OTF perturber
 
-* Modified to optionally return thetas as floats or ints 
+* Modified to optionally return thetas as floats or ints
+
+* Implemented Detector OTF perturber
 
 CI/CD
 
@@ -21,6 +23,8 @@ CI/CD
 * Added a mirroring job to replace builtin gitlab mirroring due to LFS issue.
 
 * Removed an old opencv version check script.
+
+* Added `syrupy` dependency for snapshot-based regression testing.
 
 Documentation
 
