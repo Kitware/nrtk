@@ -64,7 +64,7 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
 Building the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-The documentation for NRTK is maintained as a collection of
+The documentation for nrtk is maintained as a collection of
 `reStructuredText`_ documents in the :file:`docs/` folder of the project.
 The :program:`Sphinx` documentation tool can process this documentation
 into a variety of formats, the most common of which is HTML.
@@ -96,7 +96,7 @@ Within the :file:`docs/` directory is a small Python script called
     poetry run python sphinx_server.py
 
 This will run a small process that watches the :file:`docs/` folder contents,
-as well as the source files in :file:`nrtk/`, for changes.
+as well as the source files in :file:`src/nrtk/`, for changes.
 :command:`make html` is re-run automatically when changes are detected.
 This will serve the resulting HTML files at http://localhost:5500.
 Having this URL open in a browser will provide you with an up-to-date

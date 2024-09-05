@@ -1,15 +1,6 @@
-stages:
-  - build
-  - quality
-  - test
-  - security
-  - docs
-  - mirror
-  - publish
-
 include:
   - project: "jatic/kitware/devel-jatic"
-    ref: main
+    ref: "main"
     file: ".gitlab-ci.yml"
 
   # job overrides specific to this repo
