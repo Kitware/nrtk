@@ -36,6 +36,10 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
     # time will be determined by the well fill percentage
     int_time = 30.0e-3
 
+    # the number of time-delay integration stages (relevant only when TDI
+    # cameras are used. For CMOS cameras, the value can be assumed to be 1.0)
+    n_tdi = 1.0
+
     # dark current density of 1 nA/cm2 guess, guess mid range for a
     # silicon camera
     dark_current = dark_current_from_density(1e-5, w_x, w_y)
@@ -80,6 +84,7 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
         w_x,
         w_y,
         int_time,
+        n_tdi,
         dark_current,
         read_noise,
         max_n,
