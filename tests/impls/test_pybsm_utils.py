@@ -10,13 +10,13 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 
 
-def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
+def create_sample_sensor() -> PybsmSensor:
     name = "L32511x"
 
     # telescope focal length (m)
     f = 4
     # Telescope diameter (m)
-    D = 275e-3  # noqa:N806
+    D = 275e-3  # noqa: N806
 
     # detector pitch (m)
     p = 0.008e-3
@@ -32,8 +32,8 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
     # detector width is assumed to be equal to the pitch
     w_x = p
     w_y = p
-    # integration time (s) - this is a maximum, the actual integration
-    # time will be determined by the well fill percentage
+    # integration time (s) - this is a maximum, the actual integration time will be
+    # determined by the well fill percentage
     int_time = 30.0e-3
 
     # the number of time-delay integration stages (relevant only when TDI
@@ -42,6 +42,7 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
 
     # dark current density of 1 nA/cm2 guess, guess mid range for a
     # silicon camera
+    # dark current density of 1 nA/cm2 guess, guess mid range for a silicon camera
     dark_current = dark_current_from_density(1e-5, w_x, w_y)
 
     # rms read noise (rms electrons)
@@ -51,13 +52,12 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
     max_n = 96000.0
 
     # bit depth
-    bit_depth = 11.9
+    bitdepth = 11.9
 
     # maximum allowable well fill (see the paper for the logic behind this)
     max_well_fill = 0.6
 
-    # jitter (radians) - The Olson paper says that its "good"
-    # so we'll guess 1/4 ifov rms
+    # jitter (radians) - The Olson paper says that its "good" so we'll guess 1/4 ifov rms
     s_x = 0.25 * p / f
     s_y = s_x
 
@@ -68,9 +68,7 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
     # etector quantum efficiency as a function of wavelength (microns)
     # for a generic high quality back-illuminated silicon array
     # https://www.photometrics.com/resources/learningzone/quantumefficiency.php
-    qe_wavelengths = (
-        np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1]) * 1.0e-6
-    )
+    qe_wavelengths = np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1]) * 1.0e-6
     qe = np.array([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0])
 
     sensor = PybsmSensor(
@@ -88,7 +86,7 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
         dark_current,
         read_noise,
         max_n,
-        bit_depth,
+        bitdepth,
         max_well_fill,
         s_x,
         s_y,
@@ -98,6 +96,10 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
         qe,
     )
 
+    return sensor
+
+
+def create_sample_scenario() -> PybsmScenario:
     altitude = 9000.0
     # range to target
     ground_range = 60000.0
@@ -105,10 +107,22 @@ def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
     scenario_name = "niceday"
     # weather model
     ihaze = 1
-    scenario = PybsmScenario(scenario_name, ihaze, altitude, ground_range)
-    scenario.aircraft_speed = 100.0
 
-    return sensor, scenario
+    aircraft_speed = 100.0
+
+    scenario = PybsmScenario(
+        scenario_name,
+        ihaze,
+        altitude,
+        ground_range,
+        aircraft_speed,
+    )
+
+    return scenario
+
+
+def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
+    return create_sample_sensor(), create_sample_scenario()
 
 
 class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):

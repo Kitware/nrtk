@@ -45,3 +45,5 @@ Documentation
 
 Fixes
 -----
+
+* Remove ``Optional`` from pyBSM sensor/scenario parameters which shouldn't be ``None``
