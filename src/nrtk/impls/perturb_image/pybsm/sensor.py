@@ -54,8 +54,6 @@ class PybsmSensor(Configurable):
         desired well fill, i.e. Maximum well size x Desired fill fraction
     bit_depth :
         resolution of the detector ADC in bits (unitless)
-    n_tdi :
-        number of TDI stages (unitless)
     cold_shield_temperature :
         temperature of the cold shield (K).  It is a common approximation to assume
         that the coldshield is at the same temperature as the detector array.

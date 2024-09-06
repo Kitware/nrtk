@@ -38,34 +38,33 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
-        :param name: string representation of object
         :param sensor: pyBSM sensor object
         :param scenario: pyBSM scenario object
         :param mtf_wavelengths: a sequence of wavelengths (m)
         :param mtf_weights: a sequence of weights for each wavelength contribution (arb)
         :param altitude: height of the aircraft above the ground (m)
         :param slant_range: line-of-sight range between the aircraft and target (target is assumed
-            to be on the ground)
+            to be on the ground) (m)
         :param D: effective aperture diameter (m)
+        :param ha_wind_speed: the high altitude windspeed (m/s); used to calculate the turbulence
+            profile
+        :param cn2_at_1m: the refractive index structure parameter "near the ground" (e.g. at
+            h = 1 m); used to calculate the turbulence profile
         :param int_time: dwell (i.e. integration) time (seconds)
         :param n_tdi: the number of time-delay integration stages (relevant only when TDI cameras
             are used. For CMOS cameras, the value can be assumed to be 1.0)
         :param aircraft_speed: apparent atmospheric velocity (m/s); this can just be the windspeed
             at the sensor position if the sensor is stationary
-        :param ha_wind_speed: the high altitude windspeed (m/s); used to calculate the turbulence
-            profile
-        :param cn2_at_1m: the refractive index structure parameter "near the ground" (e.g. at
-            h = 1 m); used to calculate the turbulence profile
 
         If both sensor and scenario parameters are absent, then default values will be used for
         their parameters.
 
-        If none of the individial or the sensor/scenario parameters are provided, the following
-        values will be set as defaults:
+        If any of the individual or sensor/scenario parameters are absent, the following values
+        will be set as defaults for the absent values:
             mtf_wavelengths = [0.50e-6, 0.66e-6]
             mtf_weights = [1.0, 1.0]
-            altitude = 0
-            slant_range = 250
+            altitude = 250
+            slant_range = 250  # slant_range = altitude
             D = 40e-3 #m
             ha_wind_speed = 0
             cn2_at_1m = 1.7e-14
@@ -107,11 +106,6 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.ha_wind_speed = ha_wind_speed if ha_wind_speed is not None else scenario.ha_wind_speed
             self.cn2_at_1m = cn2_at_1m if cn2_at_1m is not None else scenario.cn2_at_1m
             self.aircraft_speed = aircraft_speed if aircraft_speed is not None else scenario.aircraft_speed
-
-            self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
-            self.slant_range = (
-                slant_range if slant_range is not None else np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
-            )
         else:
             self.mtf_wavelengths = (
                 np.asarray(mtf_wavelengths)
@@ -128,14 +122,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.n_tdi = n_tdi if n_tdi is not None else 1.0
 
             # Scenario Parameters
-            self.altitude = altitude if altitude is not None else 0
+            self.altitude = altitude if altitude is not None else 250
             self.ha_wind_speed = ha_wind_speed if ha_wind_speed is not None else 0
             self.cn2_at_1m = cn2_at_1m if cn2_at_1m is not None else 1.7e-14
             self.aircraft_speed = aircraft_speed if aircraft_speed is not None else 0
 
-            # Assume visible spectrum of light
-            self.ifov = -1
-            self.slant_range = slant_range if slant_range is not None else 0.5
+        # Assume visible spectrum of light
+        self.slant_range = slant_range if slant_range is not None else self.altitude
 
         if self.mtf_wavelengths.size == 0:
             raise ValueError("mtf_wavelengths is empty")
@@ -146,7 +139,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         if self.mtf_wavelengths.size != self.mtf_weights.size:
             raise ValueError("mtf_wavelengths and mtf_weights are not the same length")
 
-        if self.cn2_at_1m <= 0.0:  # type: ignore
+        if self.cn2_at_1m is not None and self.cn2_at_1m <= 0.0:
             raise ValueError("Turbulence effect cannot be applied at ground level")
 
         # Assume if nothing else cuts us off first, diffraction will set the
@@ -162,7 +155,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self.scenario = scenario
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.turbulence_otf, self.r0_band = polychromatic_turbulence_OTF(
+        self.turbulence_otf, _ = polychromatic_turbulence_OTF(
             uu,
             vv,
             self.mtf_wavelengths,
@@ -172,7 +165,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.D,
             self.ha_wind_speed,
             self.cn2_at_1m,
-            self.int_time * self.n_tdi,  # type: ignore
+            self.int_time * self.n_tdi if self.int_time is not None and self.n_tdi is not None else 1.0,
             self.aircraft_speed,
         )
 
@@ -180,11 +173,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
-        if self.ifov >= 0 and self.slant_range >= 0:
+        if self.sensor and self.scenario:
             if "img_gsd" not in additional_params:
                 raise ValueError(
-                    "'img_gsd' must be present in image metadata\
-                                  for this perturber"
+                    "'img_gsd' must be present in image metadata for this perturber"
                 )
             ref_gsd = additional_params["img_gsd"]
             psf = otf_to_psf(self.turbulence_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
@@ -193,7 +185,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             blur_img = cv2.filter2D(image, -1, psf)
 
             # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)
+            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, ref_gsd / self.altitude)
 
         else:
             # Default is to set dxout param to same value as dxin
@@ -202,12 +194,6 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             sim_img = cv2.filter2D(image, -1, psf)
 
         return sim_img.astype(np.uint8)
-
-    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """Alias for :meth:`.NIIRS.apply`."""
-        if additional_params is None:
-            additional_params = dict()
-        return self.perturb(image, additional_params)
 
     @classmethod
     def get_default_config(cls) -> Dict[str, Any]:

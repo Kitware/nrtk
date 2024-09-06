@@ -28,7 +28,7 @@ class TestTurbulenceApertureOTFPerturber:
             (False, None, None, None,
              None, None, None, None,
              None, None, None),
-            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 0,
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250,
              250, 40e-3, 0, 1.7e-14,
              30e-3, 1.0, 0)
         ]
@@ -165,10 +165,10 @@ class TestTurbulenceApertureOTFPerturber:
             (True, None, None, None,
              None, None, None, None,
              None, None, None),
-            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 0,
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250,
              250, 40e-3, 0, 1.7e-14,
              30e-3, 1.0, 0),
-            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 0,
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250,
              250, 40e-3, 0, 1.7e-14,
              30e-3, 1.0, 0)
         ]
@@ -269,7 +269,7 @@ class TestTurbulenceApertureOTFPerturber:
             elif sensor is not None and scenario is not None:
                 assert i.altitude == scenario.altitude
             else:  # Default value
-                assert i.altitude == 0
+                assert i.altitude == 250
             if ha_wind_speed is not None:
                 assert i.ha_wind_speed == ha_wind_speed
             elif sensor is not None and scenario is not None:
@@ -304,6 +304,7 @@ class TestTurbulenceApertureOTFPerturber:
                 assert i.sensor.w_x == sensor.w_x
                 assert i.sensor.w_y == sensor.w_y
                 assert i.sensor.int_time == sensor.int_time
+                assert i.sensor.n_tdi == sensor.n_tdi
                 assert i.sensor.dark_current == sensor.dark_current
                 assert i.sensor.read_noise == sensor.read_noise
                 assert i.sensor.max_n == sensor.max_n
@@ -350,10 +351,10 @@ class TestTurbulenceApertureOTFPerturber:
             (True, None, None, None,
              None, None, None, None,
              None, None, None),
-            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 0,
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250,
              250, 40e-3, 0, 1.7e-14,
              30e-3, 1.0, 0),
-            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 0,
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250,
              250, 40e-3, 0, 1.7e-14,
              30e-3, 1.0, 0)
         ]

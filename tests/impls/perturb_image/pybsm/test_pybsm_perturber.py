@@ -195,6 +195,7 @@ class TestPyBSMPerturber:
             assert i.sensor.w_x == sensor.w_x
             assert i.sensor.w_y == sensor.w_y
             assert i.sensor.int_time == sensor.int_time
+            assert i.sensor.n_tdi == sensor.n_tdi
             assert i.sensor.dark_current == sensor.dark_current
             assert i.sensor.read_noise == sensor.read_noise
             assert i.sensor.max_n == sensor.max_n
