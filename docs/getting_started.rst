@@ -23,9 +23,9 @@ shown below focus on a `pyBSM` based perturber. To see examples of other perturb
 `perturbers <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/perturbers.ipynb?ref_type=heads>`_ 
 notebook shows initialization and use of `scikit-image`, `Pillow`, and `openCV` perturbers.
 
-For this example, we are going to use the :ref:`PybsmPerturber <Class: PybsmPerturber>` from `pyBSM`. This 
+For this example, we are going to use the :ref:`PybsmPerturber <PybsmPerturber>` from `pyBSM`. This 
 perturber is useful for creating new images based on existing parameters. The
-:ref:`PybsmSensor <Class: PybsmSensor>` and :ref:`PybsmScenario <Class: PybsmScenario>` classes contain the 
+:ref:`PybsmSensor <PybsmSensor>` and :ref:`PybsmScenario <PybsmScenario>` classes contain the 
 parameters for an existing sensor and environment, respectively.
 
 .. code-block::
@@ -106,8 +106,8 @@ The resulting image is displayed below the code block.
 	
 	Image of a tank with ground range of 10000m.
 
-Any of the parameters in either :ref:`PybsmSensor <Class: PybsmSensor>` or 
-:ref:`PybsmScenario <Class: PybsmScenario>` can be modified; however, only one parameter can be modified 
+Any of the parameters in either :ref:`PybsmSensor <PybsmSensor>` or 
+:ref:`PybsmScenario <PybsmScenario>` can be modified; however, only one parameter can be modified 
 with one value using the basic perturber. The next section will cover modifying multiple parameters and 
 multiple values.
 
@@ -117,7 +117,7 @@ Perturbation Factories
 Building upon image perturbation, perturbation factories are able to take a range of values for parameter(s) 
 and perform multiple perturbations on the same image. This allows for quick and simple generation of 
 multiple perturbations. The `scikit-image`, `Pillow`, and `openCV` perturbers use the 
-:ref:`StepPerturbImageFactory <Class: StepPerturbImageFactory>` and the `pyBSM` perturber uses the :ref:`CustomPybsmPerturbImageFactory <Class: CustomPybsmPerturbImageFactory>`.
+:ref:`StepPerturbImageFactory <StepPerturbImageFactory>` and the `pyBSM` perturber uses the :ref:`CustomPybsmPerturbImageFactory <CustomPybsmPerturbImageFactory>`.
 
 Continuing on from the previous example, the snippet below shows the initialization of a 
 `CustomPybsmPerturbImageFactory`. The `theta_keys` variable controls which parameter(s) we are modifying
