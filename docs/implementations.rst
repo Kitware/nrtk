@@ -21,6 +21,7 @@ Image Perturbation
    nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber
    nrtk.impls.perturb_image.pybsm.detector_otf_perturber
    nrtk.impls.perturb_image.pybsm.jitter_otf_perturber
+   nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber
 
 ---------------------
 Perturbation Factory
