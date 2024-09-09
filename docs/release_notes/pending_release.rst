@@ -16,6 +16,8 @@ New Features
 
 * Implemented Detector OTF perturber
 
+* Implemented Turbulence Aperture OTF perturber
+
 CI/CD
 
 * Added checks and tests for OpenCV perturbers to ensure image is in channel-last format.

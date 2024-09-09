@@ -108,7 +108,7 @@ class TestDetectorOTFPerturber:
         scenario = None
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
-            sensor, scenario = create_sample_sensor_and_scenario()
+
         inst = DetectorOTFPerturber(
             sensor=sensor,
             scenario=scenario,
@@ -213,7 +213,7 @@ class TestDetectorOTFPerturber:
         scenario = None
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
-            sensor, scenario = create_sample_sensor_and_scenario()
+
         inst = DetectorOTFPerturber(
             sensor=sensor,
             scenario=scenario,

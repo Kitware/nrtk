@@ -35,6 +35,9 @@ class PybsmSensor(Configurable):
         detector width in the x and y directions (m)
     int_time :
         maximum integration time (s)
+    n_tdi:
+        the number of time-delay integration stages (relevant only when TDI cameras
+        are used. For CMOS cameras, the value can be assumed to be 1.0)
     qe :
         quantum efficiency as a function of wavelength (e-/photon)
     qe_wavelengths :
@@ -51,8 +54,6 @@ class PybsmSensor(Configurable):
         desired well fill, i.e. Maximum well size x Desired fill fraction
     bit_depth :
         resolution of the detector ADC in bits (unitless)
-    n_tdi :
-        number of TDI stages (unitless)
     cold_shield_temperature :
         temperature of the cold shield (K).  It is a common approximation to assume
         that the coldshield is at the same temperature as the detector array.
@@ -108,6 +109,7 @@ class PybsmSensor(Configurable):
         w_x: Optional[float] = None,
         w_y: Optional[float] = None,
         int_time: Optional[float] = 1.0,
+        n_tdi: Optional[float] = 1.0,
         dark_current: Optional[float] = 0.0,
         read_noise: Optional[float] = 0.0,
         max_n: Optional[float] = 100.0e6,
@@ -149,6 +151,7 @@ class PybsmSensor(Configurable):
         self.w_x = p_x if w_x is None else w_x
         self.w_y = p_x if w_y is None else w_y
         self.int_time = int_time
+        self.n_tdi = n_tdi
         self.dark_current = dark_current
         self.read_noise = read_noise
         self.max_n = max_n
@@ -164,7 +167,6 @@ class PybsmSensor(Configurable):
             self.qe = qe
 
         # not yet added to constructor
-        self.n_tdi = 1.0
         self.other_irradiance = 0.0
         self.cold_shield_temperature = 70.0
         self.optics_temperature = 270.0
@@ -200,6 +202,7 @@ class PybsmSensor(Configurable):
         S.w_x = self.w_x
         S.w_y = self.w_y
         S.int_time = self.int_time
+        S.n_tdi = self.n_tdi
         S.dark_current = self.dark_current
         S.read_noise = self.read_noise
         S.max_n = self.max_n
@@ -249,6 +252,7 @@ class PybsmSensor(Configurable):
             "w_x": self.w_x,
             "w_y": self.w_y,
             "int_time": self.int_time,
+            "n_tdi": self.n_tdi,
             "dark_current": self.dark_current,
             "read_noise": self.read_noise,
             "max_n": self.max_n,
