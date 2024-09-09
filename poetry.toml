@@ -1,7 +1,2 @@
 [experimental]
 system-git-client = true
-prefer-active-python = true
-
-[virtualenvs]
-in-project = true
-prefer-active-python = true
