@@ -33,7 +33,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
         Dict[str, Any],
     ]:
-        """Get the ``idx``th image and ground_truth pair."""
+        """Get the image and ground_truth pair at a particular ``idx``."""
 
     def generate(
         self,
