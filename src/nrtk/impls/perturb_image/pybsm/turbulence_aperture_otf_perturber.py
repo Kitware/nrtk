@@ -61,16 +61,17 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         If any of the individual or sensor/scenario parameters are absent, the following values
         will be set as defaults for the absent values:
-            mtf_wavelengths = [0.50e-6, 0.66e-6]
-            mtf_weights = [1.0, 1.0]
-            altitude = 250
-            slant_range = 250  # slant_range = altitude
-            D = 40e-3 #m
-            ha_wind_speed = 0
-            cn2_at_1m = 1.7e-14
-            int_time = 30e-3 #s
-            n_tdi = 1.0
-            aircraft_speed = 0
+
+        mtf_wavelengths = [0.50e-6, 0.66e-6]
+        mtf_weights = [1.0, 1.0]
+        altitude = 250
+        slant_range = 250  # slant_range = altitude
+        D = 40e-3 #m
+        ha_wind_speed = 0
+        cn2_at_1m = 1.7e-14
+        int_time = 30e-3 #s
+        n_tdi = 1.0
+        aircraft_speed = 0
 
         If sensor and scenario parameters are provided, but not the other individial parameters,
         the values will come from the sensor and scenario objects.

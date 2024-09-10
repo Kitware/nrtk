@@ -19,11 +19,12 @@ class SNRImageMetric(ImageMetric):
         :param img_1: Original input image in the shape (height, width, channels).
         :param img_2: (Optional) Second input image in the shape (height, width, channels). Not allowed for SNR
         :param additional_params: (Optional) A dictionary containing implementation-specific input param-values pairs.
-            SNR has the following optional parameters:
-                - axis: valid values are None, 0, 1, (0,1). Default is 0. The axis over which to calculate the standard
-                deviation during SNR calculation. Keeping this at None will calculate over both axes and the channels.
-                - ddof: degrees of freedom for the standard deviation calculation. Default is 0. Max value is
-                num_elements, the number of elements used in calculation. Must be non-negative.
+
+        SNR has the following optional parameters:
+        - axis: valid values are None, 0, 1, (0,1). Default is 0. The axis over which to calculate the standard
+        deviation during SNR calculation. Keeping this at None will calculate over both axes and the channels.
+        - ddof: degrees of freedom for the standard deviation calculation. Default is 0. Max value is
+        num_elements, the number of elements used in calculation. Must be non-negative.
 
         :return: Returns the signal to noise ratio for the input image.
         """
