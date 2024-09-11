@@ -25,8 +25,9 @@ https://nrtk.readthedocs.io/en/latest/installation.html).
 
 <!-- :auto getting-started: -->
 ## Getting Started
-We provide a number of examples based on Jupyter notebooks in the `./examples/` directory to show usage
-of the `nrtk` package in a number of different contexts.
+We provide a number of examples based on Jupyter notebooks in the
+`./examples/` directory to show usage of the `nrtk` package in a number
+of different contexts.
 <!-- :auto getting-started: -->
 
 <!-- :auto documentation: -->
