@@ -32,8 +32,8 @@ of different contexts.
 
 <!-- :auto documentation: -->
 ## Documentation
-Documentation snapshots for releases as well as the latest master are hosted on
-[ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
+Documentation snapshots for releases as well as the latest master are hosted
+on [ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
 
 The sphinx-based documentation may also be built locally for the most
 up-to-date reference:
@@ -53,7 +53,11 @@ firefox _build/html/index.html
 ## Developer tools
 
 **pre-commit hooks**  
-pre-commit hooks are used to ensure that any code meets all linting and formatting guidelines required. After installing, this will always run before committing to ensure that any commits are following the standards, but you can also manually run the check without committing. If you want to commit despite there being errors, you can add `--no-verify` to your commit command.
+pre-commit hooks are used to ensure that any code meets all linting and
+formatting guidelines required. After installing, this will always run before
+ committing to ensure that any commits are following the standards, but you 
+ can also manually run the check without committing. If you want to commit 
+ despite there being errors, you can add `--no-verify` to your commit command.
 
 Installing pre-commit hooks: 
 ```bash
