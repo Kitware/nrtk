@@ -34,6 +34,8 @@ CI/CD
 
 * Updates to dependencies to support the new CI/CD.
 
+* Updated config for `black` to set max line length to 120
+
 Documentation
 
 * Updated the readthedocs required packages.
