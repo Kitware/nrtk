@@ -161,6 +161,7 @@ max-line-length = 120
 # otherwise pytest-black fails to exclude the folders. For details see
 # https://github.com/shopkeep/pytest-black/issues/36
 exclude = '(/(\.git|.venv|.eggs|docs|scripts$)/)'
+line-length = 120
 # :auto black:
 
 # :auto ruff:
