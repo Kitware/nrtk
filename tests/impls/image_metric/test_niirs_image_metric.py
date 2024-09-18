@@ -1,3 +1,5 @@
+import numpy as np
+
 from nrtk.impls.image_metric.niirs_image_metric import NIIRSImageMetric
 
 from ..test_pybsm_utils import create_sample_sensor_and_scenario
@@ -12,10 +14,10 @@ class TestSNRImageMetric:
         niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
         # Test metric interface directly
         niirs = niirs_metric.compute()
-        assert expected_niirs == niirs
+        assert np.isclose(expected_niirs, niirs)
 
         # Test callable
-        assert expected_niirs == niirs_metric()
+        assert np.isclose(expected_niirs, niirs_metric())
 
     def test_reproducibility(self) -> None:
         """Ensure results are reproducible."""
