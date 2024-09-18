@@ -112,7 +112,7 @@ class PybsmSensor(Configurable):
         n_tdi: float = 1.0,
         dark_current: float = 0.0,
         read_noise: float = 0.0,
-        max_n: float = 100.0e6,
+        max_n: int = int(100.0e6),
         bit_depth: float = 100.0,
         max_well_fill: float = 1.0,
         s_x: float = 0.0,
@@ -124,8 +124,7 @@ class PybsmSensor(Configurable):
     ):
         if opt_trans_wavelengths.shape[0] < 2:
             raise ValueError(
-                "At minimum, at least the start and end wavelengths"
-                " must be specified for opt_trans_wavelengths"
+                "At minimum, at least the start and end wavelengths" " must be specified for opt_trans_wavelengths"
             )
         if opt_trans_wavelengths[0] >= opt_trans_wavelengths[-1]:
             raise ValueError("opt_trans_wavelengths must be ascending")
@@ -142,9 +141,7 @@ class PybsmSensor(Configurable):
             self.optics_transmission = np.ones(opt_trans_wavelengths.shape[0])
         else:
             if optics_transmission.shape[0] != opt_trans_wavelengths.shape[0]:
-                raise ValueError(
-                    "optics_transmission and opt_trans_wavelengths must have the same length"
-                )
+                raise ValueError("optics_transmission and opt_trans_wavelengths must have the same length")
             self.optics_transmission = optics_transmission
         self.eta = eta
         self.p_y = p_x
@@ -193,9 +190,7 @@ class PybsmSensor(Configurable):
         return self.name
 
     def create_sensor(self) -> Sensor:
-        S = Sensor(  # noqa:N806
-            self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths
-        )
+        S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # noqa:N806
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta
         S.p_y = self.p_y
@@ -221,16 +216,12 @@ class PybsmSensor(Configurable):
         config_dict = dict(config_dict)
 
         # Convert input data to expected constructor types
-        config_dict["opt_trans_wavelengths"] = np.array(
-            config_dict["opt_trans_wavelengths"]
-        )
+        config_dict["opt_trans_wavelengths"] = np.array(config_dict["opt_trans_wavelengths"])
 
         # Non-JSON type arguments with defaults (so they might not be there)
         optics_transmission = config_dict.get("optics_transmission", None)
         if optics_transmission is not None:
-            config_dict["optics_transmission"] = np.array(
-                config_dict["optics_transmission"]
-            )
+            config_dict["optics_transmission"] = np.array(config_dict["optics_transmission"])
         qe_wavelengths = config_dict.get("qe_wavelengths", None)
         if qe_wavelengths is not None:
             config_dict["qe_wavelengths"] = np.array(config_dict["qe_wavelengths"])

@@ -1,4 +1,6 @@
+import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
+from importlib.util import find_spec
 from typing import Any, ContextManager, Dict
 
 import numpy as np
@@ -11,12 +13,16 @@ from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from ...test_pybsm_utils import create_sample_sensor_and_scenario
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-INPUT_IMG_FILE = (
-    "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
-)
+INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
 
+is_usable = find_spec("cv2") is not None
 
+
+@pytest.mark.skipif(
+    not is_usable,
+    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+)
 class TestPyBSMPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -35,9 +41,7 @@ class TestPyBSMPerturber:
 
         # Test callable
         pybsm_perturber_assertions(
-            perturb=PybsmPerturber(
-                sensor=sensor, scenario=scenario, ground_range=10000
-            ),
+            perturb=PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000),
             image=image,
             expected=expected,
             additional_params={"img_gsd": img_gsd},
@@ -58,9 +62,7 @@ class TestPyBSMPerturber:
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = PybsmPerturber(
-            sensor=sensor, scenario=scenario, **{param_name: param_value}
-        )
+        inst = PybsmPerturber(sensor=sensor, scenario=scenario, **{param_name: param_value})
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
@@ -84,12 +86,8 @@ class TestPyBSMPerturber:
             assert i.sensor.D == sensor.D
             assert i.sensor.f == sensor.f
             assert i.sensor.p_x == sensor.p_x
-            assert np.array_equal(
-                i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths
-            )
-            assert np.array_equal(
-                i.sensor.optics_transmission, sensor.optics_transmission
-            )
+            assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
+            assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
             assert i.sensor.eta == sensor.eta
             assert i.sensor.w_x == sensor.w_x
             assert i.sensor.w_y == sensor.w_y
@@ -128,9 +126,7 @@ class TestPyBSMPerturber:
             (np.array([0.01, 0.5]), does_not_raise()),
             (
                 np.array([0.05]),
-                pytest.raises(
-                    ValueError, match=r"Reflectance range array must have length of 2"
-                ),
+                pytest.raises(ValueError, match=r"Reflectance range array must have length of 2"),
             ),
             (
                 np.array([0.5, 0.05]),
@@ -141,15 +137,11 @@ class TestPyBSMPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, reflectance_range: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, reflectance_range: np.ndarray, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         sensor, scenario = create_sample_sensor_and_scenario()
         with expectation:
-            PybsmPerturber(
-                sensor=sensor, scenario=scenario, reflectance_range=reflectance_range
-            )
+            PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=reflectance_range)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -164,14 +156,18 @@ class TestPyBSMPerturber:
             ),
         ],
     )
-    def test_additional_params(
-        self, additional_params: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        perturber = PybsmPerturber(
-            sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5])
-        )
+        perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5]))
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
             _ = perturber(image, additional_params)
+
+
+@mock.patch("nrtk.impls.perturb_image.pybsm.perturber.is_usable", False)
+def test_missing_deps() -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    sensor, scenario = create_sample_sensor_and_scenario()
+    with pytest.raises(ImportError, match=r"OpenCV not found"):
+        PybsmPerturber(sensor=sensor, scenario=scenario)

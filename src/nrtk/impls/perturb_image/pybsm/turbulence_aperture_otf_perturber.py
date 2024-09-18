@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Sequence, Type, TypeVar
 
-import cv2
+try:
+    import cv2
+
+    is_usable = True
+except ImportError:
+    is_usable = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
@@ -34,7 +39,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         cn2_at_1m: Optional[float] = None,
         int_time: Optional[float] = None,
         n_tdi: Optional[float] = None,
-        aircraft_speed: Optional[float] = None
+        aircraft_speed: Optional[float] = None,
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
@@ -83,9 +88,14 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         :raises: ValueError if cn2at1m <= 0.0
         """
+        if not is_usable:
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+
         if sensor and scenario:
             atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(atm, sensor, sensor.int_time)
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm, sensor.create_sensor(), sensor.int_time
+            )
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -166,7 +176,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.D,
             self.ha_wind_speed,
             self.cn2_at_1m,
-            self.int_time * self.n_tdi if self.int_time is not None and self.n_tdi is not None else 1.0,
+            (self.int_time * self.n_tdi if self.int_time is not None and self.n_tdi is not None else 1.0),
             self.aircraft_speed,
         )
 
@@ -176,11 +186,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             additional_params = dict()
         if self.sensor and self.scenario:
             if "img_gsd" not in additional_params:
-                raise ValueError(
-                    "'img_gsd' must be present in image metadata for this perturber"
-                )
+                raise ValueError("'img_gsd' must be present in image metadata for this perturber")
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(self.turbulence_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
+            psf = otf_to_psf(
+                self.turbulence_otf,
+                self.df,
+                2 * np.arctan(ref_gsd / 2 / self.slant_range),
+            )
 
             # filter the image
             blur_img = cv2.filter2D(image, -1, psf)
@@ -190,7 +202,11 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(self.turbulence_otf, self.df, 1 / (self.turbulence_otf.shape[0] * self.df))
+            psf = otf_to_psf(
+                self.turbulence_otf,
+                self.df,
+                1 / (self.turbulence_otf.shape[0] * self.df),
+            )
 
             sim_img = cv2.filter2D(image, -1, psf)
 

@@ -1,3 +1,4 @@
+from importlib.util import find_spec
 from typing import Any, Dict, Hashable, Sequence, Tuple
 
 import numpy as np
@@ -10,6 +11,8 @@ from nrtk.interfaces.gen_object_detector_blackbox_response import (
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interfaces.score_detections import ScoreDetections
 
+is_usable = find_spec("cv2") is not None
+
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
     """Example implementation of the ``GenerateObjectDetectorBlackboxResponse`` interface."""
@@ -18,9 +21,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         self,
         images: Sequence[np.ndarray],
         img_gsds: Sequence[float],
-        ground_truth: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ):
         """Generate response curve for given images and ground_truth.
 
@@ -29,10 +30,10 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
         :raises ValueError: Images and ground_truth data have a size mismatch.
         """
+        if not is_usable:
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         if len(images) != len(ground_truth):
-            raise ValueError(
-                "Size mismatch. ground_truth must be provided for each image."
-            )
+            raise ValueError("Size mismatch. ground_truth must be provided for each image.")
         if len(images) != len(img_gsds):
             raise ValueError("Size mismatch. imggsd must be provided for each image.")
         self.images = images

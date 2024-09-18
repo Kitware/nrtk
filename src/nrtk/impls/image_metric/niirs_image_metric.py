@@ -39,7 +39,7 @@ class NIIRSImageMetric(ImageMetric):
 
         :return: Returns the NIIRS metric for the given pyBSMSensor and pyBSMScenario.
         """
-        metrics = niirs5(self.sensor, self.scenario)
+        metrics = niirs5(self.sensor(), self.scenario())
         return metrics.niirs
 
     def __call__(

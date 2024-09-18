@@ -29,24 +29,18 @@ class SNRImageMetric(ImageMetric):
         :return: Returns the signal to noise ratio for the input image.
         """
         if img_1.ndim != 3:
-            raise ValueError(
-                "Incorrect number of dimensions on input image! Expected ndim == 3."
-            )
+            raise ValueError("Incorrect number of dimensions on input image! Expected ndim == 3.")
 
-        img_height, img_width, img_channels = img_1.shape
+        img_height, img_width, img_channels = img_1.shape  # type: ignore
         if img_height <= 0:
             raise ValueError("Invalid image height! Image height is <= 0.")
         if img_width <= 0:
             raise ValueError("Invalid image width! Image width is <= 0.")
         if img_channels != 1 and img_channels != 3:
-            raise ValueError(
-                "Invalid number of channels on input image! Expected 1 or 3."
-            )
+            raise ValueError("Invalid number of channels on input image! Expected 1 or 3.")
 
         if img_2 is not None:
-            raise ValueError(
-                "Incorrect number of arguments. Computing SNR can only be done on a single image."
-            )
+            raise ValueError("Incorrect number of arguments. Computing SNR can only be done on a single image.")
 
         if not additional_params:
             additional_params = dict()
@@ -58,9 +52,7 @@ class SNRImageMetric(ImageMetric):
         # checking axis
         valid_axis_parameters = [None, 0, 1, (0, 1)]
         if axis not in valid_axis_parameters:
-            raise ValueError(
-                "Invalid axis parameter! Valid axis parameters are: None, 0, 1, (0,1)."
-            )
+            raise ValueError("Invalid axis parameter! Valid axis parameters are: None, 0, 1, (0,1).")
 
         # hard coding the default axis parameter to None for now
         # this will cause it to compute over both axis and the channels, if we do not have this then the

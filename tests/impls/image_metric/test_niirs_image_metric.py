@@ -7,7 +7,7 @@ class TestSNRImageMetric:
     """This class contains the unit tests for the functionality of the NIIRSImageMetric impl."""
 
     def test_consistency(self) -> None:
-        expected_niirs = 5.5974654005905835
+        expected_niirs = 5.64306090838768
         sensor, scenario = create_sample_sensor_and_scenario()
         niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
         # Test metric interface directly
