@@ -28,7 +28,7 @@ classifiers = [
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
-version = "0.11.0"
+version = "0.12.0"
 description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
 
 [tool.poetry.dependencies]
