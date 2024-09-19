@@ -165,9 +165,11 @@ class TestPyBSMPerturber:
             _ = perturber(image, additional_params)
 
 
-@mock.patch("nrtk.impls.perturb_image.pybsm.perturber.is_usable", False)
-def test_missing_deps() -> None:
+@mock.patch.object(PybsmPerturber, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not PybsmPerturber.is_usable()
     sensor, scenario = create_sample_sensor_and_scenario()
     with pytest.raises(ImportError, match=r"OpenCV not found"):
         PybsmPerturber(sensor=sensor, scenario=scenario)

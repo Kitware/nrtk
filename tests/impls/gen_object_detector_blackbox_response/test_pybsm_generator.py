@@ -1,7 +1,5 @@
 import random
-import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from typing import Any, ContextManager, Dict, Hashable, Sequence, Tuple
 
 import numpy as np
@@ -22,11 +20,9 @@ from .test_generator_utils import gen_rand_dets, generator_assertions
 
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
-is_usable = find_spec("cv2") is not None
-
 
 @pytest.mark.skipif(
-    not is_usable,
+    not SimplePybsmGenerator.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestSimplePyBSMGenerator:
@@ -189,16 +185,3 @@ class TestSimplePyBSMGenerator:
             batch_size=1,
             verbose=verbose,
         )
-
-
-@mock.patch(
-    "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator.is_usable",
-    False,
-)
-def test_missing_deps() -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    images = ([np.array(Image.open(INPUT_IMG_FILE)) for _ in range(5)],)
-    img_gsds = ([3.19 / 160.0 for _ in range(5)],)
-    ground_truth = ([gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(5)],)
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
-        SimplePybsmGenerator(images=images, img_gsds=img_gsds, ground_truth=ground_truth)

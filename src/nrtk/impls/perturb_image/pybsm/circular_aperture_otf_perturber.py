@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional, Sequence, Type, TypeVar
 try:
     import cv2
 
-    is_usable = True
+    cv2_available = True
 except ImportError:
-    is_usable = False
+    cv2_available = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import (
@@ -61,7 +61,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         """
-        if not is_usable:
+        if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
@@ -195,3 +195,8 @@ class CircularApertureOTFPerturber(PerturbImage):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires opencv to be installed
+        return cv2_available

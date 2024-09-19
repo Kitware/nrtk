@@ -1,6 +1,5 @@
 import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from typing import Any, ContextManager, Dict, Optional, Sequence
 
 import numpy as np
@@ -21,13 +20,11 @@ from ...test_pybsm_utils import (
 )
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-is_usable = find_spec("cv2") is not None
-
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.mark.skipif(
-    not is_usable,
+    not TurbulenceApertureOTFPerturber.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestTurbulenceApertureOTFPerturber:
@@ -464,8 +461,10 @@ class TestTurbulenceApertureOTFPerturber:
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
 
-@mock.patch("nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber.is_usable", False)
-def test_missing_deps() -> None:
+@mock.patch.object(TurbulenceApertureOTFPerturber, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not TurbulenceApertureOTFPerturber.is_usable()
     with pytest.raises(ImportError, match=r"OpenCV not found"):
         TurbulenceApertureOTFPerturber()

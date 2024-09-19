@@ -1,7 +1,6 @@
 import json
 import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, ContextManager, Sequence, Tuple
 
@@ -21,11 +20,9 @@ from ...test_pybsm_utils import create_sample_sensor_and_scenario
 DATA_DIR = Path(__file__).parents[3] / "data"
 NRTK_PYBSM_CONFIG = DATA_DIR / "nrtk_pybsm_config.json"
 
-is_usable = find_spec("cv2") is not None
-
 
 @pytest.mark.skipif(
-    not is_usable,
+    not CustomPybsmPerturbImageFactory.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestStepPerturbImageFactory:
@@ -229,9 +226,11 @@ class TestStepPerturbImageFactory:
             assert original_factory_config == hydrated_factory_config
 
 
-@mock.patch("nrtk.impls.perturb_image_factory.pybsm.is_usable", False)
-def test_missing_deps() -> None:
+@mock.patch.object(CustomPybsmPerturbImageFactory, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not CustomPybsmPerturbImageFactory.is_usable()
     sensor, scenario = create_sample_sensor_and_scenario()
     theta_keys = ["altitude"]
     thetas = [[1000, 2000, 3000, 4000]]

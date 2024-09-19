@@ -1,4 +1,4 @@
-import numpy as np
+import math
 
 from nrtk.impls.image_metric.niirs_image_metric import NIIRSImageMetric
 
@@ -14,10 +14,10 @@ class TestSNRImageMetric:
         niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
         # Test metric interface directly
         niirs = niirs_metric.compute()
-        assert np.isclose(expected_niirs, niirs)
+        assert math.isclose(expected_niirs, niirs)
 
         # Test callable
-        assert np.isclose(expected_niirs, niirs_metric())
+        assert math.isclose(expected_niirs, niirs_metric())
 
     def test_reproducibility(self) -> None:
         """Ensure results are reproducible."""

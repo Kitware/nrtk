@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional, Type, TypeVar
 try:
     import cv2
 
-    is_usable = True
+    cv2_available = True
 except ImportError:
-    is_usable = False
+    cv2_available = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
@@ -55,7 +55,7 @@ class DetectorOTFPerturber(PerturbImage):
         If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
         the absent value(s) will default to 4um for w_x/w_y and 50mm for f
         """
-        if not is_usable:
+        if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         if sensor and scenario:
             atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
@@ -163,3 +163,8 @@ class DetectorOTFPerturber(PerturbImage):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires opencv to be installed
+        return cv2_available

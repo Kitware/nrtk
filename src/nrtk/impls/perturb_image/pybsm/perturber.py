@@ -16,8 +16,6 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 
-is_usable = find_spec("cv2") is not None
-
 C = TypeVar("C", bound="PybsmPerturber")
 
 DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call np.array within argument defaults
@@ -40,7 +38,7 @@ class PybsmPerturber(PerturbImage):
         :raises: ValueError if reflectance_range length != 2
         :raises: ValueError if reflectance_range not strictly ascending
         """
-        if not is_usable:
+        if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
@@ -129,3 +127,8 @@ class PybsmPerturber(PerturbImage):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires pyBSM which requires opencv to be installed
+        return find_spec("cv2") is not None

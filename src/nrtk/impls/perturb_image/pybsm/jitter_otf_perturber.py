@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional, Type, TypeVar
 try:
     import cv2
 
-    is_usable = True
+    cv2_available = True
 except ImportError:
-    is_usable = False
+    cv2_available = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
@@ -53,7 +53,7 @@ class JitterOTFPerturber(PerturbImage):
         If s_x and s_y are ever provided by the user, those values will be used
         in the otf caluclattion
         """
-        if not is_usable:
+        if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
@@ -152,6 +152,11 @@ class JitterOTFPerturber(PerturbImage):
             config_dict["scenario"] = from_config_dict(scenario, [PybsmScenario])
 
         return super().from_config(config_dict, merge_default=merge_default)
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires opencv to be installed
+        return cv2_available
 
     def get_config(self) -> Dict[str, Any]:
         sensor = to_config_dict(self.sensor) if self.sensor else None

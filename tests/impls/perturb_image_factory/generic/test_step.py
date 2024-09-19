@@ -92,9 +92,7 @@ class TestStepPerturbImageFactory:
         expectation: ContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
-        factory = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
-        )
+        factory = StepPerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
         with expectation:
             assert factory[idx].get_config()[theta_key] == expected_val
 
@@ -103,13 +101,7 @@ class TestStepPerturbImageFactory:
         [(DummyPerturber, "param_1", 1.0, 5.0, 2.0, False), (DummyPerturber, "param_2", 3.0, 9.0, 3.0, True)],
     )
     def test_configuration(
-        self,
-        perturber: Type[PerturbImage],
-        theta_key: str,
-        start: float,
-        stop: float,
-        step: float,
-        to_int: bool
+        self, perturber: Type[PerturbImage], theta_key: str, start: float, stop: float, step: float, to_int: bool
     ) -> None:
         """Test configuration stability."""
         inst = StepPerturbImageFactory(
@@ -143,15 +135,11 @@ class TestStepPerturbImageFactory:
                     "start": 1.0,
                     "stop": 2.0,
                 },
-                pytest.raises(
-                    TypeError, match=r"Passed a perturber instance, expected type"
-                ),
+                pytest.raises(TypeError, match=r"Passed a perturber instance, expected type"),
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             StepPerturbImageFactory(**kwargs)
@@ -191,20 +179,16 @@ class TestStepPerturbImageFactory:
         ("config_file_name", "expectation"),
         [
             (
-                "nrtk_blur_config.json",
+                "nrtk_brightness_config.json",
                 does_not_raise(),
             ),
             (
                 "nrtk_bad_step_config.json",
-                pytest.raises(
-                    ValueError, match=r"not a perturber is not a valid perturber."
-                ),
+                pytest.raises(ValueError, match=r"not a perturber is not a valid perturber."),
             ),
         ],
     )
-    def test_hyrdation_bounds(
-        self, config_file_name: str, expectation: ContextManager
-    ) -> None:
+    def test_hyrdation_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             with open(str(DATA_DIR / config_file_name)) as config_file:

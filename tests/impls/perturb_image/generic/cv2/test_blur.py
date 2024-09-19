@@ -1,6 +1,5 @@
 import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from typing import Any, ContextManager, Dict
 
 import numpy as np
@@ -15,11 +14,9 @@ from nrtk.impls.perturb_image.generic.cv2.blur import (
 
 from ...test_perturber_utils import perturber_assertions
 
-is_usable = find_spec("cv2") is not None
-
 
 @pytest.mark.skipif(
-    not is_usable,
+    not AverageBlurPerturber.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestAverageBlurPerturber:
@@ -100,7 +97,7 @@ class TestAverageBlurPerturber:
 
 
 @pytest.mark.skipif(
-    not is_usable,
+    not GaussianBlurPerturber.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestGaussianBlurPerturber:
@@ -189,7 +186,7 @@ class TestGaussianBlurPerturber:
 
 
 @pytest.mark.skipif(
-    not is_usable,
+    not MedianBlurPerturber.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestMedianBlurPerturber:
@@ -276,9 +273,11 @@ class TestMedianBlurPerturber:
             inst.perturb(image)
 
 
-@mock.patch("nrtk.impls.perturb_image.generic.cv2.blur.is_usable", False)
-def test_missing_deps() -> None:
+@mock.patch.object(MedianBlurPerturber, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not MedianBlurPerturber.is_usable()
     with pytest.raises(ImportError, match=r"OpenCV not found"):
         MedianBlurPerturber()
 

@@ -11,8 +11,6 @@ from nrtk.interfaces.gen_object_detector_blackbox_response import (
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interfaces.score_detections import ScoreDetections
 
-is_usable = find_spec("cv2") is not None
-
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
     """Example implementation of the ``GenerateObjectDetectorBlackboxResponse`` interface."""
@@ -30,8 +28,6 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
         :raises ValueError: Images and ground_truth data have a size mismatch.
         """
-        if not is_usable:
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         if len(images) != len(ground_truth):
             raise ValueError("Size mismatch. ground_truth must be provided for each image.")
         if len(images) != len(img_gsds):
@@ -88,3 +84,8 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         new_curve = [(entry[0][master_key], entry[1]) for entry in inter[0]]
 
         return new_curve, inter[1]
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires pyBSM which requires opencv to be installed
+        return find_spec("cv2") is not None

@@ -17,8 +17,6 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 C = TypeVar("C", bound="_PybsmPerturbImageFactory")
 
-is_usable = find_spec("cv2") is not None
-
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
     @staticmethod
@@ -46,7 +44,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         :param theta_keys: Perturber parameter(s) to vary between instances.
         :param theta_keys: Perturber parameter(s) values to vary between instances.
         """
-        if not is_usable:
+        if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         self.sensor = sensor
         self.scenario = scenario
@@ -119,6 +117,11 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
             "scenario": to_config_dict(self.scenario),
             "thetas": self.thetas,
         }
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires pyBSM which requires opencv to be installed
+        return find_spec("cv2") is not None
 
 
 class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):

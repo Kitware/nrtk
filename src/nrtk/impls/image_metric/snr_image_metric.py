@@ -31,7 +31,7 @@ class SNRImageMetric(ImageMetric):
         if img_1.ndim != 3:
             raise ValueError("Incorrect number of dimensions on input image! Expected ndim == 3.")
 
-        img_height, img_width, img_channels = img_1.shape  # type: ignore
+        img_height, img_width, img_channels = img_1.shape
         if img_height <= 0:
             raise ValueError("Invalid image height! Image height is <= 0.")
         if img_width <= 0:

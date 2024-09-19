@@ -43,8 +43,8 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
             width = int(width) + 1
             height = int(height) + 1
 
-            actual_mask: np.ndarray = np.zeros((height, width), dtype=bool)
-            predicted_mask: np.ndarray = np.zeros((height, width), dtype=bool)
+            actual_mask = np.zeros((height, width), dtype=bool)
+            predicted_mask = np.zeros((height, width), dtype=bool)
 
             for act_bbox, _ in act:
                 x_1, y_1 = act_bbox.min_vertex

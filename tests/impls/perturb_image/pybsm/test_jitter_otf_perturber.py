@@ -1,6 +1,5 @@
 import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from typing import Any, ContextManager, Dict
 
 import numpy as np
@@ -13,16 +12,13 @@ from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturb
 from ...test_pybsm_utils import create_sample_sensor_and_scenario
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-is_usable = find_spec("cv2") is not None
-
-
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
 
 
 @pytest.mark.skipif(
-    not is_usable,
+    not JitterOTFPerturber.is_usable(),
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestJitterOTFPerturber:
@@ -249,8 +245,10 @@ class TestJitterOTFPerturber:
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
 
-@mock.patch("nrtk.impls.perturb_image.pybsm.jitter_otf_perturber.is_usable", False)
-def test_missing_deps() -> None:
+@mock.patch.object(JitterOTFPerturber, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not JitterOTFPerturber.is_usable()
     with pytest.raises(ImportError, match=r"OpenCV not found"):
         JitterOTFPerturber()
