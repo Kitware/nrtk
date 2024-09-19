@@ -1,6 +1,9 @@
 v0.12.0
 =======
 
+Numerous CI/CD improvements, documentation improvements, a few new OTF perturbers, and an
+additional ``ImageMetric`` implementation.
+
 Updates / New Features
 ----------------------
 
