@@ -104,16 +104,6 @@ possible and appropriately differentiate from other classes defined here.
 If there are multiple classes that perform similar behaviors but on different
 subjects, it is important to distinguish the subject of the verb in the
 naming.
-For example, `PerturbImage` vs. `PerturbVideo` share the same verb, "perturb",
-but the subject that is to be perturbed is noted as the differentiator.
-
-Some concrete examples as can be found in this repository are:
-* [`PerturbImage`](nrtk/interfaces/perturb_image.py)
-    * verb: `Perturb`
-    * noun: `Image` (input and output)
-* [`GenerateObjectDetectorBlackboxResponse`](nrtk/interfaces/gen_object_detector_blackbox_response.py)
-    * verb: `Generate`
-    * noun(s): `ObjectDetector` (input) and `BlackboxResponse` (output)
 
 ## Non-public Contributions
 It is reasonable to expect that some extensions to this package may not be

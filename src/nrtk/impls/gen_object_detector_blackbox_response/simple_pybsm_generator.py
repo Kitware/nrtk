@@ -1,3 +1,4 @@
+from importlib.util import find_spec
 from typing import Any, Dict, Hashable, Sequence, Tuple
 
 import numpy as np
@@ -18,9 +19,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         self,
         images: Sequence[np.ndarray],
         img_gsds: Sequence[float],
-        ground_truth: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ):
         """Generate response curve for given images and ground_truth.
 
@@ -30,9 +29,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         :raises ValueError: Images and ground_truth data have a size mismatch.
         """
         if len(images) != len(ground_truth):
-            raise ValueError(
-                "Size mismatch. ground_truth must be provided for each image."
-            )
+            raise ValueError("Size mismatch. ground_truth must be provided for each image.")
         if len(images) != len(img_gsds):
             raise ValueError("Size mismatch. imggsd must be provided for each image.")
         self.images = images
@@ -87,3 +84,8 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         new_curve = [(entry[0][master_key], entry[1]) for entry in inter[0]]
 
         return new_curve, inter[1]
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires pyBSM which requires opencv to be installed
+        return find_spec("cv2") is not None

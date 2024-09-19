@@ -112,6 +112,7 @@ def test_config() -> None:
         assert i.w_x == inst.w_x
         assert i.w_y == inst.w_y
         assert i.int_time == inst.int_time
+        assert i.n_tdi == inst.n_tdi
         assert i.dark_current == inst.dark_current
         assert i.read_noise == inst.read_noise
         assert i.max_n == inst.max_n

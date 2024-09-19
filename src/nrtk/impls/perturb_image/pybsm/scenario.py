@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from pybsm.simulation.scenario import Scenario
 from smqtk_core import Configurable
@@ -61,13 +61,13 @@ class PybsmScenario(Configurable):
         ihaze: int,
         altitude: float,
         ground_range: float,
-        aircraft_speed: Optional[float] = 0.0,
-        target_reflectance: Optional[float] = 0.15,
-        target_temperature: Optional[float] = 295.0,
-        background_reflectance: Optional[float] = 0.07,
-        background_temperature: Optional[float] = 293.0,
-        ha_wind_speed: Optional[float] = 21.0,
-        cn2_at_1m: Optional[float] = 1.7e-14,
+        aircraft_speed: float = 0.0,
+        target_reflectance: float = 0.15,
+        target_temperature: float = 295.0,
+        background_reflectance: float = 0.07,
+        background_temperature: float = 293.0,
+        ha_wind_speed: float = 21.0,
+        cn2_at_1m: float = 1.7e-14,
     ):
         if ihaze not in PybsmScenario.ihaze_values:
             raise ValueError(

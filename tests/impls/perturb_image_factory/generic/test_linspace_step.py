@@ -116,9 +116,7 @@ class TestFloatStepPertubImageFactory:
         step: int,
     ) -> None:
         """Test configuration stability."""
-        inst = LinSpacePerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
-        )
+        inst = LinSpacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber
             assert i.theta_key == theta_key
@@ -147,15 +145,11 @@ class TestFloatStepPertubImageFactory:
                     "start": 1,
                     "stop": 2,
                 },
-                pytest.raises(
-                    TypeError, match=r"Passed a perturber instance, expected type"
-                ),
+                pytest.raises(TypeError, match=r"Passed a perturber instance, expected type"),
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             LinSpacePerturbImageFactory(**kwargs)
@@ -200,20 +194,16 @@ class TestFloatStepPertubImageFactory:
         ("config_file_name", "expectation"),
         [
             (
-                "nrtk_jitter_config.json",
+                "nrtk_noise_config.json",
                 does_not_raise(),
             ),
             (
                 "nrtk_bad_linspace_config.json",
-                pytest.raises(
-                    ValueError, match=r"not a perturber is not a valid perturber."
-                ),
+                pytest.raises(ValueError, match=r"not a perturber is not a valid perturber."),
             ),
         ],
     )
-    def test_hyrdation_bounds(
-        self, config_file_name: str, expectation: ContextManager
-    ) -> None:
+    def test_hyrdation_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             with open(str(DATA_DIR / config_file_name)) as config_file:

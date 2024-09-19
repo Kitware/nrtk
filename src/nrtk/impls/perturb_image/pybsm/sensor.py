@@ -35,6 +35,9 @@ class PybsmSensor(Configurable):
         detector width in the x and y directions (m)
     int_time :
         maximum integration time (s)
+    n_tdi:
+        the number of time-delay integration stages (relevant only when TDI cameras
+        are used. For CMOS cameras, the value can be assumed to be 1.0)
     qe :
         quantum efficiency as a function of wavelength (e-/photon)
     qe_wavelengths :
@@ -51,8 +54,6 @@ class PybsmSensor(Configurable):
         desired well fill, i.e. Maximum well size x Desired fill fraction
     bit_depth :
         resolution of the detector ADC in bits (unitless)
-    n_tdi :
-        number of TDI stages (unitless)
     cold_shield_temperature :
         temperature of the cold shield (K).  It is a common approximation to assume
         that the coldshield is at the same temperature as the detector array.
@@ -104,26 +105,26 @@ class PybsmSensor(Configurable):
         p_x: float,
         opt_trans_wavelengths: np.ndarray,
         optics_transmission: Optional[np.ndarray] = None,
-        eta: Optional[float] = 0.0,
+        eta: float = 0.0,
         w_x: Optional[float] = None,
         w_y: Optional[float] = None,
-        int_time: Optional[float] = 1.0,
-        dark_current: Optional[float] = 0.0,
-        read_noise: Optional[float] = 0.0,
-        max_n: Optional[float] = 100.0e6,
-        bit_depth: Optional[float] = 100.0,
-        max_well_fill: Optional[float] = 1.0,
-        s_x: Optional[float] = 0.0,
-        s_y: Optional[float] = 0.0,
-        da_x: Optional[float] = 0.0,
-        da_y: Optional[float] = 0.0,
+        int_time: float = 1.0,
+        n_tdi: float = 1.0,
+        dark_current: float = 0.0,
+        read_noise: float = 0.0,
+        max_n: int = int(100.0e6),
+        bit_depth: float = 100.0,
+        max_well_fill: float = 1.0,
+        s_x: float = 0.0,
+        s_y: float = 0.0,
+        da_x: float = 0.0,
+        da_y: float = 0.0,
         qe_wavelengths: Optional[np.ndarray] = None,
         qe: Optional[np.ndarray] = None,
     ):
         if opt_trans_wavelengths.shape[0] < 2:
             raise ValueError(
-                "At minimum, at least the start and end wavelengths"
-                " must be specified for opt_trans_wavelengths"
+                "At minimum, at least the start and end wavelengths" " must be specified for opt_trans_wavelengths"
             )
         if opt_trans_wavelengths[0] >= opt_trans_wavelengths[-1]:
             raise ValueError("opt_trans_wavelengths must be ascending")
@@ -140,15 +141,14 @@ class PybsmSensor(Configurable):
             self.optics_transmission = np.ones(opt_trans_wavelengths.shape[0])
         else:
             if optics_transmission.shape[0] != opt_trans_wavelengths.shape[0]:
-                raise ValueError(
-                    "optics_transmission and opt_trans_wavelengths must have the same length"
-                )
+                raise ValueError("optics_transmission and opt_trans_wavelengths must have the same length")
             self.optics_transmission = optics_transmission
         self.eta = eta
         self.p_y = p_x
         self.w_x = p_x if w_x is None else w_x
         self.w_y = p_x if w_y is None else w_y
         self.int_time = int_time
+        self.n_tdi = n_tdi
         self.dark_current = dark_current
         self.read_noise = read_noise
         self.max_n = max_n
@@ -164,7 +164,6 @@ class PybsmSensor(Configurable):
             self.qe = qe
 
         # not yet added to constructor
-        self.n_tdi = 1.0
         self.other_irradiance = 0.0
         self.cold_shield_temperature = 70.0
         self.optics_temperature = 270.0
@@ -191,15 +190,14 @@ class PybsmSensor(Configurable):
         return self.name
 
     def create_sensor(self) -> Sensor:
-        S = Sensor(  # noqa:N806
-            self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths
-        )
+        S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # noqa:N806
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta
         S.p_y = self.p_y
         S.w_x = self.w_x
         S.w_y = self.w_y
         S.int_time = self.int_time
+        S.n_tdi = self.n_tdi
         S.dark_current = self.dark_current
         S.read_noise = self.read_noise
         S.max_n = self.max_n
@@ -218,16 +216,12 @@ class PybsmSensor(Configurable):
         config_dict = dict(config_dict)
 
         # Convert input data to expected constructor types
-        config_dict["opt_trans_wavelengths"] = np.array(
-            config_dict["opt_trans_wavelengths"]
-        )
+        config_dict["opt_trans_wavelengths"] = np.array(config_dict["opt_trans_wavelengths"])
 
         # Non-JSON type arguments with defaults (so they might not be there)
         optics_transmission = config_dict.get("optics_transmission", None)
         if optics_transmission is not None:
-            config_dict["optics_transmission"] = np.array(
-                config_dict["optics_transmission"]
-            )
+            config_dict["optics_transmission"] = np.array(config_dict["optics_transmission"])
         qe_wavelengths = config_dict.get("qe_wavelengths", None)
         if qe_wavelengths is not None:
             config_dict["qe_wavelengths"] = np.array(config_dict["qe_wavelengths"])
@@ -249,6 +243,7 @@ class PybsmSensor(Configurable):
             "w_x": self.w_x,
             "w_y": self.w_y,
             "int_time": self.int_time,
+            "n_tdi": self.n_tdi,
             "dark_current": self.dark_current,
             "read_noise": self.read_noise,
             "max_n": self.max_n,

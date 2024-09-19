@@ -1,160 +1,201 @@
-Review Process
-**************
+Steps of the nrtk Release Process
+=================================
+Three types of releases are expected to occur:
+  - major
+  - minor
+  - patch
 
-The process for reviewing and integrating branches into nrtk is described
-below.
+See the :file:`CONTRIBUTING.md` file for information on how to contribute features
+and patches.
+See the :file:`docs/review_process.rst` for information about how to, and what
+is involved in, reviewing contributions.
 
-For guidelines on contributing, see ``CONTRIBUTING.md``.
+The following process should apply when any release that changes the version
+number occurs.
 
-For guidelines on the release process, see `Release Process and
-Notes`_.
+Create and Merge Version Update Branch
+--------------------------------------
 
-.. _`Release Process and Notes`: release_process.html
+This step of the release process depends on whether the release is considered to be major or
+minor, or
+if it is a patch release.
 
-.. contents:: The review process consists of the following parts:
-   :local:
+Major and Minor Releases
+^^^^^^^^^^^^^^^^^^^^^^^^
+Major and minor releases may add one or more trivial or non-trivial features
+and functionalities.
 
-Merge Request (MR)
-==================
-An MR is initiated by a user intending to integrate a branch from their forked
-repository.
-Before the branch is integrated into the nrtk master branch, it must
-first go through a series of checks and a review to ensure that the branch is
-consistent with the rest of the repository and doesn't contain any issues.
+1. Create a new branch off of the ``main`` named something like
+   ``update-to-v{NEW_VERSION}``, where ``NEW_VERSION`` is the new ``X.Y``
+   version.
 
-Workflow Status
+   a. Use the ``scripts/update_release_notes.sh`` script to update the project
+      version number, create ``docs/release_notes/v{NEW_VERSION}.rst``, and add
+      a new pending release notes stub file.
+
+      .. code-block:: bash
+
+         $ # When creating a major release
+         $ ./scripts/update_release_notes.sh major
+         $ # OR when creating a minor release
+         $ ./scripts/update_release_notes.sh minor
+
+   b. Add a descriptive paragraph under the title section of
+      ``docs/release_notes/v{NEW_VERSION}.rst`` summarizing this release.
+
+2. Push the created branch to the upstream repository, not your fork (this is
+   an exception to the normal forking workflow).
+
+3. Create a pull/merge request for this branch with ``release`` as the merge
+   target. This is to ensure that everything passes CI testing before making
+   the release. If there is an issue, then topic branches should be made and
+   merged into this branch until the issue is resolved.
+
+4. Get an approving review.
+
+5. Merge the pull/merge request into the ``release`` branch.
+
+6. Tag the resulting merge commit.
+   See `Tag new version`_ below for how to do this.
+
+7. As a repository administrator, merge the ``release`` branch into ``main``
+   locally and push the updated ``main`` to upstream. (Replace "upstream"
+   in the example below with your applicable remote name.)
+
+   .. code-block:: bash
+
+      $ git fetch --all
+      $ git checkout upstream/main
+      $ git merge --log --no-ff upstream/release
+      $ git push upstream main
+
+8. `Draft a new release on GitLab`_ for the new version.
+
+Patch Release
+^^^^^^^^^^^^^
+A patch release should only contain fixes for bugs or issues with an existing
+release.
+No new features or functionality should be introduced in a patch release.
+As such, patch releases should only ever be based on an existing release point
+(git tag).
+
+This list assumes we are creating a new patch release off of the *latest*
+release version, i.e. off of the ``release`` branch.
+If a patch release for an older release version is being created, see the
+`Patching an Older Release`_ section.
+
+1. Create a new branch off of the ``release`` branch named something like
+   ``update-to-v{NEW_VERSION}``, where ``NEW_VERSION`` is the target ``X.Y.Z``,
+   including the bump in the patch (``Z``) version component.
+
+   a. Use the ``scripts/update_release_notes.sh`` script to update the project
+      version number, create ``docs/release_notes/v{NEW_VERSION}.rst``, and add
+      a new pending release notes stub file.
+
+      .. code-block:: bash
+
+         $ ./scripts/update_release_notes.sh patch
+
+   b. Add a descriptive paragraph under the title section of
+      ``docs/release_notes/v{NEW_VERSION}.rst`` summarizing this release.
+
+2. Push the created branch to the upstream repository, not your fork (this is
+   an exception to the normal forking workflow).
+
+3. Create a pull/merge request for this branch with ``release`` as the merge
+   target. This is to ensure that everything passes CI testing before making
+   the release. If there is an issue, then topic branches should be made and
+   merged into this branch until the issue is resolved.
+
+4. Get an approving review.
+
+5. Merge the pull/merge request into the ``release`` branch.
+
+6. Tag the resulting merge commit.
+   See `Tag new version`_ below for how to do this.
+
+7. As a repository administrator, merge the ``release`` branch into ``main``
+   locally and push the updated ``main`` to upstream. (Replace "upstream"
+   in the example below with your applicable remote name.)
+
+   .. code-block:: bash
+
+      $ git fetch --all
+      $ git checkout upstream/main
+      $ git merge --log --no-ff upstream/release
+      $ git push upstream main
+
+8. `Draft a new release on GitLab`_ for the new version.
+
+Patching an Older Release
+"""""""""""""""""""""""""
+When patching a major/minor release that is not the latest version, a branch
+needs to be created based on the release version being patched to integrate the
+specific patches into.
+This branch should be prefixed with ``release-`` to denote that it is a release
+integration branch, e.g. ``release-v1.2.19`` (where ``19`` is the incremented
+patch version number).
+Patch topic-branches should be based on this ``release-...`` branch.
+When all fix branches have been integrated, follow the `Patch Release`_ section
+above, replacing ``release`` branch references (merge target) to be the
+``release-...`` integration branch.
+Step 6 should be to merge this release integration branch into ``release``
+first, and *then* ``release`` into ``main``, if applicable (some exceptional
+patches may only make sense for specific versions and don't warrant integration
+into upstream main).
+
+Tag New Version
 ---------------
-The submitter must set the status of their MR:
+Release branches are tagged in order to record where in the git tree a
+particular release refers to.
+All release tags should be in the history of the ``release`` and ``main``
+branches (barring exceptional circumstances).
 
-Draft
-^^^^^
-Indicates that the submitter does not think that the MR is in a reviewable or
-mergeable state.
-Once they complete their work and think that the MR is ready to be considered
-for merger, they may set the status to ``Open``.
+We prefer to use local ``git tag`` commands to create the release version
+tag, pushing the tag to upstream.
+The version tag should be applied to the merge commit resulting from the
+above described ``update-to-v{NEW_VERSION}`` topic-branch ("the release").
 
-Open
-^^^^
-Indicates that an MR is ready for review and that the submitter of the MR thinks
-that the branch is ready to be merged.
-If a review is received that requests substantial changes to the contributed
-content, effectively returning the task at hand into a "development" phase, the
-MR status should be changed to ``Draft`` (by the author of the MR) to indicate
-that such changes are underway.
+See the example commands below, replacing ``HASH`` with the appropriate git
+commit hash, and ``UPSTREAM`` with the appropriate remote name.
+We also show how to use `Poetry's version command`_ to consistently access the
+current, just-updated package version.
 
-If the submitter is still working on the MR and simply wants feedback, they
-must request it and leave their branch marked as a ``Draft``.
+.. code-block:: bash
 
-Closed
-^^^^^^
-Indicates that the MR is resolved or discarded.
+   $ git checkout HASH
+   $ VERSION="v$(poetry version -s)"
+   $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
+   $ git push UPSTREAM "$VERSION"
 
+Draft a New Release on GitLab
+-----------------------------
+After creating and pushing a new version tag, a GitLab "release" should be
+made.
 
-Continuous Integration
-======================
-The following checks are included in the automated portion of the review
-process, and are triggered whenever a merge-request is made or changes, a tag is
-created, or when the ``main`` branch is updated.
-These are run as part of the CI/CD pipeline driven by GitLab CI pipelines, and
-defined by the :file:`.gitlab-ci.yml` file.
-The success or failure of each may be seen in-line in a submitted MR in the
-"Checks" section of the MR view.
+a. Navigate to the GitLab `Releases page`_ for the nrtk repository.
 
-Code Style Consistency (``test-py-lint``)
------------------------------------------
-Runs ``flake8`` to quality check the code style.
-You can run this check manually in your local repository with
-``poetry run flake8``.
+b. Click the "Create a new release" button (or go `here
+   <gitlab-new-release-page_>`_).
 
-Passage of this check is strictly required.
+c. Select from the "Tag name" dropdown the tag version just created and
+   pushed
 
-Static Type Analysis (``test-py-typecheck``)
---------------------------------------------
-Performs static type analysis.
-You can run this check manually in your local repository with ``poetry run
-mypy``.
+d. Enter the version number as the title, e.g. "v1.2.3".
 
-Passage of this check is strictly required.
+e. Select the release date.
 
-Documentation Build (``test-docs-build``)
------------------------------------------
-Performs a build of our Sphinx documentation.
+f. Copy and paste the release notes for this version into the release notes
+   field.
 
-Passage of this check is strictly required.
+g. Click the "Create Release" button to create the GitLab release!
 
-Unit Tests (``test-pytest``)
-----------------------------
-Runs the unittests created under ``tests/`` as well as any doctests found in
-docstrings in the package code proper.
-You can run this check manually  in your local repository with ``poetry run
-pytest``.
-
-Passage of these checks is strictly required.
-
-Code Coverage (``test-coverage-percent``)
------------------------------------------
-This job checks that the lines of code covered by our Unit Tests checks meet or
-exceed certain thresholds.
-
-Passage of this check is not strictly required but highly encouraged.
-
-Release Notes Check (``test-release-notes-check``)
---------------------------------------------------
-Checks that the current branch's release notes has modifications relative to
-the marge target's.
-
-Passage of this check is not strictly required but highly encouraged.
-
-Example Notebooks Execution (``test-notebooks``)
-------------------------------------------------
-This check executes included example notebooks to ensure their proper
-functionality with the package with respect to a merge request.
-Not all notebooks may be run, as some may be set up to use too many resources
-or run for an extended period of time.
-
-Passage of these checks is strictly required.
+In the future, this may be automated.
+See the `appropriate GitLab documentation <gitlab-release-using-cicd_>`_ for
+more details.
 
 
-Human Review
-============
-Once the automatic checks are either resolved or addressed, the submitted MR
-will need to go through a human review.
-Reviewers should add comments to provide feedback and raise potential issues on
-logical and semantic details of the contributed content that would otherwise
-not be caught by the discrete automatic checks above.
-Should the MR pass their review, the reviewer should then indicate that it has
-their approval using the GitLab review interface to flag the MR as ``Approved``.
-
-A review can still be requested before the checks are resolved, but the MR must
-be marked as a ``Draft``.
-Once the MR is in a mergeable state, it will need to undergo a final review to
-ensure that there are no outstanding issues.
-
-If an MR is not a draft and has an appropriate amount of approving reviews, it
-may be merged at any time.
-
-Notebooks
----------
-The default preference is that all Jupyter Notebooks be included in execution
-of the Notebook CI job (listed under the ``parallel:matrix`` section).
-If a notebook is added in the MR, it should be verified that it has been added
-to the list of notebooks to be run.
-If it has not been, the addition should be requested or for a rationale as to
-why it has not been.
-Rationale for excluding specific notebooks from the CI job should be added to
-the relevant section in ``examples/README.md``.
-
-Resolving a Branch
-==================
-
-Merge
------
-Once an MR receives an approving review and is no longer marked as a ``Draft``,
-the repository maintainers can merge it, closing the merge request.
-It is recommended that the submitter delete their branch after the MR is
-merged.
-
-Close
------
-If it is decided that the MR will not be integrated into ``nrtk``, then
-it can be closed through GitLab.
+.. _Poetry's version command: https://python-poetry.org/docs/cli/#version
+.. _Releases page: https://gitlab.jatic.net/jatic/kitware/nrtk/-/releases
+.. _gitlab-new-release-page: https://gitlab.jatic.net/jatic/kitware/nrtk/-/releases/new
+.. _gitlab-release-using-cicd: https://docs.gitlab.com/ee/user/project/releases/#creating-a-release-by-using-a-cicd-job

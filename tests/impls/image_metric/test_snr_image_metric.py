@@ -203,3 +203,7 @@ class TestSNRImageMetric:
 
         # Assert that _signal_to_noise was called with the correct arguments
         mock_signal_to_noise.assert_called_once_with(img=image, axis=axis, ddof=ddof)
+
+    def test_classname(self) -> None:
+        niirs_metric = SNRImageMetric()
+        assert niirs_metric.name == "SNRImageMetric"

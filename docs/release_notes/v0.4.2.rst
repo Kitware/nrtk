@@ -1,7 +1,7 @@
 v0.4.2
 ======
 
-Added support for `Python 3.12 `.
+Added support for `Python 3.12`.
 
 Updates / New Features
 ----------------------

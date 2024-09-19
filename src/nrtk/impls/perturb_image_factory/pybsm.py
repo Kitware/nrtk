@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from importlib.util import find_spec
 from typing import Any, Dict, Iterable, Iterator, List, Sequence, Type, TypeVar
 
 from smqtk_core.configuration import (
@@ -43,6 +44,8 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         :param theta_keys: Perturber parameter(s) to vary between instances.
         :param theta_keys: Perturber parameter(s) values to vary between instances.
         """
+        if not self.is_usable():
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         self.sensor = sensor
         self.scenario = scenario
         self.theta_keys = theta_keys
@@ -60,10 +63,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
     def __next__(self) -> PerturbImage:
         if self.n < len(self.sets):
-            kwargs = {
-                k: self.thetas[i][self.sets[self.n][i]]
-                for i, k in enumerate(self.theta_keys)
-            }
+            kwargs = {k: self.thetas[i][self.sets[self.n][i]] for i, k in enumerate(self.theta_keys)}
             func = PybsmPerturber(self.sensor, self.scenario, **kwargs)
             self.n += 1
             return func
@@ -73,9 +73,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     def __getitem__(self, idx: int) -> PerturbImage:
         if idx >= len(self.sets):
             raise IndexError("Index out of range")
-        kwargs = {
-            k: self.thetas[i][self.sets[idx][i]] for i, k in enumerate(self.theta_keys)
-        }
+        kwargs = {k: self.thetas[i][self.sets[idx][i]] for i, k in enumerate(self.theta_keys)}
         func = PybsmPerturber(self.sensor, self.scenario, **kwargs)
         return func
 
@@ -108,9 +106,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         config_dict = dict(config_dict)
 
         config_dict["sensor"] = from_config_dict(config_dict["sensor"], [PybsmSensor])
-        config_dict["scenario"] = from_config_dict(
-            config_dict["scenario"], [PybsmScenario]
-        )
+        config_dict["scenario"] = from_config_dict(config_dict["scenario"], [PybsmScenario])
 
         return super().from_config(config_dict, merge_default=merge_default)
 
@@ -121,6 +117,11 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
             "scenario": to_config_dict(self.scenario),
             "thetas": self.thetas,
         }
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires pyBSM which requires opencv to be installed
+        return find_spec("cv2") is not None
 
 
 class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):

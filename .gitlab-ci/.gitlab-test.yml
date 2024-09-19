@@ -5,8 +5,14 @@
 # Overrides:
 # 
 # 1) nrtk specific notebooks.
+# 2) Poetry install for opencv-python-headless
 #
 ###############################################################################
+
+.test-setup:
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry install --sync --only main,dev-testing --extras headless
 
 notebooks:
   parallel:
