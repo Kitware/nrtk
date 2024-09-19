@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from importlib.util import find_spec
 from typing import Any, Dict, Optional, Type, TypeVar
 
 import numpy as np
@@ -17,9 +18,7 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 C = TypeVar("C", bound="PybsmPerturber")
 
-DEFAULT_REFLECTANCE_RANGE = np.array(
-    [0.05, 0.5]
-)  # It is bad standards to call np.array within argument defaults
+DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call np.array within argument defaults
 
 
 class PybsmPerturber(PerturbImage):
@@ -39,6 +38,8 @@ class PybsmPerturber(PerturbImage):
         :raises: ValueError if reflectance_range length != 2
         :raises: ValueError if reflectance_range not strictly ascending
         """
+        if not self.is_usable():
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 
@@ -49,13 +50,9 @@ class PybsmPerturber(PerturbImage):
                 setattr(self.scenario, k, kwargs[k])
 
         if reflectance_range.shape[0] != 2:
-            raise ValueError(
-                f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}"
-            )
+            raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
         if reflectance_range[0] >= reflectance_range[1]:
-            raise ValueError(
-                f"Reflectance range array values must be strictly ascending, got {reflectance_range}"
-            )
+            raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
         self.reflectance_range = reflectance_range
 
         # this is key:value record of the thetas use for perturbing
@@ -65,18 +62,12 @@ class PybsmPerturber(PerturbImage):
     def params(self) -> Dict:
         return self.thetas
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
-        if (
-            additional_params is None
-        ):  # Cannot have mutable data structure in argument default
+        if additional_params is None:  # Cannot have mutable data structure in argument default
             additional_params = dict()
         if "img_gsd" not in additional_params:
-            raise ValueError(
-                "'img_gsd' must be present in image metadata for this perturber"
-            )
+            raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
         ref_img = RefImage(
             image,
@@ -95,9 +86,7 @@ class PybsmPerturber(PerturbImage):
 
         return perturbed.astype(np.uint8)
 
-    def __call__(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Alias for :meth:`.NIIRS.apply`."""
         if additional_params is None:
             additional_params = dict()
@@ -123,9 +112,7 @@ class PybsmPerturber(PerturbImage):
         config_dict = dict(config_dict)
 
         config_dict["sensor"] = from_config_dict(config_dict["sensor"], [PybsmSensor])
-        config_dict["scenario"] = from_config_dict(
-            config_dict["scenario"], [PybsmScenario]
-        )
+        config_dict["scenario"] = from_config_dict(config_dict["scenario"], [PybsmScenario])
 
         # Convert input data to expected constructor types
         config_dict["reflectance_range"] = np.array(config_dict["reflectance_range"])
@@ -140,3 +127,8 @@ class PybsmPerturber(PerturbImage):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires pyBSM which requires opencv to be installed
+        return find_spec("cv2") is not None

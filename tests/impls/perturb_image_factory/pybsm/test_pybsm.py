@@ -1,4 +1,5 @@
 import json
+import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
 from typing import Any, ContextManager, Sequence, Tuple
@@ -20,6 +21,10 @@ DATA_DIR = Path(__file__).parents[3] / "data"
 NRTK_PYBSM_CONFIG = DATA_DIR / "nrtk_pybsm_config.json"
 
 
+@pytest.mark.skipif(
+    not CustomPybsmPerturbImageFactory.is_usable(),
+    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+)
 class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(
         ("theta_keys", "thetas", "expected"),
@@ -44,19 +49,13 @@ class TestStepPerturbImageFactory:
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        factory = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
-        )
+        factory = CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
             for count, _ in enumerate(theta_keys):
                 perturb_cfg = p.get_config()
-                sensor_cfg = perturb_cfg["sensor"][
-                    "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"
-                ]
-                sce_cfg = perturb_cfg["scenario"][
-                    "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"
-                ]
+                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"]
+                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"]
 
                 if theta_keys[count] in sensor_cfg:
                     assert sensor_cfg[theta_keys[count]] == expected[idx][count]
@@ -111,18 +110,12 @@ class TestStepPerturbImageFactory:
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        factory = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
-        )
+        factory = CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)
         with expectation:
             for count, _ in enumerate(theta_keys):
                 perturb_cfg = factory[idx].get_config()
-                sensor_cfg = perturb_cfg["sensor"][
-                    "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"
-                ]
-                sce_cfg = perturb_cfg["scenario"][
-                    "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"
-                ]
+                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"]
+                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"]
 
                 if theta_keys[count] in sensor_cfg:
                     assert sensor_cfg[theta_keys[count]] == expected_val[count]
@@ -152,9 +145,7 @@ class TestStepPerturbImageFactory:
     ) -> None:
         """Test configuration stability."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
-        )
+        inst = CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)
 
         for i in configuration_test_helper(inst):
             assert i.theta_keys == theta_keys
@@ -164,12 +155,8 @@ class TestStepPerturbImageFactory:
             assert i.sensor.D == sensor.D
             assert i.sensor.f == sensor.f
             assert i.sensor.p_x == sensor.p_x
-            assert np.array_equal(
-                i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths
-            )
-            assert np.array_equal(
-                i.sensor.optics_transmission, sensor.optics_transmission
-            )
+            assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
+            assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
             assert i.sensor.eta == sensor.eta
             assert i.sensor.w_x == sensor.w_x
             assert i.sensor.w_y == sensor.w_y
@@ -237,3 +224,15 @@ class TestStepPerturbImageFactory:
             hydrated_factory_config = hydrated_factory.get_config()
 
             assert original_factory_config == hydrated_factory_config
+
+
+@mock.patch.object(CustomPybsmPerturbImageFactory, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not CustomPybsmPerturbImageFactory.is_usable()
+    sensor, scenario = create_sample_sensor_and_scenario()
+    theta_keys = ["altitude"]
+    thetas = [[1000, 2000, 3000, 4000]]
+    with pytest.raises(ImportError, match=r"OpenCV not found"):
+        CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)

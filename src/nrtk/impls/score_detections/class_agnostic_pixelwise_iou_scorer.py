@@ -19,18 +19,14 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
     def score(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Computes pixelwise IoU scores and returns sequence of float values equal to the length of the input data."""
         if len(actual) != len(predicted):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise ValueError(
-                    "Actual bounding boxes must have detections and can't be empty."
-                )
+                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
 
         ious = list()
 

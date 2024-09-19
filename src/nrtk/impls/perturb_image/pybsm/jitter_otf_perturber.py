@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Type, TypeVar
 
-import cv2
+try:
+    import cv2
+
+    cv2_available = True
+except ImportError:
+    cv2_available = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
@@ -48,15 +53,16 @@ class JitterOTFPerturber(PerturbImage):
         If s_x and s_y are ever provided by the user, those values will be used
         in the otf caluclattion
         """
+        if not self.is_usable():
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+
         if sensor and scenario:
-            atm = load_database_atmosphere(
-                scenario.altitude, scenario.ground_range, scenario.ihaze
-            )
+            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
             (
                 _,
                 _,
                 spectral_weights,
-            ) = radiance.reflectance_to_photoelectrons(atm, sensor, sensor.int_time)
+            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -95,9 +101,7 @@ class JitterOTFPerturber(PerturbImage):
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.jit_OTF = jitter_OTF(uu, vv, self.s_x, self.s_y)
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
@@ -108,9 +112,7 @@ class JitterOTFPerturber(PerturbImage):
                                   for this perturber"
                 )
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(
-                self.jit_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range)
-            )
+            psf = otf_to_psf(self.jit_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
             blur_img = cv2.filter2D(image, -1, psf)
@@ -120,17 +122,13 @@ class JitterOTFPerturber(PerturbImage):
 
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(
-                self.jit_OTF, self.df, 1 / (self.jit_OTF.shape[0] * self.df)
-            )
+            psf = otf_to_psf(self.jit_OTF, self.df, 1 / (self.jit_OTF.shape[0] * self.df))
 
             sim_img = cv2.filter2D(image, -1, psf)
 
         return sim_img.astype(np.uint8)
 
-    def __call__(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Alias for :meth:`.NIIRS.apply`."""
         if additional_params is None:
             additional_params = dict()
@@ -154,6 +152,11 @@ class JitterOTFPerturber(PerturbImage):
             config_dict["scenario"] = from_config_dict(scenario, [PybsmScenario])
 
         return super().from_config(config_dict, merge_default=merge_default)
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires opencv to be installed
+        return cv2_available
 
     def get_config(self) -> Dict[str, Any]:
         sensor = to_config_dict(self.sensor) if self.sensor else None

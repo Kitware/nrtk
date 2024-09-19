@@ -1,3 +1,4 @@
+import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
 from typing import Any, ContextManager, Dict, Sequence
 
@@ -13,15 +14,17 @@ from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
 from ...test_pybsm_utils import create_sample_sensor_and_scenario
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-INPUT_IMG_FILE = (
-    "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
-)
+INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE = (
     "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_provided_expected_output.tiff"
 )
 
 
+@pytest.mark.skipif(
+    not CircularApertureOTFPerturber.is_usable(),
+    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+)
 class TestCircularApertureOTFPerturber:
     def test_provided_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -55,9 +58,7 @@ class TestCircularApertureOTFPerturber:
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
 
         # Test callable
-        pybsm_perturber_assertions(
-            perturb=CircularApertureOTFPerturber(), image=image, expected=expected
-        )
+        pybsm_perturber_assertions(perturb=CircularApertureOTFPerturber(), image=image, expected=expected)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights"),
@@ -100,12 +101,8 @@ class TestCircularApertureOTFPerturber:
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         inst = CircularApertureOTFPerturber()
-        out_image = pybsm_perturber_assertions(
-            perturb=inst.perturb, image=image, expected=None
-        )
-        pybsm_perturber_assertions(
-            perturb=inst.perturb, image=image, expected=out_image
-        )
+        out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None)
+        pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -113,15 +110,11 @@ class TestCircularApertureOTFPerturber:
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 {},
-                pytest.raises(
-                    ValueError, match=r"'img_gsd' must be present in image metadata"
-                ),
+                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
             ),
         ],
     )
-    def test_provided_additional_params(
-        self, additional_params: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_provided_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
@@ -161,9 +154,7 @@ class TestCircularApertureOTFPerturber:
     ) -> None:
         """Test variations of additional params."""
         with expectation:
-            _ = CircularApertureOTFPerturber(
-                mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights
-            )
+            _ = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -171,9 +162,7 @@ class TestCircularApertureOTFPerturber:
             ({}, does_not_raise()),
         ],
     )
-    def test_default_additional_params(
-        self, additional_params: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_default_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
         """Test variations of additional params."""
         perturber = CircularApertureOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE))
@@ -192,9 +181,7 @@ class TestCircularApertureOTFPerturber:
         mtf_weights: Sequence[float],
     ) -> None:
         """Test configuration stability."""
-        inst = CircularApertureOTFPerturber(
-            mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights
-        )
+        inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights)
         for i in configuration_test_helper(inst):
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
@@ -209,12 +196,8 @@ class TestCircularApertureOTFPerturber:
                 assert i.sensor.D == sensor.D
                 assert i.sensor.f == sensor.f
                 assert i.sensor.p_x == sensor.p_x
-                assert np.array_equal(
-                    i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths
-                )
-                assert np.array_equal(
-                    i.sensor.optics_transmission, sensor.optics_transmission
-                )
+                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
+                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
                 assert i.sensor.w_x == sensor.w_x
                 assert i.sensor.w_y == sensor.w_y
@@ -238,12 +221,8 @@ class TestCircularApertureOTFPerturber:
                 assert i.scenario.aircraft_speed == scenario.aircraft_speed
                 assert i.scenario.target_reflectance == scenario.target_reflectance
                 assert i.scenario.target_temperature == scenario.target_temperature
-                assert (
-                    i.scenario.background_reflectance == scenario.background_reflectance
-                )
-                assert (
-                    i.scenario.background_temperature == scenario.background_temperature
-                )
+                assert i.scenario.background_reflectance == scenario.background_reflectance
+                assert i.scenario.background_temperature == scenario.background_temperature
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
@@ -274,12 +253,8 @@ class TestCircularApertureOTFPerturber:
                 assert i.sensor.D == sensor.D
                 assert i.sensor.f == sensor.f
                 assert i.sensor.p_x == sensor.p_x
-                assert np.array_equal(
-                    i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths
-                )
-                assert np.array_equal(
-                    i.sensor.optics_transmission, sensor.optics_transmission
-                )
+                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
+                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
                 assert i.sensor.w_x == sensor.w_x
                 assert i.sensor.w_y == sensor.w_y
@@ -303,11 +278,16 @@ class TestCircularApertureOTFPerturber:
                 assert i.scenario.aircraft_speed == scenario.aircraft_speed
                 assert i.scenario.target_reflectance == scenario.target_reflectance
                 assert i.scenario.target_temperature == scenario.target_temperature
-                assert (
-                    i.scenario.background_reflectance == scenario.background_reflectance
-                )
-                assert (
-                    i.scenario.background_temperature == scenario.background_temperature
-                )
+                assert i.scenario.background_reflectance == scenario.background_reflectance
+                assert i.scenario.background_temperature == scenario.background_temperature
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
+
+
+@mock.patch.object(CircularApertureOTFPerturber, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not CircularApertureOTFPerturber.is_usable()
+    with pytest.raises(ImportError, match=r"OpenCV not found"):
+        CircularApertureOTFPerturber()

@@ -36,6 +36,16 @@ CI/CD
 
 * Updated config for `black` to set max line length to 120
 
+* Bumped `pybsm` to 0.7.0.
+
+* Changed `opencv-python` to an optional dependency.
+
+* Added `opencv-python-headless` as an optional dependency.
+
+* Added two extras (graphics and headless) for `opencv-python` and `opencv-python-headless` compatibility.
+
+* Changed CI to use headless extra.
+
 Documentation
 
 * Updated the readthedocs required packages.

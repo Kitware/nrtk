@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Type, TypeVar
 
-import cv2
+try:
+    import cv2
+
+    cv2_available = True
+except ImportError:
+    cv2_available = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
@@ -50,13 +55,13 @@ class DetectorOTFPerturber(PerturbImage):
         If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
         the absent value(s) will default to 4um for w_x/w_y and 50mm for f
         """
+        if not self.is_usable():
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         if sensor and scenario:
-            atm = load_database_atmosphere(
-                scenario.altitude, scenario.ground_range, scenario.ihaze
-            )
+            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
 
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
-                atm, sensor, sensor.int_time
+                atm, sensor.create_sensor(), sensor.int_time
             )
 
             wavelengths = spectral_weights[0]
@@ -101,23 +106,17 @@ class DetectorOTFPerturber(PerturbImage):
 
         self.det_OTF = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
 
         if self.ifov >= 0 and self.slant_range >= 0:
             if "img_gsd" not in additional_params:
-                raise ValueError(
-                    "'img_gsd' must be present in image metadata for this perturber"
-                )
+                raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(
-                self.det_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range)
-            )
+            psf = otf_to_psf(self.det_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
             blur_img = cv2.filter2D(image, -1, psf)
@@ -126,9 +125,7 @@ class DetectorOTFPerturber(PerturbImage):
             sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(
-                self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df)
-            )
+            psf = otf_to_psf(self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df))
 
             sim_img = cv2.filter2D(image, -1, psf)
 
@@ -166,3 +163,8 @@ class DetectorOTFPerturber(PerturbImage):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires opencv to be installed
+        return cv2_available

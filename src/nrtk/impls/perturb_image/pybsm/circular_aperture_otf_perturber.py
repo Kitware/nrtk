@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Sequence, Type, TypeVar
 
-import cv2
+try:
+    import cv2
+
+    cv2_available = True
+except ImportError:
+    cv2_available = False
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import (
@@ -56,15 +61,16 @@ class CircularApertureOTFPerturber(PerturbImage):
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         """
+        if not self.is_usable():
+            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+
         if sensor and scenario:
-            atm = load_database_atmosphere(
-                scenario.altitude, scenario.ground_range, scenario.ihaze
-            )
+            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
             (
                 _,
                 _,
                 spectral_weights,
-            ) = radiance.reflectance_to_photoelectrons(atm, sensor, sensor.int_time)
+            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -72,15 +78,9 @@ class CircularApertureOTFPerturber(PerturbImage):
             # cut down the wavelength range to only the regions of interests
             pos_weights = np.where(weights > 0.0)
             self.mtf_wavelengths = (
-                np.asarray(mtf_wavelengths)
-                if mtf_wavelengths is not None
-                else wavelengths[pos_weights]
+                np.asarray(mtf_wavelengths) if mtf_wavelengths is not None else wavelengths[pos_weights]
             )
-            self.mtf_weights = (
-                np.asarray(mtf_weights)
-                if mtf_weights is not None
-                else weights[pos_weights]
-            )
+            self.mtf_weights = np.asarray(mtf_weights) if mtf_weights is not None else weights[pos_weights]
 
             D = sensor.D  # noqa: N806
             eta = sensor.eta  # noqa: N806
@@ -94,9 +94,7 @@ class CircularApertureOTFPerturber(PerturbImage):
                 else np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             )
             self.mtf_weights = (
-                np.asarray(mtf_weights)
-                if mtf_weights is not None
-                else np.ones(len(self.mtf_wavelengths))
+                np.asarray(mtf_weights) if mtf_weights is not None else np.ones(len(self.mtf_wavelengths))
             )
             # Assume visible spectrum of light
             self.ifov = -1
@@ -128,16 +126,12 @@ class CircularApertureOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
-        ap_function = lambda wavelengths: circular_aperture_OTF(  # noqa: E731
-            uu, vv, wavelengths, D, eta
-        )
-        self.ap_OTF = weighted_by_wavelength(
-            self.mtf_wavelengths, self.mtf_weights, ap_function
-        )
+        def ap_function(wavelengths: float) -> np.ndarray:
+            return circular_aperture_OTF(uu, vv, wavelengths, D, eta)  # noqa: E731
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+        self.ap_OTF = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)
+
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
@@ -148,9 +142,7 @@ class CircularApertureOTFPerturber(PerturbImage):
                                   for this perturber"
                 )
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(
-                self.ap_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range)
-            )
+            psf = otf_to_psf(self.ap_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
             blur_img = cv2.filter2D(image, -1, psf)
@@ -166,9 +158,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         return sim_img.astype(np.uint8)
 
-    def __call__(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Alias for :meth:`.NIIRS.apply`."""
         if additional_params is None:
             additional_params = dict()
@@ -205,3 +195,8 @@ class CircularApertureOTFPerturber(PerturbImage):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        # Requires opencv to be installed
+        return cv2_available

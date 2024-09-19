@@ -1,10 +1,10 @@
 {
     "type": "nrtk.impls.perturb_image_factory.generic.linspace_step.LinSpacePerturbImageFactory",
     "nrtk.impls.perturb_image_factory.generic.linspace_step.LinSpacePerturbImageFactory": {
-        "perturber": "nrtk.impls.perturb_image.pybsm.jitter_otf_perturber.JitterOTFPerturber",
-        "theta_key": "ksize",
-        "start": 1.0,
-        "stop": 10.0,
+        "perturber": "nrtk.impls.perturb_image.generic.skimage.random_noise.SaltNoisePerturber",
+        "theta_key": "amount",
+        "start": 0.1,
+        "stop": 0.9,
         "step": 2
     }
 }

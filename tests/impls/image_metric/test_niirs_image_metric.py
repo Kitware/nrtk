@@ -1,3 +1,5 @@
+import math
+
 from nrtk.impls.image_metric.niirs_image_metric import NIIRSImageMetric
 
 from ..test_pybsm_utils import create_sample_sensor_and_scenario
@@ -7,15 +9,15 @@ class TestSNRImageMetric:
     """This class contains the unit tests for the functionality of the NIIRSImageMetric impl."""
 
     def test_consistency(self) -> None:
-        expected_niirs = 5.5974654005905835
+        expected_niirs = 5.64306090838768
         sensor, scenario = create_sample_sensor_and_scenario()
         niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
         # Test metric interface directly
         niirs = niirs_metric.compute()
-        assert expected_niirs == niirs
+        assert math.isclose(expected_niirs, niirs)
 
         # Test callable
-        assert expected_niirs == niirs_metric()
+        assert math.isclose(expected_niirs, niirs_metric())
 
     def test_reproducibility(self) -> None:
         """Ensure results are reproducible."""

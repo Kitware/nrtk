@@ -1,3 +1,4 @@
+import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
 from typing import Any, ContextManager, Dict
 
@@ -14,6 +15,10 @@ from nrtk.impls.perturb_image.generic.cv2.blur import (
 from ...test_perturber_utils import perturber_assertions
 
 
+@pytest.mark.skipif(
+    not AverageBlurPerturber.is_usable(),
+    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+)
 class TestAverageBlurPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -22,9 +27,7 @@ class TestAverageBlurPerturber:
 
         # Test perturb interface directly
         inst = AverageBlurPerturber(ksize=ksize)
-        perturber_assertions(
-            perturb=inst.perturb, image=image, expected=EXPECTED_AVERAGE
-        )
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_AVERAGE)
 
         # Test callable
         perturber_assertions(
@@ -45,9 +48,7 @@ class TestAverageBlurPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = AverageBlurPerturber(ksize=ksize)
-        out_image = perturber_assertions(
-            perturb=inst.perturb, image=image, expected=None
-        )
+        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -71,9 +72,7 @@ class TestAverageBlurPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             AverageBlurPerturber(**kwargs)
@@ -86,19 +85,21 @@ class TestAverageBlurPerturber:
             (np.ones((256, 256, 4)), does_not_raise()),
             (
                 np.ones((3, 256, 256)),
-                pytest.raises(ValueError, match=r"Image is not in expected format")
+                pytest.raises(ValueError, match=r"Image is not in expected format"),
             ),
         ],
     )
-    def test_perturb_bounds(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_perturb_bounds(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = AverageBlurPerturber()
         with expectation:
             inst.perturb(image)
 
 
+@pytest.mark.skipif(
+    not GaussianBlurPerturber.is_usable(),
+    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+)
 class TestGaussianBlurPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -107,9 +108,7 @@ class TestGaussianBlurPerturber:
 
         # Test perturb interface directly
         inst = GaussianBlurPerturber(ksize=ksize)
-        perturber_assertions(
-            perturb=inst.perturb, image=image, expected=EXPECTED_GAUSSIAN
-        )
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_GAUSSIAN)
 
         # Test callable
         perturber_assertions(
@@ -130,9 +129,7 @@ class TestGaussianBlurPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = GaussianBlurPerturber(ksize=ksize)
-        out_image = perturber_assertions(
-            perturb=inst.perturb, image=image, expected=None
-        )
+        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -164,9 +161,7 @@ class TestGaussianBlurPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             GaussianBlurPerturber(**kwargs)
@@ -179,19 +174,21 @@ class TestGaussianBlurPerturber:
             (np.ones((256, 256, 4)), does_not_raise()),
             (
                 np.ones((3, 256, 256)),
-                pytest.raises(ValueError, match=r"Image is not in expected format")
+                pytest.raises(ValueError, match=r"Image is not in expected format"),
             ),
         ],
     )
-    def test_perturb_bounds(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_perturb_bounds(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = GaussianBlurPerturber()
         with expectation:
             inst.perturb(image)
 
 
+@pytest.mark.skipif(
+    not MedianBlurPerturber.is_usable(),
+    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+)
 class TestMedianBlurPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -200,9 +197,7 @@ class TestMedianBlurPerturber:
 
         # Test perturb interface directly
         inst = MedianBlurPerturber(ksize=ksize)
-        perturber_assertions(
-            perturb=inst.perturb, image=image, expected=EXPECTED_MEDIAN
-        )
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_MEDIAN)
 
         # Test callable
         perturber_assertions(
@@ -222,9 +217,7 @@ class TestMedianBlurPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = MedianBlurPerturber(ksize=ksize)
-        out_image = perturber_assertions(
-            perturb=inst.perturb, image=image, expected=None
-        )
+        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -256,9 +249,7 @@ class TestMedianBlurPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             MedianBlurPerturber(**kwargs)
@@ -271,17 +262,24 @@ class TestMedianBlurPerturber:
             (np.ones((256, 256, 4), dtype=np.float32), does_not_raise()),
             (
                 np.ones((3, 256, 256)),
-                pytest.raises(ValueError, match=r"Image is not in expected format")
+                pytest.raises(ValueError, match=r"Image is not in expected format"),
             ),
         ],
     )
-    def test_perturb_bounds(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_perturb_bounds(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = MedianBlurPerturber(ksize=5)
         with expectation:
             inst.perturb(image)
+
+
+@mock.patch.object(MedianBlurPerturber, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not MedianBlurPerturber.is_usable()
+    with pytest.raises(ImportError, match=r"OpenCV not found"):
+        MedianBlurPerturber()
 
 
 EXPECTED_AVERAGE = np.array([[4, 4, 4], [5, 5, 5], [6, 6, 6]], dtype=np.uint8)
