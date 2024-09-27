@@ -45,7 +45,7 @@ class JitterOTFPerturber(PerturbImage):
         will be used for their parameters
 
         If neither s_x, s_y, sensor or scenario parameters are provided, the values
-        of s_x and s_y will be the default of 1.0
+        of s_x and s_y will be the default of 0.0 as that results in a nadir view.
 
         If sensor and scenario parameters are provided, but not s_x and s_y, the
         values of s_x and s_y will come from the sensor and scenario objects.
