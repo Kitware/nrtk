@@ -77,8 +77,8 @@ class JitterOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.s_x = s_x if s_x is not None else 1.0
-            self.s_y = s_y if s_y is not None else 1.0
+            self.s_x = s_x if s_x is not None else 0.0
+            self.s_y = s_y if s_y is not None else 0.0
             # Assume visible spectrum of light
             self.ifov = -1
             self.slant_range = -1
