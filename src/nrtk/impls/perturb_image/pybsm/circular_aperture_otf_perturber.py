@@ -37,7 +37,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         scenario: Optional[PybsmScenario] = None,
         mtf_wavelengths: Optional[Sequence[float]] = None,
         mtf_weights: Optional[Sequence[float]] = None,
-        interp: Optional[bool] = False,
+        interp: Optional[bool] = True,
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 

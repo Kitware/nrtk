@@ -33,7 +33,7 @@ class DetectorOTFPerturber(PerturbImage):
         w_x: Optional[float] = None,
         w_y: Optional[float] = None,
         f: Optional[float] = None,
-        interp: Optional[bool] = False,
+        interp: Optional[bool] = True,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 

@@ -32,7 +32,7 @@ class JitterOTFPerturber(PerturbImage):
         scenario: Optional[PybsmScenario] = None,
         s_x: Optional[float] = None,
         s_y: Optional[float] = None,
-        interp: Optional[bool] = False,
+        interp: Optional[bool] = True,
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
