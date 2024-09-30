@@ -7,7 +7,10 @@ Updates / New Features
 Documentation
 
 * Updated README to include a reference to the `nrtk-jatic` package.
+
 * Restored and improved review process documentation.
+
+* Added ``sphinx-click`` as a dev docs dependency.
 
 Implementations
 
