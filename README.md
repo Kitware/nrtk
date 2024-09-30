@@ -8,7 +8,7 @@ into systems and applications.
 
 We have also created the [`nrtk-jatic`](https://github.com/Kitware/nrtk-jatic) package to support AI T&E
 use-cases and workflows, through interoperability with the [`maite`](https://github.com/mit-ll-ai-technology/maite)
-library and integration with other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use NRTK to 
+library and integration with other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use NRTK to
 perturb MAITE-wrapped datasets or evaluate MAITE-wrapped models should
 start with the `nrtk-jatic` package.
 
