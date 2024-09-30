@@ -46,6 +46,8 @@ class CircularApertureOTFPerturber(PerturbImage):
         :param scenario: pyBSM scenario object
         :param mtf_wavelengths: a numpy array of wavelengths (m)
         :param mtf_wavelengths_weights: a numpy array of weights for each wavelength contribution (arb)
+        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
+                       interpoloation
 
         If both sensor and scenario parameters are absent, then default values
         will be used for their parameters
@@ -118,6 +120,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         self.sensor = sensor
         self.scenario = scenario
+        self.interp = interp
 
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -196,6 +199,7 @@ class CircularApertureOTFPerturber(PerturbImage):
             "scenario": scenario,
             "mtf_wavelengths": self.mtf_wavelengths,
             "mtf_weights": self.mtf_weights,
+            "interp": self.interp,
         }
 
         return config

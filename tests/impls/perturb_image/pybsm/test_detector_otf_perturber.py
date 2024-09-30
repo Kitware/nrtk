@@ -24,9 +24,31 @@ INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm he
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestDetectorOTFPerturber:
+    def test_interp_consistency(self) -> None:
+        """Run on a dummy image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        img_gsd = 3.19 / 160.0
+        sensor, scenario = create_sample_sensor_and_scenario()
+        # Test perturb interface directly
+        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
+        inst2 = DetectorOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
+        out_image = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            additional_params={"img_gsd": img_gsd},
+        )
+
+        pybsm_perturber_assertions(
+            perturb=inst2.perturb,
+            image=image,
+            expected=out_image,
+            additional_params={"img_gsd": img_gsd},
+        )
+
     @pytest.mark.parametrize(
-        ("use_sensor_scenario", "w_x", "w_y", "f"),
-        [(False, None, None, None), (True, 3e-6, 20e-6, 30e-3)],
+        ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),
+        [(False, None, None, None, None), (True, 3e-6, 20e-6, 30e-3, True), (True, 3e-6, 20e-6, 30e-3, False)],
     )
     def test_reproducibility(
         self,
@@ -34,6 +56,7 @@ class TestDetectorOTFPerturber:
         w_x: Optional[float],
         w_y: Optional[float],
         f: Optional[float],
+        interp: Optional[bool],
     ) -> None:
         """Ensure results are reproducible."""
         img = np.array(Image.open(INPUT_IMG_FILE))
@@ -44,7 +67,7 @@ class TestDetectorOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
 
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f)
+        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
 
@@ -79,12 +102,12 @@ class TestDetectorOTFPerturber:
             _ = perturber.perturb(img, additional_params)
 
     @pytest.mark.parametrize(
-        ("use_sensor_scenario", "w_x", "w_y", "f"),
+        ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),
         [
-            (False, None, None, None),
-            (True, None, None, None),
-            (True, 3e-6, 20e-6, 30e-3),
-            (False, 3e-6, 20e-6, 30e-3),
+            (False, None, None, None, None),
+            (True, None, None, None, None),
+            (True, 3e-6, 20e-6, 30e-3, False),
+            (False, 3e-6, 20e-6, 30e-3, True),
         ],
     )
     def test_configuration(
@@ -93,6 +116,7 @@ class TestDetectorOTFPerturber:
         w_x: Optional[float],
         w_y: Optional[float],
         f: Optional[float],
+        interp: Optional[bool],
     ) -> None:
         """Test configuration stability."""
         sensor = None
@@ -100,7 +124,7 @@ class TestDetectorOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
 
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f)
+        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
         for i in configuration_test_helper(inst):
             if w_x is not None:
                 assert i.w_x == w_x
@@ -166,12 +190,12 @@ class TestDetectorOTFPerturber:
                 assert scenario is None
 
     @pytest.mark.parametrize(
-        ("use_sensor_scenario", "w_x", "w_y", "f"),
+        ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),
         [
-            (False, None, None, None),
-            (True, None, None, None),
-            (True, 3e-6, 20e-6, 30e-3),
-            (False, 3e-6, 20e-6, 30e-3),
+            (False, None, None, None, None),
+            (True, None, None, None, None),
+            (True, 3e-6, 20e-6, 30e-3, False),
+            (False, 3e-6, 20e-6, 30e-3, True),
         ],
     )
     def test_regression(
@@ -181,6 +205,7 @@ class TestDetectorOTFPerturber:
         w_x: Optional[float],
         w_y: Optional[float],
         f: Optional[float],
+        interp: Optional[bool],
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE))
@@ -191,7 +216,7 @@ class TestDetectorOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
 
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f)
+        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
 

@@ -42,6 +42,8 @@ class DetectorOTFPerturber(PerturbImage):
         :param w_x: Detector width in the x direction (m).
         :param w_y: Detector width in the y direction (m).
         :param f: Focal length (m).
+        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
+                       interpoloation
 
         If a value is provided for w_x, w_y and/or f that value(s) will be used in
         the otf calculation.
@@ -96,6 +98,7 @@ class DetectorOTFPerturber(PerturbImage):
 
         self.sensor = sensor
         self.scenario = scenario
+        self.interp = interp
 
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -164,6 +167,7 @@ class DetectorOTFPerturber(PerturbImage):
             "w_x": self.w_x,
             "w_y": self.w_y,
             "f": self.f,
+            "interp": self.interp,
         }
 
         return config
