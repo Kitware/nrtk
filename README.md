@@ -8,7 +8,7 @@ into systems and applications.
 
 We have also created the [`nrtk-jatic`](https://github.com/Kitware/nrtk-jatic) package to support AI T&E
 use-cases and workflows, through interoperability with the [`maite`](https://github.com/mit-ll-ai-technology/maite)
-library and integration with other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use NRTK to 
+library and integration with other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use NRTK to
 perturb MAITE-wrapped datasets or evaluate MAITE-wrapped models should
 start with the `nrtk-jatic` package.
 
@@ -46,7 +46,7 @@ The sphinx-based documentation may also be built locally for the most
 up-to-date reference:
 ```bash
 # Install dependencies
-poetry install --sync --with dev-linting,dev-testing,dev-docs 
+poetry install --sync --with dev-linting,dev-testing,dev-docs
 # Navigate to the documentation root.
 cd docs
 # Build the docs.
@@ -59,20 +59,20 @@ firefox _build/html/index.html
 <!-- :auto developer-tools: -->
 ## Developer tools
 
-**pre-commit hooks**  
+**pre-commit hooks**
 pre-commit hooks are used to ensure that any code meets all linting and
 formatting guidelines required. After installing, this will always run before
- committing to ensure that any commits are following the standards, but you 
- can also manually run the check without committing. If you want to commit 
+ committing to ensure that any commits are following the standards, but you
+ can also manually run the check without committing. If you want to commit
  despite there being errors, you can add `--no-verify` to your commit command.
 
-Installing pre-commit hooks: 
+Installing pre-commit hooks:
 ```bash
-# Ensure that all dependencies are installed  
+# Ensure that all dependencies are installed
 poetry install --sync --with dev-linting,dev-testing,dev-docs
-# Initialize pre-commit for the repository  
-poetry run pre-commit install  
-# Run pre-commit check on all files  
+# Initialize pre-commit for the repository
+poetry run pre-commit install
+# Run pre-commit check on all files
 poetry run pre-commit run --all-files
 ```
 <!-- :auto developer-tools: -->
