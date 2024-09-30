@@ -11,7 +11,7 @@ except ImportError:
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -32,6 +32,7 @@ class JitterOTFPerturber(PerturbImage):
         scenario: Optional[PybsmScenario] = None,
         s_x: Optional[float] = None,
         s_y: Optional[float] = None,
+        interp: Optional[bool] = False,
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
@@ -57,7 +58,10 @@ class JitterOTFPerturber(PerturbImage):
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             (
                 _,
                 _,

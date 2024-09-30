@@ -16,7 +16,7 @@ from pybsm.otf.functional import (
     resample_2D,
     weighted_by_wavelength,
 )
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -37,6 +37,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         scenario: Optional[PybsmScenario] = None,
         mtf_wavelengths: Optional[Sequence[float]] = None,
         mtf_weights: Optional[Sequence[float]] = None,
+        interp: Optional[bool] = False,
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 
@@ -65,7 +66,10 @@ class CircularApertureOTFPerturber(PerturbImage):
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             (
                 _,
                 _,

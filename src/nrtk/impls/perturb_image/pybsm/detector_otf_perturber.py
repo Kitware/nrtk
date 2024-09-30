@@ -11,7 +11,7 @@ except ImportError:
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -33,6 +33,7 @@ class DetectorOTFPerturber(PerturbImage):
         w_x: Optional[float] = None,
         w_y: Optional[float] = None,
         f: Optional[float] = None,
+        interp: Optional[bool] = False,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -58,7 +59,10 @@ class DetectorOTFPerturber(PerturbImage):
         if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
 
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
                 atm, sensor.create_sensor(), sensor.int_time
