@@ -1,5 +1,5 @@
-Steps of the NRTK Release Process
-=================================
+Steps of the Release Process
+============================
 Three types of releases are expected to occur:
   - major
   - minor
