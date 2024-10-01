@@ -29,23 +29,23 @@ CI/CD
 
 * Removed an old opencv version check script.
 
-* Added `syrupy` dependency for snapshot-based regression testing.
+* Added ``syrupy`` dependency for snapshot-based regression testing.
 
 * Numerous changes to help automated the CI/CD process.
 
-* `poetry.lock` file updated for the dev environment.
+* ``poetry.lock`` file updated for the dev environment.
 
 * Updates to dependencies to support the new CI/CD.
 
-* Updated config for `black` to set max line length to 120
+* Updated config for ``black`` to set max line length to 120
 
-* Bumped `pybsm` to 0.7.0.
+* Bumped ``pybsm`` to 0.7.0.
 
-* Changed `opencv-python` to an optional dependency.
+* Changed ``opencv-python`` to an optional dependency.
 
-* Added `opencv-python-headless` as an optional dependency.
+* Added ``opencv-python-headless`` as an optional dependency.
 
-* Added two extras (graphics and headless) for `opencv-python` and `opencv-python-headless` compatibility.
+* Added two extras (graphics and headless) for ``opencv-python`` and ``opencv-python-headless`` compatibility.
 
 * Changed CI to use headless extra.
 
@@ -53,9 +53,9 @@ Documentation
 
 * Updated the readthedocs required packages.
 
-* Removed lfs objects that were in `docs` to allow readthedocs to render.
+* Removed lfs objects that were in ``docs`` to allow readthedocs to render.
 
-* Added sphinx's `autosummary` template for recursively populating
+* Added sphinx's ``autosummary`` template for recursively populating
   docstrings from the module level down to the class method level.
 
 Fixes

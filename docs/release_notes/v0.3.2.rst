@@ -12,9 +12,10 @@ CI/CD
 
 Dependency Vulnerabilities
 
-* Upgraded `Pillow` to `Pillow>=10.2.0`
+* Upgraded ``Pillow`` to ``Pillow>=10.2.0``
 
-* Replaced `jupyter` and `ipython` with `notebook>=7.0.7`, which also future proofed `jupyter notebook` to current package name.
+* Replaced ``jupyter`` and ``ipython`` with ``notebook>=7.0.7``, which also future proofed ``jupyter notebook`` to
+  current package name.
 
 Fixes
 -----

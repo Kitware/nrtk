@@ -77,6 +77,7 @@ pre-commit = ">=2.20"
 ruff = "^0.1.0"
 types-setuptools = ">=65.6.0.1"
 black = {version = ">=24.3.0", extras=["jupyter"]}
+sphinx-lint = ">=1.0.0"
 # :auto dev-linting:
 
 # :auto dev-docs:
