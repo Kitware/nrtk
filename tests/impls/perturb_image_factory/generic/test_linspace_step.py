@@ -5,19 +5,28 @@ from typing import Any, ContextManager, Dict, Optional, Tuple, Type
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_core.configuration import (
     configuration_test_helper,
     from_config_dict,
     to_config_dict,
 )
+from syrupy.assertion import SnapshotAssertion
 
+from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
+from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
+from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
 from nrtk.impls.perturb_image_factory.generic.linspace_step import (
     LinSpacePerturbImageFactory,
 )
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
+from ...perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from ...test_pybsm_utils import TIFFImageSnapshotExtension
+
 DATA_DIR = Path(__file__).parents[3] / "data"
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 class DummyFloatPerturber(PerturbImage):
@@ -203,9 +212,41 @@ class TestFloatStepPertubImageFactory:
             ),
         ],
     )
-    def test_hyrdation_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
+    def test_hydration_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             with open(str(DATA_DIR / config_file_name)) as config_file:
                 config = json.load(config_file)
                 from_config_dict(config, PerturbImageFactory.get_impls())
+
+    @pytest.mark.parametrize(
+        ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),
+        [
+            (JitterOTFPerturber, "s_y", 0, "s_x", 1e-3, 6e-3, 5),
+            (DetectorOTFPerturber, "w_x", 0, "w_y", 4e-3, 9e-3, 5),
+            (TurbulenceApertureOTFPerturber, "altitude", 250, "D", 40e-3, 40e-5, 5),
+        ],
+    )
+    def test_perturb_instance_modification(
+        self,
+        snapshot: SnapshotAssertion,
+        perturber: Type[PerturbImage],
+        modifying_param: str,
+        modifying_val: float,
+        theta_key: str,
+        start: float,
+        stop: float,
+        step: int,
+    ) -> None:
+        """Test perturber instance modificaition for a perturber factory."""
+        perturber_factory = LinSpacePerturbImageFactory(
+            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+        )
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        img_md = {"img_gsd": 3.19 / 160.0}
+        for perturber in perturber_factory:
+            setattr(perturber, modifying_param, modifying_val)
+            out_img = pybsm_perturber_assertions(perturb=perturber, image=img, expected=None, additional_params=img_md)
+            assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(
+                extension_class=TIFFImageSnapshotExtension
+            )

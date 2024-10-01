@@ -74,9 +74,9 @@ class JitterOTFPerturber(PerturbImage):
             weights = spectral_weights[1]
 
             # cut down the wavelength range to only the regions of interests
-            mtf_wavelengths = wavelengths[weights > 0.0]
+            self.mtf_wavelengths = wavelengths[weights > 0.0]
 
-            D = sensor.D  # noqa: N806
+            self.D = sensor.D  # noqa: N806
             self.s_x = s_x if s_x is not None else sensor.s_x
             self.s_y = s_y if s_y is not None else sensor.s_y
 
@@ -88,28 +88,29 @@ class JitterOTFPerturber(PerturbImage):
             # Assume visible spectrum of light
             self.ifov = -1
             self.slant_range = -1
-            mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+            self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            D = 0.003  # noqa: N806
+            self.D = 0.003  # noqa: N806
 
+        self.sensor = sensor
+        self.scenario = scenario
+        self.interp = interp
+
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
-        cutoff_frequency = D / np.min(mtf_wavelengths)
+        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)
         u_rng = np.linspace(-1.0, 1.0, 1501) * cutoff_frequency
         v_rng = np.linspace(1.0, -1.0, 1501) * cutoff_frequency
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-        self.sensor = sensor
-        self.scenario = scenario
-        self.interp = interp
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.jit_OTF = jitter_OTF(uu, vv, self.s_x, self.s_y)
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
         if self.ifov >= 0 and self.slant_range >= 0:

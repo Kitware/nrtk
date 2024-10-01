@@ -157,6 +157,12 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         if self.cn2_at_1m is not None and self.cn2_at_1m <= 0.0:
             raise ValueError("Turbulence effect cannot be applied at ground level")
 
+        self.sensor = sensor
+        self.scenario = scenario
+        self.interp = interp
+
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
@@ -166,9 +172,6 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-        self.sensor = sensor
-        self.scenario = scenario
-        self.interp = interp
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.turbulence_otf, _ = polychromatic_turbulence_OTF(
@@ -185,8 +188,6 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.aircraft_speed,
         )
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
         if self.sensor and self.scenario:

@@ -14,9 +14,11 @@ from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
 from ...test_pybsm_utils import create_sample_sensor_and_scenario
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
-EXPECTED_DEFAULT_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_default_expected_output.tiff"
-EXPECTED_PROVIDED_IMG_FILE = (
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+EXPECTED_DEFAULT_IMG_FILE_PATH = (
+    "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_default_expected_output.tiff"
+)
+EXPECTED_PROVIDED_IMG_FILE_PATH = (
     "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_provided_expected_output.tiff"
 )
 
@@ -59,8 +61,8 @@ class TestCircularApertureOTFPerturber:
         interp: bool,
     ) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE))
-        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
@@ -82,8 +84,8 @@ class TestCircularApertureOTFPerturber:
 
     def test_default_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE))
-        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE_PATH))
         # Test perturb interface directly
         inst = CircularApertureOTFPerturber()
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
@@ -106,7 +108,7 @@ class TestCircularApertureOTFPerturber:
     ) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         sensor, scenario = create_sample_sensor_and_scenario()
         inst = CircularApertureOTFPerturber(
             sensor=sensor,
@@ -132,7 +134,7 @@ class TestCircularApertureOTFPerturber:
     def test_default_reproducibility(self) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = CircularApertureOTFPerturber()
         out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None)
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
@@ -151,7 +153,7 @@ class TestCircularApertureOTFPerturber:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber(image, additional_params)
 
@@ -202,7 +204,7 @@ class TestCircularApertureOTFPerturber:
     def test_default_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
         """Test variations of additional params."""
         perturber = CircularApertureOTFPerturber()
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber(image, additional_params)
 

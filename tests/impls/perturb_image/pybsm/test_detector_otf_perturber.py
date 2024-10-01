@@ -16,7 +16,7 @@ from ...test_pybsm_utils import (
 )
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.mark.skipif(
@@ -59,7 +59,7 @@ class TestDetectorOTFPerturber:
         interp: Optional[bool],
     ) -> None:
         """Ensure results are reproducible."""
-        img = np.array(Image.open(INPUT_IMG_FILE))
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None
@@ -97,7 +97,7 @@ class TestDetectorOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
         perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
-        img = np.array(Image.open(INPUT_IMG_FILE))
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber.perturb(img, additional_params)
 
@@ -208,7 +208,7 @@ class TestDetectorOTFPerturber:
         interp: Optional[bool],
     ) -> None:
         """Regression testing results to detect API changes."""
-        img = np.array(Image.open(INPUT_IMG_FILE))
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None
