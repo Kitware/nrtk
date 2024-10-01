@@ -1,12 +1,12 @@
 v0.4.0
 ======
 
-Updated package code, dependency, and tests to use `pybsm>=0.2.0`.
+Updated package code, dependency, and tests to use ``pybsm>=0.2.0``.
 
 Updates / New Features
 ----------------------
 
-* Updated `pybsm` to `0.2.0`.
+* Updated ``pybsm`` to ``0.2.0``.
 
 Fixes
 -----
