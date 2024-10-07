@@ -19,7 +19,6 @@ classifiers = [
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: Unix',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
@@ -33,20 +32,19 @@ description = "An open source toolkit for evaluating the natural robustness of c
 
 [tool.poetry.dependencies]
 # :auto python-version:
-python = "^3.8.1"
+python = "^3.9"
 # :auto python-version:
 
 # Python capped to <3.13 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.22,<1.25", python = "~3.8"}, # CVE-2021-34141
-    {version = ">=1.22,^1.25", python = ">=3.9,<3.12" }, # CVE-2021-34141
+    {version = ">=1.22,<2.0", python = "<3.12" }, # CVE-2021-34141
     {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
 pybsm = ">=0.7.0"
 Pillow = ">=10.3.0" # CVE-2024-28219
 scikit-image = [
-    {version = ">=0.21,<0.22", python = ">=3.8,<3.12"},
+    {version = ">=0.21", python = "<3.12"},
     {version = ">=0.22", python = ">=3.12"}
 ]
 smqtk-classifier = ">=0.19.0"
@@ -196,7 +194,7 @@ known-first-party = ["nrtk"]
 
 # :auto mypy:
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 disallow_untyped_defs = true
 ignore_errors = false
 ignore_missing_imports = true
