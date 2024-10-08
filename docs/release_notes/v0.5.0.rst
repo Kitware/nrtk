@@ -1,7 +1,7 @@
 v0.5.0
 ======
 
-Updated to use newer version of `pybsm` which included an improvement to Fourier sampling.
+Updated to use newer version of ``pybsm`` which included an improvement to Fourier sampling.
 
 Updates / New Features
 ----------------------
@@ -9,9 +9,9 @@ Updates / New Features
 * Added Sphinx document rendering for MRs. The docs pages can be accessed by clicking the "View App"
   button located in the merge request page under the test pipeline section.
 
-* Updated to use `pybsm`'s new Fourier sampling method
+* Updated to use ``pybsm``'s new Fourier sampling method
 
 Fixes
 -----
 
-* Fix incorrect version range for `numpy`. 
+* Fix incorrect version range for ``numpy``.

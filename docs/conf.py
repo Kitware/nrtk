@@ -36,6 +36,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx-prompt",
     "sphinx_copybutton",
+    "sphinx_click",
 ]
 
 suppress_warnings = [
@@ -47,7 +48,7 @@ suppress_warnings = [
 
 # Autosummary templates reference link:
 # https://github.com/JamesALeedham/Sphinx-Autosummary-Recursion/tree/master
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 

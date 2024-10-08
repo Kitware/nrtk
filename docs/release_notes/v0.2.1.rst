@@ -8,4 +8,4 @@ Fixes
 
 Package
 
-* Fixed author email address to be a valid address (`nrtk@kitware.com`).
+* Fixed author email address to be a valid address (``nrtk@kitware.com``).

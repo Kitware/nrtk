@@ -27,3 +27,8 @@ repos:
         entry: poetry run pflake8
         types: [file, python]
         language: system
+      - id: sphinx-lint
+        name: sphinx-lint
+        entry: poetry run sphinx-lint --enable all --disable leaked-markup --jobs 1 --max-line-length 120 -i docs/_implementations docs
+        types: [rst]
+        language: system

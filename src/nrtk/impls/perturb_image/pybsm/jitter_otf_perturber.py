@@ -45,7 +45,7 @@ class JitterOTFPerturber(PerturbImage):
         will be used for their parameters
 
         If neither s_x, s_y, sensor or scenario parameters are provided, the values
-        of s_x and s_y will be the default of 1.0
+        of s_x and s_y will be the default of 0.0 as that results in a nadir view.
 
         If sensor and scenario parameters are provided, but not s_x and s_y, the
         values of s_x and s_y will come from the sensor and scenario objects.
@@ -77,8 +77,8 @@ class JitterOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.s_x = s_x if s_x is not None else 1.0
-            self.s_y = s_y if s_y is not None else 1.0
+            self.s_x = s_x if s_x is not None else 0.0
+            self.s_y = s_y if s_y is not None else 0.0
             # Assume visible spectrum of light
             self.ifov = -1
             self.slant_range = -1
