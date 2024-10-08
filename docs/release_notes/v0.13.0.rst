@@ -1,6 +1,8 @@
 v0.13.0
 =======
 
+Dropped support for Python 3.8, improved documentation, and updated default values for ``JitterOTFPerturber``.
+
 Updates / New Features
 ----------------------
 
