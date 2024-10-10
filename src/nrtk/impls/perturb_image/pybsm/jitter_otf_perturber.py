@@ -11,7 +11,7 @@ except ImportError:
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -32,6 +32,7 @@ class JitterOTFPerturber(PerturbImage):
         scenario: Optional[PybsmScenario] = None,
         s_x: Optional[float] = None,
         s_y: Optional[float] = None,
+        interp: Optional[bool] = True,
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
@@ -40,6 +41,8 @@ class JitterOTFPerturber(PerturbImage):
         :param scenario: pyBSM scenario object
         :param s_x: root-mean-squared jitter amplitudes in the x direction (rad).
         :param s_y: root-mean-squared jitter amplitudes in the y direction (rad).
+        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
+                interpoloation
 
         If both sensor and scenario parameters are not present, then default values
         will be used for their parameters
@@ -57,7 +60,10 @@ class JitterOTFPerturber(PerturbImage):
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             (
                 _,
                 _,
@@ -97,6 +103,7 @@ class JitterOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         self.sensor = sensor
         self.scenario = scenario
+        self.interp = interp
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.jit_OTF = jitter_OTF(uu, vv, self.s_x, self.s_y)
@@ -162,11 +169,6 @@ class JitterOTFPerturber(PerturbImage):
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        config = {
-            "sensor": sensor,
-            "scenario": scenario,
-            "s_x": self.s_x,
-            "s_y": self.s_y,
-        }
+        config = {"sensor": sensor, "scenario": scenario, "s_x": self.s_x, "s_y": self.s_y, "interp": self.interp}
 
         return config

@@ -41,9 +41,10 @@ class TestTurbulenceApertureOTFPerturber:
             "int_time",
             "n_tdi",
             "aircraft_speed",
+            "interp",
         ),
         [
-            (False, None, None, None, None, None, None, None, None, None, None),
+            (False, None, None, None, None, None, None, None, None, None, None, None),
             (
                 True,
                 [0.50e-6, 0.66e-6],
@@ -56,6 +57,21 @@ class TestTurbulenceApertureOTFPerturber:
                 30e-3,
                 1.0,
                 0,
+                True,
+            ),
+            (
+                True,
+                [0.50e-6, 0.66e-6],
+                [1.0, 1.0],
+                250,
+                250,
+                40e-3,
+                0,
+                1.7e-14,
+                30e-3,
+                1.0,
+                0,
+                False,
             ),
         ],
     )
@@ -72,6 +88,7 @@ class TestTurbulenceApertureOTFPerturber:
         int_time: Optional[float],
         n_tdi: Optional[float],
         aircraft_speed: Optional[float],
+        interp: Optional[bool],
     ) -> None:
         """Ensure results are reproducible."""
         img = np.array(Image.open(INPUT_IMG_FILE))
@@ -95,6 +112,7 @@ class TestTurbulenceApertureOTFPerturber:
             int_time=int_time,
             n_tdi=n_tdi,
             aircraft_speed=aircraft_speed,
+            interp=interp,
         )
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
@@ -193,36 +211,14 @@ class TestTurbulenceApertureOTFPerturber:
             "int_time",
             "n_tdi",
             "aircraft_speed",
+            "interp",
         ),
         [
-            (False, None, None, None, None, None, None, None, None, None, None),
-            (True, None, None, None, None, None, None, None, None, None, None),
-            (
-                True,
-                [0.50e-6, 0.66e-6],
-                [1.0, 1.0],
-                250,
-                250,
-                40e-3,
-                0,
-                1.7e-14,
-                30e-3,
-                1.0,
-                0,
-            ),
-            (
-                False,
-                [0.50e-6, 0.66e-6],
-                [1.0, 1.0],
-                250,
-                250,
-                40e-3,
-                0,
-                1.7e-14,
-                30e-3,
-                1.0,
-                0,
-            ),
+            (False, None, None, None, None, None, None, None, None, None, None, None),
+            (True, None, None, None, None, None, None, None, None, None, None, None),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
         ],
     )
     def test_configuration(
@@ -238,6 +234,7 @@ class TestTurbulenceApertureOTFPerturber:
         int_time: Optional[float],
         n_tdi: Optional[float],
         aircraft_speed: Optional[float],
+        interp: Optional[bool],
     ) -> None:
         """Test configuration stability."""
         sensor = None
@@ -266,6 +263,7 @@ class TestTurbulenceApertureOTFPerturber:
             int_time=int_time,
             n_tdi=n_tdi,
             aircraft_speed=aircraft_speed,
+            interp=interp,
         )
 
         for i in configuration_test_helper(inst):
@@ -385,36 +383,13 @@ class TestTurbulenceApertureOTFPerturber:
             "int_time",
             "n_tdi",
             "aircraft_speed",
+            "interp",
         ),
         [
-            (False, None, None, None, None, None, None, None, None, None, None),
-            (True, None, None, None, None, None, None, None, None, None, None),
-            (
-                True,
-                [0.50e-6, 0.66e-6],
-                [1.0, 1.0],
-                250,
-                250,
-                40e-3,
-                0,
-                1.7e-14,
-                30e-3,
-                1.0,
-                0,
-            ),
-            (
-                False,
-                [0.50e-6, 0.66e-6],
-                [1.0, 1.0],
-                250,
-                250,
-                40e-3,
-                0,
-                1.7e-14,
-                30e-3,
-                1.0,
-                0,
-            ),
+            (False, None, None, None, None, None, None, None, None, None, None, None),
+            (True, None, None, None, None, None, None, None, None, None, None, None),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True),
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
         ],
     )
     def test_regression(
@@ -431,6 +406,7 @@ class TestTurbulenceApertureOTFPerturber:
         int_time: Optional[float],
         n_tdi: Optional[float],
         aircraft_speed: Optional[float],
+        interp: Optional[bool],
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE))
@@ -454,6 +430,7 @@ class TestTurbulenceApertureOTFPerturber:
             int_time=int_time,
             n_tdi=n_tdi,
             aircraft_speed=aircraft_speed,
+            interp=interp,
         )
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
