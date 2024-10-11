@@ -1,6 +1,10 @@
 v0.14.0
 =======
 
+Added a feature to use interpolation to atmospheric data, changed a
+default value for JitterOTFPerturber, and modified how ``pybsm`` and
+``opencv`` optional dependencies are installed.
+
 Updates / New Features
 ----------------------
 
@@ -10,7 +14,7 @@ Documentation
 
 Implementations
 
-* Updated default sx and sy values to 0 for JitterOTFPerturber
+* Updated default sx and sy values to 0 for ``JitterOTFPerturber``
 
 * Added optional usage of load_database_atmosphere_no_interp in addition
   to existing load_database_atmosphere functionality
