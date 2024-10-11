@@ -48,9 +48,9 @@ class StepPerturbImageFactory(PerturbImageFactory):
     @property
     def thetas(self) -> Union[Sequence[float], Sequence[int]]:
         if not self.to_int:
-            return [self.start + i*self.step for i in range(math.ceil((self.stop-self.start)/self.step))]
+            return [self.start + i * self.step for i in range(math.ceil((self.stop - self.start) / self.step))]
         else:
-            return [int(self.start + i*self.step) for i in range(math.ceil((self.stop-self.start)/self.step))]
+            return [int(self.start + i * self.step) for i in range(math.ceil((self.stop - self.start) / self.step))]
 
     @property
     def theta_key(self) -> str:

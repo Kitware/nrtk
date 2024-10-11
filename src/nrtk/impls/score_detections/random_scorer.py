@@ -22,18 +22,14 @@ class RandomScorer(ScoreDetections):
     def score(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Return sequence of random float values equal to the length of the ground truth input."""
         if len(actual) != len(predicted):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise ValueError(
-                    "Actual bounding boxes must have detections and can't be empty."
-                )
+                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
 
         # we include nosemgrep because random.random() is sufficient for our need
         return [random.random() for actual_det in actual]  # nosemgrep

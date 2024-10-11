@@ -12,13 +12,9 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 class TestRandomScorer:
 
-    dummy_actual = [
-        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category": "dummy_class_1"})]
-    ]
+    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category": "dummy_class_1"})]]
     dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
-    dummy_pred_class = _class_map(
-        classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1]
-    )
+    dummy_pred_class = _class_map(classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1])
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
     dummy_actual_test_len_mismatch = [
@@ -35,9 +31,7 @@ class TestRandomScorer:
             (
                 dummy_actual_test_len_mismatch,
                 dummy_predicted,
-                pytest.raises(
-                    ValueError, match=r"Size mismatch between actual and predicted data"
-                ),
+                pytest.raises(ValueError, match=r"Size mismatch between actual and predicted data"),
             ),
             (
                 dummy_empty,
@@ -52,9 +46,7 @@ class TestRandomScorer:
     def test_basic_assertions_and_exceptions(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
         expectation: ContextManager,
     ) -> None:
         """Test basic scorer assertions and exceptions using the helper function from the utils file."""
@@ -78,9 +70,7 @@ class TestRandomScorer:
         self,
         random_seed: int,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ) -> None:
         """Test if the returned random sequence is reproducible with a set random_seed on two different method calls.
 

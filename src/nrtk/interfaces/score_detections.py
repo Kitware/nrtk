@@ -21,9 +21,7 @@ class ScoreDetections(Plugfigurable):
     def score(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Generate a sequence of scores corresponding to a specific metric.
 
@@ -41,9 +39,7 @@ class ScoreDetections(Plugfigurable):
     def __call__(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Alias for :meth:`.ScoreDetection.score`."""
         return self.score(actual, predicted)

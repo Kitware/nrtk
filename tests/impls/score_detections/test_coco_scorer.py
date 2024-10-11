@@ -15,13 +15,9 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 class TestCOCOScorer:
 
-    dummy_actual = [
-        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})]
-    ]
+    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})]]
     dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
-    dummy_pred_class = _class_map(
-        classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1]
-    )
+    dummy_pred_class = _class_map(classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1])
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
     dummy_actual_test_len_mismatch = [
@@ -42,9 +38,7 @@ class TestCOCOScorer:
                 "iscrowd": 0,
             }
         ],
-        "images": [
-            {"id": 1, "file_name": "dummy_img.tif", "width": 128.0, "height": 128.0}
-        ],
+        "images": [{"id": 1, "file_name": "dummy_img.tif", "width": 128.0, "height": 128.0}],
         "categories": [
             {"id": 1, "name": "dummy_class_1"},
             {"id": 2, "name": "dummy_class_2"},
@@ -60,9 +54,7 @@ class TestCOCOScorer:
                 dummy_actual_test_len_mismatch,
                 dummy_predicted,
                 annotation_data,
-                pytest.raises(
-                    ValueError, match=r"Size mismatch between actual and predicted data"
-                ),
+                pytest.raises(ValueError, match=r"Size mismatch between actual and predicted data"),
             ),
             (
                 dummy_empty,
@@ -78,9 +70,7 @@ class TestCOCOScorer:
     def test_basic_assertions_and_exceptions(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
         annotation_data: Dict,
         expectation: ContextManager,
     ) -> None:
@@ -117,9 +107,7 @@ class TestCOCOScorer:
     def test_gt_and_predictions_validity(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
         annotation_data: Dict,
         stat_index: int,
         expectation: ContextManager,
@@ -158,10 +146,7 @@ class TestCOCOScorer:
             cats = ann_json["categories"]
 
             assert any(scorer.cat_ids[idx] == c["id"] for c in cats)
-            assert all(
-                np.concatenate([pred_bbox.min_vertex, pred_bbox.max_vertex])
-                >= np.array([0.0, 0.0, 0.0, 0.0])
-            )
+            assert all(np.concatenate([pred_bbox.min_vertex, pred_bbox.max_vertex]) >= np.array([0.0, 0.0, 0.0, 0.0]))
 
             scorer.score(actual=actual, predicted=predicted)
 

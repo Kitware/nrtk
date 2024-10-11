@@ -75,36 +75,26 @@ class TestSaltNoisePerturber:
             (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
             (
                 np.ones((256, 356, 3), dtype=np.csingle),
-                pytest.raises(
-                    NotImplementedError, match=r"Perturb not implemented for"
-                ),
+                pytest.raises(NotImplementedError, match=r"Perturb not implemented for"),
             ),
         ],
     )
-    def test_no_perturbation(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_no_perturbation(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
 
         This attempts to isolate perturber implementation code from external calls to the extent that
         is possible (quantization errors also possible).
         """
         with expectation:
-            perturber_assertions(
-                perturb=SaltNoisePerturber(amount=0), image=image, expected=image
-            )
+            perturber_assertions(perturb=SaltNoisePerturber(amount=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """Ensure results are reproducible."""
         rng_assertions(perturber=SaltNoisePerturber, rng=rng)
 
-    @pytest.mark.parametrize(
-        ("rng", "amount"), [(42, 0.8), (np.random.default_rng(12345), 0.3)]
-    )
-    def test_configuration(
-        self, rng: Union[np.random.Generator, int], amount: float
-    ) -> None:
+    @pytest.mark.parametrize(("rng", "amount"), [(42, 0.8), (np.random.default_rng(12345), 0.3)])
+    def test_configuration(self, rng: Union[np.random.Generator, int], amount: float) -> None:
         """Test configuration stability."""
         inst = SaltNoisePerturber(rng=rng, amount=amount)
         for i in configuration_test_helper(inst):
@@ -127,9 +117,7 @@ class TestSaltNoisePerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             SaltNoisePerturber(**kwargs)
@@ -144,9 +132,7 @@ class TestPepperNoisePerturber:
 
         # Test perturb interface directly
         inst = PepperNoisePerturber(amount=amount, rng=rng)
-        perturber_assertions(
-            perturb=inst.perturb, image=image, expected=EXPECTED_PEPPER
-        )
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_PEPPER)
 
         # Test callable
         perturber_assertions(
@@ -165,36 +151,26 @@ class TestPepperNoisePerturber:
             (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
             (
                 np.ones((256, 356, 3), dtype=np.csingle),
-                pytest.raises(
-                    NotImplementedError, match=r"Perturb not implemented for"
-                ),
+                pytest.raises(NotImplementedError, match=r"Perturb not implemented for"),
             ),
         ],
     )
-    def test_no_perturbation(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_no_perturbation(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
 
         This attempts to isolate perturber implementation code from external calls to the extent
         that is possible (quantization errors also possible).
         """
         with expectation:
-            perturber_assertions(
-                perturb=PepperNoisePerturber(amount=0), image=image, expected=image
-            )
+            perturber_assertions(perturb=PepperNoisePerturber(amount=0), image=image, expected=image)
 
     @pytest.mark.parametrize("rng", [42, 12345])
     def test_rng(self, rng: int) -> None:
         """Ensure results are reproducible."""
         rng_assertions(perturber=PepperNoisePerturber, rng=rng)
 
-    @pytest.mark.parametrize(
-        ("rng", "amount"), [(42, 0.8), (np.random.default_rng(12345), 0.3)]
-    )
-    def test_configuration(
-        self, rng: Union[np.random.Generator, int], amount: float
-    ) -> None:
+    @pytest.mark.parametrize(("rng", "amount"), [(42, 0.8), (np.random.default_rng(12345), 0.3)])
+    def test_configuration(self, rng: Union[np.random.Generator, int], amount: float) -> None:
         """Test configuration stability."""
         inst = PepperNoisePerturber(rng=rng, amount=amount)
         for i in configuration_test_helper(inst):
@@ -217,9 +193,7 @@ class TestPepperNoisePerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             PepperNoisePerturber(**kwargs)
@@ -234,16 +208,12 @@ class TestSaltAndPepperNoisePerturber:
         salt_vs_pepper = 0.5
 
         # Test perturb interface directly
-        inst = SaltAndPepperNoisePerturber(
-            amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng
-        )
+        inst = SaltAndPepperNoisePerturber(amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng)
         perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SP)
 
         # Test callable
         perturber_assertions(
-            perturb=SaltAndPepperNoisePerturber(
-                amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng
-            ),
+            perturb=SaltAndPepperNoisePerturber(amount=amount, salt_vs_pepper=salt_vs_pepper, rng=rng),
             image=image,
             expected=EXPECTED_SP,
         )
@@ -258,15 +228,11 @@ class TestSaltAndPepperNoisePerturber:
             (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
             (
                 np.ones((256, 356, 3), dtype=np.csingle),
-                pytest.raises(
-                    NotImplementedError, match=r"Perturb not implemented for"
-                ),
+                pytest.raises(NotImplementedError, match=r"Perturb not implemented for"),
             ),
         ],
     )
-    def test_no_perturbation(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_no_perturbation(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
 
         This attempts to isolate perturber implementation code from external calls to the extent
@@ -288,13 +254,9 @@ class TestSaltAndPepperNoisePerturber:
         ("rng", "amount", "salt_vs_pepper"),
         [(42, 0.8, 0.25), (np.random.default_rng(12345), 0.3, 0.2)],
     )
-    def test_configuration(
-        self, rng: Union[np.random.Generator, int], amount: float, salt_vs_pepper: float
-    ) -> None:
+    def test_configuration(self, rng: Union[np.random.Generator, int], amount: float, salt_vs_pepper: float) -> None:
         """Test configuration stability."""
-        inst = SaltAndPepperNoisePerturber(
-            rng=rng, amount=amount, salt_vs_pepper=salt_vs_pepper
-        )
+        inst = SaltAndPepperNoisePerturber(rng=rng, amount=amount, salt_vs_pepper=salt_vs_pepper)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
@@ -308,15 +270,11 @@ class TestSaltAndPepperNoisePerturber:
             ({"amount": 1}, does_not_raise()),
             (
                 {"amount": 1.2},
-                pytest.raises(
-                    ValueError, match=r"SaltAndPepperNoisePerturber invalid amount"
-                ),
+                pytest.raises(ValueError, match=r"SaltAndPepperNoisePerturber invalid amount"),
             ),
             (
                 {"amount": -0.2},
-                pytest.raises(
-                    ValueError, match=r"SaltAndPepperNoisePerturber invalid amount"
-                ),
+                pytest.raises(ValueError, match=r"SaltAndPepperNoisePerturber invalid amount"),
             ),
             ({"salt_vs_pepper": 0.2}, does_not_raise()),
             ({"salt_vs_pepper": 0}, does_not_raise()),
@@ -337,9 +295,7 @@ class TestSaltAndPepperNoisePerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             SaltAndPepperNoisePerturber(**kwargs)
@@ -355,9 +311,7 @@ class TestGaussianNoisePerturber:
 
         # Test perturb interface directly
         inst = GaussianNoisePerturber(mean=mean, var=var, rng=rng)
-        perturber_assertions(
-            perturb=inst.perturb, image=image, expected=EXPECTED_GAUSSIAN
-        )
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_GAUSSIAN)
 
         # Test callable
         perturber_assertions(
@@ -376,15 +330,11 @@ class TestGaussianNoisePerturber:
             (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
             (
                 np.ones((256, 356, 3), dtype=np.csingle),
-                pytest.raises(
-                    NotImplementedError, match=r"Perturb not implemented for"
-                ),
+                pytest.raises(NotImplementedError, match=r"Perturb not implemented for"),
             ),
         ],
     )
-    def test_no_perturbation(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_no_perturbation(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
 
         This attempts to isolate perturber implementation code from external calls to the extent
@@ -406,9 +356,7 @@ class TestGaussianNoisePerturber:
         ("rng", "mean", "var"),
         [(42, 0.8, 0.25), (np.random.default_rng(12345), 0.3, 0.2)],
     )
-    def test_configuration(
-        self, rng: Union[np.random.Generator, int], mean: float, var: float
-    ) -> None:
+    def test_configuration(self, rng: Union[np.random.Generator, int], mean: float, var: float) -> None:
         """Test configuration stability."""
         inst = GaussianNoisePerturber(rng=rng, mean=mean, var=var)
         for i in configuration_test_helper(inst):
@@ -427,9 +375,7 @@ class TestGaussianNoisePerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             GaussianNoisePerturber(**kwargs)
@@ -445,9 +391,7 @@ class TestSpeckleNoisePerturber:
 
         # Test perturb interface directly
         inst = SpeckleNoisePerturber(mean=mean, var=var, rng=rng)
-        perturber_assertions(
-            perturb=inst.perturb, image=image, expected=EXPECTED_SPECKLE
-        )
+        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SPECKLE)
 
         # Test callable
         perturber_assertions(
@@ -466,15 +410,11 @@ class TestSpeckleNoisePerturber:
             (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
             (
                 np.ones((256, 356, 3), dtype=np.csingle),
-                pytest.raises(
-                    NotImplementedError, match=r"Perturb not implemented for"
-                ),
+                pytest.raises(NotImplementedError, match=r"Perturb not implemented for"),
             ),
         ],
     )
-    def test_no_perturbation(
-        self, image: np.ndarray, expectation: ContextManager
-    ) -> None:
+    def test_no_perturbation(self, image: np.ndarray, expectation: ContextManager) -> None:
         """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
 
         This attempts to isolate perturber implementation code from external calls to the extent
@@ -496,9 +436,7 @@ class TestSpeckleNoisePerturber:
         ("rng", "mean", "var"),
         [(42, 0.8, 0.25), (np.random.default_rng(12345), 0.3, 0.2)],
     )
-    def test_configuration(
-        self, rng: Union[np.random.Generator, int], mean: float, var: float
-    ) -> None:
+    def test_configuration(self, rng: Union[np.random.Generator, int], mean: float, var: float) -> None:
         """Test configuration stability."""
         inst = SpeckleNoisePerturber(rng=rng, mean=mean, var=var)
         for i in configuration_test_helper(inst):
@@ -517,20 +455,14 @@ class TestSpeckleNoisePerturber:
             ),
         ],
     )
-    def test_configuration_bounds(
-        self, kwargs: Dict[str, Any], expectation: ContextManager
-    ) -> None:
+    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             SpeckleNoisePerturber(**kwargs)
 
 
 EXPECTED_SALT = np.array([[0, 255, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
-EXPECTED_PEPPER = np.array(
-    [[255, 0, 255], [255, 0, 255], [255, 255, 0]], dtype=np.uint8
-)
+EXPECTED_PEPPER = np.array([[255, 0, 255], [255, 0, 255], [255, 255, 0]], dtype=np.uint8)
 EXPECTED_SP = np.array([[0, 255, 0], [0, 0, 0], [0, 0, 255]], dtype=np.uint8)
 EXPECTED_GAUSSIAN = np.array([[17, 0, 43], [54, 0, 0], [7, 0, 0]], dtype=np.uint8)
-EXPECTED_SPECKLE = np.array(
-    [[255, 196, 255], [255, 144, 181], [255, 237, 254]], dtype=np.uint8
-)
+EXPECTED_SPECKLE = np.array([[255, 196, 255], [255, 144, 181], [255, 237, 254]], dtype=np.uint8)
