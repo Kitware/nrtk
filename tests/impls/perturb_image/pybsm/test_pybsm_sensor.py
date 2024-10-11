@@ -86,10 +86,7 @@ def test_verify_parameters(
         assert sensor.create_sensor().D == D
         assert sensor.create_sensor().f == f
         assert sensor.create_sensor().p_x == p_x
-        assert (
-            sensor.create_sensor().opt_trans_wavelengths.all()
-            == opt_trans_wavelengths.all()
-        )
+        assert sensor.create_sensor().opt_trans_wavelengths.all() == opt_trans_wavelengths.all()
         assert sensor.create_sensor().name == name
 
 

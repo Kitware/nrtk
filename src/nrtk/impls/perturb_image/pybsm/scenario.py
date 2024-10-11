@@ -43,10 +43,7 @@ class PybsmScenario(Configurable):
 
     ihaze_values = [1, 2]
     altitude_values = (
-        [2, 32.55, 75, 150, 225, 500]
-        + list(range(1000, 12001, 1000))
-        + list(range(14000, 20001, 2000))
-        + [24500]
+        [2, 32.55, 75, 150, 225, 500] + list(range(1000, 12001, 1000)) + list(range(14000, 20001, 2000)) + [24500]
     )
     ground_range_values = (
         [0, 100, 500]
@@ -70,9 +67,7 @@ class PybsmScenario(Configurable):
         cn2_at_1m: float = 1.7e-14,
     ):
         if ihaze not in PybsmScenario.ihaze_values:
-            raise ValueError(
-                f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}"
-            )
+            raise ValueError(f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}")
         if altitude not in PybsmScenario.altitude_values:
             raise ValueError(f"Invalid altitude value ({altitude})")
         if ground_range not in PybsmScenario.ground_range_values:
@@ -100,9 +95,7 @@ class PybsmScenario(Configurable):
         return self.name
 
     def create_scenario(self) -> Scenario:
-        S = Scenario(  # noqa:N806
-            self.name, self.ihaze, self.altitude, self.ground_range
-        )
+        S = Scenario(self.name, self.ihaze, self.altitude, self.ground_range)  # noqa:N806
         S.aircraft_speed = self.aircraft_speed
         S.target_reflectance = self.target_reflectance
         S.target_temperature = self.target_temperature

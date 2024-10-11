@@ -60,10 +60,7 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         """
         if amount < 0.0 or amount > 1.0:
-            raise ValueError(
-                f"{type(self).__name__} invalid amount ({amount})."
-                f" Must be in [0.0, 1.0]"
-            )
+            raise ValueError(f"{type(self).__name__} invalid amount ({amount})." f" Must be in [0.0, 1.0]")
 
         super().__init__(rng=rng)
 
@@ -78,9 +75,7 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
 class SaltNoisePerturber(_SPNoisePerturber):
     """Adds salt noise to image stimulus."""
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Return image stimulus with salt noise."""
         if additional_params is None:
             additional_params = dict()
@@ -90,9 +85,7 @@ class SaltNoisePerturber(_SPNoisePerturber):
 class PepperNoisePerturber(_SPNoisePerturber):
     """Adds pepper noise to image stimulus."""
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Return image stimulus with pepper noise."""
         if additional_params is None:
             additional_params = dict()
@@ -117,23 +110,18 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         """
         if salt_vs_pepper < 0.0 or salt_vs_pepper > 1.0:
             raise ValueError(
-                f"{type(self).__name__} invalid salt_vs_pepper ({salt_vs_pepper})."
-                f" Must be in [0.0, 1.0]"
+                f"{type(self).__name__} invalid salt_vs_pepper ({salt_vs_pepper})." f" Must be in [0.0, 1.0]"
             )
 
         super().__init__(amount=amount, rng=rng)
 
         self.salt_vs_pepper = salt_vs_pepper
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Return image stimulus with S&P noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(
-            image, mode="s&p", amount=self.amount, salt_vs_pepper=self.salt_vs_pepper
-        )
+        return self._perturb(image, mode="s&p", amount=self.amount, salt_vs_pepper=self.salt_vs_pepper)
 
     def get_config(self) -> Dict[str, Any]:
         cfg = super().get_config()
@@ -155,9 +143,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         :param var: Variance of random distribution.
         """
         if var < 0:
-            raise ValueError(
-                f"{type(self).__name__} invalid var ({var})." f" Must be >= 0.0"
-            )
+            raise ValueError(f"{type(self).__name__} invalid var ({var})." f" Must be >= 0.0")
 
         super().__init__(rng=rng)
 
@@ -174,9 +160,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
 class GaussianNoisePerturber(_GSNoisePerturber):
     """Adds Gaussian-distributed additive noise to image stimulus."""
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Return image stimulus with Gaussian noise."""
         if additional_params is None:
             additional_params = dict()
@@ -186,9 +170,7 @@ class GaussianNoisePerturber(_GSNoisePerturber):
 class SpeckleNoisePerturber(_GSNoisePerturber):
     """Adds multiplicative noise to image stimulus. Noise is Gaussian-based."""
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Return image stimulus with multiplicative noise."""
         if additional_params is None:
             additional_params = dict()

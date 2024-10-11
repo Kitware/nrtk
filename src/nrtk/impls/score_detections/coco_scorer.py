@@ -30,9 +30,7 @@ class COCOScorer(ScoreDetections):
     def score(
         self,
         actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Computes scores for a particular statistic index.
 
@@ -47,9 +45,7 @@ class COCOScorer(ScoreDetections):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise ValueError(
-                    "Actual bounding boxes must have detections and can't be empty."
-                )
+                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
 
         for act_dets, pred_dets in zip(actual, predicted):
             image_id = act_dets[0][1]["image_id"]
