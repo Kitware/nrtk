@@ -92,14 +92,10 @@ class PerturbImageFactory(Plugfigurable):
         if "perturber" in config_dict:
             perturber_impls = PerturbImage.get_impls()
 
-            type_dict = {
-                pert_impl.get_type_string(): pert_impl for pert_impl in perturber_impls
-            }
+            type_dict = {pert_impl.get_type_string(): pert_impl for pert_impl in perturber_impls}
 
             if config_dict["perturber"] not in type_dict:
-                raise ValueError(
-                    f"{config_dict['perturber']} is not a valid perturber."
-                )
+                raise ValueError(f"{config_dict['perturber']} is not a valid perturber.")
 
             config_dict["perturber"] = type_dict[config_dict["perturber"]]
 

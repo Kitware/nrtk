@@ -70,10 +70,6 @@ def gen_rand_dets(
         """
         x_vals = [random.randrange(im_shape[0]) for _ in range(2)]
         y_vals = [random.randrange(0, im_shape[1]) for _ in range(2)]
-        return AxisAlignedBoundingBox(
-            min_vertex=(min(x_vals), min(y_vals)), max_vertex=(max(x_vals), max(y_vals))
-        )
+        return AxisAlignedBoundingBox(min_vertex=(min(x_vals), min(y_vals)), max_vertex=(max(x_vals), max(y_vals)))
 
-    return [
-        (_get_rand_bbox(im_shape), {"class": random.random()}) for _ in range(n_dets)
-    ]
+    return [(_get_rand_bbox(im_shape), {"class": random.random()}) for _ in range(n_dets)]

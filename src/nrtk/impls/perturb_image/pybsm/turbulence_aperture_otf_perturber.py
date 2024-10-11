@@ -11,7 +11,7 @@ except ImportError:
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -40,6 +40,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         int_time: Optional[float] = None,
         n_tdi: Optional[float] = None,
         aircraft_speed: Optional[float] = None,
+        interp: Optional[float] = True,
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
@@ -92,7 +93,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
                 atm, sensor.create_sensor(), sensor.int_time
             )
@@ -164,6 +168,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         self.sensor = sensor
         self.scenario = scenario
+        self.interp = interp
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.turbulence_otf, _ = polychromatic_turbulence_OTF(
@@ -248,6 +253,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             "int_time": self.int_time,
             "n_tdi": self.n_tdi,
             "aircraft_speed": self.aircraft_speed,
+            "interp": self.interp,
         }
 
         return config

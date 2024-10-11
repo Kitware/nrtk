@@ -22,14 +22,45 @@ EXPECTED_PROVIDED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/jitter_otf_
     reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
 )
 class TestJitterOTFPerturber:
-    def test_provided_consistency(self) -> None:
+    def test_interp_consistency(self) -> None:
+        """Run on a dummy image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        img_gsd = 3.19 / 160.0
+        sensor, scenario = create_sample_sensor_and_scenario()
+        # Test perturb interface directly
+        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
+        inst2 = JitterOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
+        out_image = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            additional_params={"img_gsd": img_gsd},
+        )
+
+        pybsm_perturber_assertions(
+            perturb=inst2.perturb,
+            image=image,
+            expected=out_image,
+            additional_params={"img_gsd": img_gsd},
+        )
+
+    @pytest.mark.parametrize(
+        ("interp"),
+        [
+            (True, False),
+        ],
+    )
+    def test_provided_consistency(
+        self,
+        interp: bool,
+    ) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE))
         expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario)
+        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, interp=interp)
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -58,12 +89,13 @@ class TestJitterOTFPerturber:
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
     @pytest.mark.parametrize("s_y", [0.5, 1.5])
-    def test_provided_reproducibility(self, s_x: float, s_y: float) -> None:
+    @pytest.mark.parametrize("interp", [True, False])
+    def test_provided_reproducibility(self, s_x: float, s_y: float, interp: bool) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y)
+        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
@@ -198,14 +230,16 @@ class TestJitterOTFPerturber:
 
     @pytest.mark.parametrize("s_x", [0.5])
     @pytest.mark.parametrize("s_y", [0.5])
+    @pytest.mark.parametrize("interp", [True, False])
     def test_overall_configuration(
         self,
         s_x: float,
         s_y: float,
+        interp: bool,
     ) -> None:
         """Test configuration stability."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y)
+        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
         for i in configuration_test_helper(inst):
             assert i.s_x == s_x
             assert i.s_y == s_y

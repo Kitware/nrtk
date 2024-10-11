@@ -11,7 +11,7 @@ except ImportError:
 import numpy as np
 import pybsm.radiance as radiance
 from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -33,6 +33,7 @@ class DetectorOTFPerturber(PerturbImage):
         w_x: Optional[float] = None,
         w_y: Optional[float] = None,
         f: Optional[float] = None,
+        interp: Optional[bool] = True,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -41,6 +42,8 @@ class DetectorOTFPerturber(PerturbImage):
         :param w_x: Detector width in the x direction (m).
         :param w_y: Detector width in the y direction (m).
         :param f: Focal length (m).
+        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
+                       interpoloation
 
         If a value is provided for w_x, w_y and/or f that value(s) will be used in
         the otf calculation.
@@ -58,7 +61,10 @@ class DetectorOTFPerturber(PerturbImage):
         if not self.is_usable():
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
 
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
                 atm, sensor.create_sensor(), sensor.int_time
@@ -92,6 +98,7 @@ class DetectorOTFPerturber(PerturbImage):
 
         self.sensor = sensor
         self.scenario = scenario
+        self.interp = interp
 
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -160,6 +167,7 @@ class DetectorOTFPerturber(PerturbImage):
             "w_x": self.w_x,
             "w_y": self.w_y,
             "f": self.f,
+            "interp": self.interp,
         }
 
         return config

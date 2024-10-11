@@ -16,7 +16,7 @@ from pybsm.otf.functional import (
     resample_2D,
     weighted_by_wavelength,
 )
-from pybsm.utils import load_database_atmosphere
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -37,6 +37,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         scenario: Optional[PybsmScenario] = None,
         mtf_wavelengths: Optional[Sequence[float]] = None,
         mtf_weights: Optional[Sequence[float]] = None,
+        interp: Optional[bool] = True,
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 
@@ -45,6 +46,8 @@ class CircularApertureOTFPerturber(PerturbImage):
         :param scenario: pyBSM scenario object
         :param mtf_wavelengths: a numpy array of wavelengths (m)
         :param mtf_wavelengths_weights: a numpy array of weights for each wavelength contribution (arb)
+        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
+                       interpoloation
 
         If both sensor and scenario parameters are absent, then default values
         will be used for their parameters
@@ -65,7 +68,10 @@ class CircularApertureOTFPerturber(PerturbImage):
             raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
 
         if sensor and scenario:
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            if interp:
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            else:
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             (
                 _,
                 _,
@@ -114,6 +120,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         self.sensor = sensor
         self.scenario = scenario
+        self.interp = interp
 
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -192,6 +199,7 @@ class CircularApertureOTFPerturber(PerturbImage):
             "scenario": scenario,
             "mtf_wavelengths": self.mtf_wavelengths,
             "mtf_weights": self.mtf_weights,
+            "interp": self.interp,
         }
 
         return config

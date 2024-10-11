@@ -104,9 +104,7 @@ class TestSNRImageMetric:
                 {"axis": 2},
                 pytest.raises(
                     ValueError,
-                    match=re.escape(
-                        "Invalid axis parameter! Valid axis parameters are: None, 0, 1, (0,1)."
-                    ),
+                    match=re.escape("Invalid axis parameter! Valid axis parameters are: None, 0, 1, (0,1)."),
                 ),
             ),
             (  # single random input image, None, a dict containing "ddof" = -1

@@ -14,9 +14,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
     def __init__(
         self,
         images: Sequence[np.ndarray],
-        ground_truth: Sequence[
-            Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]
-        ],
+        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
     ):
         """Generate response curve for given images and ground_truth.
 
@@ -26,9 +24,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
         :raises ValueError: Images and ground_truth data have a size mismatch.
         """
         if len(images) != len(ground_truth):
-            raise ValueError(
-                "Size mismatch. ground_truth must be provided for each image."
-            )
+            raise ValueError("Size mismatch. ground_truth must be provided for each image.")
         self.images = images
         self.ground_truth = ground_truth
 

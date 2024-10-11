@@ -15,9 +15,7 @@ class NOPPerturber(PerturbImage):
     perturber.
     """
 
-    def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
-    ) -> np.ndarray:
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
         """Return unperturbed image."""
         if additional_params is None:
             additional_params = dict()
