@@ -2878,22 +2878,24 @@ tests = ["pytest"]
 
 [[package]]
 name = "pybsm"
-version = "0.7.0"
+version = "0.8.0"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
-optional = false
-python-versions = "<4.0.0,>=3.8.1"
+optional = true
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pybsm-0.7.0-py3-none-any.whl", hash = "sha256:a5848a41524780ac4fe86c62addd482758167e123fa66b2d4919e9de0118ba04"},
-    {file = "pybsm-0.7.0.tar.gz", hash = "sha256:020a7cddd79d55bba734037e16ad3d5b3072f8d4a44051516227844a62e0f75f"},
+    {file = "pybsm-0.8.0-py3-none-any.whl", hash = "sha256:b59f75a81e378d9f2ac8cb94a6b560b83ff3b2848529afe5a1430b77d25fc892"},
+    {file = "pybsm-0.8.0.tar.gz", hash = "sha256:b25b917ceff730cc00eb97015a0f3e29ed057149d08361b08bcb3497db2e2c99"},
 ]
 
 [package.dependencies]
 matplotlib = ">=3.5.2"
 numpy = [
-    {version = ">=1.25,<2.0", markers = "python_version >= \"3.9\" and python_version < \"3.12\""},
+    {version = ">=1.22,<2.0", markers = "python_version < \"3.12\""},
     {version = ">=1.26,<2.0", markers = "python_version >= \"3.12\" and python_version < \"3.13\""},
 ]
-scipy = {version = ">=1.10.0,<1.14", markers = "python_version >= \"3.9\""}
+opencv-python = {version = ">=4.6", optional = true, markers = "extra == \"graphics\""}
+opencv-python-headless = {version = ">=4.6", optional = true, markers = "extra == \"headless\""}
+scipy = ">=1.10.0,<1.14"
 setuptools = ">=65.6.1"
 
 [package.extras]
@@ -4595,8 +4597,11 @@ type = ["pytest-mypy"]
 [extras]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
+pybsm = ["pybsm", "pybsm", "pybsm"]
+pybsm-graphics = ["pybsm", "pybsm", "pybsm"]
+pybsm-headless = ["pybsm", "pybsm", "pybsm"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "d7a1fe780f671e6fd06af055cb521734ab91ef518594a1dff99a35a94ba4291e"
+content-hash = "4f46de23d5efbf16b7bb4a0ad338d1b36bb1ac68699d772e51d8284f73b431ad"
