@@ -61,7 +61,6 @@ def test_verify_parameters(
     name: str,
     expectation: ContextManager,
 ) -> None:
-
     with expectation:
         pybsm_scenario = PybsmScenario(name, ihaze, altitude, ground_range)
 

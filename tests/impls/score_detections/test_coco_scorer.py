@@ -14,7 +14,6 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 
 class TestCOCOScorer:
-
     dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})]]
     dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
     dummy_pred_class = _class_map(classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1])
