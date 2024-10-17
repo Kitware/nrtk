@@ -28,9 +28,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
     """
 
     @abc.abstractmethod
-    def __getitem__(
-        self, idx: int
-    ) -> Tuple[
+    def __getitem__(self, idx: int) -> Tuple[
         np.ndarray,
         Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
         Dict[str, Any],
