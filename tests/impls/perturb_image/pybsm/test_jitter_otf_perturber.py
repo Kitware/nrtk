@@ -12,9 +12,9 @@ from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturb
 from ...test_pybsm_utils import create_sample_sensor_and_scenario
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
-EXPECTED_DEFAULT_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
-EXPECTED_PROVIDED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
+EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
 
 
 @pytest.mark.skipif(
@@ -24,7 +24,7 @@ EXPECTED_PROVIDED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/jitter_otf_
 class TestJitterOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
@@ -55,8 +55,8 @@ class TestJitterOTFPerturber:
         interp: bool,
     ) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE))
-        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
@@ -78,8 +78,8 @@ class TestJitterOTFPerturber:
 
     def test_default_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE))
-        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE_PATH))
         # Test perturb interface directly
         inst = JitterOTFPerturber()
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
@@ -93,7 +93,7 @@ class TestJitterOTFPerturber:
     def test_provided_reproducibility(self, s_x: float, s_y: float, interp: bool) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         sensor, scenario = create_sample_sensor_and_scenario()
         inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
         img_gsd = 3.19 / 160.0
@@ -113,7 +113,7 @@ class TestJitterOTFPerturber:
     def test_default_reproducibility(self) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = JitterOTFPerturber()
         out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None)
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
@@ -132,7 +132,7 @@ class TestJitterOTFPerturber:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber(image, additional_params)
 
@@ -145,7 +145,7 @@ class TestJitterOTFPerturber:
     def test_default_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
         """Test variations of additional params."""
         perturber = JitterOTFPerturber()
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber(image, additional_params)
 
@@ -158,7 +158,7 @@ class TestJitterOTFPerturber:
     ) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        image = np.array(Image.open(INPUT_IMG_FILE))
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         sensor, scenario = create_sample_sensor_and_scenario()
         inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y)
         img_gsd = 3.19 / 160.0

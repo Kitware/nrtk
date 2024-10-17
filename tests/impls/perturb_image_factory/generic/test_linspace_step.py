@@ -203,7 +203,7 @@ class TestFloatStepPertubImageFactory:
             ),
         ],
     )
-    def test_hyrdation_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
+    def test_hydration_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             with open(str(DATA_DIR / config_file_name)) as config_file:
