@@ -68,9 +68,8 @@ class GenerateBlackboxResponse(Plugfigurable):
         """Number of images for which responses will be generated."""
 
     @abc.abstractmethod
-    def __getitem__(
-        self, idx: int
-    ) -> Union[
+    # noqa
+    def __getitem__(self, idx: int) -> Union[
         Tuple[
             np.ndarray,
             Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
