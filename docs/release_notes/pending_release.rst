@@ -14,5 +14,9 @@ Documentation
 
 * Updated Design Principles link to new URL.
 
+Dependencies
+
+* Reduced minimum version of ``scikit-image`` to ``0.20``.
+
 Fixes
 -----

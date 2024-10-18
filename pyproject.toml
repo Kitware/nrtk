@@ -43,7 +43,7 @@ numpy = [
 ]
 Pillow = ">=10.3.0" # CVE-2024-28219
 scikit-image = [
-    {version = ">=0.21", python = "<3.12"},
+    {version = ">=0.20", python = "<3.12"},
     {version = ">=0.22", python = ">=3.12"}
 ]
 smqtk-classifier = ">=0.19.0"
