@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, TypeVar
 
 try:
     import cv2
@@ -24,6 +24,7 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -35,12 +36,12 @@ C = TypeVar("C", bound="DetectorOTFPerturber")
 class DetectorOTFPerturber(PerturbImage):
     def __init__(
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        w_x: Optional[float] = None,
-        w_y: Optional[float] = None,
-        f: Optional[float] = None,
-        interp: Optional[bool] = True,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
+        w_x: float | None = None,
+        w_y: float | None = None,
+        f: float | None = None,
+        interp: bool = True,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -49,8 +50,8 @@ class DetectorOTFPerturber(PerturbImage):
         :param w_x: Detector width in the x direction (m).
         :param w_y: Detector width in the y direction (m).
         :param f: Focal length (m).
-        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
-                       interpoloation
+        :param interp: a boolean determining whether load_database_atmosphere is used with or without
+                       interpolation
 
         If a value is provided for w_x, w_y and/or f that value(s) will be used in
         the otf calculation.
@@ -79,7 +80,9 @@ class DetectorOTFPerturber(PerturbImage):
                 atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
 
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
-                atm, sensor.create_sensor(), sensor.int_time
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
             )
 
             wavelengths = spectral_weights[0]
@@ -88,7 +91,7 @@ class DetectorOTFPerturber(PerturbImage):
             # cut down the wavelength range to only the regions of interests
             self.mtf_wavelengths = wavelengths[weights > 0.0]
 
-            self.D = sensor.D  # noqa: N806
+            self.D = sensor.D
 
             self.w_x = w_x if w_x is not None else sensor.w_x
             self.w_y = w_y if w_y is not None else sensor.w_y
@@ -106,13 +109,14 @@ class DetectorOTFPerturber(PerturbImage):
             self.slant_range = -1
             self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            self.D = 0.003  # noqa: N806
+            self.D = 0.003
 
         self.sensor = sensor
         self.scenario = scenario
         self.interp = interp
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -150,15 +154,17 @@ class DetectorOTFPerturber(PerturbImage):
 
         return sim_img.astype(np.uint8)
 
+    @override
     @classmethod
-    def get_default_config(cls) -> Dict[str, Any]:
+    def get_default_config(cls) -> dict[str, Any]:
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         return cfg
 
+    @override
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
@@ -169,11 +175,12 @@ class DetectorOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        config = {
+        return {
             "sensor": sensor,
             "scenario": scenario,
             "w_x": self.w_x,
@@ -182,8 +189,7 @@ class DetectorOTFPerturber(PerturbImage):
             "interp": self.interp,
         }
 
-        return config
-
+    @override
     @classmethod
     def is_usable(cls) -> bool:
         # Requires pybsm[graphics] or pybsm[headless]

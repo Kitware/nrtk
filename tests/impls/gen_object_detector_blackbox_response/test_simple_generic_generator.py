@@ -1,6 +1,6 @@
-import random
+from collections.abc import Hashable, Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Dict, Hashable, Sequence, Tuple
 
 import numpy as np
 import pytest
@@ -21,19 +21,21 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 from .test_generator_utils import gen_rand_dets, generator_assertions
 
+rng = np.random.default_rng()
+
 
 class TestSimpleGenerator:
     @pytest.mark.parametrize(
         ("images", "ground_truth", "expectation"),
         [
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(4)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(4)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(4)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(4)],
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11))],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11))],
                 pytest.raises(ValueError, match=r"Size mismatch."),
             ),
         ],
@@ -41,8 +43,8 @@ class TestSimpleGenerator:
     def test_configuration(
         self,
         images: Sequence[np.ndarray],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-        expectation: ContextManager,
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+        expectation: AbstractContextManager,
     ) -> None:
         """Test configuration stability."""
         with expectation:
@@ -56,32 +58,32 @@ class TestSimpleGenerator:
         ("images", "ground_truth", "idx", "expectation"),
         [
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 0,
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 1,
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 2,
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 -1,
                 pytest.raises(IndexError),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 5,
                 pytest.raises(IndexError),
             ),
@@ -90,16 +92,16 @@ class TestSimpleGenerator:
     def test_indexing(
         self,
         images: Sequence[np.ndarray],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
         idx: int,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to index the generator and that len(generator) matches expectations."""
         inst = SimpleGenericGenerator(images=images, ground_truth=ground_truth)
 
         assert len(inst) == len(images)
         with expectation:
-            inst_im, inst_gt, extra = inst[idx]
+            inst_im, inst_gt, _ = inst[idx]
             assert np.array_equal(inst_im, images[idx])
             assert inst_gt == ground_truth[idx]
 
@@ -107,8 +109,8 @@ class TestSimpleGenerator:
         ("images", "ground_truth", "perturber_factories", "verbose"),
         [
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(5)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(5)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(5)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(5)],
                 [
                     StepPerturbImageFactory(
                         perturber=BrightnessPerturber,
@@ -129,8 +131,8 @@ class TestSimpleGenerator:
                 False,
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(2)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
                 [
                     StepPerturbImageFactory(
                         perturber=BrightnessPerturber,
@@ -138,7 +140,7 @@ class TestSimpleGenerator:
                         start=1,
                         stop=6,
                         to_int=True,
-                    )
+                    ),
                 ],
                 True,
             ),
@@ -147,7 +149,7 @@ class TestSimpleGenerator:
     def test_generate(
         self,
         images: Sequence[np.ndarray],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
         perturber_factories: Sequence[PerturbImageFactory],
         verbose: bool,
     ) -> None:

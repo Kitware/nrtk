@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator, Sequence
 from importlib.util import find_spec
-from typing import Any, Dict, Iterable, Iterator, List, Sequence, Type, TypeVar
+from typing import Any, TypeVar
 
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
     to_config_dict,
 )
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -20,15 +22,11 @@ C = TypeVar("C", bound="_PybsmPerturbImageFactory")
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
     @staticmethod
-    def _build_set_list(layer: int, top: Sequence[int]) -> Sequence[List[int]]:
+    def _build_set_list(layer: int, top: Sequence[int]) -> Sequence[list[int]]:
         if layer == len(top) - 1:
             return [[i] for i in range(top[layer])]
-        out = []
-        for i in range(top[layer]):
-            rec = _PybsmPerturbImageFactory._build_set_list(layer + 1, top)
-            for e in rec:
-                out.append([i] + e)
-        return out
+
+        return [[i] + e for i in range(top[layer]) for e in _PybsmPerturbImageFactory._build_set_list(layer + 1, top)]
 
     def __init__(
         self,
@@ -59,39 +57,45 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         top = [len(entry) for entry in self.thetas]
         self.sets = _PybsmPerturbImageFactory._build_set_list(0, top)
 
+    @override
     def __len__(self) -> int:
         return len(self.sets)
 
+    @override
     def __iter__(self) -> Iterator[PerturbImage]:
         self.n = 0
         return self
 
+    @override
     def __next__(self) -> PerturbImage:
         if self.n < len(self.sets):
             kwargs = {k: self.thetas[i][self.sets[self.n][i]] for i, k in enumerate(self.theta_keys)}
             func = PybsmPerturber(self.sensor, self.scenario, **kwargs)
             self.n += 1
             return func
-        else:
-            raise StopIteration
+        raise StopIteration
 
+    @override
     def __getitem__(self, idx: int) -> PerturbImage:
         if idx >= len(self.sets):
             raise IndexError("Index out of range")
         kwargs = {k: self.thetas[i][self.sets[idx][i]] for i, k in enumerate(self.theta_keys)}
-        func = PybsmPerturber(self.sensor, self.scenario, **kwargs)
-        return func
 
+        return PybsmPerturber(self.sensor, self.scenario, **kwargs)
+
+    @override
     @property
     def thetas(self) -> Sequence[Sequence[Any]]:
         return self._thetas
 
+    @override
     @property
     def theta_key(self) -> str:
         return "params"
 
+    @override
     @classmethod
-    def get_default_config(cls) -> Dict[str, Any]:
+    def get_default_config(cls) -> dict[str, Any]:
         cfg = super().get_default_config()
 
         # Remove perturber key if it exists
@@ -102,10 +106,11 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
         return cfg
 
+    @override
     @classmethod
     def from_config(
-        cls: Type[C],
-        config_dict: Dict,
+        cls: type[C],
+        config_dict: dict,
         merge_default: bool = True,
     ) -> C:
         config_dict = dict(config_dict)
@@ -115,7 +120,8 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {
             "theta_keys": self.theta_keys,
             "sensor": to_config_dict(self.sensor),
@@ -123,6 +129,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
             "thetas": self.thetas,
         }
 
+    @override
     @classmethod
     def is_usable(cls) -> bool:
         # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
@@ -138,5 +145,5 @@ class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):
         scenario: PybsmScenario,
         theta_keys: Sequence[str],
         thetas: Sequence[Any],
-    ):
+    ) -> None:
         super().__init__(sensor, scenario, theta_keys, thetas)

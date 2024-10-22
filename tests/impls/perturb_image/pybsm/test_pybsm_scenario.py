@@ -1,6 +1,6 @@
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager
 
 import pytest
 from pybsm.simulation.scenario import Scenario
@@ -72,7 +72,7 @@ def test_verify_parameters(
     altitude: float,
     ground_range: float,
     name: str,
-    expectation: ContextManager,
+    expectation: AbstractContextManager,
 ) -> None:
     with expectation:
         pybsm_scenario = PybsmScenario(name, ihaze, altitude, ground_range)

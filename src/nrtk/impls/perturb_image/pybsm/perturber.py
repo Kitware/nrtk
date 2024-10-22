@@ -26,6 +26,7 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -93,6 +94,7 @@ class PybsmPerturber(PerturbImage):
         # this is key:value record of the thetas use for perturbing
         self.thetas = copy.deepcopy(kwargs)
 
+    @override
     @property
     def params(self) -> dict:
         """
@@ -151,6 +153,7 @@ class PybsmPerturber(PerturbImage):
         """
         return self.sensor.name + " " + self.scenario.name
 
+    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
         """
@@ -165,6 +168,7 @@ class PybsmPerturber(PerturbImage):
         cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
         return cfg
 
+    @override
     @classmethod
     def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
         """
@@ -187,6 +191,7 @@ class PybsmPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """
         Get the current configuration of the perturber.
@@ -201,6 +206,7 @@ class PybsmPerturber(PerturbImage):
             "rng_seed": self._rng_seed,
         }
 
+    @override
     @classmethod
     def is_usable(cls) -> bool:
         """

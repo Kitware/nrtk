@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import re
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Optional
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -10,6 +13,8 @@ from nrtk.impls.image_metric.snr_image_metric import SNRImageMetric, _signal_to_
 
 from .image_metric_utils import image_metric_assertions
 
+rng = np.random.default_rng()
+
 
 class TestSNRImageMetric:
     """This class contains the unit tests for the functionality of the SNRImageMetric impl."""
@@ -18,13 +23,13 @@ class TestSNRImageMetric:
         ("img_1", "img_2", "additional_params", "expectation"),
         [
             (  # single random input image, None, None
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 None,
                 does_not_raise(),
             ),
             (  # single random input image with ndim != 3, None, None
-                np.random.randint(0, 255, (256, 256), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256), dtype=np.uint8),
                 None,
                 None,
                 pytest.raises(
@@ -33,7 +38,7 @@ class TestSNRImageMetric:
                 ),
             ),
             (  # single random input image with height <= 0, None, None
-                np.random.randint(0, 255, (0, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (0, 256, 3), dtype=np.uint8),
                 None,
                 None,
                 pytest.raises(
@@ -42,7 +47,7 @@ class TestSNRImageMetric:
                 ),
             ),
             (  # single random input image with width <= 0, None, None
-                np.random.randint(0, 255, (256, 0, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 0, 3), dtype=np.uint8),
                 None,
                 None,
                 pytest.raises(
@@ -51,7 +56,7 @@ class TestSNRImageMetric:
                 ),
             ),
             (  # single random input image with number of channels = 2, None, None
-                np.random.randint(0, 255, (256, 256, 2), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 2), dtype=np.uint8),
                 None,
                 None,
                 pytest.raises(
@@ -60,8 +65,8 @@ class TestSNRImageMetric:
                 ),
             ),
             (  # two random input images, None
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 pytest.raises(
                     ValueError,
@@ -69,46 +74,48 @@ class TestSNRImageMetric:
                 ),
             ),
             (  # single random input image, None, a dict containing just "axis" = None
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"axis": None},
                 does_not_raise(),
             ),
             (  # single random input image, None, a dict containing just "axis" = 0
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"axis": 0},
                 does_not_raise(),
             ),
             (  # single random input image, None, a dict containing just "axis" = 1
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"axis": 1},
                 does_not_raise(),
             ),
             (  # single random input image, None, a dict containing just "axis" = (0,1)
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"axis": (0, 1)},
                 does_not_raise(),
             ),
             (  # single random input image, None, a dict containing "axis" = 0 and "ddof" = 1
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"axis": 0, "ddof": 1},
                 does_not_raise(),
             ),
             (  # single random input image, None, a dict containing just "axis" = 2
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"axis": 2},
                 pytest.raises(
                     ValueError,
-                    match=re.escape("Invalid axis parameter! Valid axis parameters are: None, 0, 1, (0,1)."),
+                    match=re.escape(
+                        "Invalid axis parameter! Valid axis parameters are: None, 0, 1, (0,1).",
+                    ),
                 ),
             ),
             (  # single random input image, None, a dict containing "ddof" = -1
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"ddof": -1},
                 pytest.raises(
@@ -117,7 +124,7 @@ class TestSNRImageMetric:
                 ),
             ),
             (  # single random input image, None, a dict containing "ddof" = 100000000
-                np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+                rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
                 None,
                 {"ddof": 100000000},
                 pytest.raises(
@@ -146,9 +153,9 @@ class TestSNRImageMetric:
     def test_compute_snr(
         self,
         img_1: np.ndarray,
-        img_2: Optional[np.ndarray],
-        additional_params: Optional[Dict[str, Any]],
-        expectation: ContextManager,
+        img_2: np.ndarray | None,
+        additional_params: dict[str, Any] | None,
+        expectation: AbstractContextManager,
     ) -> None:
         """Test computeSNR with various random image inputs and parameters."""
         with expectation:
@@ -191,7 +198,7 @@ class TestSNRImageMetric:
     @patch("nrtk.impls.image_metric.snr_image_metric._signal_to_noise")
     def test_signal_to_noise(self, mock_signal_to_noise: MagicMock) -> None:
         """Tests that the inputs are properly received inside of _signal_to_noise()."""
-        image = np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8)
+        image = rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
         axis = None
         ddof = 0
 

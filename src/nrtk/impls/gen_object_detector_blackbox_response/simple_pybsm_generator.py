@@ -1,9 +1,11 @@
+from collections.abc import Hashable, Sequence
 from importlib.util import find_spec
-from typing import Any, Dict, Hashable, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 from smqtk_detection import DetectImageObjects
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.gen_object_detector_blackbox_response import (
     GenerateObjectDetectorBlackboxResponse,
@@ -19,8 +21,8 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         self,
         images: Sequence[np.ndarray],
         img_gsds: Sequence[float],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-    ):
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+    ) -> None:
         """Generate response curve for given images and ground_truth.
 
         :param images: Sequence of images to generate responses for.
@@ -42,16 +44,18 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         self.img_gsds = img_gsds
         self.ground_truth = ground_truth
 
+    @override
     def __len__(self) -> int:
         """:return: Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
+    @override
     def __getitem__(
         self, idx: int
-    ) -> Tuple[
+    ) -> tuple[
         np.ndarray,
-        Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
-        Dict[str, Any],
+        Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
+        dict[str, Any],
     ]:
         """Get the image and ground_truth pair for a specific index.
 
@@ -65,13 +69,15 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {"img_gsd": self.img_gsds[idx]}
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {
             "images": self.images,
             "img_gsds": self.img_gsds,
             "ground_truth": self.ground_truth,
         }
 
+    @override
     def generate(
         self,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
@@ -79,7 +85,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         blackbox_scorer: ScoreDetections,
         img_batch_size: int,
         verbose: bool = False,
-    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
+    ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         inter = super().generate(
             blackbox_perturber_factories=blackbox_perturber_factories,
             blackbox_detector=blackbox_detector,
@@ -93,6 +99,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
         return new_curve, inter[1]
 
+    @override
     @classmethod
     def is_usable(cls) -> bool:
         # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]

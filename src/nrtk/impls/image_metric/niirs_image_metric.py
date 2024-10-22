@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import copy
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 
@@ -11,6 +13,7 @@ except ImportError:
     pybsm_available = False
 
 from smqtk_core.configuration import to_config_dict
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -36,11 +39,12 @@ class NIIRSImageMetric(ImageMetric):
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 
+    @override
     def compute(
         self,
-        img_1: Optional[np.ndarray] = None,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_1: np.ndarray | None = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
 
@@ -56,22 +60,18 @@ class NIIRSImageMetric(ImageMetric):
         metrics = niirs5(self.sensor(), self.scenario())
         return metrics.niirs
 
+    @override
     def __call__(
         self,
-        img_1: Optional[np.ndarray] = None,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_1: np.ndarray | None = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
-        """Calls compute() with the given pyBSMSensor and pyBSMScenario.
-
-        See compute() documentation for more information on input arguements.
-
-        :return: Returns the NIIRS metric for the given pyBSMSensor and pyBSMScenario
-        """
         return self.compute()
 
-    def get_config(self) -> Dict[str, Any]:
-        config = {
+    @override
+    def get_config(self) -> dict[str, Any]:
+        return {
             "sensor": to_config_dict(self.sensor),
             "scenario": to_config_dict(self.scenario),
         }

@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import json
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Any, ContextManager, Dict, Optional, Tuple, Type
+from typing import Any
 
 import numpy as np
 import pytest
@@ -19,25 +22,26 @@ from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import Tur
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-
-from ...perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from ...test_pybsm_utils import TIFFImageSnapshotExtension
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 DATA_DIR = Path(__file__).parents[3] / "data"
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 class DummyPerturber(PerturbImage):
-    def __init__(self, param_1: int = 1, param_2: int = 2):
+    def __init__(self, param_1: int = 1, param_2: int = 2) -> None:
         self.param_1 = param_1
         self.param_2 = param_2
 
     def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
+        self,
+        image: np.ndarray,
+        _: dict[str, Any] | None = None,
     ) -> np.ndarray:  # pragma: no cover
         return np.copy(image)
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         return {"param_1": self.param_1, "param_2": self.param_2}
 
 
@@ -53,17 +57,22 @@ class TestStepPerturbImageFactory:
     )
     def test_iteration(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
         step: float,
         to_int: bool,
-        expected: Tuple[float, ...],
+        expected: tuple[float, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
         factory = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step, to_int=to_int
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
+            to_int=to_int,
         )
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
@@ -91,14 +100,14 @@ class TestStepPerturbImageFactory:
     )
     def test_indexing(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
         step: float,
         idx: int,
         expected_val: float,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
         factory = StepPerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
@@ -110,11 +119,22 @@ class TestStepPerturbImageFactory:
         [(DummyPerturber, "param_1", 1.0, 5.0, 2.0, False), (DummyPerturber, "param_2", 3.0, 9.0, 3.0, True)],
     )
     def test_configuration(
-        self, perturber: Type[PerturbImage], theta_key: str, start: float, stop: float, step: float, to_int: bool
+        self,
+        perturber: type[PerturbImage],
+        theta_key: str,
+        start: float,
+        stop: float,
+        step: float,
+        to_int: bool,
     ) -> None:
         """Test configuration stability."""
         inst = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step, to_int=to_int
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
+            to_int=to_int,
         )
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber
@@ -148,7 +168,7 @@ class TestStepPerturbImageFactory:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             StepPerturbImageFactory(**kwargs)
@@ -160,7 +180,7 @@ class TestStepPerturbImageFactory:
     def test_hydration(
         self,
         tmp_path: Path,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
@@ -168,7 +188,11 @@ class TestStepPerturbImageFactory:
     ) -> None:
         """Test configuration hydration using from_config_dict."""
         original_factory = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
         )
 
         original_factory_config = original_factory.get_config()
@@ -197,12 +221,11 @@ class TestStepPerturbImageFactory:
             ),
         ],
     )
-    def test_hydration_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
+    def test_hydration_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
-        with expectation:
-            with open(str(DATA_DIR / config_file_name)) as config_file:
-                config = json.load(config_file)
-                from_config_dict(config, PerturbImageFactory.get_impls())
+        with expectation, open(str(DATA_DIR / config_file_name)) as config_file:
+            config = json.load(config_file)
+            from_config_dict(config, PerturbImageFactory.get_impls())
 
     @pytest.mark.parametrize(
         ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),
@@ -215,7 +238,7 @@ class TestStepPerturbImageFactory:
     def test_perturb_instance_modification(
         self,
         snapshot: SnapshotAssertion,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         modifying_param: str,
         modifying_val: float,
         theta_key: str,
@@ -225,7 +248,12 @@ class TestStepPerturbImageFactory:
     ) -> None:
         """Test perturber instance modification for a perturber factory."""
         perturber_factory = StepPerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step, to_int=False
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
+            to_int=False,
         )
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
@@ -233,5 +261,5 @@ class TestStepPerturbImageFactory:
             setattr(perturber, modifying_param, modifying_val)
             out_img = pybsm_perturber_assertions(perturb=perturber, image=img, expected=None, additional_params=img_md)
             assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(
-                extension_class=TIFFImageSnapshotExtension
+                extension_class=TIFFImageSnapshotExtension,
             )

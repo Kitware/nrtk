@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import abc
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_core import Plugfigurable
@@ -9,7 +11,11 @@ class PerturbImage(Plugfigurable):
     """Algorithm that generates a perturbed image for given input image stimulus as a ``numpy.ndarray`` type array."""
 
     @abc.abstractmethod
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Generate a perturbed image for the given image stimulus.
 
         Note perturbers that resize, rotate, or similarly affect the dimensions of an image may impact
@@ -25,7 +31,11 @@ class PerturbImage(Plugfigurable):
             additional_params = dict()
         return image
 
-    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    def __call__(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Calls ``perturb()`` with the given input image."""
         if additional_params is None:
             additional_params = dict()

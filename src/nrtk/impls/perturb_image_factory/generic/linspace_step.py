@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Sequence, Type
+from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -13,12 +15,12 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
 
     def __init__(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
         step: int = 1,
-    ):
+    ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
@@ -43,13 +45,15 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
         self.stop = stop
         self.step = step
 
+    @override
     @property
     def thetas(self) -> Sequence[float]:
         if self.start == self.stop:
             return []
         return np.linspace(self.start, self.stop, self.step, endpoint=False).tolist()
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         cfg = super().get_config()
         cfg["start"] = self.start
         cfg["stop"] = self.stop

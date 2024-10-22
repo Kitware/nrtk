@@ -1,11 +1,13 @@
 import abc
+from collections.abc import Sequence
 from contextlib import nullcontext
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 from smqtk_classifier import ClassifyImage
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
 from tqdm import tqdm
+from typing_extensions import override
 
 from nrtk.interfaces.gen_blackbox_response import (
     GenerateBlackboxResponse,
@@ -25,8 +27,12 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
     these detections is computed with the given blackbox scorer.
     """
 
+    @override
     @abc.abstractmethod
-    def __getitem__(self, idx: int) -> Tuple[np.ndarray, CLASSIFICATION_DICT_T, Dict[str, Any]]:
+    def __getitem__(
+        self,
+        idx: int,
+    ) -> tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]:
         """Get the ``idx``th image and ground_truth pair."""
 
     def generate(
@@ -36,7 +42,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         blackbox_scorer: ScoreClassifications,
         img_batch_size: int,
         verbose: bool = False,
-    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
+    ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         """Generate item-response curves for given parameters.
 
         :param blackbox_perturber_factories: Sequence of factories to perturb stimuli.
@@ -48,15 +54,15 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         :return: Item-response curve
         :return: Scores for each input stimuli
         """
-        curve: List[Tuple[Dict[str, Any], float]] = list()
-        full: List[Sequence[float]] = list()
+        curve: list[tuple[dict[str, Any], float]] = list()
+        full: list[Sequence[float]] = list()
 
         def process(perturbers: Sequence[PerturbImage]) -> None:
             """Generate item-response curve and individual stimuli scores for this set of perturbers.
 
             :param perturbers: Set of perturbers to perturb image stimuli.
             """
-            image_scores: List[float] = list()
+            image_scores: list[float] = list()
 
             # Generate batch of images and GT detections so we can predict
             # and score in batches
@@ -77,7 +83,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
 
                 scores = blackbox_scorer(
                     actual=batch_gt,
-                    predicted=[b for b in batch_predicted],  # Interface requires list not iterator
+                    predicted=list(batch_predicted),  # Interface requires list not iterator
                 )
                 image_scores.extend(scores)
 
@@ -110,7 +116,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         blackbox_scorer: ScoreClassifications,
         img_batch_size: int,
         verbose: bool = False,
-    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
+    ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         """Alias for :meth: ``.GenerateClassifierBlackboxResponse.generate``."""
         return self.generate(
             blackbox_perturber_factories=blackbox_perturber_factories,

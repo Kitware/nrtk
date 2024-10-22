@@ -1,7 +1,9 @@
 import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
+from importlib.util import find_spec
 from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -163,7 +165,7 @@ class TestPyBSMPerturber:
 
 
 @mock.patch.object(PybsmPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmPerturber.is_usable()

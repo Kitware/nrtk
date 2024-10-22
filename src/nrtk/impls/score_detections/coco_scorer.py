@@ -1,10 +1,12 @@
 import contextlib
-from typing import Any, Dict, Hashable, Sequence, Tuple
+from collections.abc import Hashable, Sequence
+from typing import Any
 
 # 3rd party imports
 from pycocotools.coco import COCO  # type: ignore
 from pycocotools.cocoeval import COCOeval  # type: ignore
 from smqtk_image_io import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.score_detections import ScoreDetections
 
@@ -27,10 +29,11 @@ class COCOScorer(ScoreDetections):
 
         self.cat_ids = {v["name"]: k for k, v in self.coco_gt.cats.items()}
 
+    @override
     def score(
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Computes scores for a particular statistic index.
 
@@ -45,7 +48,9 @@ class COCOScorer(ScoreDetections):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
+                raise ValueError(
+                    "Actual bounding boxes must have detections and can't be empty.",
+                )
 
         for act_dets, pred_dets in zip(actual, predicted):
             image_id = act_dets[0][1]["image_id"]
@@ -112,5 +117,6 @@ class COCOScorer(ScoreDetections):
 
         return final_scores
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {"gt_path": self.gt_path, "stat_index": self.stat_index}

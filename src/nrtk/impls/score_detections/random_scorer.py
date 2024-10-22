@@ -1,7 +1,11 @@
-import random
-from typing import Any, Dict, Hashable, Optional, Sequence, Tuple
+from __future__ import annotations
 
+from collections.abc import Hashable, Sequence
+from typing import Any
+
+import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.score_detections import ScoreDetections
 
@@ -15,24 +19,27 @@ class RandomScorer(ScoreDetections):
     This class, in particular, implements a random scorer that returns random float values.
     """
 
-    def __init__(self, rng: Optional[int] = None):
-        self.rng = rng
-        random.seed(self.rng)
+    def __init__(self, seed: int | None = None) -> None:
+        self.seed = seed
+        self._rng = np.random.default_rng(self.seed)
 
+    @override
     def score(
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Return sequence of random float values equal to the length of the ground truth input."""
         if len(actual) != len(predicted):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
+                raise ValueError(
+                    "Actual bounding boxes must have detections and can't be empty.",
+                )
 
-        # we include nosemgrep because random.random() is sufficient for our need
-        return [random.random() for actual_det in actual]  # nosemgrep
+        return [self._rng.random() for actual_det in actual]
 
-    def get_config(self) -> Dict[str, Any]:
-        return {"rng": self.rng}
+    @override
+    def get_config(self) -> dict[str, Any]:
+        return {"seed": self.seed}

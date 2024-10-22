@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 try:
     from pybsm.simulation.scenario import Scenario
@@ -8,6 +8,7 @@ except ImportError:
     pybsm_available = False
 
 from smqtk_core import Configurable
+from typing_extensions import override
 
 
 class PybsmScenario(Configurable):
@@ -37,7 +38,7 @@ class PybsmScenario(Configurable):
         background_temperature: float = 293.0,
         ha_wind_speed: float = 21.0,
         cn2_at_1m: float = 1.7e-14,
-    ):
+    ) -> None:
         """Wrapper for pybsm.scenario.
 
         ihaze:
@@ -81,7 +82,9 @@ class PybsmScenario(Configurable):
             )
 
         if ihaze not in PybsmScenario.ihaze_values:
-            raise ValueError(f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}")
+            raise ValueError(
+                f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}",
+            )
         if altitude not in PybsmScenario.altitude_values:
             raise ValueError(f"Invalid altitude value ({altitude})")
         if ground_range not in PybsmScenario.ground_range_values:
@@ -123,7 +126,8 @@ class PybsmScenario(Configurable):
         """Alias for :meth:`.StoreScenario.create_scenario`."""
         return self.create_scenario()
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "ihaze": self.ihaze,

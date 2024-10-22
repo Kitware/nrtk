@@ -1,7 +1,9 @@
-from typing import Any, Dict, Hashable, Sequence, Tuple
+from collections.abc import Hashable, Sequence
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.gen_object_detector_blackbox_response import (
     GenerateObjectDetectorBlackboxResponse,
@@ -14,8 +16,8 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
     def __init__(
         self,
         images: Sequence[np.ndarray],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-    ):
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+    ) -> None:
         """Generate response curve for given images and ground_truth.
 
         :param images: Sequence of images to generate responses for.
@@ -24,20 +26,24 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
         :raises ValueError: Images and ground_truth data have a size mismatch.
         """
         if len(images) != len(ground_truth):
-            raise ValueError("Size mismatch. ground_truth must be provided for each image.")
+            raise ValueError(
+                "Size mismatch. ground_truth must be provided for each image.",
+            )
         self.images = images
         self.ground_truth = ground_truth
 
+    @override
     def __len__(self) -> int:
         """:return: Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
+    @override
     def __getitem__(
         self, idx: int
-    ) -> Tuple[
+    ) -> tuple[
         np.ndarray,
-        Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
-        Dict[str, Any],
+        Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
+        dict[str, Any],
     ]:
         """Get the image and ground_truth pair for a specific index.
 
@@ -51,5 +57,6 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {}
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {"images": self.images, "ground_truth": self.ground_truth}

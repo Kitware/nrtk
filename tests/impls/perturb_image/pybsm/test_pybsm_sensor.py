@@ -1,6 +1,8 @@
+from __future__ import annotations
 import unittest.mock as mock
+
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Optional
 
 import numpy as np
 import pytest
@@ -71,9 +73,9 @@ def test_sensor_call() -> None:
 )
 def test_verify_parameters(
     opt_trans_wavelengths: np.ndarray,
-    optics_transmission: Optional[np.ndarray],
+    optics_transmission: np.ndarray | None,
     name: str,
-    expectation: ContextManager,
+    expectation: AbstractContextManager,
 ) -> None:
     D = 0  # noqa:N806
     f = 0

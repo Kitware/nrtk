@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 
@@ -12,6 +12,7 @@ except ImportError:
     pybsm_available = False
 
 from smqtk_core import Configurable
+from typing_extensions import override
 
 C = TypeVar("C", bound="PybsmSensor")
 
@@ -26,10 +27,10 @@ class PybsmSensor(Configurable):
         f: float,
         p_x: float,
         opt_trans_wavelengths: np.ndarray,
-        optics_transmission: Optional[np.ndarray] = None,
+        optics_transmission: np.ndarray | None = None,
         eta: float = 0.0,
-        w_x: Optional[float] = None,
-        w_y: Optional[float] = None,
+        w_x: float | None = None,
+        w_y: float | None = None,
         int_time: float = 1.0,
         n_tdi: float = 1.0,
         dark_current: float = 0.0,
@@ -41,8 +42,8 @@ class PybsmSensor(Configurable):
         s_y: float = 0.0,
         da_x: float = 0.0,
         da_y: float = 0.0,
-        qe_wavelengths: Optional[np.ndarray] = None,
-        qe: Optional[np.ndarray] = None,
+        qe_wavelengths: np.ndarray = None,
+        qe: np.ndarray = None,
     ):
         """Wrapper for pybsm.sensor.
 
@@ -139,7 +140,7 @@ class PybsmSensor(Configurable):
 
         if opt_trans_wavelengths.shape[0] < 2:
             raise ValueError(
-                "At minimum, at least the start and end wavelengths" " must be specified for opt_trans_wavelengths"
+                "At minimum, at least the start and end wavelengths must be specified for opt_trans_wavelengths",
             )
         if opt_trans_wavelengths[0] >= opt_trans_wavelengths[-1]:
             raise ValueError("opt_trans_wavelengths must be ascending")
@@ -226,8 +227,9 @@ class PybsmSensor(Configurable):
         """Alias for :meth:`.StoreSensor.sensor`."""
         return self.create_sensor()
 
+    @override
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
         config_dict = dict(config_dict)
 
         # Convert input data to expected constructor types
@@ -246,7 +248,8 @@ class PybsmSensor(Configurable):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "D": self.D,

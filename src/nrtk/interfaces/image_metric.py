@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import abc
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_core import Plugfigurable
+from typing_extensions import override
 
 
 class ImageMetric(Plugfigurable):
@@ -12,8 +15,8 @@ class ImageMetric(Plugfigurable):
     def compute(
         self,
         img_1: np.ndarray,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given up to two images, and additional parameters, return some given metric about the image(s).
 
@@ -28,8 +31,8 @@ class ImageMetric(Plugfigurable):
     def __call__(
         self,
         img_1: np.ndarray,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Calls compute() with the given input image(s) and additional parameters.
 
@@ -46,6 +49,7 @@ class ImageMetric(Plugfigurable):
     def name(self) -> str:
         return self.__class__.__name__
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         """Returns the config for the interface."""
         return {}

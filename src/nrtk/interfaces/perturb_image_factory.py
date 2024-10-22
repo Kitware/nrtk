@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Dict, Iterator, Sequence, Type, TypeVar
+from collections.abc import Iterator, Sequence
+from typing import Any, TypeVar
 
 from smqtk_core import Plugfigurable
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -13,7 +15,7 @@ C = TypeVar("C", bound="PerturbImageFactory")
 class PerturbImageFactory(Plugfigurable):
     """Factory class for producing PerturbImage instances of a specified type and configuration."""
 
-    def __init__(self, perturber: Type[PerturbImage], theta_key: str):
+    def __init__(self, perturber: type[PerturbImage], theta_key: str) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
@@ -62,8 +64,7 @@ class PerturbImageFactory(Plugfigurable):
             func = self.perturber(**kwargs)
             self.n += 1
             return func
-        else:
-            raise StopIteration
+        raise StopIteration
 
     def __getitem__(self, idx: int) -> PerturbImage:
         """Get the perturber for a specific index.
@@ -77,13 +78,14 @@ class PerturbImageFactory(Plugfigurable):
         if idx < 0 or idx >= len(self.thetas):
             raise IndexError
         kwargs = {self.theta_key: self.thetas[idx]}
-        func = self.perturber(**kwargs)
-        return func
 
+        return self.perturber(**kwargs)
+
+    @override
     @classmethod
     def from_config(
-        cls: Type[C],
-        config_dict: Dict,
+        cls: type[C],
+        config_dict: dict,
         merge_default: bool = True,
     ) -> C:
         config_dict = dict(config_dict)
@@ -95,20 +97,24 @@ class PerturbImageFactory(Plugfigurable):
             type_dict = {pert_impl.get_type_string(): pert_impl for pert_impl in perturber_impls}
 
             if config_dict["perturber"] not in type_dict:
-                raise ValueError(f"{config_dict['perturber']} is not a valid perturber.")
+                raise ValueError(
+                    f"{config_dict['perturber']} is not a valid perturber.",
+                )
 
             config_dict["perturber"] = type_dict[config_dict["perturber"]]
 
         return super().from_config(config_dict, merge_default=merge_default)
 
+    @override
     @classmethod
-    def get_default_config(cls) -> Dict[str, Any]:
+    def get_default_config(cls) -> dict[str, Any]:
         cfg = super().get_default_config()
         cfg["perturber"] = PerturbImage.get_type_string()
 
         return cfg
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_key": self.theta_key,

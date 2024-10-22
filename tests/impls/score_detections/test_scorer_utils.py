@@ -1,10 +1,11 @@
 import copy
-from typing import Any, Callable, Dict, Hashable, Sequence, Tuple
+from collections.abc import Hashable, Sequence
+from typing import Any, Callable
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 
-def _class_map(classes: Sequence, scores: Sequence) -> Dict[Hashable, float]:
+def _class_map(classes: Sequence, scores: Sequence) -> dict[Hashable, float]:
     """Mapping function that returns the class-wise scores dict."""
     d = {}
     for i, c in enumerate(classes):
@@ -16,13 +17,13 @@ def _class_map(classes: Sequence, scores: Sequence) -> Dict[Hashable, float]:
 def scorer_assertions(
     scorer: Callable[
         [
-            Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-            Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+            Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+            Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
         ],
         Sequence[float],
     ],
-    actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-    predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+    actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+    predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
 ) -> None:
     """Basic scorer assertions.
 

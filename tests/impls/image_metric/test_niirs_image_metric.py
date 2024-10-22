@@ -4,8 +4,7 @@ import unittest.mock as mock
 import pytest
 
 from nrtk.impls.image_metric.niirs_image_metric import NIIRSImageMetric
-
-from ..test_pybsm_utils import create_sample_sensor_and_scenario
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
 @pytest.mark.skipif(

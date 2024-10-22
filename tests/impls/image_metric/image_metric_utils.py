@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import copy
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 
 import numpy as np
 
 
 def image_metric_assertions(
-    computation: Callable[[np.ndarray, Optional[np.ndarray], Optional[Dict[str, Any]]], float],
+    computation: Callable[
+        [np.ndarray, np.ndarray | None, dict[str, Any] | None],
+        float,
+    ],
     img_1: np.ndarray,
-    img_2: Optional[np.ndarray] = None,
-    additional_params: Optional[Dict[str, Any]] = None,
+    img_2: np.ndarray | None = None,
+    additional_params: dict[str, Any] | None = None,
 ) -> float:
     """Test that the inputs are not modified while computing an image metric.
 

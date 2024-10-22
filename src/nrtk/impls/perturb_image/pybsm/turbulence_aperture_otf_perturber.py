@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Sequence, Type, TypeVar
+from collections.abc import Sequence
+from typing import Any, TypeVar
 
 try:
     import cv2
@@ -24,6 +25,7 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -35,19 +37,19 @@ C = TypeVar("C", bound="TurbulenceApertureOTFPerturber")
 class TurbulenceApertureOTFPerturber(PerturbImage):
     def __init__(
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        mtf_wavelengths: Optional[Sequence[float]] = None,
-        mtf_weights: Optional[Sequence[float]] = None,
-        altitude: Optional[float] = None,
-        slant_range: Optional[float] = None,
-        D: Optional[float] = None,  # noqa: N803
-        ha_wind_speed: Optional[float] = None,
-        cn2_at_1m: Optional[float] = None,
-        int_time: Optional[float] = None,
-        n_tdi: Optional[float] = None,
-        aircraft_speed: Optional[float] = None,
-        interp: Optional[float] = True,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
+        mtf_wavelengths: Sequence[float] | None = None,
+        mtf_weights: Sequence[float] | None = None,
+        altitude: float | None = None,
+        slant_range: float | None = None,
+        D: float | None = None,  # noqa: N803
+        ha_wind_speed: float | None = None,
+        cn2_at_1m: float | None = None,
+        int_time: float | None = None,
+        n_tdi: float | None = None,
+        aircraft_speed: float | None = None,
+        interp: bool = True,
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
@@ -68,6 +70,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             are used. For CMOS cameras, the value can be assumed to be 1.0)
         :param aircraft_speed: apparent atmospheric velocity (m/s); this can just be the windspeed
             at the sensor position if the sensor is stationary
+        :param interp: a boolean determining whether load_database_atmosphere is used with or without
+                       interpolation
 
         If both sensor and scenario parameters are absent, then default values will be used for
         their parameters.
@@ -109,7 +113,9 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             else:
                 atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
-                atm, sensor.create_sensor(), sensor.int_time
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
             )
 
             wavelengths = spectral_weights[0]
@@ -123,7 +129,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.mtf_weights = np.asarray(mtf_weights) if mtf_weights is not None else weights[pos_weights]
 
             # Sensor paramaters
-            self.D = D if D is not None else sensor.D  # noqa: N806
+            self.D = D if D is not None else sensor.D
             self.int_time = int_time if int_time is not None else sensor.int_time
             self.n_tdi = n_tdi if n_tdi is not None else sensor.n_tdi
 
@@ -143,7 +149,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             )
 
             # Sensor paramaters
-            self.D = D if D is not None else 40e-3  # noqa: N806
+            self.D = D if D is not None else 40e-3
             self.int_time = int_time if int_time is not None else 30e-3
             self.n_tdi = n_tdi if n_tdi is not None else 1.0
 
@@ -172,12 +178,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self.scenario = scenario
         self.interp = interp
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
-        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)  # noqa: N806
+        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)
         u_rng = np.linspace(-1.0, 1.0, 1501) * cutoff_frequency
         v_rng = np.linspace(1.0, -1.0, 1501) * cutoff_frequency
 
@@ -229,15 +236,17 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         return sim_img.astype(np.uint8)
 
+    @override
     @classmethod
-    def get_default_config(cls) -> Dict[str, Any]:
+    def get_default_config(cls) -> dict[str, Any]:
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         return cfg
 
+    @override
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
@@ -248,18 +257,19 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        config = {
+        return {
             "sensor": sensor,
             "scenario": scenario,
             "mtf_wavelengths": self.mtf_wavelengths,
             "mtf_weights": self.mtf_weights,
             "altitude": self.altitude,
             "slant_range": self.slant_range,
-            "D": self.D,  # noqa: N803
+            "D": self.D,
             "ha_wind_speed": self.ha_wind_speed,
             "cn2_at_1m": self.cn2_at_1m,
             "int_time": self.int_time,
@@ -268,8 +278,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             "interp": self.interp,
         }
 
-        return config
-
+    @override
     @classmethod
     def is_usable(cls) -> bool:
         # Requires pybsm[graphics] or pybsm[headless]

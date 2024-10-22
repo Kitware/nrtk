@@ -1,6 +1,9 @@
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -15,11 +18,17 @@ class NOPPerturber(PerturbImage):
     perturber.
     """
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return unperturbed image."""
         if additional_params is None:
             additional_params = dict()
         return np.copy(image)
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {}

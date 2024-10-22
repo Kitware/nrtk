@@ -1,34 +1,39 @@
-from typing import TYPE_CHECKING, Any, Dict, Optional, Protocol, Type, runtime_checkable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import numpy as np
 from PIL import Image, ImageEnhance
 from PIL.Image import Image as PILImage
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
 @runtime_checkable
 class _Enhancement(Protocol):  # Used for type checking only  # pragma: no cover
-    def __init__(self: "_Enhancement", image: PILImage):
+    def __init__(self: _Enhancement, image: PILImage) -> None:
         pass
 
-    def enhance(self: "_Enhancement", factor: float) -> PILImage:
+    def enhance(self: _Enhancement, factor: float) -> PILImage:
         pass
 
 
 class _PILEnhancePerturber(PerturbImage):
-    def __init__(self, factor: float = 1.0):
+    def __init__(self, factor: float = 1.0) -> None:
         """:param factor: Enhancement factor."""
         if factor < 0.0:
-            raise ValueError(f"{type(self).__name__} invalid factor ({factor})." f" Must be >= 0.0")
+            raise ValueError(
+                f"{type(self).__name__} invalid factor ({factor}). Must be >= 0.0",
+            )
 
         self.factor = factor
 
     def _perturb(
         self,
-        enhancement: Type[_Enhancement],
+        enhancement: type[_Enhancement],
         image: np.ndarray,
-        additional_params: Optional[Dict[str, Any]] = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> np.ndarray:
         """Call appropriate enhancement interface and perform any necessary data type conversion.
 
@@ -55,19 +60,28 @@ class _PILEnhancePerturber(PerturbImage):
 
         return image_np
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {"factor": self.factor}
 
 
 class BrightnessPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus brightness."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with adjusted brightness."""
         if additional_params is None:
             additional_params = dict()
         enhancement = ImageEnhance.Brightness
-        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+        if TYPE_CHECKING and not isinstance(
+            enhancement,
+            _Enhancement,
+        ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
 
@@ -75,12 +89,20 @@ class BrightnessPerturber(_PILEnhancePerturber):
 class ColorPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus color balance."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with adjusted color balance."""
         if additional_params is None:
             additional_params = dict()
         enhancement = ImageEnhance.Color
-        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+        if TYPE_CHECKING and not isinstance(
+            enhancement,
+            _Enhancement,
+        ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
 
@@ -88,12 +110,20 @@ class ColorPerturber(_PILEnhancePerturber):
 class ContrastPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus contrast."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with adjusted contrast."""
         if additional_params is None:
             additional_params = dict()
         enhancement = ImageEnhance.Contrast
-        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+        if TYPE_CHECKING and not isinstance(
+            enhancement,
+            _Enhancement,
+        ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)
 
@@ -101,18 +131,28 @@ class ContrastPerturber(_PILEnhancePerturber):
 class SharpnessPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus sharpness."""
 
-    def __init__(self, factor: float = 1.0):
+    def __init__(self, factor: float = 1.0) -> None:
         """:param rng: Enhancement factor."""
         if factor < 0.0 or factor > 2.0:
-            raise ValueError(f"{type(self).__name__} invalid sharpness factor ({factor})." f" Must be in [0.0, 2.0]")
+            raise ValueError(
+                f"{type(self).__name__} invalid sharpness factor ({factor}). Must be in [0.0, 2.0]",
+            )
 
         super().__init__(factor=factor)
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with adjusted sharpness."""
         if additional_params is None:
             additional_params = dict()
         enhancement = ImageEnhance.Sharpness
-        if TYPE_CHECKING and not isinstance(enhancement, _Enhancement):  # pragma: no cover
+        if TYPE_CHECKING and not isinstance(
+            enhancement,
+            _Enhancement,
+        ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
         return self._perturb(enhancement=enhancement, image=image)

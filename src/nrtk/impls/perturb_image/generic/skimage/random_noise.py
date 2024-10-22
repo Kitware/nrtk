@@ -1,13 +1,16 @@
-from typing import Any, Dict, Optional, Union
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 import skimage.util  # type:ignore
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: Optional[Union[np.random.Generator, int]] = None):
+    def __init__(self, rng: np.random.Generator | int | None = None) -> None:
         """:param rng: Pseudo-random number generator or seed."""
         self.rng = rng
 
@@ -44,29 +47,33 @@ class _SKImageNoisePerturber(PerturbImage):
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         return {"rng": self.rng}
 
 
 class _SPNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
-        rng: Optional[Union[np.random.Generator, int]] = None,
+        rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
-    ):
+    ) -> None:
         """Initializes the SPNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         """
         if amount < 0.0 or amount > 1.0:
-            raise ValueError(f"{type(self).__name__} invalid amount ({amount})." f" Must be in [0.0, 1.0]")
+            raise ValueError(
+                f"{type(self).__name__} invalid amount ({amount}). Must be in [0.0, 1.0]",
+            )
 
         super().__init__(rng=rng)
 
         self.amount = amount
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         cfg = super().get_config()
         cfg["amount"] = self.amount
         return cfg
@@ -75,7 +82,12 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
 class SaltNoisePerturber(_SPNoisePerturber):
     """Adds salt noise to image stimulus."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with salt noise."""
         if additional_params is None:
             additional_params = dict()
@@ -85,7 +97,12 @@ class SaltNoisePerturber(_SPNoisePerturber):
 class PepperNoisePerturber(_SPNoisePerturber):
     """Adds pepper noise to image stimulus."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with pepper noise."""
         if additional_params is None:
             additional_params = dict()
@@ -97,10 +114,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     def __init__(
         self,
-        rng: Optional[Union[np.random.Generator, int]] = None,
+        rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
-    ):
+    ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
@@ -110,20 +127,31 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         """
         if salt_vs_pepper < 0.0 or salt_vs_pepper > 1.0:
             raise ValueError(
-                f"{type(self).__name__} invalid salt_vs_pepper ({salt_vs_pepper})." f" Must be in [0.0, 1.0]"
+                f"{type(self).__name__} invalid salt_vs_pepper ({salt_vs_pepper}). Must be in [0.0, 1.0]",
             )
 
         super().__init__(amount=amount, rng=rng)
 
         self.salt_vs_pepper = salt_vs_pepper
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with S&P noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="s&p", amount=self.amount, salt_vs_pepper=self.salt_vs_pepper)
+        return self._perturb(
+            image,
+            mode="s&p",
+            amount=self.amount,
+            salt_vs_pepper=self.salt_vs_pepper,
+        )
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         cfg = super().get_config()
         cfg["salt_vs_pepper"] = self.salt_vs_pepper
         return cfg
@@ -132,10 +160,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 class _GSNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
-        rng: Optional[Union[np.random.Generator, int]] = None,
+        rng: np.random.Generator | int | None = None,
         mean: float = 0.0,
         var: float = 0.05,
-    ):
+    ) -> None:
         """Initializes the GSNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
@@ -143,14 +171,17 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         :param var: Variance of random distribution.
         """
         if var < 0:
-            raise ValueError(f"{type(self).__name__} invalid var ({var})." f" Must be >= 0.0")
+            raise ValueError(
+                f"{type(self).__name__} invalid var ({var}). Must be >= 0.0",
+            )
 
         super().__init__(rng=rng)
 
         self.mean = mean
         self.var = var
 
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         cfg = super().get_config()
         cfg["mean"] = self.mean
         cfg["var"] = self.var
@@ -160,7 +191,12 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
 class GaussianNoisePerturber(_GSNoisePerturber):
     """Adds Gaussian-distributed additive noise to image stimulus."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with Gaussian noise."""
         if additional_params is None:
             additional_params = dict()
@@ -170,7 +206,12 @@ class GaussianNoisePerturber(_GSNoisePerturber):
 class SpeckleNoisePerturber(_GSNoisePerturber):
     """Adds multiplicative noise to image stimulus. Noise is Gaussian-based."""
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Return image stimulus with multiplicative noise."""
         if additional_params is None:
             additional_params = dict()
