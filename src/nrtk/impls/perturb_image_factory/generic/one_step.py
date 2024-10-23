@@ -13,9 +13,9 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         theta_key: str,
         theta_value: float,
     ):
-        """Initialize the factory to produce PerturbImage an instance of the given type.
+        """Initialize the factory to produce an instance of PerturbImage for the given type.
 
-        Initialize the factory to produce PerturbImage an instance of the given type,
+        Initialize the factory to produce an instance of PerturbImage for the given type,
         given the ``theta_key`` and the ``theta_value`` parameters.
 
         :param perturber: Python implementation type of the PerturbImage interface
