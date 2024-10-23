@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: TestStepPerturbImageFactory.test_iteration[DummyPerturber-param_1-1.0]
+  dict({
+    'param_1': 1,
+    'param_2': 2,
+  })
+# ---
+# name: TestStepPerturbImageFactory.test_iteration[DummyPerturber-param_2-3.0]
+  dict({
+    'param_1': 1,
+    'param_2': 3,
+  })
+# ---
