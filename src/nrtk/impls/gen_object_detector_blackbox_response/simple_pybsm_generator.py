@@ -40,7 +40,9 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         """:return: Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
-    def __getitem__(self, idx: int) -> Tuple[
+    def __getitem__(
+        self, idx: int
+    ) -> Tuple[
         np.ndarray,
         Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
         Dict[str, Any],

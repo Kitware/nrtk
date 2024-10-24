@@ -69,7 +69,9 @@ class GenerateBlackboxResponse(Plugfigurable):
 
     @abc.abstractmethod
     # noqa
-    def __getitem__(self, idx: int) -> Union[
+    def __getitem__(
+        self, idx: int
+    ) -> Union[
         Tuple[
             np.ndarray,
             Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]],
