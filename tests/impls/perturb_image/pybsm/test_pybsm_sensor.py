@@ -1,3 +1,4 @@
+import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Optional
 
@@ -9,6 +10,10 @@ from smqtk_core.configuration import configuration_test_helper
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 
 
+@pytest.mark.skipif(
+    not PybsmSensor.is_usable(),
+    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
+)
 @pytest.mark.parametrize("name", ["spatial", "spectra", "hyperspectral"])
 def test_sensor_string_rep(name: str) -> None:
     D = 0  # noqa:N806
@@ -19,6 +24,10 @@ def test_sensor_string_rep(name: str) -> None:
     assert name == str(sensor)
 
 
+@pytest.mark.skipif(
+    not PybsmSensor.is_usable(),
+    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
+)
 def test_sensor_call() -> None:
     D = 0  # noqa:N806
     f = 0
@@ -29,6 +38,10 @@ def test_sensor_call() -> None:
     assert isinstance(sensor(), Sensor)
 
 
+@pytest.mark.skipif(
+    not PybsmSensor.is_usable(),
+    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
+)
 @pytest.mark.parametrize(
     ("opt_trans_wavelengths", "optics_transmission", "name", "expectation"),
     [
@@ -90,6 +103,10 @@ def test_verify_parameters(
         assert sensor.create_sensor().name == name
 
 
+@pytest.mark.skipif(
+    not PybsmSensor.is_usable(),
+    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
+)
 def test_config() -> None:
     """Test configuration stability."""
     D = 0  # noqa:N806
@@ -121,3 +138,17 @@ def test_config() -> None:
         assert i.da_y == inst.da_y
         assert np.array_equal(i.qe_wavelengths, inst.qe_wavelengths)
         assert np.array_equal(i.qe, inst.qe)
+
+
+@mock.patch.object(PybsmSensor, "is_usable")
+def test_missing_deps(mock_is_usable) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not PybsmSensor.is_usable()
+    name = "spatial"
+    D = 0  # noqa:N806
+    f = 0
+    p_x = 0
+    opt_trans_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+    with pytest.raises(ImportError, match=r"pybsm not found"):
+        PybsmSensor(name, D, f, p_x, opt_trans_wavelengths)

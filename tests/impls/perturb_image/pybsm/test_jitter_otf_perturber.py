@@ -19,7 +19,7 @@ EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter
 
 @pytest.mark.skipif(
     not JitterOTFPerturber.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
 )
 class TestJitterOTFPerturber:
     def test_interp_consistency(self) -> None:
@@ -284,5 +284,5 @@ def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not JitterOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
+    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
         JitterOTFPerturber()

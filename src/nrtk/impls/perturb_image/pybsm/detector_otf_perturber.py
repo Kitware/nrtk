@@ -9,9 +9,16 @@ try:
 except ImportError:
     cv2_available = False
 import numpy as np
-import pybsm.radiance as radiance
-from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+try:
+    import pybsm.radiance as radiance
+    from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
+    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -57,9 +64,14 @@ class DetectorOTFPerturber(PerturbImage):
 
         If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
         the absent value(s) will default to 4um for w_x/w_y and 50mm for f
+
+         :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
         if sensor and scenario:
             if interp:
                 atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
@@ -174,5 +186,5 @@ class DetectorOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires opencv to be installed
-        return cv2_available
+        # Requires pybsm[graphics] or pybsm[headless]
+        return cv2_available and pybsm_available

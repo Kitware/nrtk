@@ -9,9 +9,16 @@ try:
 except ImportError:
     cv2_available = False
 import numpy as np
-import pybsm.radiance as radiance
-from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
-from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+try:
+    import pybsm.radiance as radiance
+    from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
+    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -85,12 +92,16 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         If individial parameter values are provided by the user, those values will be used
         in the otf calculation.
 
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         :raises: ValueError if cn2at1m <= 0.0
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
 
         if sensor and scenario:
             if interp:
@@ -261,5 +272,5 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires opencv to be installed
-        return cv2_available
+        # Requires pybsm[graphics] or pybsm[headless]
+        return cv2_available and pybsm_available

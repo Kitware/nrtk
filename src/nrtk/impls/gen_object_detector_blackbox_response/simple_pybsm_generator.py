@@ -26,8 +26,14 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         :param images: Sequence of images to generate responses for.
         :param ground_truth: Sequence of sequences of detections corresponsing to each image.
 
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         :raises ValueError: Images and ground_truth data have a size mismatch.
         """
+        if not self.is_usable():
+            raise ImportError(
+                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'."
+            )
         if len(images) != len(ground_truth):
             raise ValueError("Size mismatch. ground_truth must be provided for each image.")
         if len(images) != len(img_gsds):
@@ -89,5 +95,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires pyBSM which requires opencv to be installed
-        return find_spec("cv2") is not None
+        # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
+        # we don't need to check for opencv because this can run with
+        # a non-opencv pybsm based perturber
+        return find_spec("pybsm") is not None
