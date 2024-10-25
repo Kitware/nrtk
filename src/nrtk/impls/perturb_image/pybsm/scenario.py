@@ -108,7 +108,7 @@ class PybsmScenario(Configurable):
     def __repr__(self) -> str:
         return self.name
 
-    def create_scenario(self) -> Scenario:
+    def create_scenario(self) -> "Scenario":
         S = Scenario(self.name, self.ihaze, self.altitude, self.ground_range)  # noqa:N806
         S.aircraft_speed = self.aircraft_speed
         S.target_reflectance = self.target_reflectance
@@ -119,7 +119,7 @@ class PybsmScenario(Configurable):
         S.cn2_at_1m = self.cn2_at_1m
         return S
 
-    def __call__(self) -> Scenario:
+    def __call__(self) -> "Scenario":
         """Alias for :meth:`.StoreScenario.create_scenario`."""
         return self.create_scenario()
 
