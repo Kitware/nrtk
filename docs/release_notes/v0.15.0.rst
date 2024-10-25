@@ -1,10 +1,13 @@
 v0.15.0
 =======
 
+A couple minor features added, but mostly addressed outdated docs,
+vulnerabilities, and bug fixes.
+
 Updates / New Features
 ----------------------
 
-Code Changes
+Features & Code Updates
 
 * Moved OTF perturber computation to perturb method for OTF perturbers.
 
