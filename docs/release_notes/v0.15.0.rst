@@ -1,0 +1,29 @@
+v0.15.0
+=======
+
+A couple minor features added, but mostly addressed outdated docs,
+vulnerabilities, and bug fixes.
+
+Updates / New Features
+----------------------
+
+Features & Code Updates
+
+* Moved OTF perturber computation to perturb method for OTF perturbers.
+
+* Added and tested ``one_step`` perturber factory
+
+Documentation
+
+* Updated a few links from ``GitLab`` to ``GitHub``.
+
+* Updated Design Principles link to new URL.
+
+Dependencies
+
+* Reduced minimum version of ``scikit-image`` to ``0.20``.
+
+Fixes
+-----
+
+* Added numerous missing guarded imports for ``pybsm`` and ``opencv``.
