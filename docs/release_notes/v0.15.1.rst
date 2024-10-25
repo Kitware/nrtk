@@ -1,6 +1,8 @@
 v0.15.1
 =======
 
+Hotfix to fix missing import issue with returned ``pybsm`` types.
+
 Updates / New Features
 ----------------------
 
