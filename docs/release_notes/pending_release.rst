@@ -22,3 +22,5 @@ Dependencies
 
 Fixes
 -----
+
+* Added numerous missing guarded imports for ``pybsm`` and ``opencv``.

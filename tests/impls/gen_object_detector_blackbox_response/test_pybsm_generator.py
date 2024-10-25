@@ -23,7 +23,7 @@ INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm he
 
 @pytest.mark.skipif(
     not SimplePybsmGenerator.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
 )
 class TestSimplePyBSMGenerator:
     @pytest.mark.parametrize(

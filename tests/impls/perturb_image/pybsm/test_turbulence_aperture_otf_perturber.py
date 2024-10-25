@@ -25,7 +25,7 @@ INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319
 
 @pytest.mark.skipif(
     not TurbulenceApertureOTFPerturber.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
 )
 class TestTurbulenceApertureOTFPerturber:
     @pytest.mark.parametrize(
@@ -443,5 +443,5 @@ def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not TurbulenceApertureOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
+    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
         TurbulenceApertureOTFPerturber()

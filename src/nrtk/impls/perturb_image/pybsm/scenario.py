@@ -1,45 +1,17 @@
 from typing import Any, Dict
 
-from pybsm.simulation.scenario import Scenario
+try:
+    from pybsm.simulation.scenario import Scenario
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core import Configurable
 
 
 class PybsmScenario(Configurable):
-    """Wrapper for pybsm.scenario.
-
-    ihaze:
-        MODTRAN code for visibility, valid options are ihaze = 1 (Rural extinction with 23 km visibility)
-        or ihaze = 2 (Rural extinction with 5 km visibility)
-    altitude:
-        sensor height above ground level in meters.  The database includes the following
-        altitude options: 2 32.55 75 150 225 500 meters, 1000 to 12000 in 1000 meter steps,
-        and 14000 to 20000 in 2000 meter steps, 24500
-    ground_range:
-        distance *on the ground* between the target and sensor in meters.
-        The following ground ranges are included in the database at each altitude
-        until the ground range exceeds the distance to the spherical earth horizon:
-        0 100 500 1000 to 20000 in 1000 meter steps, 22000 to 80000 in 2000 m steps,
-        and  85000 to 300000 in 5000 meter steps.
-    aircraft_speed:
-        ground speed of the aircraft (m/s)
-    target_reflectance:
-        object reflectance (unitless)
-    target_temperature:
-        object temperature (Kelvin)
-    background_reflectance:
-        background reflectance (unitless)
-    background_temperature:
-        background temperature (Kelvin)
-    ha_wind_speed:
-        the high altitude windspeed (m/s).  Used to calculate the turbulence profile.
-    cn2_at_1m:
-        the refractive index structure parameter "near the ground" (e.g. at h = 1 m).
-        Used to calculate the turbulence profile.
-
-    :raises: ValueError if ihaze not in acceptable ihaze values
-    :raises: ValueError if altitude not in acceptable altitude values
-    :raises: ValueError if ground range not in acceptable ground range values
-    """
+    """Wrapper for pybsm.scenario."""
 
     ihaze_values = [1, 2]
     altitude_values = (
@@ -66,6 +38,48 @@ class PybsmScenario(Configurable):
         ha_wind_speed: float = 21.0,
         cn2_at_1m: float = 1.7e-14,
     ):
+        """Wrapper for pybsm.scenario.
+
+        ihaze:
+            MODTRAN code for visibility, valid options are ihaze = 1 (Rural extinction with 23 km visibility)
+            or ihaze = 2 (Rural extinction with 5 km visibility)
+        altitude:
+            sensor height above ground level in meters.  The database includes the following
+            altitude options: 2 32.55 75 150 225 500 meters, 1000 to 12000 in 1000 meter steps,
+            and 14000 to 20000 in 2000 meter steps, 24500
+        ground_range:
+            distance *on the ground* between the target and sensor in meters.
+            The following ground ranges are included in the database at each altitude
+            until the ground range exceeds the distance to the spherical earth horizon:
+            0 100 500 1000 to 20000 in 1000 meter steps, 22000 to 80000 in 2000 m steps,
+            and  85000 to 300000 in 5000 meter steps.
+        aircraft_speed:
+            ground speed of the aircraft (m/s)
+        target_reflectance:
+            object reflectance (unitless)
+        target_temperature:
+            object temperature (Kelvin)
+        background_reflectance:
+            background reflectance (unitless)
+        background_temperature:
+            background temperature (Kelvin)
+        ha_wind_speed:
+            the high altitude windspeed (m/s).  Used to calculate the turbulence profile.
+        cn2_at_1m:
+            the refractive index structure parameter "near the ground" (e.g. at h = 1 m).
+            Used to calculate the turbulence profile.
+
+        :raises: ImportError if pybsm not found,
+        installed via 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.
+        :raises: ValueError if ihaze not in acceptable ihaze values
+        :raises: ValueError if altitude not in acceptable altitude values
+        :raises: ValueError if ground range not in acceptable ground range values
+        """
+        if not self.is_usable():
+            raise ImportError(
+                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'."
+            )
+
         if ihaze not in PybsmScenario.ihaze_values:
             raise ValueError(f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}")
         if altitude not in PybsmScenario.altitude_values:
@@ -123,3 +137,7 @@ class PybsmScenario(Configurable):
             "ha_wind_speed": self.ha_wind_speed,
             "cn2_at_1m": self.cn2_at_1m,
         }
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        return pybsm_available

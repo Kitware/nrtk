@@ -1,6 +1,5 @@
 import unittest.mock as mock
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from typing import Any, ContextManager, Dict
 
 import numpy as np
@@ -16,12 +15,10 @@ from ..test_perturber_utils import pybsm_perturber_assertions
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
 
-is_usable = find_spec("cv2") is not None
-
 
 @pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+    not PybsmPerturber.is_usable(),
+    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
 )
 class TestPyBSMPerturber:
     def test_consistency(self) -> None:
@@ -171,5 +168,5 @@ def test_missing_deps(mock_is_usable) -> None:
     mock_is_usable.return_value = False
     assert not PybsmPerturber.is_usable()
     sensor, scenario = create_sample_sensor_and_scenario()
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
+    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
         PybsmPerturber(sensor=sensor, scenario=scenario)

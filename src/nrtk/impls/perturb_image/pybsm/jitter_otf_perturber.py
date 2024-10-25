@@ -9,9 +9,16 @@ try:
 except ImportError:
     cv2_available = False
 import numpy as np
-import pybsm.radiance as radiance
-from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+try:
+    import pybsm.radiance as radiance
+    from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
+    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -55,9 +62,14 @@ class JitterOTFPerturber(PerturbImage):
 
         If s_x and s_y are ever provided by the user, those values will be used
         in the otf caluclattion
+
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
 
         if sensor and scenario:
             if interp:
@@ -163,8 +175,8 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires opencv to be installed
-        return cv2_available
+        # Requires pybsm[graphics] or pybsm[headless]
+        return cv2_available and pybsm_available
 
     def get_config(self) -> Dict[str, Any]:
         sensor = to_config_dict(self.sensor) if self.sensor else None
