@@ -204,7 +204,7 @@ class PybsmSensor(Configurable):
     def __repr__(self) -> str:
         return self.name
 
-    def create_sensor(self) -> Sensor:
+    def create_sensor(self) -> "Sensor":
         S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # noqa:N806
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta
@@ -222,7 +222,7 @@ class PybsmSensor(Configurable):
         S.qe = self.qe
         return S
 
-    def __call__(self) -> Sensor:
+    def __call__(self) -> "Sensor":
         """Alias for :meth:`.StoreSensor.sensor`."""
         return self.create_sensor()
 
