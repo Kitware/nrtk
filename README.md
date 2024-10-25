@@ -35,6 +35,9 @@ https://nrtk.readthedocs.io/en/latest/installation.html).
 We provide a number of examples based on Jupyter notebooks in the
 `./examples/` directory to show usage of the `nrtk` package in a number
 of different contexts.
+
+Contributions are welcome!
+See the [CONTRIBUTING.md](./CONTRIBUTING.md) file for details.
 <!-- :auto getting-started: -->
 
 <!-- :auto documentation: -->
@@ -80,7 +83,7 @@ poetry run pre-commit run --all-files
 <!-- :auto contributing: -->
 ## Contributing
 - We follow the general guidelines outlined in the
-[JATIC Software Development Plan](https://gitlab.jatic.net/jatic/docs/sdp/-/blob/main/Branch,%20Merge,%20Release%20Strategy.md).
+[JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
 - We use the Git Flow branching strategy.
 - See [docs/release_process.rst](./docs/release_process.rst) for detailed release information.
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) for additional contributing information.

@@ -35,7 +35,7 @@ Quick Start
 .. prompt:: bash
 
     cd /where/things/should/go/
-    git clone https://gitlab.jatic.net/jatic/kitware/nrtk ./
+    git clone https://github.com/kitware/nrtk ./
     poetry install
     poetry run pytest
     cd docs

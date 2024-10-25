@@ -4604,4 +4604,4 @@ pybsm-headless = ["pybsm", "pybsm", "pybsm"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "4f46de23d5efbf16b7bb4a0ad338d1b36bb1ac68699d772e51d8284f73b431ad"
+content-hash = "cc16e8baa1859d461f2df3fb70dbec240f7f6752aa16897256039eef1748c365"

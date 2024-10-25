@@ -9,14 +9,21 @@ try:
 except ImportError:
     cv2_available = False
 import numpy as np
-import pybsm.radiance as radiance
-from pybsm.otf.functional import (
-    circular_aperture_OTF,
-    otf_to_psf,
-    resample_2D,
-    weighted_by_wavelength,
-)
-from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+try:
+    import pybsm.radiance as radiance
+    from pybsm.otf.functional import (
+        circular_aperture_OTF,
+        otf_to_psf,
+        resample_2D,
+        weighted_by_wavelength,
+    )
+    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -61,11 +68,15 @@ class CircularApertureOTFPerturber(PerturbImage):
         If mtf_wavelengths and mtf_weights are provided by the user, those values will be used
         in the otf caluclattion
 
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
 
         if sensor and scenario:
             if interp:
@@ -88,8 +99,8 @@ class CircularApertureOTFPerturber(PerturbImage):
             )
             self.mtf_weights = np.asarray(mtf_weights) if mtf_weights is not None else weights[pos_weights]
 
-            D = sensor.D  # noqa: N806
-            eta = sensor.eta  # noqa: N806
+            self.D = sensor.D  # noqa: N806
+            self.eta = sensor.eta  # noqa: N806
 
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
@@ -106,8 +117,8 @@ class CircularApertureOTFPerturber(PerturbImage):
             self.ifov = -1
             self.slant_range = -1
             # Default value for lens diameter and relative linear obscuration
-            D = 0.003  # noqa: N806
-            eta = 0.0  # noqa: N806
+            self.D = 0.003  # noqa: N806
+            self.eta = 0.0  # noqa: N806
 
         if self.mtf_wavelengths.size == 0:
             raise ValueError("mtf_wavelengths is empty")
@@ -122,24 +133,25 @@ class CircularApertureOTFPerturber(PerturbImage):
         self.scenario = scenario
         self.interp = interp
 
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
-        cutoff_frequency = D / np.min(self.mtf_wavelengths)
+        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)
         u_rng = np.linspace(-1.0, 1.0, 1501) * cutoff_frequency
         v_rng = np.linspace(1.0, -1.0, 1501) * cutoff_frequency
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
+
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
         def ap_function(wavelengths: float) -> np.ndarray:
-            return circular_aperture_OTF(uu, vv, wavelengths, D, eta)  # noqa: E731
+            return circular_aperture_OTF(uu, vv, wavelengths, self.D, self.eta)  # noqa: E731
 
         self.ap_OTF = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
         if self.ifov >= 0 and self.slant_range >= 0:
@@ -206,5 +218,5 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires opencv to be installed
-        return cv2_available
+        # Requires pybsm[graphics] or pybsm[headless]
+        return cv2_available and pybsm_available

@@ -23,7 +23,7 @@ NRTK_PYBSM_CONFIG = DATA_DIR / "nrtk_pybsm_config.json"
 
 @pytest.mark.skipif(
     not CustomPybsmPerturbImageFactory.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
 )
 class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(
@@ -234,5 +234,5 @@ def test_missing_deps(mock_is_usable) -> None:
     sensor, scenario = create_sample_sensor_and_scenario()
     theta_keys = ["altitude"]
     thetas = [[1000, 2000, 3000, 4000]]
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
+    with pytest.raises(ImportError, match=r"pybsm not found"):
         CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)

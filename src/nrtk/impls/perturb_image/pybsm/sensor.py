@@ -3,99 +3,21 @@ from __future__ import annotations
 from typing import Any, Dict, Optional, Type, TypeVar
 
 import numpy as np
-from pybsm.simulation.sensor import Sensor
+
+try:
+    from pybsm.simulation.sensor import Sensor
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core import Configurable
 
 C = TypeVar("C", bound="PybsmSensor")
 
 
 class PybsmSensor(Configurable):
-    """Wrapper for pybsm.sensor.
-
-    Attributes (the first four are mandatory):
-    ------------------------------------------
-    name :
-        name of the sensor (string)
-    D :
-        effective aperture diameter (m)
-    f :
-        focal length (m)
-    p_x and p_y :
-        detector center-to-center spacings (pitch) in the x and y directions (m)
-    opt_trans_wavelengths :
-        numpy array specifying the spectral bandpass of the camera (m).  At
-        minimum, start and end wavelength should be specified.
-    optics_transmission :
-        full system in-band optical transmission (unitless).  Loss due to any
-        telescope obscuration should *not* be included in with this optical transmission
-        array.
-    eta :
-        relative linear obscuration (unitless)
-    w_x and w_y :
-        detector width in the x and y directions (m)
-    int_time :
-        maximum integration time (s)
-    n_tdi:
-        the number of time-delay integration stages (relevant only when TDI cameras
-        are used. For CMOS cameras, the value can be assumed to be 1.0)
-    qe :
-        quantum efficiency as a function of wavelength (e-/photon)
-    qe_wavelengths :
-        wavelengths corresponding to the array qe (m)
-    other_irradiance :
-        spectral irradiance from other sources (W/m^2 m).
-        This is particularly useful for self emission in infrared cameras.  It may
-        also represent stray light.
-    dark_current :
-        detector dark current (e-/s)
-    max_n :
-        detector electron well capacity (e-)
-    max_well_fill :
-        desired well fill, i.e. Maximum well size x Desired fill fraction
-    bit_depth :
-        resolution of the detector ADC in bits (unitless)
-    cold_shield_temperature :
-        temperature of the cold shield (K).  It is a common approximation to assume
-        that the coldshield is at the same temperature as the detector array.
-    optics_temperature :
-        temperature of the optics (K)
-    optics_emissivity :
-        emissivity of the optics (unitless) except for the cold filter.
-        A common approximation is 1-optics transmissivity.
-    cold_filter_transmission :
-        transmission through the cold filter (unitless)
-    cold_filter_temperature :
-        temperature of the cold filter.  It is a common approximation to assume
-        that the filter is at the same temperature as the detector array.
-    cold_filter_emissivity :
-        emissivity through the cold filter (unitless).  A common approximation
-        is 1-cold filter transmission
-    s_x and s_y :
-        Root-mean-squared jitter amplitudes in the x and y directions respectively. (rad)
-    da_x and da_y :
-        line-of-sight angular drift rate during one integration time in the x and y
-        directions respectively. (rad/s)
-    pv :
-        wavefront error phase variance (rad^2) - tip: write as (2*pi*waves of error)^2
-    pv_wavelength :
-        wavelength at which pv is obtained (m)
-    L_x and L_y :
-        correlation lengths of the phase autocorrelation function.  Apparently,
-        it is common to set the L_x and L_y to the aperture diameter.  (m)
-    other_noise :
-        a catch all for noise terms that are not explicitly included elsewhere
-        (read noise, photon noise, dark current, quantization noise are
-        all already included)
-    filter_kernel:
-         2-D filter kernel (for sharpening or whatever).  Note that
-         the kernel is assumed to sum to one.
-    frame_stacks:
-         the number of frames to be added together for improved SNR.
-
-    :raises: ValueError if opt_trans_wavelengths length < 2
-    :raises: ValueError if opt_trans_wavelengths is not ascending
-    :raises: ValueError if opt_trans_wavelengths and (if provided) optics_transmission lengths are different
-    """
+    """Wrapper for pybsm.sensor."""
 
     def __init__(
         self,
@@ -122,6 +44,99 @@ class PybsmSensor(Configurable):
         qe_wavelengths: Optional[np.ndarray] = None,
         qe: Optional[np.ndarray] = None,
     ):
+        """Wrapper for pybsm.sensor.
+
+        Attributes (the first four are mandatory):
+        ------------------------------------------
+        name :
+            name of the sensor (string)
+        D :
+            effective aperture diameter (m)
+        f :
+            focal length (m)
+        p_x and p_y :
+            detector center-to-center spacings (pitch) in the x and y directions (m)
+        opt_trans_wavelengths :
+            numpy array specifying the spectral bandpass of the camera (m).  At
+            minimum, start and end wavelength should be specified.
+        optics_transmission :
+            full system in-band optical transmission (unitless).  Loss due to any
+            telescope obscuration should *not* be included in with this optical transmission
+            array.
+        eta :
+            relative linear obscuration (unitless)
+        w_x and w_y :
+            detector width in the x and y directions (m)
+        int_time :
+            maximum integration time (s)
+        n_tdi:
+            the number of time-delay integration stages (relevant only when TDI cameras
+            are used. For CMOS cameras, the value can be assumed to be 1.0)
+        qe :
+            quantum efficiency as a function of wavelength (e-/photon)
+        qe_wavelengths :
+            wavelengths corresponding to the array qe (m)
+        other_irradiance :
+            spectral irradiance from other sources (W/m^2 m).
+            This is particularly useful for self emission in infrared cameras.  It may
+            also represent stray light.
+        dark_current :
+            detector dark current (e-/s)
+        max_n :
+            detector electron well capacity (e-)
+        max_well_fill :
+            desired well fill, i.e. Maximum well size x Desired fill fraction
+        bit_depth :
+            resolution of the detector ADC in bits (unitless)
+        cold_shield_temperature :
+            temperature of the cold shield (K).  It is a common approximation to assume
+            that the coldshield is at the same temperature as the detector array.
+        optics_temperature :
+            temperature of the optics (K)
+        optics_emissivity :
+            emissivity of the optics (unitless) except for the cold filter.
+            A common approximation is 1-optics transmissivity.
+        cold_filter_transmission :
+            transmission through the cold filter (unitless)
+        cold_filter_temperature :
+            temperature of the cold filter.  It is a common approximation to assume
+            that the filter is at the same temperature as the detector array.
+        cold_filter_emissivity :
+            emissivity through the cold filter (unitless).  A common approximation
+            is 1-cold filter transmission
+        s_x and s_y :
+            Root-mean-squared jitter amplitudes in the x and y directions respectively. (rad)
+        da_x and da_y :
+            line-of-sight angular drift rate during one integration time in the x and y
+            directions respectively. (rad/s)
+        pv :
+            wavefront error phase variance (rad^2) - tip: write as (2*pi*waves of error)^2
+        pv_wavelength :
+            wavelength at which pv is obtained (m)
+        L_x and L_y :
+            correlation lengths of the phase autocorrelation function.  Apparently,
+            it is common to set the L_x and L_y to the aperture diameter.  (m)
+        other_noise :
+            a catch all for noise terms that are not explicitly included elsewhere
+            (read noise, photon noise, dark current, quantization noise are
+            all already included)
+        filter_kernel:
+            2-D filter kernel (for sharpening or whatever).  Note that
+            the kernel is assumed to sum to one.
+        frame_stacks:
+            the number of frames to be added together for improved SNR.
+
+        :raises: ImportError if pybsm not found,
+        installed via 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.
+        :raises: ValueError if opt_trans_wavelengths length < 2
+        :raises: ValueError if opt_trans_wavelengths is not ascending
+        :raises: ValueError if opt_trans_wavelengths and (if provided) optics_transmission lengths are different
+        """
+        if not self.is_usable():
+            raise ImportError(
+                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'."
+            )
+
         if opt_trans_wavelengths.shape[0] < 2:
             raise ValueError(
                 "At minimum, at least the start and end wavelengths" " must be specified for opt_trans_wavelengths"
@@ -256,3 +271,7 @@ class PybsmSensor(Configurable):
             "qe_wavelengths": self.qe_wavelengths.tolist(),
             "qe": self.qe.tolist(),
         }
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        return pybsm_available

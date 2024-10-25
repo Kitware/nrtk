@@ -17,10 +17,10 @@ Image Perturbation
 The core of NRTK is based on image perturbation. NRTK offers a wide variety of ways to perturb
 images. `scikit-image <https://scikit-image.org/>`_, `Pillow <https://pillow.readthedocs.io/en/stable/>`_,
 `openCV <https://pypi.org/project/opencv-python/#documentation-for-opencv-python>`_, and
-`pyBSM  <https://gitlab.jatic.net/jatic/kitware/pybsm>`_ are used for various types of perturbation. The
+`pyBSM  <https://github.com/kitware/pybsm/>`_ are used for various types of perturbation. The
 perturbation classes take an image and perform a transformation based on input parameters. The examples
 shown below focus on a ``pyBSM`` based perturber. To see examples of other perturbations, the
-`perturbers <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/perturbers.ipynb?ref_type=heads>`_
+`perturbers <https://github.com/Kitware/nrtk/blob/main/examples/perturbers.ipynb?ref_type=heads>`_
 notebook shows initialization and use of ``scikit-image``, ``Pillow``, and ``openCV`` perturbers.
 
 For this example, we are going to use the :ref:`PybsmPerturber <PybsmPerturber>` from ``pyBSM``. This
@@ -206,13 +206,13 @@ tasks. The package also provides test orchestration functionality for performing
 sweep of parameters in order to test model response to varying severity of image degradation.
 
 To see examples of image classification and object detection, the
-`coco_scorer <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/coco_scorer.ipynb?ref_type=heads>`_
+`coco_scorer <https://github.com/Kitware/nrtk/blob/main/examples/coco_scorer.ipynb?ref_type=heads>`_
 notebook from the ``examples`` directory shows different scoring techniques. For examples of model response to image
 degradations, there are two notebooks to check out. The
 `simple_generic_generator
-<https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/simple_generic_generator.ipynb?ref_type=heads>`_
+<https://github.com/Kitware/nrtk/blob/main/examples/simple_generic_generator.ipynb?ref_type=heads>`_
 notebook shows model response to image degradation through perturbers based on ``scikit-image``, ``Pillow``, and
 ``openCV``. The
 `simple_pybsm_generator
-<https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/examples/simple_pybsm_generator.ipynb?ref_type=heads>`_
+<https://github.com/Kitware/nrtk/blob/main/examples/simple_pybsm_generator.ipynb?ref_type=heads>`_
 notebook shows model response to image degradation through ``pyBSM``-based perturbers.

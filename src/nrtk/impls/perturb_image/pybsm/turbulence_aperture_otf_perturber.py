@@ -9,9 +9,16 @@ try:
 except ImportError:
     cv2_available = False
 import numpy as np
-import pybsm.radiance as radiance
-from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
-from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+try:
+    import pybsm.radiance as radiance
+    from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
+    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -85,12 +92,16 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         If individial parameter values are provided by the user, those values will be used
         in the otf calculation.
 
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         :raises: ValueError if cn2at1m <= 0.0
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
 
         if sensor and scenario:
             if interp:
@@ -157,6 +168,12 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         if self.cn2_at_1m is not None and self.cn2_at_1m <= 0.0:
             raise ValueError("Turbulence effect cannot be applied at ground level")
 
+        self.sensor = sensor
+        self.scenario = scenario
+        self.interp = interp
+
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
@@ -166,9 +183,6 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-        self.sensor = sensor
-        self.scenario = scenario
-        self.interp = interp
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.turbulence_otf, _ = polychromatic_turbulence_OTF(
@@ -185,8 +199,6 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.aircraft_speed,
         )
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
         if self.sensor and self.scenario:
@@ -260,5 +272,5 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires opencv to be installed
-        return cv2_available
+        # Requires pybsm[graphics] or pybsm[headless]
+        return cv2_available and pybsm_available

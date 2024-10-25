@@ -20,12 +20,12 @@ from ...test_pybsm_utils import (
 )
 from ..test_perturber_utils import pybsm_perturber_assertions
 
-INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.mark.skipif(
     not TurbulenceApertureOTFPerturber.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
+    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
 )
 class TestTurbulenceApertureOTFPerturber:
     @pytest.mark.parametrize(
@@ -91,7 +91,7 @@ class TestTurbulenceApertureOTFPerturber:
         interp: Optional[bool],
     ) -> None:
         """Ensure results are reproducible."""
-        img = np.array(Image.open(INPUT_IMG_FILE))
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None
@@ -143,7 +143,7 @@ class TestTurbulenceApertureOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
         perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
-        img = np.array(Image.open(INPUT_IMG_FILE))
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber.perturb(img, additional_params)
 
@@ -409,7 +409,7 @@ class TestTurbulenceApertureOTFPerturber:
         interp: Optional[bool],
     ) -> None:
         """Regression testing results to detect API changes."""
-        img = np.array(Image.open(INPUT_IMG_FILE))
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None
@@ -443,5 +443,5 @@ def test_missing_deps(mock_is_usable) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not TurbulenceApertureOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
+    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
         TurbulenceApertureOTFPerturber()

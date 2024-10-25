@@ -9,9 +9,16 @@ try:
 except ImportError:
     cv2_available = False
 import numpy as np
-import pybsm.radiance as radiance
-from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
-from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+try:
+    import pybsm.radiance as radiance
+    from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
+    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -57,9 +64,14 @@ class DetectorOTFPerturber(PerturbImage):
 
         If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
         the absent value(s) will default to 4um for w_x/w_y and 50mm for f
+
+         :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
         if sensor and scenario:
             if interp:
                 atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
@@ -74,9 +86,9 @@ class DetectorOTFPerturber(PerturbImage):
             weights = spectral_weights[1]
 
             # cut down the wavelength range to only the regions of interests
-            mtf_wavelengths = wavelengths[weights > 0.0]
+            self.mtf_wavelengths = wavelengths[weights > 0.0]
 
-            D = sensor.D  # noqa: N806
+            self.D = sensor.D  # noqa: N806
 
             self.w_x = w_x if w_x is not None else sensor.w_x
             self.w_y = w_y if w_y is not None else sensor.w_y
@@ -92,29 +104,29 @@ class DetectorOTFPerturber(PerturbImage):
             # Assume visible spectrum of light
             self.ifov = -1
             self.slant_range = -1
-            mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+            self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            D = 0.003  # noqa: N806
+            self.D = 0.003  # noqa: N806
 
         self.sensor = sensor
         self.scenario = scenario
         self.interp = interp
 
+    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
-        cutoff_frequency = D / np.min(mtf_wavelengths)
+        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)
         u_rng = np.linspace(-1.0, 1.0, 1501) * cutoff_frequency
         v_rng = np.linspace(1.0, -1.0, 1501) * cutoff_frequency
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
+        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.det_OTF = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:
             additional_params = dict()
 
@@ -174,5 +186,5 @@ class DetectorOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires opencv to be installed
-        return cv2_available
+        # Requires pybsm[graphics] or pybsm[headless]
+        return cv2_available and pybsm_available

@@ -43,9 +43,14 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         :param scenario: pyBSM scenario object.
         :param theta_keys: Perturber parameter(s) to vary between instances.
         :param theta_keys: Perturber parameter(s) values to vary between instances.
+
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'."
+            )
         self.sensor = sensor
         self.scenario = scenario
         self.theta_keys = theta_keys
@@ -120,8 +125,10 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires pyBSM which requires opencv to be installed
-        return find_spec("cv2") is not None
+        # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
+        # we don't need to check for opencv because this can run with
+        # a non-opencv pybsm based perturber
+        return find_spec("pybsm") is not None
 
 
 class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):

@@ -5,7 +5,14 @@ from importlib.util import find_spec
 from typing import Any, Dict, Optional, Type, TypeVar
 
 import numpy as np
-from pybsm.simulation import RefImage, simulate_image
+
+try:
+    from pybsm.simulation import RefImage, simulate_image
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -35,11 +42,15 @@ class PybsmPerturber(PerturbImage):
         :param scenario: pyBSM scenario object.
         :param reflectance_range: Array of reflectances that correspond to pixel values.
 
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         :raises: ValueError if reflectance_range length != 2
         :raises: ValueError if reflectance_range not strictly ascending
         """
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise ImportError(
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+            )
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 
@@ -130,5 +141,6 @@ class PybsmPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        # Requires pyBSM which requires opencv to be installed
-        return find_spec("cv2") is not None
+        # Requires pybsm[graphics] or pybsm[headless]
+        cv2_check = find_spec("cv2") is not None
+        return cv2_check and pybsm_available

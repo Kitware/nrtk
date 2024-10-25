@@ -2,7 +2,14 @@ import copy
 from typing import Any, Dict, Optional
 
 import numpy as np
-from pybsm.metrics import niirs5
+
+try:
+    from pybsm.metrics import niirs5
+
+    pybsm_available = True
+except ImportError:
+    pybsm_available = False
+
 from smqtk_core.configuration import to_config_dict
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
@@ -18,7 +25,14 @@ class NIIRSImageMetric(ImageMetric):
 
         :param sensor: pyBSM sensor object.
         :param scenario: pyBSM scenario object.
+
+        :raises: ImportError if pyBSM with OpenCV not found,
+        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
+        if not self.is_usable():
+            raise ImportError(
+                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'."
+            )
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 
@@ -63,3 +77,7 @@ class NIIRSImageMetric(ImageMetric):
         }
 
         return config
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        return pybsm_available
