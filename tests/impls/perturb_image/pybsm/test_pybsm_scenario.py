@@ -116,7 +116,7 @@ def test_config() -> None:
 
 
 @mock.patch.object(PybsmScenario, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmScenario.is_usable()

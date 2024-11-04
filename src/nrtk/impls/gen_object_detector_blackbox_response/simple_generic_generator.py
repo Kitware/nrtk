@@ -1,3 +1,27 @@
+"""
+This module defines the `SimpleGenericGenerator` class, an implementation of the
+`GenerateObjectDetectorBlackboxResponse` interface for generating item-response curves
+based on a set of images and ground-truth bounding box annotations.
+
+Classes:
+    SimpleGenericGenerator: An example implementation that generates object detection
+    responses for a sequence of images and their associated ground-truth data.
+
+Dependencies:
+    - numpy for handling image data.
+    - smqtk_image_io for bounding box operations.
+    - nrtk.interfaces for blackbox response generation interface.
+
+Example usage:
+    images = [image1, image2, ...]
+    ground_truth = [
+        [(bbox1, {label1: score1}), (bbox2, {label2: score2})],
+        ...
+    ]
+    generator = SimpleGenericGenerator(images, ground_truth)
+    image, ground_truth, metadata = generator[0]
+"""
+
 from collections.abc import Hashable, Sequence
 from typing import Any
 
@@ -39,7 +63,8 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @override
     def __getitem__(
-        self, idx: int
+        self,
+        idx: int,
     ) -> tuple[
         np.ndarray,
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
@@ -57,6 +82,11 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {}
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Generates a serializable configuration for the instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary containing instance parameters.
+        """
         return {"images": self.images, "ground_truth": self.ground_truth}

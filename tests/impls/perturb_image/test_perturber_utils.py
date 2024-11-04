@@ -43,7 +43,6 @@ def pybsm_perturber_assertions(
     perturb: Callable[[np.ndarray, dict[str, Any]], np.ndarray],
     image: np.ndarray,
     expected: np.ndarray | None = None,
-    random_seed: int = 0,
     additional_params: dict[str, Any] | None = None,
 ) -> np.ndarray:
     """Test some blanket assertions for perturbers.
@@ -61,7 +60,7 @@ def pybsm_perturber_assertions(
     if additional_params is None:
         additional_params = dict()
     copy = np.copy(image)
-    np.random.seed(random_seed)
+
     out_image = perturb(image, additional_params)
 
     assert np.array_equal(image, copy)

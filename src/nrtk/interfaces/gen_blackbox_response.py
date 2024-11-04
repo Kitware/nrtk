@@ -1,3 +1,25 @@
+"""
+This module defines the `GenerateBlackboxResponse` interface and a utility function
+for generating perturber combinations across multiple factories.
+
+Classes:
+    GenerateBlackboxResponse: An interface for generating item-response curves and scores
+    for object detections/classifications from perturbed images in a blackbox model.
+
+Functions:
+    gen_perturber_combinations: Generates combinations of perturbers, selecting one from each factory.
+
+Dependencies:
+    - numpy for numerical operations.
+    - smqtk_core for configuration and plugin support.
+    - smqtk_image_io for image bounding box handling.
+    - smqtk_classifier for classification dictionary typing.
+
+Example usage:
+    factories = [factory1, factory2]
+    perturber_combinations = gen_perturber_combinations(factories)
+"""
+
 import abc
 from collections.abc import Hashable, Sequence
 from typing import Any, Union
@@ -10,7 +32,7 @@ from smqtk_image_io import AxisAlignedBoundingBox
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
-def gen_perturber_combinations(
+def gen_perturber_combinations(  # noqa: C901
     factories: Sequence[PerturbImageFactory],
 ) -> list[list[int]]:
     """Generates list of perturber combinations, including one perturber from each factory.
@@ -66,7 +88,8 @@ class GenerateBlackboxResponse(Plugfigurable):
 
     @abc.abstractmethod
     def __getitem__(
-        self, idx: int
+        self,
+        idx: int,
     ) -> Union[
         tuple[
             np.ndarray,

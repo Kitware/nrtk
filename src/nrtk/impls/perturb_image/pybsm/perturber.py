@@ -1,9 +1,24 @@
 """
-Module: PybsmPerturber
-======================
-This module implements the `PybsmPerturber` class, a specialized perturber for applying pyBSM-based
-perturbations to images. It includes functionality for configuration handling, image perturbation,
-and validation of required dependencies.
+This module provides the `PybsmPerturber` class, which applies image perturbations using
+the pyBSM library. The perturbations are based on a sensor configuration and a scenario,
+allowing for realistic image simulations in remote sensing or other image-processing
+applications.
+
+Classes:
+    PybsmPerturber: Applies image perturbations using pyBSM based on specified sensor and
+    scenario configurations.
+
+Dependencies:
+    - pybsm for simulation and reference image functionality.
+    - nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario for scenario configuration.
+    - nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor for sensor configuration.
+    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+
+Example usage:
+    sensor = PybsmSensor(...)
+    scenario = PybsmScenario(...)
+    perturber = PybsmPerturber(sensor=sensor, scenario=scenario)
+    perturbed_image = perturber.perturb(image)
 """
 
 from __future__ import annotations
@@ -39,16 +54,16 @@ DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call
 
 class PybsmPerturber(PerturbImage):
     """
-    Implements a perturber that uses pyBSM simulate_image for applying controlled
-    perturbations to images. Supports configuration-based initialization and validation
-    of pyBSM dependencies.
+    Implements image perturbation using pyBSM sensor and scenario configurations.
+
+    The `PybsmPerturber` class applies realistic perturbations to images by leveraging
+    pyBSM's simulation functionalities. It takes in a sensor and scenario, along with
+    other optional parameters, to simulate environmental effects on the image.
 
     Attributes:
-        sensor (PybsmSensor): The pyBSM sensor object used for simulations.
-        scenario (PybsmScenario): The pyBSM scenario object used for simulations.
-        reflectance_range (np.ndarray): A 2-element array defining pixel reflectance range.
-        thetas (dict[str, Any]): Dictionary storing parameters used for perturbations.
-        _rng_seed (int): Random number generator seed.
+        sensor (PybsmSensor): The sensor configuration for the perturbation.
+        scenario (PybsmScenario): Scenario settings to apply during the perturbation.
+        reflectance_range (np.ndarray): Default reflectance range for image simulation.
     """
 
     def __init__(  # noqa: C901
@@ -98,11 +113,16 @@ class PybsmPerturber(PerturbImage):
     @property
     def params(self) -> dict:
         """
-        Returns the parameters used for the perturbation.
+        Retrieves the theta parameters related to the perturbation configuration.
+
+        This method provides extra configuration details for the `PybsmPerturber` instance,
+        which may include specific parameters related to the sensor, scenario, or any
+        additional customizations applied during initialization.
 
         Returns:
-            dict: A dictionary of perturbation parameters.
+            dict[str, Any]: A dictionary containing additional perturbation parameters.
         """
+
         return self.thetas
 
     def perturb(self, image: np.ndarray, additional_params: dict[str, Any] = None) -> np.ndarray:
@@ -137,30 +157,29 @@ class PybsmPerturber(PerturbImage):
 
     def __str__(self) -> str:
         """
-        Returns a string representation of the PybsmPerturber.
+        Returns a string representation combining sensor and scenario names.
 
         Returns:
-            str: The names of the sensor and scenario.
+            str: Concatenated sensor and scenario names.
         """
         return self.sensor.name + " " + self.scenario.name
 
     def __repr__(self) -> str:
         """
-        Returns a string representation for debugging.
+        Returns a representation of the perturber including sensor and scenario names.
 
         Returns:
-            str: The names of the sensor and scenario.
+            str: Representation showing sensor and scenario names.
         """
         return self.sensor.name + " " + self.scenario.name
 
-    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
         """
-        Generate the default configuration for the perturber.
+        Provides the default configuration for PybsmPerturber instances.
 
         Returns:
-            dict[str, Any]: Default configuration as a dictionary.
+            dict[str, Any]: A dictionary with the default configuration values.
         """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
@@ -168,18 +187,17 @@ class PybsmPerturber(PerturbImage):
         cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
         return cfg
 
-    @override
     @classmethod
     def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
         """
-        Create an instance of the perturber from a configuration dictionary.
+        Instantiates a PybsmPerturber from a configuration dictionary.
 
         Args:
-            config_dict (dict): Configuration dictionary.
-            merge_default (bool): Whether to merge with the default configuration.
+            config_dict (dict): Configuration dictionary with initialization parameters.
+            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            PybsmPerturber: A configured perturber instance.
+            C: An instance of PybsmPerturber configured according to `config_dict`.
         """
         config_dict = dict(config_dict)
 
@@ -191,13 +209,12 @@ class PybsmPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    @override
     def get_config(self) -> dict[str, Any]:
         """
-        Get the current configuration of the perturber.
+        Returns the current configuration of the PybsmPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary.
+            dict[str, Any]: Configuration dictionary with current settings.
         """
         return {
             "sensor": to_config_dict(self.sensor),
@@ -206,14 +223,13 @@ class PybsmPerturber(PerturbImage):
             "rng_seed": self._rng_seed,
         }
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Check if the pyBSM and OpenCV dependencies are available.
+        Checks if the necessary dependencies (pybsm and OpenCV) are available.
 
         Returns:
-            bool: True if dependencies are available, False otherwise.
+            bool: True if both pybsm and OpenCV are available; False otherwise.
         """
         # Requires pybsm[graphics] or pybsm[headless]
         cv2_check = find_spec("cv2") is not None

@@ -1,3 +1,25 @@
+"""
+This module defines the `DetectorOTFPerturber` class, which applies image perturbations
+based on the Optical Transfer Function (OTF) of a detector, using configurations for
+sensor and scenario. This class can simulate the effects of detector and environmental
+parameters on images, with support for OpenCV and pyBSM functionalities.
+
+Classes:
+    DetectorOTFPerturber: Applies OTF-based perturbations to images using specified
+    sensor and scenario configurations.
+
+Dependencies:
+    - OpenCV for image processing.
+    - pyBSM for radiance and OTF-related functionalities.
+    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+
+Example usage:
+    sensor = PybsmSensor(...)
+    scenario = PybsmScenario(...)
+    perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
+    perturbed_image = perturber.perturb(image)
+"""
+
 from __future__ import annotations
 
 from typing import Any, TypeVar
@@ -34,6 +56,22 @@ C = TypeVar("C", bound="DetectorOTFPerturber")
 
 
 class DetectorOTFPerturber(PerturbImage):
+    """
+    Implements OTF-based image perturbation using detector specifications and atmospheric conditions.
+
+    The `DetectorOTFPerturber` class uses sensor and scenario configurations to apply realistic
+    perturbations to images. This includes adjusting for detector width, focal length, and atmospheric
+    conditions using OpenCV and pyBSM functionalities.
+
+    Attributes:
+        sensor (PybsmSensor | None): The sensor configuration used to define perturbation parameters.
+        scenario (PybsmScenario | None): Scenario configuration providing environmental context.
+        w_x (float | None): Detector width in the x direction (meters).
+        w_y (float | None): Detector width in the y direction (meters).
+        f (float | None): Focal length of the detector (meters).
+        interp (bool): Indicates whether atmospheric database should use interpolation.
+    """
+
     def __init__(
         self,
         sensor: PybsmSensor | None = None,
@@ -71,7 +109,7 @@ class DetectorOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
         if sensor and scenario:
             if interp:
@@ -117,7 +155,19 @@ class DetectorOTFPerturber(PerturbImage):
 
     @override
     def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
+        """
+        Applies the OTF-based perturbation to the provided image.
+
+        Args:
+            image (np.ndarray): The image to be perturbed.
+            additional_params (dict[str, Any], optional): Additional parameters, including 'img_gsd'.
+
+        Returns:
+            np.ndarray: The perturbed image.
+
+        Raises:
+            ValueError: If 'img_gsd' is not present in `additional_params`.
+        """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
@@ -154,17 +204,31 @@ class DetectorOTFPerturber(PerturbImage):
 
         return sim_img.astype(np.uint8)
 
-    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
+        """
+        Provides the default configuration for DetectorOTFPerturber instances.
+
+        Returns:
+            dict[str, Any]: A dictionary with the default configuration values.
+        """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         return cfg
 
-    @override
     @classmethod
     def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+        """
+        Instantiates a DetectorOTFPerturber from a configuration dictionary.
+
+        Args:
+            config_dict (dict): Configuration dictionary with initialization parameters.
+            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+
+        Returns:
+            C: An instance of DetectorOTFPerturber configured according to `config_dict`.
+        """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
@@ -175,8 +239,13 @@ class DetectorOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the DetectorOTFPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
@@ -189,8 +258,13 @@ class DetectorOTFPerturber(PerturbImage):
             "interp": self.interp,
         }
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+
+        Returns:
+            bool: True if both pyBSM and OpenCV are available; False otherwise.
+        """
         # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available

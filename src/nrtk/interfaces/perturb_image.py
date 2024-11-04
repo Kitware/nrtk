@@ -1,3 +1,29 @@
+"""
+This module defines the `PerturbImage` interface, which provides an abstract base for
+implementing image perturbation algorithms. The primary purpose of this interface is to
+generate perturbed versions of input images, represented as `numpy.ndarray` arrays.
+
+Classes:
+    PerturbImage: An abstract base class that specifies the structure for image perturbation
+    algorithms, allowing for different perturbation techniques to be implemented.
+
+Dependencies:
+    - numpy for handling image arrays.
+    - smqtk_core for configurable plugin interface capabilities.
+
+Usage:
+    To create a custom image perturbation class, inherit from `PerturbImage` and implement
+    the `perturb` method, defining the specific perturbation logic.
+
+Example:
+    class CustomPerturbImage(PerturbImage):
+        def perturb(self, image, additional_params=None):
+            # Custom perturbation logic here
+            pass
+
+    perturber = CustomPerturbImage()
+    perturbed_image = perturber(image_data)
+"""
 from __future__ import annotations
 
 import abc
@@ -43,4 +69,11 @@ class PerturbImage(Plugfigurable):
 
     @classmethod
     def get_type_string(cls) -> str:
+        """Calls ``perturb()`` with the given input image.
+
+        :param image: Input image as a numpy array.
+        :param additional_params: A dictionary containing additional parameters for the perturbation.
+
+        :return: Perturbed image as numpy array.
+        """
         return f"{cls.__module__}.{cls.__name__}"

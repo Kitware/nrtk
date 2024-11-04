@@ -1,3 +1,22 @@
+"""
+This module provides the `PerturbImageFactory` class, an abstract base factory for generating
+instances of `PerturbImage` with specified configurations. This factory pattern allows users
+to produce various image perturbations by adjusting key parameters in a flexible, reusable way.
+
+Classes:
+    PerturbImageFactory: An abstract factory for creating `PerturbImage` instances with specific
+    configurations. Allows for custom parameterization of generated instances.
+
+Dependencies:
+    - smqtk_core.Plugfigurable for plug-and-play configuration support.
+    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for perturbing images.
+
+Example usage:
+    factory = PerturbImageFactory(perturber=SomePerturbImageClass, theta_key="altitude")
+    for perturber in factory:
+        perturber(perturbed_image)
+"""
+
 from __future__ import annotations
 
 import abc
@@ -5,7 +24,6 @@ from collections.abc import Iterator, Sequence
 from typing import Any, TypeVar
 
 from smqtk_core import Plugfigurable
-from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -81,13 +99,21 @@ class PerturbImageFactory(Plugfigurable):
 
         return self.perturber(**kwargs)
 
-    @override
     @classmethod
     def from_config(
         cls: type[C],
         config_dict: dict,
         merge_default: bool = True,
     ) -> C:
+        """
+        Instantiates a PerturbImageFactory from a configuration dictionary.
+
+        Args:
+            config_dict (dict[str, Any]): Configuration dictionary with parameters for instantiation.
+
+        Returns:
+            C: An instance of the PerturbImageFactory class.
+        """
         config_dict = dict(config_dict)
 
         # Check to see if there is a perturber key and if it is in bad format
@@ -105,16 +131,30 @@ class PerturbImageFactory(Plugfigurable):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
+        """
+        Returns the default configuration for the PerturbImageFactory.
+
+        This method provides a default configuration dictionary, specifying default
+        values for key parameters in the factory. It can be used to create an instance
+        of the factory with preset configurations.
+
+        Returns:
+            dict[str, Any]: A dictionary containing default configuration parameters.
+        """
         cfg = super().get_default_config()
         cfg["perturber"] = PerturbImage.get_type_string()
 
         return cfg
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the configuration of the factory instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary containing the perturber type and theta_key.
+        """
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_key": self.theta_key,

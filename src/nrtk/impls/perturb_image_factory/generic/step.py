@@ -1,3 +1,35 @@
+"""
+This module defines the `StepPerturbImageFactory` class, which is an implementation
+of the `PerturbImageFactory` interface. The `StepPerturbImageFactory` class is designed
+to generate a series of `PerturbImage` instances with a parameter (`theta_key`) that
+steps through a specified range of values, enabling controlled variation in the
+perturbation process.
+
+Classes:
+    StepPerturbImageFactory: Factory for producing `PerturbImage` instances with a specific
+    parameter (`theta_key`) varying over a specified range.
+
+Dependencies:
+    - math for range calculations.
+    - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
+
+Usage:
+    Instantiate `StepPerturbImageFactory` with a `PerturbImage` type, a `theta_key` to vary,
+    and the start, stop, and step values for the parameter range. This factory can then be
+    used to generate perturbed image instances with controlled variations.
+
+Example:
+    factory = StepPerturbImageFactory(
+        perturber=SomePerturbImageClass,
+        theta_key="parameter",
+        start=0.0,
+        stop=10.0,
+        step=1.0,
+        to_int=False
+    )
+    theta_values = factory.thetas  # Access generated range of parameter values
+"""
+
 from __future__ import annotations
 
 import math

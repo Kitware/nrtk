@@ -57,7 +57,7 @@ class TestSNRImageMetric:
 
 
 @mock.patch.object(NIIRSImageMetric, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not NIIRSImageMetric.is_usable()

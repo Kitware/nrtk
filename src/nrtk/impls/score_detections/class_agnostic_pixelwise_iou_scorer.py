@@ -1,3 +1,23 @@
+"""
+This module provides the `ClassAgnosticPixelwiseIoUScorer` class, which calculates pixelwise
+Intersection over Union (IoU) scores in a class-agnostic manner. It is intended for evaluating
+object detection results based on IoU between predicted and actual bounding boxes, without
+differentiating between object classes.
+
+Classes:
+    ClassAgnosticPixelwiseIoUScorer: Computes pixelwise IoU scores for bounding boxes in a
+    class-agnostic fashion.
+
+Dependencies:
+    - numpy for numerical operations.
+    - smqtk_image_io for handling bounding boxes.
+    - nrtk.interfaces.score_detections.ScoreDetections for the detection scoring interface.
+
+Example usage:
+    scorer = ClassAgnosticPixelwiseIoUScorer()
+    scores = scorer.score(actual_detections, predicted_detections)
+"""
+
 # standard library imports
 from collections.abc import Hashable, Sequence
 from typing import Any
@@ -19,7 +39,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
     """
 
     @override
-    def score(
+    def score(  # noqa: C901
         self,
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
@@ -52,14 +72,17 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
             for act_bbox, _ in act:
                 x_1, y_1 = act_bbox.min_vertex
                 x_2, y_2 = act_bbox.max_vertex
-                actual_mask[int(y_1) : int(y_2), int(x_1) : int(x_2)] = 1
+                # Black formatting keeps moving the noqa comment down a line, which causes flake8 error
+                # fmt: off
+                actual_mask[int(y_1): int(y_2), int(x_1): int(x_2)] = 1
+                # fmt: on
 
             for pred_bbox, _ in pred:
                 x_1, y_1 = pred_bbox.min_vertex
                 x_2, y_2 = pred_bbox.max_vertex
                 # Black formatting keeps moving the noqa comment down a line, which causes flake8 error
                 # fmt: off
-                predicted_mask[int(y_1) : int(y_2), int(x_1) : int(x_2)] = (
+                predicted_mask[int(y_1):int(y_2), int(x_1):int(x_2)] = (
                     1
                 )
                 # fmt: on
@@ -71,6 +94,11 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
 
         return ious
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Generates a serializable config that can be used to rehydrate object
+
+        Returns:
+            dict[str, Any]: serializable config containing all instance parameters
+        """
         return {}

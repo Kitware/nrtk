@@ -1,3 +1,37 @@
+"""
+This module provides classes for enhancing image properties, such as brightness, color,
+contrast, and sharpness, by implementing the `PerturbImage` interface. These classes use
+the PIL library to adjust the enhancement level for a given image, allowing for customized
+image modifications. The `_Enhancement` protocol and `_PILEnhancePerturber` base class
+facilitate this by defining common behavior for all enhancement-based perturbations.
+
+Classes:
+    _PILEnhancePerturber: Base class for applying a specific PIL enhancement to an image.
+    BrightnessPerturber: Adjusts the brightness of an image.
+    ColorPerturber: Adjusts the color balance of an image.
+    ContrastPerturber: Adjusts the contrast of an image.
+    SharpnessPerturber: Adjusts the sharpness of an image.
+
+Dependencies:
+    - numpy for image data handling.
+    - PIL (Pillow) for image enhancements.
+    - typing_extensions for type checking and enhancements.
+
+Usage:
+    Instantiate any of the enhancement classes with a specific enhancement factor, then call
+    `perturb` to apply the desired enhancement to an input image.
+
+Example:
+    brightness_perturber = BrightnessPerturber(factor=1.5)
+    brighter_image = brightness_perturber.perturb(input_image)
+
+    contrast_perturber = ContrastPerturber(factor=0.8)
+    contrasted_image = contrast_perturber.perturb(input_image)
+
+Notes:
+    - Each enhancement class has a default factor of 1.0, which applies no change to the image.
+    - `SharpnessPerturber` enforces a factor range of [0.0, 2.0].
+"""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable

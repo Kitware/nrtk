@@ -1,3 +1,25 @@
+"""
+This module provides the `TurbulenceApertureOTFPerturber` class, which applies image perturbations
+based on Optical Transfer Function (OTF) calculations considering turbulence and aperture effects.
+The class supports configurations with specific sensor and scenario parameters, leveraging pyBSM
+and OpenCV for realistic image simulations.
+
+Classes:
+    TurbulenceApertureOTFPerturber: Applies OTF-based perturbations with turbulence and aperture
+    effects to images, utilizing pyBSM and OpenCV functionalities.
+
+Dependencies:
+    - OpenCV for image processing.
+    - pyBSM for radiance and OTF-related calculations.
+    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+
+Example usage:
+    sensor = PybsmSensor(...)
+    scenario = PybsmScenario(...)
+    perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
+    perturbed_image = perturber.perturb(image)
+"""
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -35,7 +57,31 @@ C = TypeVar("C", bound="TurbulenceApertureOTFPerturber")
 
 
 class TurbulenceApertureOTFPerturber(PerturbImage):
-    def __init__(
+    """
+    Implements OTF-based image perturbation with turbulence and aperture effects.
+
+    The `TurbulenceApertureOTFPerturber` class simulates image degradation due to atmospheric
+    turbulence and optical aperture effects, using pyBSM sensor and scenario configurations.
+    It supports adjustable wavelengths, weights, and other environmental parameters for
+    realistic perturbations.
+
+    Attributes:
+        sensor (PybsmSensor | None): Sensor configuration for the perturbation.
+        scenario (PybsmScenario | None): Scenario settings applied during perturbation.
+        mtf_wavelengths (Sequence[float]): Wavelengths used in MTF calculations.
+        mtf_weights (Sequence[float]): Weights associated with each wavelength.
+        altitude (float): Altitude of the imaging platform.
+        slant_range (float): Line-of-sight distance between platform and target.
+        D (float): Effective aperture diameter.
+        ha_wind_speed (float): High-altitude wind speed affecting turbulence profile.
+        cn2_at_1m (float): Refractive index structure parameter at ground level.
+        int_time (float): Integration time for imaging.
+        n_tdi (float): Number of time-delay integration stages.
+        aircraft_speed (float): Apparent atmospheric velocity.
+        interp (bool): Indicates whether to use interpolated atmospheric data.
+    """
+
+    def __init__(  # noqa: C901
         self,
         sensor: PybsmSensor | None = None,
         scenario: PybsmScenario | None = None,
@@ -104,7 +150,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
 
         if sensor and scenario:
@@ -180,7 +226,19 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @override
     def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
+        """
+        Applies turbulence and aperture-based perturbation to the provided image.
+
+        Args:
+            image (np.ndarray): The image to be perturbed.
+            additional_params (dict[str, Any], optional): Additional parameters, including 'img_gsd'.
+
+        Returns:
+            np.ndarray: The perturbed image.
+
+        Raises:
+            ValueError: If 'img_gsd' is not provided in `additional_params`.
+        """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
@@ -236,17 +294,31 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         return sim_img.astype(np.uint8)
 
-    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
+        """
+        Provides the default configuration for TurbulenceApertureOTFPerturber instances.
+
+        Returns:
+            dict[str, Any]: A dictionary with the default configuration values.
+        """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         return cfg
 
-    @override
     @classmethod
     def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+        """
+        Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
+
+        Args:
+            config_dict (dict): Configuration dictionary with initialization parameters.
+            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+
+        Returns:
+            C: An instance of TurbulenceApertureOTFPerturber configured according to `config_dict`.
+        """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
@@ -257,8 +329,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the TurbulenceApertureOTFPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
@@ -278,8 +355,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             "interp": self.interp,
         }
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+
+        Returns:
+            bool: True if both pyBSM and OpenCV are available; False otherwise.
+        """
         # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available

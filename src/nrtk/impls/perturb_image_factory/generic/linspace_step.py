@@ -1,3 +1,31 @@
+"""
+This module defines the `LinSpacePerturbImageFactory` class, an implementation
+of the `PerturbImageFactory` interface that generates `PerturbImage` instances
+with a parameter (`theta_key`) varying over a specified range, using linearly spaced values.
+
+Classes:
+    LinSpacePerturbImageFactory: A factory class for creating `PerturbImage` instances
+    where a specified parameter varies over a defined range in linearly spaced steps.
+
+Dependencies:
+    - numpy for generating linearly spaced values.
+    - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
+
+Usage:
+    To use `LinSpacePerturbImageFactory`, initialize it with a `PerturbImage` type, a `theta_key`
+    to vary, and specify the start, stop, and number of steps. This factory can then be used to
+    generate perturbed image instances with linearly spaced parameter variations.
+
+Example:
+    factory = LinSpacePerturbImageFactory(
+        perturber=SomePerturbImageClass,
+        theta_key="parameter",
+        start=0.0,
+        stop=10.0,
+        step=5
+    )
+    theta_values = factory.thetas  # Access generated linearly spaced values
+"""
 from __future__ import annotations
 
 from collections.abc import Sequence

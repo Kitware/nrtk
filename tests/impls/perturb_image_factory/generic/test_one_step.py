@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional, Type
+from typing import Any, Optional
 
 import numpy as np
 import pytest
@@ -20,16 +20,18 @@ INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319
 
 
 class DummyPerturber(PerturbImage):
-    def __init__(self, param_1: int = 1, param_2: int = 2):
+    def __init__(self, param_1: int = 1, param_2: int = 2) -> None:
         self.param_1 = param_1
         self.param_2 = param_2
 
     def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
+        self,
+        image: np.ndarray,
+        additional_params: Optional[dict[str, Any]] = None,  # noqa: ARG002
     ) -> np.ndarray:  # pragma: no cover
         return np.copy(image)
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         return {"param_1": self.param_1, "param_2": self.param_2}
 
 
@@ -44,7 +46,7 @@ class TestStepPerturbImageFactory:
     def test_iteration(
         self,
         snapshot: SnapshotAssertion,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         theta_value: float,
     ) -> None:
@@ -57,7 +59,7 @@ class TestStepPerturbImageFactory:
         ("perturber", "theta_key", "theta_value"),
         [(DummyPerturber, "param_1", 1.0), (DummyPerturber, "param_2", 3.0)],
     )
-    def test_configuration(self, perturber: Type[PerturbImage], theta_key: str, theta_value: float) -> None:
+    def test_configuration(self, perturber: type[PerturbImage], theta_key: str, theta_value: float) -> None:
         """Test configuration stability."""
         inst = OneStepPerturbImageFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
         for i in configuration_test_helper(inst):
@@ -77,7 +79,7 @@ class TestStepPerturbImageFactory:
     def test_hydration(
         self,
         tmp_path: Path,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         theta_value: float,
     ) -> None:

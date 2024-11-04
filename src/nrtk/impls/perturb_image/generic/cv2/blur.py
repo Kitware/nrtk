@@ -1,3 +1,39 @@
+"""
+This module provides classes for applying different types of blurring to image stimuli,
+implementing the `PerturbImage` interface. Blurring methods include average, Gaussian,
+and median blurring, each with customizable kernel sizes for controlling the level of
+blur effect.
+
+Classes:
+    AverageBlurPerturber: Applies average blurring to an image.
+    GaussianBlurPerturber: Applies Gaussian blurring to an image, useful for reducing noise
+        and detail with a smooth effect.
+    MedianBlurPerturber: Applies median blurring to an image, commonly used for removing
+        salt-and-pepper noise while preserving edges.
+
+Dependencies:
+    - OpenCV (cv2) for image processing.
+    - numpy for handling image data.
+
+Usage:
+    Each blur perturber class can be instantiated with a specific kernel size, controlling
+    the intensity and spread of the blur. The `perturb` method applies the blur effect to
+    an input image, returning the processed result.
+
+Example:
+    avg_blur = AverageBlurPerturber(ksize=3)
+    blurred_image = avg_blur.perturb(input_image)
+
+    gauss_blur = GaussianBlurPerturber(ksize=5)
+    blurred_image = gauss_blur.perturb(input_image)
+
+    median_blur = MedianBlurPerturber(ksize=3)
+    blurred_image = median_blur.perturb(input_image)
+
+Note:
+    Each class requires OpenCV for functionality. An ImportError will be raised if OpenCV is
+    not available.
+"""
 from __future__ import annotations
 
 from typing import Any

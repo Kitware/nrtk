@@ -1,7 +1,6 @@
 import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from importlib.util import find_spec
 from typing import Any
 from unittest.mock import MagicMock
 

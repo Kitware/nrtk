@@ -1,3 +1,25 @@
+"""
+This module provides an example implementation of the GenerateObjectDetectorBlackboxResponse interface
+using a `SimplePybsmGenerator` class. It generates object detection responses for a series of input images
+based on ground truth bounding boxes and scoring methods.
+
+Classes:
+    SimplePybsmGenerator: Implements the `GenerateObjectDetectorBlackboxResponse` interface for generating
+    and scoring object detection responses with configurable image perturbation.
+
+Dependencies:
+    - smqtk_detection
+    - smqtk_image_io
+    - nrtk.interfaces.gen_object_detector_blackbox_response
+    - nrtk.interfaces.perturb_image_factory
+    - nrtk.interfaces.score_detections
+
+Example usage:
+    generator = SimplePybsmGenerator(images, img_gsds, ground_truth)
+    response = generator.generate_response()
+
+"""
+
 from collections.abc import Hashable, Sequence
 from importlib.util import find_spec
 from typing import Any
@@ -15,7 +37,21 @@ from nrtk.interfaces.score_detections import ScoreDetections
 
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
-    """Example implementation of the ``GenerateObjectDetectorBlackboxResponse`` interface."""
+    """
+    Example implementation of the `GenerateObjectDetectorBlackboxResponse` interface.
+
+    This class generates detection response data for a sequence of images, using ground truth bounding
+    boxes and configurable scoring and perturbation methods.
+
+    Attributes:
+        images (Sequence[np.ndarray]): Sequence of images to process.
+        img_gsds (Sequence[float]): Ground sample distances for each image.
+        ground_truth (Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]):
+            Ground truth bounding boxes with associated labels and scores.
+
+    Methods:
+        generate_response(): Generates a response for each image based on ground truth and scoring.
+    """
 
     def __init__(
         self,
@@ -23,18 +59,22 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         img_gsds: Sequence[float],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> None:
-        """Generate response curve for given images and ground_truth.
+        """
+        Initializes the SimplePybsmGenerator with input images, ground sample distances, and ground truth.
 
-        :param images: Sequence of images to generate responses for.
-        :param ground_truth: Sequence of sequences of detections corresponsing to each image.
+        Args:
+            images (Sequence[np.ndarray]): Sequence of images for detection.
+            img_gsds (Sequence[float]): Ground sample distances (GSD) for each image.
+            ground_truth (Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]):
+                Ground truth data, containing bounding boxes and associated labels and scores.
 
-        :raises: ImportError if pyBSM with OpenCV not found,
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
-        :raises ValueError: Images and ground_truth data have a size mismatch.
+        Raises:
+            ImportError: If pybsm library is not available.
+            ValueError: If `images` and `ground_truth` do not have the same length.
         """
         if not self.is_usable():
             raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'."
+                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
             )
         if len(images) != len(ground_truth):
             raise ValueError("Size mismatch. ground_truth must be provided for each image.")
@@ -49,28 +89,37 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         """:return: Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
-    @override
     def __getitem__(
-        self, idx: int
+        self,
+        idx: int,
     ) -> tuple[
         np.ndarray,
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:
-        """Get the image and ground_truth pair for a specific index.
+        """
+        Get the image and ground truth pair for a specific index.
 
-        :param idx: Index of desired data pair.
+        Args:
+            idx (int): Index of the desired data pair.
 
-        :raises IndexError: The given index does not exist.
+        Raises:
+            IndexError: If the given index is out of range.
 
-        :return: Data pair corresponding to the given index.
+        Returns:
+            tuple: A tuple containing the image, ground truth data, and metadata for the specified index.
         """
         if idx < 0 or idx >= len(self):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {"img_gsd": self.img_gsds[idx]}
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Generates a serializable configuration for the instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary containing instance parameters.
+        """
         return {
             "images": self.images,
             "img_gsds": self.img_gsds,
@@ -93,15 +142,34 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
             img_batch_size=img_batch_size,
             verbose=verbose,
         )
+        """
+        Generates detection responses for the sequence of images using perturbation and scoring.
 
+        Args:
+            blackbox_perturber_factories (Sequence[PerturbImageFactory]): Factories to perturb images.
+            blackbox_detector (DetectImageObjects): Object detection model.
+            blackbox_scorer (ScoreDetections): Scoring function for detection evaluation.
+            img_batch_size (int): Number of images to process in each batch.
+            verbose (bool, optional): If True, prints verbose output.
+
+        Returns:
+            tuple: Contains two elements:
+                - Sequence of tuples with metadata and score for each perturbation.
+                - Sequence of scores for each perturbation level.
+        """
         master_key = blackbox_perturber_factories[0].theta_key
         new_curve = [(entry[0][master_key], entry[1]) for entry in inter[0]]
 
         return new_curve, inter[1]
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the required pybsm module is available.
+
+        Returns:
+            bool: True if pybsm is installed; False otherwise.
+        """
         # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
         # we don't need to check for opencv because this can run with
         # a non-opencv pybsm based perturber

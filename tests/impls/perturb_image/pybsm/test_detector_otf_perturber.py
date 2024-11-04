@@ -113,7 +113,7 @@ class TestDetectorOTFPerturber:
             (False, 3e-6, 20e-6, 30e-3, True),
         ],
     )
-    def test_configuration(
+    def test_configuration(  # noqa: C901
         self,
         use_sensor_scenario: bool,
         w_x: float | None,

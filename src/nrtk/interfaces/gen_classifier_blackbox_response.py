@@ -1,3 +1,40 @@
+"""
+This module defines the `GenerateClassifierBlackboxResponse` interface, which provides
+functionality for generating item-response curves and scores for image classification tasks
+in a blackbox context. The interface allows images to be perturbed and then classified,
+with scores computed based on the classification results.
+
+Classes:
+    GenerateClassifierBlackboxResponse: An interface for generating item-response curves
+    and scores for perturbed image classifications using a specified classifier and scoring mechanism.
+
+Dependencies:
+    - numpy for handling image data and computations.
+    - smqtk_classifier for image classification.
+    - tqdm for progress tracking.
+    - smqtk_core for plugin configuration.
+    - nrtk.interfaces for blackbox response generation, perturbation, and scoring interfaces.
+
+Usage:
+    To create an instance of `GenerateClassifierBlackboxResponse`, implement the required
+    abstract methods, such as `__getitem__`, and use the `generate` method to produce
+    item-response curves and scores.
+
+Example:
+    class CustomClassifierResponse(GenerateClassifierBlackboxResponse):
+        def __getitem__(self, idx):
+            # Implementation of data retrieval
+            pass
+
+    generator = CustomClassifierResponse()
+    response_curve, scores = generator.generate(
+        blackbox_perturber_factories=[factory1, factory2],
+        blackbox_classifier=classifier,
+        blackbox_scorer=scorer,
+        img_batch_size=32,
+        verbose=True
+    )
+"""
 import abc
 from collections.abc import Sequence
 from contextlib import nullcontext
@@ -35,7 +72,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
     ) -> tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]:
         """Get the ``idx``th image and ground_truth pair."""
 
-    def generate(
+    def generate(  # noqa C901:
         self,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_classifier: ClassifyImage,

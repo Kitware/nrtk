@@ -1,3 +1,32 @@
+"""
+This module provides the `GenerateObjectDetectorBlackboxResponse` class, an interface
+for generating item-response curves and scores for object detection models. The module
+also includes functions to handle image perturbations and scoring within a blackbox setting,
+using various factories, detectors, and scoring mechanisms.
+
+Classes:
+    GenerateObjectDetectorBlackboxResponse: An interface that defines methods to generate
+    item-response curves and scores for object detections in response to perturbed images.
+
+Functions:
+    gen_perturber_combinations: Generates combinations of perturbers, selecting one from
+    each factory.
+
+Dependencies:
+    - numpy for handling numerical operations.
+    - smqtk_detection for object detection.
+    - smqtk_image_io for image bounding box handling.
+    - tqdm for progress updates.
+    - typing and collections for typing and context management.
+
+Example usage:
+    factories = [perturber_factory1, perturber_factory2]
+    detector = SomeObjectDetector()
+    scorer = SomeScorer()
+    generator = GenerateObjectDetectorBlackboxResponse()
+    item_response, scores = generator.generate(factories, detector, scorer, img_batch_size=4, verbose=True)
+"""
+
 import abc
 from collections.abc import Hashable, Sequence
 from contextlib import nullcontext
@@ -32,7 +61,8 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
     @override
     @abc.abstractmethod
     def __getitem__(
-        self, idx: int
+        self,
+        idx: int,
     ) -> tuple[
         np.ndarray,
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
@@ -40,7 +70,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
     ]:
         """Get the image and ground_truth pair at a particular ``idx``."""
 
-    def generate(
+    def generate(  # noqa: C901
         self,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_detector: DetectImageObjects,

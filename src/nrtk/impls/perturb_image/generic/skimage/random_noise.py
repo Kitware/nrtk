@@ -1,3 +1,32 @@
+"""
+This module provides a set of classes for adding different types of noise to images, implementing
+the `PerturbImage` interface. The perturbation types include salt, pepper, salt-and-pepper,
+Gaussian, and speckle noise, allowing for a wide range of image noise simulations.
+
+Classes:
+    _SKImageNoisePerturber: Base class for noise perturbation, using `skimage.util.random_noise`.
+    _SPNoisePerturber: Base class for salt-and-pepper type noise.
+    SaltNoisePerturber: Adds salt noise to an image.
+    PepperNoisePerturber: Adds pepper noise to an image.
+    SaltAndPepperNoisePerturber: Adds both salt and pepper noise to an image, with control over
+        the ratio of salt to pepper.
+    _GSNoisePerturber: Base class for Gaussian-based noise.
+    GaussianNoisePerturber: Adds Gaussian-distributed additive noise to an image.
+    SpeckleNoisePerturber: Adds Gaussian-based multiplicative noise (speckle) to an image.
+
+Dependencies:
+    - numpy for handling image data and random number generation.
+    - skimage.util for applying various noise effects to images.
+
+Usage:
+    Each noise perturber class can be instantiated with specific parameters, allowing the user
+    to customize the type and intensity of noise applied to an image. Use the `perturb` method
+    of each class to apply the chosen noise effect.
+
+Example:
+    gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
+    noisy_image = gaussian_perturber.perturb(image_data)
+"""
 from __future__ import annotations
 
 from typing import Any

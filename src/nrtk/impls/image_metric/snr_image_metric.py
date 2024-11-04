@@ -1,3 +1,36 @@
+"""
+This module provides an implementation of the `ImageMetric` interface for calculating the
+Signal-to-Noise Ratio (SNR) of an image. The main class, `SNRImageMetric`, computes the SNR
+for a single input image, with options to control the axis and degrees of freedom used in the
+calculation.
+
+Classes:
+    SNRImageMetric: Calculates the Signal-to-Noise Ratio (SNR) of an image using specified
+    parameters for axis and degrees of freedom.
+
+Functions:
+    _signal_to_noise: A helper function for computing the SNR of an image based on its mean
+    and standard deviation along a given axis and degrees of freedom.
+
+Dependencies:
+    - numpy for image processing and statistical calculations.
+
+Usage:
+    Instantiate `SNRImageMetric` and call the `compute` method with an image to obtain the
+    SNR. Optional parameters for `axis` and `ddof` (degrees of freedom) can be specified
+    in `additional_params`.
+
+Example:
+    snr_metric = SNRImageMetric()
+    snr_value = snr_metric.compute(image_data, additional_params={"axis": 0, "ddof": 0})
+
+Notes:
+    - SNR calculations are only supported for single images; attempting to pass a second
+      image to `compute` will raise an error.
+    - The optional `axis` parameter controls the dimensions over which the mean and standard
+      deviation are computed. This affects the SNR calculation but defaults to None, which
+      includes all axes and channels.
+"""
 from __future__ import annotations
 
 from typing import Any
@@ -12,7 +45,7 @@ class SNRImageMetric(ImageMetric):
     """Implementation of the ``ComputeImageMetrics`` interface to calculate the Signal to Noise Ratio."""
 
     @override
-    def compute(
+    def compute(  # noqa: C901
         self,
         img_1: np.ndarray,
         img_2: np.ndarray | None = None,

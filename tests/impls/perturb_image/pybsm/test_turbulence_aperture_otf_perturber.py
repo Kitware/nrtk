@@ -225,7 +225,7 @@ class TestTurbulenceApertureOTFPerturber:
             (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
         ],
     )
-    def test_configuration(
+    def test_configuration(  # noqa: C901
         self,
         use_sensor_scenario: bool,
         mtf_wavelengths: Sequence[float] | None,
