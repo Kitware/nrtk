@@ -23,6 +23,7 @@ Example:
     random_scorer = RandomScorer(seed=123)
     random_scores = random_scorer.score(actual_detections, predicted_detections)
 """
+
 from __future__ import annotations
 
 from collections.abc import Hashable, Sequence

@@ -31,6 +31,7 @@ Notes:
       deviation are computed. This affects the SNR calculation but defaults to None, which
       includes all axes and channels.
 """
+
 from __future__ import annotations
 
 from typing import Any

@@ -26,6 +26,7 @@ Example:
     )
     theta_values = factory.thetas  # Access generated linearly spaced values
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence

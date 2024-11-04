@@ -34,6 +34,7 @@ Note:
     Each class requires OpenCV for functionality. An ImportError will be raised if OpenCV is
     not available.
 """
+
 from __future__ import annotations
 
 from typing import Any

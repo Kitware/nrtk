@@ -25,6 +25,7 @@ Example:
     scorer = CustomScorer()
     scores = scorer(actual_detections, predicted_detections)
 """
+
 import abc
 from collections.abc import Hashable, Sequence
 from typing import Any

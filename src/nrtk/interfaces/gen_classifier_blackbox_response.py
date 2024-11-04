@@ -35,6 +35,7 @@ Example:
         verbose=True
     )
 """
+
 import abc
 from collections.abc import Sequence
 from contextlib import nullcontext

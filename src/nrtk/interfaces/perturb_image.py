@@ -24,6 +24,7 @@ Example:
     perturber = CustomPerturbImage()
     perturbed_image = perturber(image_data)
 """
+
 from __future__ import annotations
 
 import abc

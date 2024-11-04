@@ -32,6 +32,7 @@ Notes:
     - Each enhancement class has a default factor of 1.0, which applies no change to the image.
     - `SharpnessPerturber` enforces a factor range of [0.0, 2.0].
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable

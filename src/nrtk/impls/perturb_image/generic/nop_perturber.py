@@ -20,6 +20,7 @@ Example:
     nop_perturber = NOPPerturber()
     output_image = nop_perturber.perturb(input_image)
 """
+
 from __future__ import annotations
 
 from typing import Any

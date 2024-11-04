@@ -24,6 +24,7 @@ Example:
     scorer = COCOScorer(gt_path="path/to/ground_truth.json", stat_index=0)
     scores = scorer.score(actual_detections, predicted_detections)
 """
+
 import contextlib
 from collections.abc import Hashable, Sequence
 from typing import Any

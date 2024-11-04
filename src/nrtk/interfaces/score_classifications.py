@@ -25,6 +25,7 @@ Example:
     scorer = CustomClassificationScorer()
     scores = scorer(actual_classifications, predicted_classifications)
 """
+
 import abc
 from collections.abc import Sequence
 

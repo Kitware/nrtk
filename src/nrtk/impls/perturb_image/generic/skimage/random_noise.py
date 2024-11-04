@@ -27,6 +27,7 @@ Example:
     gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
     noisy_image = gaussian_perturber.perturb(image_data)
 """
+
 from __future__ import annotations
 
 from typing import Any
