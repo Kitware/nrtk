@@ -317,6 +317,8 @@ class PybsmSensor(Configurable):
             >>> sensor_instance = sensor.create_sensor()
 
         """
+        if not self.is_usable():
+            raise ImportError("pybsm not found")
         S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # noqa:N806
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta

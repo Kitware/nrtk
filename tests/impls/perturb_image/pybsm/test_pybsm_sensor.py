@@ -142,10 +142,9 @@ def test_config() -> None:
         assert np.array_equal(i.qe, inst.qe)
 
 
-@mock.patch.object(PybsmSensor, "is_usable")
-def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
+@mock.patch.object(PybsmSensor, "is_usable", return_value=False)
+def test_missing_deps() -> None:
     """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
     assert not PybsmSensor.is_usable()
     name = "spatial"
     D = 0  # noqa:N806
@@ -153,7 +152,7 @@ def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     p_x = 0
     opt_trans_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
     with pytest.raises(ImportError, match=r"pybsm not found"):
-        PybsmSensor(name, D, f, p_x, opt_trans_wavelengths)
+        PybsmSensor(name, D, f, p_x, opt_trans_wavelengths).create_sensor()
 
 
 @pytest.fixture

@@ -16,6 +16,8 @@ from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
 
+np.random.seed(42)  # noqa: NPY002
+
 
 @pytest.mark.skipif(
     not PybsmPerturber.is_usable(),
