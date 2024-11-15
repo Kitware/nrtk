@@ -15,6 +15,7 @@ Image Perturbation
    nrtk.impls.perturb_image.generic.PIL.enhance
    nrtk.impls.perturb_image.generic.skimage.random_noise
    nrtk.impls.perturb_image.generic.nop_perturber
+   nrtk.impls.perturb_image.generic.compose_perturber
    nrtk.impls.perturb_image.pybsm.perturber
    nrtk.impls.perturb_image.pybsm.scenario
    nrtk.impls.perturb_image.pybsm.sensor
