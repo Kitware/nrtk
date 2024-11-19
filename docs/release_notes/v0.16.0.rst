@@ -1,6 +1,9 @@
 v0.16.0
 =======
 
+Added a new feature which composes ``Perturber`` impls into one composite
+perturber much like ``torch.transforms.Compose``.
+
 Updates / New Features
 ----------------------
 
