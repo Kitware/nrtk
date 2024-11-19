@@ -27,7 +27,7 @@ classifiers = [
 # package-specific meta, don't put this in "generated package-meta"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 license = "Apache-2.0"
-version = "0.15.1"
+version = "0.16.0"
 description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
 
 [tool.poetry.dependencies]
@@ -124,12 +124,16 @@ papermill = ">=2.4.0"
 # Add implementation sub-module exposure here.
 "impls.gen_object_detector_blackbox_response.simple_generic_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator"
 "impls.gen_object_detector_blackbox_response.simple_pybsm_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator"
+"impls.perturb_image.generic.compose_perturber" = "nrtk.impls.perturb_image.generic.compose_perturber"
 "impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
 "impls.perturb_image.generic.PIL.enhance" = "nrtk.impls.perturb_image.generic.PIL.enhance"
 "impls.perturb_image.generic.cv2.blur" = "nrtk.impls.perturb_image.generic.cv2.blur"
 "impls.perturb_image.generic.skimage.random_noise" = "nrtk.impls.perturb_image.generic.skimage.random_noise"
 "impls.perturb_image.pybsm.perturber" = "nrtk.impls.perturb_image.pybsm.perturber"
 "impls.perturb_image.pybsm.jitter_otf_perturber" = "nrtk.impls.perturb_image.pybsm.jitter_otf_perturber"
+"impls.perturb_image.pybsm.detector_otf_perturber" = "nrtk.impls.perturb_image.pybsm.detector_otf_perturber"
+"impls.perturb_image.pybsm.turbulence_aperture_otf_perturber" = "nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber"
+"impls.perturb_image.pybsm.circular_aperture_otf_perturber" = "nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber"
 "impls.perturb_image_factory.generic.step" = "nrtk.impls.perturb_image_factory.generic.step"
 "impls.perturb_image_factory.generic.one_step" = "nrtk.impls.perturb_image_factory.generic.one_step"
 "impls.perturb_image_factory.generic.linspace_step" = "nrtk.impls.perturb_image_factory.generic.linspace_step"
