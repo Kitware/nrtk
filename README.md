@@ -1,3 +1,6 @@
+<!-- :auto badges: -->
+<!-- :auto badges: -->
+
 # Natural Robustness Toolkit (NRTK)
 
 The `nrtk` package is an open source toolkit for evaluating the natural robustness of computer vision
