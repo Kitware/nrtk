@@ -14,7 +14,6 @@ classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: Apache Software License',
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: Unix',
     'Programming Language :: Python :: 3',
@@ -74,43 +73,39 @@ pybsm = ["pybsm"]
 pybsm-graphics = ["pybsm"]
 pybsm-headless = ["pybsm"]
 
-# :auto dev-linting:
+# :auto linting:
 # Linting
-[tool.poetry.group.dev-linting]
+[tool.poetry.group.linting]
 optional = true
 
-[tool.poetry.group.dev-linting.dependencies]
-flake8 = ">=6"
-flake8-mutable = ">=1.2.0"
-pyproject-flake8 = ">=6"
+[tool.poetry.group.linting.dependencies]
 mypy = ">=0.991,!=1.11.0"
 pre-commit = ">=2.20"
-ruff = "^0.1.0"
+ruff = "^0.5.6"
 types-setuptools = ">=65.6.0.1"
-black = {version = ">=24.3.0", extras=["jupyter"]}
 sphinx-lint = ">=1.0.0"
-# :auto dev-linting:
+# :auto linting:
 
-# :auto dev-docs:
+# :auto docs:
 # Docs
-[tool.poetry.group.dev-docs]
+[tool.poetry.group.docs]
 optional = true
 
-[tool.poetry.group.dev-docs.dependencies]
+[tool.poetry.group.docs.dependencies]
 Sphinx = ">=5.3.0"
 sphinx-copybutton = "^0.5.2"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 sphinx-click = ">=5.0.0"
 livereload = ">=2.6.3"
-# :auto dev-docs:
+# :auto docs:
 
-# :auto dev-testing:
+# :auto tests:
 # Testing
-[tool.poetry.group.dev-testing]
+[tool.poetry.group.tests]
 optional = true
 
-[tool.poetry.group.dev-testing.dependencies]
+[tool.poetry.group.tests.dependencies]
 coverage = ">=6.5.0"
 pytest = ">=7.2.0"
 pytest-cov = ">=4.0.0"
@@ -118,7 +113,7 @@ syrupy = ">=4.0.0"
 # Jupyter notebook testing
 notebook = ">=7.2.2"
 papermill = ">=2.4.0"
-# :auto dev-testing:
+# :auto tests:
 
 [tool.poetry.plugins."smqtk_plugins"]
 # Add implementation sub-module exposure here.
@@ -165,50 +160,79 @@ doctest_optionflags = [
 ]
 # :auto pytest:
 
-# :auto flake8:
-[tool.flake8]
-exclude = [
-    "__pycache__",
-    ".eggs",
-    ".venv",
-    "docs",
-    "scripts"
-]
-# While a max length of 79 is encouraged, sometimes going over makes more sense
-# for overall clarity.
-max-line-length = 120
-# :auto flake8:
-
-# :auto black:
-[tool.black]
-# The regular expression pattern must be written as a single line;
-# otherwise pytest-black fails to exclude the folders. For details see
-# https://github.com/shopkeep/pytest-black/issues/36
-exclude = '(/(\.git|.venv|.eggs|docs|scripts$)/)'
-line-length = 120
-# :auto black:
-
 # :auto ruff:
 [tool.ruff]
-select = ["E", "W", "F", "I", "D", "A", "B", "N", "YTT", "C4", "PT"]
-line-length = 120
-
-ignore = [
-    # -- Ignore these rules, since they contradict our coding standards
-    "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
-    "C416",  # JATIC guidelines prefer "dict()", rather than "{}", to create an empty dict
-    # -- Ignoring these "Missing Docstring" errors for now, we will fix later
-    "D100", "D101", "D102", "D103", "D104", "D105", "D107"
+# Exclude content as appropriate.
+extend-exclude = [
+    "__pycache__",
+    "demos",
+    "scripts",
+    "docs/_build",
+    "docs/_implementations",
 ]
 
-[tool.ruff.pydocstyle]
+line-length = 120
+indent-width = 4
+
+# Assume Python 3.9
+target-version = "py39"
+
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = [
+    "F", "E", "W", "C90", "I", "N", "D1", "D200", "D201", "D211", "D403", "D419", "UP",
+    "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PYI", "PT", "Q",
+    "RSE", "RET", "SLF", "SIM", "TID252", "ARG", "FIX", "PD", "FLY", "NPY", "RUF027",
+    "RUF100", "PERF"
+]
+preview = true  # needed for RUF027
+explicit-preview-rules = true
+
+ignore = [
+  "ANN101",
+  "ANN102",
+  # -- Ignore these rules, since they contradict our coding standards
+  "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = [
+  "S101",  # Allow asserts in tests
+  "SLF001",  # Allow private member access for introspection in tests
+  "D100", "D101", "D102", "D103", "D104", "D105", "D107"  # Allow missing docstring in test dir
+]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true  # Allow Any for *args and **kwargs
+
+[tool.ruff.lint.isort]
+known-first-party = ["nrtk"]
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 5.
+max-complexity = 5
+
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.pycodestyle]
+[tool.ruff.lint.pycodestyle]
 max-doc-length = 120
 
-[tool.ruff.isort]
-known-first-party = ["nrtk"]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
 # :auto ruff:
 
 # :auto mypy:

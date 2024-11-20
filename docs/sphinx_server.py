@@ -9,10 +9,10 @@ and browse to http://localhost:5500
 
 livereload_: https://pypi.python.org/pypi/livereload
 """
+
 import os
 import sys
 from pathlib import Path
-from typing import List
 
 from livereload import Server, shell
 
@@ -28,7 +28,7 @@ else:
 rebuild_root = "_build/html"
 
 # Watch files recursively under these directories.
-watch_dirs: List[Path] = [SCRIPT_DIR, SCRIPT_DIR / ".." / "examples"]
+watch_dirs: list[Path] = [SCRIPT_DIR, SCRIPT_DIR / ".." / "examples"]
 # Watch files matching these globs under the above directories.
 watch_globs = ["*.rst", "*.ipynb"]
 
