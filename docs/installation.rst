@@ -35,7 +35,7 @@ Quick Start
 .. prompt:: bash
 
     cd /where/things/should/go/
-    git clone https://github.com/kitware/nrtk ./
+    git clone https://github.com/kitware/nrtk.git ./
     poetry install
     poetry run pytest
     cd docs
@@ -59,7 +59,7 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
 .. prompt:: bash
 
-    poetry install --sync --with dev-linting,dev-testing,dev-docs
+    poetry install --sync --with linting,tests,docs
 
 
 Building the Documentation

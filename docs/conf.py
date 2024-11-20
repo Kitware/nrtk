@@ -1,10 +1,12 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
+Configuration file for the Sphinx documentation builder.
+
+For the full list of built-in configuration values, see the documentation:
+https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
+
 import sys
 from pathlib import Path
-from typing import List
 
 # -- Path setup --------------------------------------------------------------
 
@@ -16,7 +18,7 @@ from typing import List
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, str(Path(__file__).parent.parent.absolute()))
-import nrtk  # noqa: E402
+import nrtk
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -56,4 +58,4 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
-html_static_path: List[str] = list()  # ['_static']
+html_static_path: list[str] = list()  # ['_static']

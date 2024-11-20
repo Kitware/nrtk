@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # Wrapper to pull and invoke the "common" script of the same name from the
 # smqtk-core repository. If the environment variable "JUST_DOWNLOAD" is set to
 # a non-empty value, we will only download the cache files and not execute
