@@ -47,7 +47,7 @@ class PybsmPerturber(PerturbImage):
         scenario (PybsmScenario): The pyBSM scenario object used for simulations.
         reflectance_range (np.ndarray): A 2-element array defining pixel reflectance range.
         thetas (dict[str, Any]): Dictionary storing parameters used for perturbations.
-        _rng_seed (float): Random number generator seed.
+        _rng_seed (int): Random number generator seed.
     """
 
     def __init__(  # noqa: C901
@@ -55,7 +55,7 @@ class PybsmPerturber(PerturbImage):
         sensor: PybsmSensor,
         scenario: PybsmScenario,
         reflectance_range: np.ndarray = DEFAULT_REFLECTANCE_RANGE,
-        rng_seed: float = 1,
+        rng_seed: int = 1,
         **kwargs: Any,
     ) -> None:
         """Initializes the PybsmPerturber.
@@ -63,6 +63,7 @@ class PybsmPerturber(PerturbImage):
         :param sensor: pyBSM sensor object.
         :param scenario: pyBSM scenario object.
         :param reflectance_range: Array of reflectances that correspond to pixel values.
+        :param rng_seed: integer seed value that will be used for the random number generator
 
         :raises: ImportError if pyBSM with OpenCV not found,
         installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
@@ -162,7 +163,6 @@ class PybsmPerturber(PerturbImage):
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
-        cfg["rng_seed"] = 1
         return cfg
 
     @classmethod
