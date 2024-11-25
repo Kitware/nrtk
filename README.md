@@ -1,4 +1,7 @@
 <!-- :auto badges: -->
+[![PyPI - Python Version](https://img.shields.io/pypi/v/nrtk)](https://pypi.org/project/nrtk/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nrtk)
+[![Documentation Status](https://readthedocs.org/projects/nrtk/badge/?version=latest)](https://nrtk.readthedocs.io/en/latest/?badge=latest)
 <!-- :auto badges: -->
 
 # Natural Robustness Toolkit (NRTK)
