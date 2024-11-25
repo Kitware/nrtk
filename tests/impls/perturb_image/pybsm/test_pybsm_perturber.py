@@ -1,6 +1,7 @@
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict
+from typing import Any
 
 import numpy as np
 import pytest
@@ -8,9 +9,8 @@ from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
-
-from ...test_pybsm_utils import create_sample_sensor_and_scenario
-from ..test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
@@ -45,21 +45,21 @@ class TestPyBSMPerturber:
         )
 
     @pytest.mark.parametrize(
-        ("param_name", "param_value"),
+        ("param_name", "param_value", "rng_seed"),
         [
-            ("ground_range", 10000),
-            ("ground_range", 20000),
-            ("ground_range", 30000),
-            ("altitude", 10000),
-            ("ihaze", 2),
+            ("ground_range", 10000, 1),
+            ("ground_range", 20000, 1),
+            ("ground_range", 30000, 2),
+            ("altitude", 10000, 2),
+            ("ihaze", 2, 2),
         ],
     )
-    def test_reproducibility(self, param_name: str, param_value: Any) -> None:
+    def test_reproducibility(self, param_name: str, param_value: int, rng_seed: float) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = PybsmPerturber(sensor=sensor, scenario=scenario, **{param_name: param_value})
+        inst = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
@@ -134,7 +134,7 @@ class TestPyBSMPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, reflectance_range: np.ndarray, expectation: ContextManager) -> None:
+    def test_configuration_bounds(self, reflectance_range: np.ndarray, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         sensor, scenario = create_sample_sensor_and_scenario()
         with expectation:
@@ -153,7 +153,7 @@ class TestPyBSMPerturber:
             ),
         ],
     )
-    def test_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_additional_params(self, additional_params: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5]))
@@ -163,7 +163,7 @@ class TestPyBSMPerturber:
 
 
 @mock.patch.object(PybsmPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmPerturber.is_usable()
