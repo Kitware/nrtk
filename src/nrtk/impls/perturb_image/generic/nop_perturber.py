@@ -52,6 +52,11 @@ class NOPPerturber(PerturbImage):
             additional_params = dict()
         return np.copy(image)
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Get the configuration dictionary of the ComposePerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary containing perturber configurations.
+        """
         return {}

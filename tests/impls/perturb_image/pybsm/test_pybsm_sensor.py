@@ -155,7 +155,7 @@ def test_missing_deps() -> None:
         PybsmSensor(name, D, f, p_x, opt_trans_wavelengths).create_sensor()
 
 
-@pytest.fixture
+@pytest.fixture()  # noqa:PT001
 def sensor_instance() -> PybsmSensor:
     """Fixture to provide a PybsmSensor instance with basic parameters."""
     return PybsmSensor(name="test_sensor", D=0.3, f=1.1, p_x=0.4, opt_trans_wavelengths=np.array([0.1, 0.4]) * 1.0e-6)

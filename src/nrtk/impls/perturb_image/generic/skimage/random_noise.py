@@ -77,8 +77,13 @@ class _SKImageNoisePerturber(PerturbImage):
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the _SKImageNoisePerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         return {"rng": self.rng}
 
 
@@ -102,8 +107,13 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
 
         self.amount = amount
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the _SPNoisePerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         cfg = super().get_config()
         cfg["amount"] = self.amount
         return cfg
@@ -180,8 +190,13 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
             salt_vs_pepper=self.salt_vs_pepper,
         )
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the SaltAndPepperNoisePerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         cfg = super().get_config()
         cfg["salt_vs_pepper"] = self.salt_vs_pepper
         return cfg
@@ -210,8 +225,13 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         self.mean = mean
         self.var = var
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the _GSNoisePerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         cfg = super().get_config()
         cfg["mean"] = self.mean
         cfg["var"] = self.var

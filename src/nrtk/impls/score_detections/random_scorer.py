@@ -74,6 +74,11 @@ class RandomScorer(ScoreDetections):
 
         return [self._rng.random() for actual_det in actual]
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the RandomScorer instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         return {"seed": self.seed}

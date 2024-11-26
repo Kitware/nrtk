@@ -151,7 +151,6 @@ class COCOScorer(ScoreDetections):
 
         return final_scores
 
-    @override
     def get_config(self) -> dict[str, Any]:
         """
         Returns the configuration dictionary for the `COCOScorer` instance.

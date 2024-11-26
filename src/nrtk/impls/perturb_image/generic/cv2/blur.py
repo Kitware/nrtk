@@ -76,13 +76,23 @@ class AverageBlurPerturber(PerturbImage):
 
         return cv2.blur(image, ksize=(self.ksize, self.ksize))
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the AverageBlurPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         return {"ksize": self.ksize}
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the required pybsm module is available.
+
+        Returns:
+            bool: True if pybsm is installed; False otherwise.
+        """
         # Requires opencv to be installed
         return cv2_available
 
@@ -112,13 +122,23 @@ class GaussianBlurPerturber(PerturbImage):
 
         return cv2.GaussianBlur(image, ksize=(self.ksize, self.ksize), sigmaX=0)
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the GaussianBlurPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         return {"ksize": self.ksize}
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the required pybsm module is available.
+
+        Returns:
+            bool: True if pybsm is installed; False otherwise.
+        """
         # Requires opencv to be installed
         return cv2_available
 
@@ -148,12 +168,22 @@ class MedianBlurPerturber(PerturbImage):
 
         return cv2.medianBlur(image, ksize=self.ksize)
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the MedianBlurPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         return {"ksize": self.ksize}
 
-    @override
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the required pybsm module is available.
+
+        Returns:
+            bool: True if pybsm is installed; False otherwise.
+        """
         # Requires opencv to be installed
         return cv2_available

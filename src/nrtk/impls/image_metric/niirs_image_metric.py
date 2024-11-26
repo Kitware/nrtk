@@ -129,8 +129,12 @@ class NIIRSImageMetric(ImageMetric):
             "scenario": to_config_dict(self.scenario),
         }
 
-        return config
-
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the required pybsm module is available.
+
+        Returns:
+            bool: True if pybsm is installed; False otherwise.
+        """
         return pybsm_available

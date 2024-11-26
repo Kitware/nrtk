@@ -41,7 +41,6 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
-from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -109,7 +108,6 @@ class PybsmPerturber(PerturbImage):
         # this is key:value record of the thetas use for perturbing
         self.thetas = copy.deepcopy(kwargs)
 
-    @override
     @property
     def params(self) -> dict:
         """

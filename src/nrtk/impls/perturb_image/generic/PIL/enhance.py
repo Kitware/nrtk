@@ -95,8 +95,13 @@ class _PILEnhancePerturber(PerturbImage):
 
         return image_np
 
-    @override
     def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the _PILEnhancePerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         return {"factor": self.factor}
 
 
