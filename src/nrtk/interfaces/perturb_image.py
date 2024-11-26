@@ -70,11 +70,10 @@ class PerturbImage(Plugfigurable):
 
     @classmethod
     def get_type_string(cls) -> str:
-        """Calls ``perturb()`` with the given input image.
+        """
+        Returns the fully qualified type string of the `PerturbImage` class or its subclass.
 
-        :param image: Input image as a numpy array.
-        :param additional_params: A dictionary containing additional parameters for the perturbation.
-
-        :return: Perturbed image as numpy array.
+        :return: A string representing the fully qualified type, in the format `<module>.<class_name>`.
+                 For example, "my_module.CustomPerturbImage".
         """
         return f"{cls.__module__}.{cls.__name__}"

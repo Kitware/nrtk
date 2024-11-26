@@ -143,8 +143,9 @@ def test_config() -> None:
 
 
 @mock.patch.object(PybsmSensor, "is_usable", return_value=False)
-def test_missing_deps() -> None:
+def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
     assert not PybsmSensor.is_usable()
     name = "spatial"
     D = 0  # noqa:N806

@@ -1,5 +1,5 @@
 """
-This module provides classes for applying different types of blurring to image stimuli,
+This module provides classes for applying different types of blurring to an image,
 implementing the `PerturbImage` interface. Blurring methods include average, Gaussian,
 and median blurring, each with customizable kernel sizes for controlling the level of
 blur effect.

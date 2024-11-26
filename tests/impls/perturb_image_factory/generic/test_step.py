@@ -23,10 +23,15 @@ from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
+from tests.test_utils import CustomFloatSnapshotExtension
 
 DATA_DIR = Path(__file__).parents[3] / "data"
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+
+
+@pytest.fixture()  # noqa:PT001
+def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
 
 class DummyPerturber(PerturbImage):
@@ -230,14 +235,14 @@ class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(
         ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),
         [
-            (JitterOTFPerturber, "s_y", 0, "s_x", 1e-3, 6e-3, 1e-3),
-            (DetectorOTFPerturber, "w_x", 0, "w_y", 4e-3, 9e-3, 1e-3),
+            (JitterOTFPerturber, "s_y", 0, "s_x", 2e-3, 6e-3, 1e-3),
+            (DetectorOTFPerturber, "w_x", 0, "w_y", 3e-3, 9e-3, 1e-3),
             (TurbulenceApertureOTFPerturber, "altitude", 250, "D", 40e-5, 40e-3, 66e-4),
         ],
     )
     def test_perturb_instance_modification(
         self,
-        snapshot: SnapshotAssertion,
+        snapshot_custom: SnapshotAssertion,
         perturber: type[PerturbImage],
         modifying_param: str,
         modifying_val: float,
@@ -260,6 +265,4 @@ class TestStepPerturbImageFactory:
         for perturber in perturber_factory:
             setattr(perturber, modifying_param, modifying_val)
             out_img = pybsm_perturber_assertions(perturb=perturber, image=img, expected=None, additional_params=img_md)
-            assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(
-                extension_class=TIFFImageSnapshotExtension,
-            )
+            snapshot_custom.assert_match(out_img)

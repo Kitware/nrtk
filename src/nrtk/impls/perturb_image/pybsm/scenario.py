@@ -113,6 +113,8 @@ class PybsmScenario(Configurable):
             default, 1.7e-14, is the HV 5/7 profile value
 
         """
+        if not self.is_usable():
+            raise ImportError("pybsm not found")
 
         if ihaze not in PybsmScenario.ihaze_values:
             raise ValueError(

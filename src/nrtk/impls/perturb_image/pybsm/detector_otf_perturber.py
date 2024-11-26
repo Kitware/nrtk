@@ -2,7 +2,7 @@
 This module defines the `DetectorOTFPerturber` class, which applies image perturbations
 based on the Optical Transfer Function (OTF) of a detector, using configurations for
 sensor and scenario. This class can simulate the effects of detector and environmental
-parameters on images, with support for OpenCV and pyBSM functionalities.
+parameters on images.
 
 Classes:
     DetectorOTFPerturber: Applies OTF-based perturbations to images using specified

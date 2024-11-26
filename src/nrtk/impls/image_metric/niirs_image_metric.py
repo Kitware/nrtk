@@ -64,7 +64,7 @@ class NIIRSImageMetric(ImageMetric):
 
         Raises:
             ImportError: If the pyBSM library is not available.
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+            installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
             raise ImportError(
