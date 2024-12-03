@@ -1,6 +1,6 @@
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager
 
 import pytest
 from pybsm.simulation.scenario import Scenario
@@ -72,7 +72,7 @@ def test_verify_parameters(
     altitude: float,
     ground_range: float,
     name: str,
-    expectation: ContextManager,
+    expectation: AbstractContextManager,
 ) -> None:
     with expectation:
         pybsm_scenario = PybsmScenario(name, ihaze, altitude, ground_range)
@@ -116,7 +116,7 @@ def test_config() -> None:
 
 
 @mock.patch.object(PybsmScenario, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmScenario.is_usable()

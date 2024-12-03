@@ -1,6 +1,9 @@
 import unittest.mock as mock
+from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Optional, Sequence
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -10,9 +13,8 @@ from smqtk_core.configuration import configuration_test_helper
 from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
     CircularApertureOTFPerturber,
 )
-
-from ...test_pybsm_utils import create_sample_sensor_and_scenario
-from ..test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = (
@@ -149,7 +151,11 @@ class TestCircularApertureOTFPerturber:
             ),
         ],
     )
-    def test_provided_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_provided_additional_params(
+        self,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
@@ -188,8 +194,8 @@ class TestCircularApertureOTFPerturber:
         self,
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
-        interp: Optional[bool],
-        expectation: ContextManager,
+        interp: bool,
+        expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
         with expectation:
@@ -201,7 +207,11 @@ class TestCircularApertureOTFPerturber:
             ({}, does_not_raise()),
         ],
     )
-    def test_default_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_default_additional_params(
+        self,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test variations of additional params."""
         perturber = CircularApertureOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -324,7 +334,7 @@ class TestCircularApertureOTFPerturber:
 
 
 @mock.patch.object(CircularApertureOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not CircularApertureOTFPerturber.is_usable()

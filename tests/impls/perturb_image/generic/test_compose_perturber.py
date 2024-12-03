@@ -1,7 +1,7 @@
 import json
 import unittest.mock as mock
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import numpy as np
 import pytest
@@ -14,11 +14,10 @@ from smqtk_core.configuration import (
 from nrtk.impls.perturb_image.generic.compose_perturber import ComposePerturber
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.perturb_image import PerturbImage
+from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
-from ..test_perturber_utils import perturber_assertions
 
-
-def _perturb(image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:  # pragma: no cover
+def _perturb(image: np.ndarray, _: Optional[dict[str, Any]] = None) -> np.ndarray:  # pragma: no cover
     return np.copy(image) + 1
 
 
@@ -49,7 +48,7 @@ class TestComposePerturber:
             (np.ones((256, 256, 3), dtype=np.float64), [m_dummy, m_dummy]),
         ],
     )
-    def test_reproducibility(self, image: np.ndarray, perturbers: List[PerturbImage]) -> None:
+    def test_reproducibility(self, image: np.ndarray, perturbers: list[PerturbImage]) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = ComposePerturber(perturbers=perturbers)
@@ -60,7 +59,7 @@ class TestComposePerturber:
         perturber_assertions(perturb=inst, image=image, expected=out_image)
 
     @pytest.mark.parametrize("perturbers", [[NOPPerturber()], [NOPPerturber(), NOPPerturber()]])
-    def test_configuration(self, perturbers: List[PerturbImage]) -> None:
+    def test_configuration(self, perturbers: list[PerturbImage]) -> None:
         """Test configuration stability."""
         inst = ComposePerturber(perturbers=perturbers)
         for i in configuration_test_helper(inst):
@@ -74,7 +73,7 @@ class TestComposePerturber:
     def test_hydration(
         self,
         tmp_path: Path,
-        perturbers: List[PerturbImage],
+        perturbers: list[PerturbImage],
     ) -> None:
         """Test configuration hydration using from_config_dict."""
         original_perturber = ComposePerturber(perturbers=perturbers)

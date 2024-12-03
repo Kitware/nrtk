@@ -1,6 +1,8 @@
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -11,8 +13,9 @@ from nrtk.impls.perturb_image.generic.cv2.blur import (
     GaussianBlurPerturber,
     MedianBlurPerturber,
 )
+from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
-from ...test_perturber_utils import perturber_assertions
+rng = np.random.default_rng()
 
 
 @pytest.mark.skipif(
@@ -39,7 +42,7 @@ class TestAverageBlurPerturber:
     @pytest.mark.parametrize(
         ("image", "ksize"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 1),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 1),
             (np.ones((256, 256, 3), dtype=np.float32), 3),
             (np.ones((256, 256, 3), dtype=np.float64), 5),
         ],
@@ -72,7 +75,7 @@ class TestAverageBlurPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             AverageBlurPerturber(**kwargs)
@@ -89,7 +92,7 @@ class TestAverageBlurPerturber:
             ),
         ],
     )
-    def test_perturb_bounds(self, image: np.ndarray, expectation: ContextManager) -> None:
+    def test_perturb_bounds(self, image: np.ndarray, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = AverageBlurPerturber()
         with expectation:
@@ -120,7 +123,7 @@ class TestGaussianBlurPerturber:
     @pytest.mark.parametrize(
         ("image", "ksize"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 1),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 1),
             (np.ones((256, 256, 3), dtype=np.float32), 3),
             (np.ones((256, 256, 3), dtype=np.float64), 5),
         ],
@@ -161,7 +164,7 @@ class TestGaussianBlurPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             GaussianBlurPerturber(**kwargs)
@@ -178,7 +181,7 @@ class TestGaussianBlurPerturber:
             ),
         ],
     )
-    def test_perturb_bounds(self, image: np.ndarray, expectation: ContextManager) -> None:
+    def test_perturb_bounds(self, image: np.ndarray, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = GaussianBlurPerturber()
         with expectation:
@@ -209,7 +212,7 @@ class TestMedianBlurPerturber:
     @pytest.mark.parametrize(
         ("image", "ksize"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 3),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 3),
             (np.ones((256, 256, 3), dtype=np.float32), 5),
         ],
     )
@@ -249,7 +252,7 @@ class TestMedianBlurPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             MedianBlurPerturber(**kwargs)
@@ -266,7 +269,7 @@ class TestMedianBlurPerturber:
             ),
         ],
     )
-    def test_perturb_bounds(self, image: np.ndarray, expectation: ContextManager) -> None:
+    def test_perturb_bounds(self, image: np.ndarray, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = MedianBlurPerturber(ksize=5)
         with expectation:
@@ -274,7 +277,7 @@ class TestMedianBlurPerturber:
 
 
 @mock.patch.object(MedianBlurPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not MedianBlurPerturber.is_usable()

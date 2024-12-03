@@ -1,6 +1,7 @@
-import random
+from collections.abc import Hashable, Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Hashable, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 import pytest
@@ -14,11 +15,12 @@ from nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator imp
 )
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.impls.score_detections.random_scorer import RandomScorer
-
-from ..test_pybsm_utils import create_sample_scenario, create_sample_sensor
-from .test_generator_utils import gen_rand_dets, generator_assertions
+from tests.impls.gen_object_detector_blackbox_response.test_generator_utils import gen_rand_dets, generator_assertions
+from tests.impls.test_pybsm_utils import create_sample_scenario, create_sample_sensor
 
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+
+rng = np.random.default_rng()
 
 
 @pytest.mark.skipif(
@@ -30,21 +32,21 @@ class TestSimplePyBSMGenerator:
         ("images", "img_gsds", "ground_truth", "expectation"),
         [
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(4)],
-                np.random.rand(4, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(4)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(4)],
+                rng.random((4, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(4)],
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                np.random.rand(2, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11))],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                rng.random((2, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11))],
                 pytest.raises(ValueError, match=r"Size mismatch."),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                np.random.rand(4, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(2)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                rng.random((4, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
                 pytest.raises(ValueError, match=r"Size mismatch."),
             ),
         ],
@@ -53,8 +55,8 @@ class TestSimplePyBSMGenerator:
         self,
         images: Sequence[np.ndarray],
         img_gsds: Sequence[float],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-        expectation: ContextManager,
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+        expectation: AbstractContextManager,
     ) -> None:
         """Test configuration stability."""
         with expectation:
@@ -69,37 +71,37 @@ class TestSimplePyBSMGenerator:
         ("images", "img_gsds", "ground_truth", "idx", "expectation"),
         [
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                np.random.rand(3, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                rng.random((3, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 0,
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                np.random.rand(3, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                rng.random((3, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 1,
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                np.random.rand(3, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                rng.random((3, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 2,
                 does_not_raise(),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                np.random.rand(3, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                rng.random((3, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 -1,
                 pytest.raises(IndexError),
             ),
             (
-                [np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                np.random.rand(3, 1),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(3)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                rng.random((3, 1)),
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
                 5,
                 pytest.raises(IndexError),
             ),
@@ -109,9 +111,9 @@ class TestSimplePyBSMGenerator:
         self,
         images: Sequence[np.ndarray],
         img_gsds: Sequence[float],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
         idx: int,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to index the generator and that len(generator) matches expectations."""
         inst = SimplePybsmGenerator(images=images, img_gsds=img_gsds, ground_truth=ground_truth)
@@ -129,7 +131,7 @@ class TestSimplePyBSMGenerator:
             (
                 [np.array(Image.open(INPUT_IMG_FILE)) for _ in range(5)],
                 [3.19 / 160.0 for _ in range(5)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(5)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(5)],
                 [
                     {
                         "sensor": create_sample_sensor(),
@@ -149,7 +151,7 @@ class TestSimplePyBSMGenerator:
             (
                 [np.array(Image.open(INPUT_IMG_FILE)) for _ in range(2)],
                 [3.19 / 160.0 for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=random.randint(1, 11)) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
                 [
                     {
                         "sensor": create_sample_sensor(),
@@ -166,8 +168,8 @@ class TestSimplePyBSMGenerator:
         self,
         images: Sequence[np.ndarray],
         img_gsds: Sequence[float],
-        ground_truth: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-        perturber_factory_configs: Sequence[Dict[str, Any]],
+        ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+        perturber_factory_configs: Sequence[dict[str, Any]],
         verbose: bool,
     ) -> None:
         """Ensure generation assertions hold."""

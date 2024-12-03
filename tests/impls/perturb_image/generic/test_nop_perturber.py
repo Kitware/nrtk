@@ -3,14 +3,15 @@ import pytest
 from smqtk_core.configuration import configuration_test_helper
 
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
+from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
-from ..test_perturber_utils import perturber_assertions
+rng = np.random.default_rng()
 
 
 @pytest.mark.parametrize(
     "image",
     [
-        np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8),
+        rng.integers(0, 255, (256, 256, 3), dtype=np.uint8),
         np.ones((256, 256, 3), dtype=np.float32),
     ],
 )

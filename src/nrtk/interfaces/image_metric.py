@@ -1,5 +1,30 @@
+"""
+This module defines the `ImageMetric` abstract base class, an interface for computing
+metrics between one or two images. Implementations of `ImageMetric` should define the
+specific metric computation in the `compute` method, which can be called directly or
+via the `__call__` method.
+
+Classes:
+    ImageMetric: An interface outlining the computation of a given metric for image comparison or analysis.
+
+Dependencies:
+    - numpy for numerical operations on images.
+    - smqtk_core for configuration management and plugin compatibility.
+
+Example usage:
+    class SpecificMetric(ImageMetric):
+        def compute(self, img_1, img_2=None, additional_params=None):
+            # Define metric calculation logic here.
+            pass
+
+    metric = SpecificMetric()
+    score = metric(img_1, img_2)
+"""
+
+from __future__ import annotations
+
 import abc
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_core import Plugfigurable
@@ -12,8 +37,8 @@ class ImageMetric(Plugfigurable):
     def compute(
         self,
         img_1: np.ndarray,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given up to two images, and additional parameters, return some given metric about the image(s).
 
@@ -28,8 +53,8 @@ class ImageMetric(Plugfigurable):
     def __call__(
         self,
         img_1: np.ndarray,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Calls compute() with the given input image(s) and additional parameters.
 
@@ -44,8 +69,17 @@ class ImageMetric(Plugfigurable):
 
     @property
     def name(self) -> str:
+        """
+        Returns the name of the ImageMetric instance.
+
+        This property provides a convenient way to retrieve the name of the
+        class instance, which can be useful for logging, debugging, or display purposes.
+
+        Returns:
+            str: The name of the ImageMetric instance.
+        """
         return self.__class__.__name__
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         """Returns the config for the interface."""
         return {}

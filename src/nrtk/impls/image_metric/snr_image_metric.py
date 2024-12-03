@@ -1,6 +1,43 @@
-from typing import Any, Dict, Optional, Tuple, Union
+"""
+This module provides an implementation of the `ImageMetric` interface for calculating the
+Signal-to-Noise Ratio (SNR) of an image. The main class, `SNRImageMetric`, computes the SNR
+for a single input image, with options to control the axis and degrees of freedom used in the
+calculation.
+
+Classes:
+    SNRImageMetric: Calculates the Signal-to-Noise Ratio (SNR) of an image using specified
+    parameters for axis and degrees of freedom.
+
+Functions:
+    _signal_to_noise: A helper function for computing the SNR of an image based on its mean
+    and standard deviation along a given axis and degrees of freedom.
+
+Dependencies:
+    - numpy for image processing and statistical calculations.
+
+Usage:
+    Instantiate `SNRImageMetric` and call the `compute` method with an image to obtain the
+    SNR. Optional parameters for `axis` and `ddof` (degrees of freedom) can be specified
+    in `additional_params`.
+
+Example:
+    snr_metric = SNRImageMetric()
+    snr_value = snr_metric.compute(image_data, additional_params={"axis": 0, "ddof": 0})
+
+Notes:
+    - SNR calculations are only supported for single images; attempting to pass a second
+      image to `compute` will raise an error.
+    - The optional `axis` parameter controls the dimensions over which the mean and standard
+      deviation are computed. This affects the SNR calculation but defaults to None, which
+      includes all axes and channels.
+"""
+
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
+from typing_extensions import override
 
 from nrtk.interfaces.image_metric import ImageMetric
 
@@ -8,11 +45,12 @@ from nrtk.interfaces.image_metric import ImageMetric
 class SNRImageMetric(ImageMetric):
     """Implementation of the ``ComputeImageMetrics`` interface to calculate the Signal to Noise Ratio."""
 
-    def compute(
+    @override
+    def compute(  # noqa: C901
         self,
         img_1: np.ndarray,
-        img_2: Optional[np.ndarray] = None,
-        additional_params: Optional[Dict[str, Any]] = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given one image, compute the Signal to Noise ratio.
 
@@ -81,7 +119,7 @@ class SNRImageMetric(ImageMetric):
         """
         if ddof > num_elements:
             raise ValueError(
-                f"Invalid ddof value! ddof must be at most {num_elements}, depending on the value of axis."
+                f"Invalid ddof value! ddof must be at most {num_elements}, depending on the value of axis.",
             )
 
         # Check that we are calling the signal_to_noise function correctly
@@ -90,7 +128,7 @@ class SNRImageMetric(ImageMetric):
 
 def _signal_to_noise(
     img: np.ndarray,
-    axis: Optional[Union[int, Tuple[int, ...]]] = None,
+    axis: int | tuple[int, ...] | None = None,
     ddof: int = 0,
 ) -> float:
     """Computes the signal to noise ratio of an input image.

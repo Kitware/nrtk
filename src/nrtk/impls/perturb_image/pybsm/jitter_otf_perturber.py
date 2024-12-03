@@ -1,6 +1,27 @@
+"""
+This module provides the `JitterOTFPerturber` class, which applies jitter and Optical Transfer Function (OTF)
+perturbations to images for use in remote sensing and other image processing applications. The class leverages
+sensor and scenario configurations provided by `PybsmSensor` and `PybsmScenario`, using pyBSM functionalities
+to implement realistic perturbations.
+
+Classes:
+    JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM and OpenCV.
+
+Dependencies:
+    - OpenCV (cv2) for image processing.
+    - pyBSM for OTF and radiance calculations.
+    - nrtk.interfaces.perturb_image.PerturbImage for base functionality.
+
+Example usage:
+    sensor = PybsmSensor(...)
+    scenario = PybsmScenario(...)
+    perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
+    perturbed_image = perturber.perturb(image)
+"""
+
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, TypeVar
 
 try:
     import cv2
@@ -24,6 +45,7 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -33,13 +55,31 @@ C = TypeVar("C", bound="JitterOTFPerturber")
 
 
 class JitterOTFPerturber(PerturbImage):
+    """
+    Implements image perturbation using jitter and Optical Transfer Function (OTF).
+
+    This class applies realistic perturbations to images based on sensor and scenario configurations,
+    leveraging Optical Transfer Function (OTF) modeling through the pyBSM library. Perturbations include
+    jitter effects that simulate real-world distortions in optical imaging systems.
+
+    Attributes:
+        sensor (PybsmSensor | None): The sensor configuration used to define perturbation parameters.
+        scenario (PybsmScenario | None): Scenario configuration providing environmental context for perturbations.
+        additional_params (dict): Additional configuration options for customizing perturbations.
+
+    Methods:
+        perturb(image): Applies the jitter-based OTF perturbation to the provided image.
+        get_config(): Returns the configuration for the current instance.
+        from_config(config_dict): Instantiates from a configuration dictionary.
+    """
+
     def __init__(
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        s_x: Optional[float] = None,
-        s_y: Optional[float] = None,
-        interp: Optional[bool] = True,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
+        s_x: float | None = None,
+        s_y: float | None = None,
+        interp: bool = True,
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
@@ -48,8 +88,8 @@ class JitterOTFPerturber(PerturbImage):
         :param scenario: pyBSM scenario object
         :param s_x: root-mean-squared jitter amplitudes in the x direction (rad).
         :param s_y: root-mean-squared jitter amplitudes in the y direction (rad).
-        :param interp: a boolean determinings whether load_database_atmosphere is used with or without
-                interpoloation
+        :param interp: a boolean determining whether load_database_atmosphere is used with or without
+                       interpolation
 
         If both sensor and scenario parameters are not present, then default values
         will be used for their parameters
@@ -68,7 +108,7 @@ class JitterOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
 
         if sensor and scenario:
@@ -88,7 +128,7 @@ class JitterOTFPerturber(PerturbImage):
             # cut down the wavelength range to only the regions of interests
             self.mtf_wavelengths = wavelengths[weights > 0.0]
 
-            self.D = sensor.D  # noqa: N806
+            self.D = sensor.D
             self.s_x = s_x if s_x is not None else sensor.s_x
             self.s_y = s_y if s_y is not None else sensor.s_y
 
@@ -102,13 +142,14 @@ class JitterOTFPerturber(PerturbImage):
             self.slant_range = -1
             self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            self.D = 0.003  # noqa: N806
+            self.D = 0.003
 
         self.sensor = sensor
         self.scenario = scenario
         self.interp = interp
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -129,7 +170,7 @@ class JitterOTFPerturber(PerturbImage):
             if "img_gsd" not in additional_params:
                 raise ValueError(
                     "'img_gsd' must be present in image metadata\
-                                  for this perturber"
+                                  for this perturber",
                 )
             ref_gsd = additional_params["img_gsd"]
             psf = otf_to_psf(self.jit_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
@@ -148,21 +189,38 @@ class JitterOTFPerturber(PerturbImage):
 
         return sim_img.astype(np.uint8)
 
-    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def __call__(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
         """Alias for :meth:`.NIIRS.apply`."""
         if additional_params is None:
             additional_params = dict()
         return self.perturb(image, additional_params)
 
     @classmethod
-    def get_default_config(cls) -> Dict[str, Any]:
+    def get_default_config(cls) -> dict[str, Any]:
+        """
+        Provides the default configuration for JitterOTFPerturber instances.
+
+        Returns:
+            dict[str, Any]: A dictionary with the default configuration values.
+        """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         return cfg
 
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+        """
+        Instantiates a JitterOTFPerturber from a configuration dictionary.
+
+        Args:
+            config_dict (dict): Configuration dictionary with initialization parameters.
+            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+
+        Returns:
+            C: An instance of JitterOTFPerturber configured according to `config_dict`.
+        """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
@@ -175,13 +233,29 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the necessary dependencies (pybsm and OpenCV) are available.
+
+        Returns:
+            bool: True if both pybsm and OpenCV are available; False otherwise.
+        """
         # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the JitterOTFPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        config = {"sensor": sensor, "scenario": scenario, "s_x": self.s_x, "s_y": self.s_y, "interp": self.interp}
-
-        return config
+        return {
+            "sensor": sensor,
+            "scenario": scenario,
+            "s_x": self.s_x,
+            "s_y": self.s_y,
+            "interp": self.interp,
+        }

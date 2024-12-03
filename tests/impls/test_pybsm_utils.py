@@ -1,5 +1,4 @@
 import io
-from typing import Tuple
 
 import numpy as np
 from PIL import Image
@@ -71,7 +70,7 @@ def create_sample_sensor() -> PybsmSensor:
     qe_wavelengths = np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1]) * 1.0e-6
     qe = np.array([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0])
 
-    sensor = PybsmSensor(
+    return PybsmSensor(
         name,
         D,
         f,
@@ -96,8 +95,6 @@ def create_sample_sensor() -> PybsmSensor:
         qe,
     )
 
-    return sensor
-
 
 def create_sample_scenario() -> PybsmScenario:
     altitude = 9000.0
@@ -110,7 +107,7 @@ def create_sample_scenario() -> PybsmScenario:
 
     aircraft_speed = 100.0
 
-    scenario = PybsmScenario(
+    return PybsmScenario(
         scenario_name,
         ihaze,
         altitude,
@@ -118,10 +115,8 @@ def create_sample_scenario() -> PybsmScenario:
         aircraft_speed,
     )
 
-    return scenario
 
-
-def create_sample_sensor_and_scenario() -> Tuple[PybsmSensor, PybsmScenario]:
+def create_sample_sensor_and_scenario() -> tuple[PybsmSensor, PybsmScenario]:
     return create_sample_sensor(), create_sample_scenario()
 
 

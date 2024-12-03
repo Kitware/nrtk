@@ -1,7 +1,9 @@
 import json
 import tempfile
+from collections.abc import Hashable, Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Hashable, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 import pytest
@@ -14,9 +16,14 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 
 class TestCOCOScorer:
-    dummy_actual = [[(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})]]
+    dummy_actual = [
+        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})],
+    ]
     dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
-    dummy_pred_class = _class_map(classes=("dummy_class_1", "dummy_class_2"), scores=[0.9, 0.1])
+    dummy_pred_class = _class_map(
+        classes=("dummy_class_1", "dummy_class_2"),
+        scores=[0.9, 0.1],
+    )
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
     dummy_actual_test_len_mismatch = [
@@ -35,9 +42,11 @@ class TestCOCOScorer:
                 "id": 1,
                 "image_id": 1,
                 "iscrowd": 0,
-            }
+            },
         ],
-        "images": [{"id": 1, "file_name": "dummy_img.tif", "width": 128.0, "height": 128.0}],
+        "images": [
+            {"id": 1, "file_name": "dummy_img.tif", "width": 128.0, "height": 128.0},
+        ],
         "categories": [
             {"id": 1, "name": "dummy_class_1"},
             {"id": 2, "name": "dummy_class_2"},
@@ -53,7 +62,10 @@ class TestCOCOScorer:
                 dummy_actual_test_len_mismatch,
                 dummy_predicted,
                 annotation_data,
-                pytest.raises(ValueError, match=r"Size mismatch between actual and predicted data"),
+                pytest.raises(
+                    ValueError,
+                    match=r"Size mismatch between actual and predicted data",
+                ),
             ),
             (
                 dummy_empty,
@@ -68,10 +80,10 @@ class TestCOCOScorer:
     )
     def test_basic_assertions_and_exceptions(
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-        annotation_data: Dict,
-        expectation: ContextManager,
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+        annotation_data: dict,
+        expectation: AbstractContextManager,
     ) -> None:
         """Test basic scorer assertions and exceptions using the helper function from the utils file."""
         tmp_file = tempfile.NamedTemporaryFile(mode="w+", suffix=".json")
@@ -105,11 +117,11 @@ class TestCOCOScorer:
     )
     def test_gt_and_predictions_validity(
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
-        annotation_data: Dict,
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+        annotation_data: dict,
         stat_index: int,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         """Test validity of the ground truth and predictions."""
         tmp_file = tempfile.NamedTemporaryFile(mode="w+", suffix=".json")
@@ -117,7 +129,7 @@ class TestCOCOScorer:
         tmp_file.flush()
         json_filename = tmp_file.name
 
-        with open(json_filename, mode="r", encoding="utf-8") as file:
+        with open(json_filename, encoding="utf-8") as file:
             ann_data = file.read()
 
         ann_json = json.loads(ann_data)
@@ -145,12 +157,14 @@ class TestCOCOScorer:
             cats = ann_json["categories"]
 
             assert any(scorer.cat_ids[idx] == c["id"] for c in cats)
-            assert all(np.concatenate([pred_bbox.min_vertex, pred_bbox.max_vertex]) >= np.array([0.0, 0.0, 0.0, 0.0]))
+            assert all(
+                np.concatenate([pred_bbox.min_vertex, pred_bbox.max_vertex]) >= np.array([0.0, 0.0, 0.0, 0.0]),
+            )
 
             scorer.score(actual=actual, predicted=predicted)
 
     @pytest.mark.parametrize("annotation_data", [annotation_data])
-    def test_config(self, annotation_data: Dict) -> None:
+    def test_config(self, annotation_data: dict) -> None:
         """Test configuration stability."""
         tmp_file = tempfile.NamedTemporaryFile(mode="w+", suffix=".json")
         json.dump(annotation_data, tmp_file)

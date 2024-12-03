@@ -1,6 +1,7 @@
 import itertools
+from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Sequence
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -22,12 +23,18 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
         ),
         (
             [0],
-            pytest.raises(ValueError, match=r"Factory passed in with invald length of 0"),
+            pytest.raises(
+                ValueError,
+                match=r"Factory passed in with invald length of 0",
+            ),
         ),
         ([1], does_not_raise()),
         (
             [1, 0],
-            pytest.raises(ValueError, match=r"Factory passed in with invald length of 0"),
+            pytest.raises(
+                ValueError,
+                match=r"Factory passed in with invald length of 0",
+            ),
         ),
         ([1, 1], does_not_raise()),
         ([1, 2], does_not_raise()),
@@ -35,7 +42,10 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
         ([10, 15, 2], does_not_raise()),
     ],
 )
-def test_gen_perturber_combinations(factory_lengths: Sequence[int], expectation: ContextManager) -> None:
+def test_gen_perturber_combinations(
+    factory_lengths: Sequence[int],
+    expectation: AbstractContextManager,
+) -> None:
     with expectation:
         # Create mock factories
         factories = []
@@ -49,9 +59,6 @@ def test_gen_perturber_combinations(factory_lengths: Sequence[int], expectation:
 
         result = gen_perturber_combinations(factories)
 
-        # Generate expected output based on the input factory lengths
-        expected_output = []
-
         # create a list of range objects for later multiplication
         # output will look like [range(0,2), range(0,5), etc.]
         factory_length_ranges = [range(factory_length) for factory_length in factory_lengths]
@@ -60,7 +67,7 @@ def test_gen_perturber_combinations(factory_lengths: Sequence[int], expectation:
         # the * breaks the factory_length_ranges argument into multiple arguments, instead of passing the list as one
         cartesian_product = itertools.product(*factory_length_ranges)
 
-        for combination in cartesian_product:
-            expected_output.append(list(combination))  # must convert to list because itertools.product returns tuple
+        # must convert to list because itertools.product returns tuple
+        expected_output = [list(combination) for combination in cartesian_product]
 
         np.testing.assert_equal(result, expected_output)

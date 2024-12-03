@@ -1,5 +1,42 @@
+"""
+This module defines the `StepPerturbImageFactory` class, which is an implementation
+of the `PerturbImageFactory` interface. The `StepPerturbImageFactory` class is designed
+to generate a series of `PerturbImage` instances with a parameter (`theta_key`) that
+steps through a specified range of values, enabling controlled variation in the
+perturbation process.
+
+Classes:
+    StepPerturbImageFactory: Factory for producing `PerturbImage` instances with a specific
+    parameter (`theta_key`) varying over a specified range.
+
+Dependencies:
+    - math for range calculations.
+    - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
+
+Usage:
+    Instantiate `StepPerturbImageFactory` with a `PerturbImage` type, a `theta_key` to vary,
+    and the start, stop, and step values for the parameter range. This factory can then be
+    used to generate perturbed image instances with controlled variations.
+
+Example:
+    factory = StepPerturbImageFactory(
+        perturber=SomePerturbImageClass,
+        theta_key="parameter",
+        start=0.0,
+        stop=10.0,
+        step=1.0,
+        to_int=False
+    )
+    theta_values = factory.thetas  # Access generated range of parameter values
+"""
+
+from __future__ import annotations
+
 import math
-from typing import Any, Dict, Optional, Sequence, Type, Union
+from collections.abc import Sequence
+from typing import Any
+
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -10,13 +47,13 @@ class StepPerturbImageFactory(PerturbImageFactory):
 
     def __init__(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
         step: float = 1.0,
-        to_int: Optional[bool] = True,
-    ):
+        to_int: bool = True,
+    ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
@@ -45,18 +82,15 @@ class StepPerturbImageFactory(PerturbImageFactory):
         self.stop = stop
         self.step = step
 
+    @override
     @property
-    def thetas(self) -> Union[Sequence[float], Sequence[int]]:
+    def thetas(self) -> Sequence[float] | Sequence[int]:
         if not self.to_int:
             return [self.start + i * self.step for i in range(math.ceil((self.stop - self.start) / self.step))]
-        else:
-            return [int(self.start + i * self.step) for i in range(math.ceil((self.stop - self.start) / self.step))]
+        return [int(self.start + i * self.step) for i in range(math.ceil((self.stop - self.start) / self.step))]
 
-    @property
-    def theta_key(self) -> str:
-        return super().theta_key
-
-    def get_config(self) -> Dict[str, Any]:
+    @override
+    def get_config(self) -> dict[str, Any]:
         cfg = super().get_config()
         cfg["start"] = self.start
         cfg["stop"] = self.stop

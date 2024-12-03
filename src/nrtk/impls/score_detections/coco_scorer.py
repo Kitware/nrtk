@@ -1,10 +1,39 @@
+"""
+This module provides the `COCOScorer` class, an implementation of the `ScoreDetections`
+interface that calculates object detection scores conforming to the COCO (Common Objects in
+Context) dataset format and evaluation metrics. This class is specifically tailored to use COCO
+evaluation metrics by formatting ground truth and predicted data accordingly.
+
+Classes:
+    COCOScorer: Scores object detection results based on COCO evaluation metrics, allowing
+    users to specify ground truth data and a particular statistic index to retrieve a sequence
+    of metric scores.
+
+Dependencies:
+    - pycocotools for COCO data handling and evaluation.
+    - smqtk_image_io for bounding box handling.
+    - nrtk.interfaces for the `ScoreDetections` interface.
+    - contextlib for suppressing unwanted output during COCO initialization.
+
+Usage:
+    Instantiate `COCOScorer` with the path to the COCO-formatted ground truth data and specify
+    the statistic index to be used for scoring. Call `score` with actual and predicted bounding
+    boxes to obtain a sequence of float scores.
+
+Example:
+    scorer = COCOScorer(gt_path="path/to/ground_truth.json", stat_index=0)
+    scores = scorer.score(actual_detections, predicted_detections)
+"""
+
 import contextlib
-from typing import Any, Dict, Hashable, Sequence, Tuple
+from collections.abc import Hashable, Sequence
+from typing import Any
 
 # 3rd party imports
 from pycocotools.coco import COCO  # type: ignore
 from pycocotools.cocoeval import COCOeval  # type: ignore
 from smqtk_image_io import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.score_detections import ScoreDetections
 
@@ -19,6 +48,13 @@ class COCOScorer(ScoreDetections):
     """
 
     def __init__(self, gt_path: str, stat_index: int = 0) -> None:
+        """
+        Initializes the `COCOScorer` with a path to the ground truth data and a statistic index.
+
+        Args:
+            gt_path (str): Path to the COCO-formatted ground truth JSON file.
+            stat_index (int): Index of the statistic to retrieve from the COCO evaluation. Defaults to 0.
+        """
         self.gt_path = gt_path
         self.stat_index = stat_index
 
@@ -27,10 +63,11 @@ class COCOScorer(ScoreDetections):
 
         self.cat_ids = {v["name"]: k for k, v in self.coco_gt.cats.items()}
 
-    def score(
+    @override
+    def score(  # noqa: C901
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Computes scores for a particular statistic index.
 
@@ -45,7 +82,9 @@ class COCOScorer(ScoreDetections):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
             if len(actual_det) < 1:
-                raise ValueError("Actual bounding boxes must have detections and can't be empty.")
+                raise ValueError(
+                    "Actual bounding boxes must have detections and can't be empty.",
+                )
 
         for act_dets, pred_dets in zip(actual, predicted):
             image_id = act_dets[0][1]["image_id"]
@@ -112,5 +151,11 @@ class COCOScorer(ScoreDetections):
 
         return final_scores
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
+        """
+        Returns the configuration dictionary for the `COCOScorer` instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary containing the ground truth path and statistic index.
+        """
         return {"gt_path": self.gt_path, "stat_index": self.stat_index}

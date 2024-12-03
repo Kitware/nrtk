@@ -1,6 +1,10 @@
+from __future__ import annotations
+
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Optional
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -9,12 +13,11 @@ from smqtk_core.configuration import configuration_test_helper
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
-
-from ...test_pybsm_utils import (
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import (
     TIFFImageSnapshotExtension,
     create_sample_sensor_and_scenario,
 )
-from ..test_perturber_utils import pybsm_perturber_assertions
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
@@ -53,10 +56,10 @@ class TestDetectorOTFPerturber:
     def test_reproducibility(
         self,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
-        f: Optional[float],
-        interp: Optional[bool],
+        w_x: float | None,
+        w_y: float | None,
+        f: float | None,
+        interp: bool,
     ) -> None:
         """Ensure results are reproducible."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -88,8 +91,8 @@ class TestDetectorOTFPerturber:
     def test_additional_params(
         self,
         use_sensor_scenario: bool,
-        additional_params: Dict[str, Any],
-        expectation: ContextManager,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
     ) -> None:
         """Test that exceptions are appropriately raised based on available metadata."""
         sensor = None
@@ -110,13 +113,13 @@ class TestDetectorOTFPerturber:
             (False, 3e-6, 20e-6, 30e-3, True),
         ],
     )
-    def test_configuration(
+    def test_configuration(  # noqa: C901
         self,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
-        f: Optional[float],
-        interp: Optional[bool],
+        w_x: float | None,
+        w_y: float | None,
+        f: float | None,
+        interp: bool,
     ) -> None:
         """Test configuration stability."""
         sensor = None
@@ -202,10 +205,10 @@ class TestDetectorOTFPerturber:
         self,
         snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
-        f: Optional[float],
-        interp: Optional[bool],
+        w_x: float | None,
+        w_y: float | None,
+        f: float | None,
+        interp: bool,
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -224,7 +227,7 @@ class TestDetectorOTFPerturber:
 
 
 @mock.patch.object(DetectorOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not DetectorOTFPerturber.is_usable()

@@ -1,6 +1,8 @@
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -8,9 +10,8 @@ from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
-
-from ...test_pybsm_utils import create_sample_sensor_and_scenario
-from ..test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
@@ -128,7 +129,11 @@ class TestJitterOTFPerturber:
             ),
         ],
     )
-    def test_provided_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_provided_additional_params(
+        self,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
@@ -142,7 +147,11 @@ class TestJitterOTFPerturber:
             ({}, does_not_raise()),
         ],
     )
-    def test_default_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_default_additional_params(
+        self,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test variations of additional params."""
         perturber = JitterOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -280,7 +289,7 @@ class TestJitterOTFPerturber:
 
 
 @mock.patch.object(JitterOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not JitterOTFPerturber.is_usable()

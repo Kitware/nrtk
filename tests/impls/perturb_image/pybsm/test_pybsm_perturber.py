@@ -2,6 +2,7 @@ import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -14,6 +15,8 @@ from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
+
+np.random.seed(42)  # noqa: NPY002
 
 
 @pytest.mark.skipif(
@@ -163,7 +166,7 @@ class TestPyBSMPerturber:
 
 
 @mock.patch.object(PybsmPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmPerturber.is_usable()

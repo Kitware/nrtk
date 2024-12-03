@@ -1,5 +1,34 @@
+"""
+This module defines the `PerturbImage` interface, which provides an abstract base for
+implementing image perturbation algorithms. The primary purpose of this interface is to
+generate perturbed versions of input images, represented as `numpy.ndarray` arrays.
+
+Classes:
+    PerturbImage: An abstract base class that specifies the structure for image perturbation
+    algorithms, allowing for different perturbation techniques to be implemented.
+
+Dependencies:
+    - numpy for handling image arrays.
+    - smqtk_core for configurable plugin interface capabilities.
+
+Usage:
+    To create a custom image perturbation class, inherit from `PerturbImage` and implement
+    the `perturb` method, defining the specific perturbation logic.
+
+Example:
+    class CustomPerturbImage(PerturbImage):
+        def perturb(self, image, additional_params=None):
+            # Custom perturbation logic here
+            pass
+
+    perturber = CustomPerturbImage()
+    perturbed_image = perturber(image_data)
+"""
+
+from __future__ import annotations
+
 import abc
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_core import Plugfigurable
@@ -9,7 +38,11 @@ class PerturbImage(Plugfigurable):
     """Algorithm that generates a perturbed image for given input image stimulus as a ``numpy.ndarray`` type array."""
 
     @abc.abstractmethod
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    def perturb(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Generate a perturbed image for the given image stimulus.
 
         Note perturbers that resize, rotate, or similarly affect the dimensions of an image may impact
@@ -25,7 +58,11 @@ class PerturbImage(Plugfigurable):
             additional_params = dict()
         return image
 
-    def __call__(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
+    def __call__(
+        self,
+        image: np.ndarray,
+        additional_params: dict[str, Any] | None = None,
+    ) -> np.ndarray:
         """Calls ``perturb()`` with the given input image."""
         if additional_params is None:
             additional_params = dict()
@@ -33,4 +70,10 @@ class PerturbImage(Plugfigurable):
 
     @classmethod
     def get_type_string(cls) -> str:
+        """
+        Returns the fully qualified type string of the `PerturbImage` class or its subclass.
+
+        :return: A string representing the fully qualified type, in the format `<module>.<class_name>`.
+                 For example, "my_module.CustomPerturbImage".
+        """
         return f"{cls.__module__}.{cls.__name__}"
