@@ -25,15 +25,20 @@ Usage:
 
 Example:
     gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
-    noisy_image = gaussian_perturber.perturb(image_data)
+    noisy_image, boxes = gaussian_perturber.perturb(image_data, boxes)
+
+Notes:
+    - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
 from __future__ import annotations
 
+from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
 import skimage.util  # type:ignore
+from smqtk_image_io import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -126,12 +131,13 @@ class SaltNoisePerturber(_SPNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with salt noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="salt", amount=self.amount)
+        return self._perturb(image, mode="salt", amount=self.amount), boxes
 
 
 class PepperNoisePerturber(_SPNoisePerturber):
@@ -141,12 +147,13 @@ class PepperNoisePerturber(_SPNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with pepper noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="pepper", amount=self.amount)
+        return self._perturb(image, mode="pepper", amount=self.amount), boxes
 
 
 class SaltAndPepperNoisePerturber(_SPNoisePerturber):
@@ -178,8 +185,9 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with S&P noise."""
         if additional_params is None:
             additional_params = dict()
@@ -188,7 +196,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
             mode="s&p",
             amount=self.amount,
             salt_vs_pepper=self.salt_vs_pepper,
-        )
+        ), boxes
 
     def get_config(self) -> dict[str, Any]:
         """
@@ -245,12 +253,13 @@ class GaussianNoisePerturber(_GSNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with Gaussian noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean)
+        return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean), boxes
 
 
 class SpeckleNoisePerturber(_GSNoisePerturber):
@@ -260,9 +269,10 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with multiplicative noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="speckle", var=self.var, mean=self.mean)
+        return self._perturb(image, mode="speckle", var=self.var, mean=self.mean), boxes

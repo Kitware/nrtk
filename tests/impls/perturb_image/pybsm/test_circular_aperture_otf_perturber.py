@@ -1,5 +1,5 @@
 import unittest.mock as mock
-from collections.abc import Sequence
+from collections.abc import Hashable, Iterable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
     CircularApertureOTFPerturber,
@@ -161,7 +162,7 @@ class TestCircularApertureOTFPerturber:
         perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params)
+            _ = perturber(image, None, additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "interp", "expectation"),
@@ -331,6 +332,23 @@ class TestCircularApertureOTFPerturber:
                 assert i.scenario.background_temperature == scenario.background_temperature
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = CircularApertureOTFPerturber()
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        assert boxes == out_boxes
 
 
 @mock.patch.object(CircularApertureOTFPerturber, "is_usable")

@@ -3,13 +3,18 @@ This module provides the ComposePerturber class, which allows for composing mult
 image perturbations by sequentially applying a list of PerturbImage instances.
 """
 
-from typing import Any, Optional, TypeVar
+from __future__ import annotations
+
+from collections.abc import Hashable, Iterable
+from typing import Any, TypeVar
 
 import numpy as np
 from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
+from smqtk_image_io import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -35,12 +40,20 @@ class ComposePerturber(PerturbImage):
         """
         self.perturbers = perturbers
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[dict[str, Any]] = None) -> np.ndarray:
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Apply the sequence of perturbers to the input image.
 
         Args:
             image (np.ndarray): The input image to perturb.
+            boxes (Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]): The bounding boxes for
+                the input image. This is the single image output from DetectImageObjects.detect_objects
             additional_params (Optional[dict[str, Any]]): Additional parameters for perturbation.
 
         Returns:
@@ -52,9 +65,9 @@ class ComposePerturber(PerturbImage):
             additional_params = dict()
 
         for perturber in self.perturbers:
-            out_img = perturber(out_img, additional_params)
+            out_img, _ = perturber(out_img, boxes, additional_params)
 
-        return out_img
+        return out_img, boxes
 
     def get_config(self) -> dict[str, Any]:
         """

@@ -1,5 +1,6 @@
 import json
 import unittest.mock as mock
+from collections.abc import Hashable, Iterable
 from pathlib import Path
 from typing import Any, Optional
 
@@ -10,6 +11,7 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
+from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generic.compose_perturber import ComposePerturber
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
@@ -17,8 +19,12 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 
-def _perturb(image: np.ndarray, _: Optional[dict[str, Any]] = None) -> np.ndarray:  # pragma: no cover
-    return np.copy(image) + 1
+def _perturb(
+    image: np.ndarray,
+    _: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+    __: Optional[dict[str, Any]] = None,
+) -> np.ndarray:  # pragma: no cover
+    return np.copy(image) + 1, None
 
 
 m_dummy = mock.Mock(spec=PerturbImage)
@@ -90,3 +96,20 @@ class TestComposePerturber:
             hydrated_perturber_config = hydrated_perturber.get_config()
 
             assert original_perturber_config == hydrated_perturber_config
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = ComposePerturber(perturbers=[NOPPerturber(), NOPPerturber()])
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes

@@ -28,10 +28,12 @@ Example:
 from __future__ import annotations
 
 import abc
+from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
 from smqtk_core import Plugfigurable
+from smqtk_image_io import AxisAlignedBoundingBox
 
 
 class PerturbImage(Plugfigurable):
@@ -41,32 +43,39 @@ class PerturbImage(Plugfigurable):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Generate a perturbed image for the given image stimulus.
 
         Note perturbers that resize, rotate, or similarly affect the dimensions of an image may impact
         scoring if bounding boxes are not similarly transformed.
 
         :param image: Input image as a numpy array.
+        :param boxes: Input bounding boxes as a Iterable of tuples containing bounding boxes. This is the single
+            image output from DetectImageObjects.detect_objects
         :param additional_params: A dictionary containing perturber implementation-specific input param-values pairs.
 
-        :return: Perturbed image as numpy array, including matching dtype. Implementations should impart no side
-            effects upon the input image.
+        :return:
+            Perturbed image as numpy array, including matching dtype. Implementations should impart no side
+                effects upon the input image.
+            Iterable of tuples containing the bounding boxes for detections in the image. If an implementation
+                modifies the size of an image, it is expected to modify the bounding boxes as well.
         """
         if additional_params is None:
             additional_params = dict()
-        return image
+        return image, boxes
 
     def __call__(
         self,
         image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Calls ``perturb()`` with the given input image."""
         if additional_params is None:
             additional_params = dict()
-        return self.perturb(image, additional_params)
+        return self.perturb(image, boxes, additional_params)
 
     @classmethod
     def get_type_string(cls) -> str:

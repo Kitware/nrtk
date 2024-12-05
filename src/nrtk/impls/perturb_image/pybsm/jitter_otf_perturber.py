@@ -21,7 +21,10 @@ Example usage:
 
 from __future__ import annotations
 
+from collections.abc import Hashable, Iterable
 from typing import Any, TypeVar
+
+from smqtk_image_io import AxisAlignedBoundingBox
 
 try:
     import cv2
@@ -149,7 +152,12 @@ class JitterOTFPerturber(PerturbImage):
         self.interp = interp
 
     @override
-    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -187,14 +195,7 @@ class JitterOTFPerturber(PerturbImage):
 
             sim_img = cv2.filter2D(image, -1, psf)
 
-        return sim_img.astype(np.uint8)
-
-    @override
-    def __call__(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
-        """Alias for :meth:`.NIIRS.apply`."""
-        if additional_params is None:
-            additional_params = dict()
-        return self.perturb(image, additional_params)
+        return sim_img.astype(np.uint8), boxes
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:

@@ -1,4 +1,5 @@
 import unittest.mock as mock
+from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
@@ -8,6 +9,7 @@ import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
@@ -162,7 +164,26 @@ class TestPyBSMPerturber:
         perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5]))
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
-            _ = perturber(image, additional_params)
+            _ = perturber(image, None, additional_params)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        sensor, scenario = create_sample_sensor_and_scenario()
+        inst = PybsmPerturber(sensor=sensor, scenario=scenario)
+        _, out_boxes = inst.perturb(image, boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        assert boxes == out_boxes
 
 
 @mock.patch.object(PybsmPerturber, "is_usable")

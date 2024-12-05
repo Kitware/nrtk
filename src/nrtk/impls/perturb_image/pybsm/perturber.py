@@ -24,10 +24,12 @@ Example usage:
 from __future__ import annotations
 
 import copy
+from collections.abc import Hashable, Iterable
 from importlib.util import find_spec
 from typing import Any, TypeVar
 
 import numpy as np
+from smqtk_image_io import AxisAlignedBoundingBox
 
 try:
     from pybsm.simulation import RefImage, simulate_image
@@ -123,7 +125,12 @@ class PybsmPerturber(PerturbImage):
 
         return self.thetas
 
-    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] = None) -> np.ndarray:
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:  # Cannot have mutable data structure in argument default
             additional_params = dict()
@@ -145,13 +152,7 @@ class PybsmPerturber(PerturbImage):
         perturbed /= den
         perturbed *= 255
 
-        return perturbed.astype(np.uint8)
-
-    def __call__(self, image: np.ndarray, additional_params: dict[str, Any] = None) -> np.ndarray:
-        """Alias for :meth:`.NIIRS.apply`."""
-        if additional_params is None:
-            additional_params = dict()
-        return self.perturb(image, additional_params)
+        return perturbed.astype(np.uint8), boxes
 
     def __str__(self) -> str:
         """

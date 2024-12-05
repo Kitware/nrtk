@@ -17,13 +17,18 @@ Example usage:
     sensor = PybsmSensor(...)
     scenario = PybsmScenario(...)
     perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
-    perturbed_image = perturber.perturb(image)
+    perturbed_image, boxes = perturber.perturb(image, boxes)
+
+Notes:
+    - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Hashable, Iterable, Sequence
 from typing import Any, TypeVar
+
+from smqtk_image_io import AxisAlignedBoundingBox
 
 try:
     import cv2
@@ -225,16 +230,25 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self.interp = interp
 
     @override
-    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies turbulence and aperture-based perturbation to the provided image.
 
         Args:
             image (np.ndarray): The image to be perturbed.
+            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], optional): bounding boxes
+                for detections in input image
             additional_params (dict[str, Any], optional): Additional parameters, including 'img_gsd'.
 
         Returns:
             np.ndarray: The perturbed image.
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: unmodified bounding boxes
+                for detections in input image
 
         Raises:
             ValueError: If 'img_gsd' is not provided in `additional_params`.
@@ -292,7 +306,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
             sim_img = cv2.filter2D(image, -1, psf)
 
-        return sim_img.astype(np.uint8)
+        return sim_img.astype(np.uint8), boxes
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
