@@ -23,8 +23,6 @@ Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
-from __future__ import annotations
-
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any, TypeVar
 
@@ -89,21 +87,27 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
-        mtf_wavelengths: Sequence[float] | None = None,
-        mtf_weights: Sequence[float] | None = None,
+        sensor: PybsmSensor = None,
+        scenario: PybsmScenario = None,
+        mtf_wavelengths: Sequence[float] = None,
+        mtf_weights: Sequence[float] = None,
         interp: bool = True,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 
-        :param name: string representation of object
         :param sensor: pyBSM sensor object
         :param scenario: pyBSM scenario object
         :param mtf_wavelengths: a numpy array of wavelengths (m)
-        :param mtf_wavelengths_weights: a numpy array of weights for each wavelength contribution (arb)
+        :param mtf_weights: a numpy array of weights for each wavelength contribution (arb)
         :param interp: a boolean determining whether load_database_atmosphere is used with or without
                        interpolation
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
 
         If both sensor and scenario parameters are absent, then default values
         will be used for their parameters
@@ -126,6 +130,8 @@ class CircularApertureOTFPerturber(PerturbImage):
             raise ImportError(
                 "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
+
+        super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
             if interp:
@@ -186,9 +192,9 @@ class CircularApertureOTFPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """
         Applies the circular aperture-based perturbation to the provided image.
 
@@ -290,16 +296,16 @@ class CircularApertureOTFPerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        sensor = to_config_dict(self.sensor) if self.sensor else None
-        scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        return {
-            "sensor": sensor,
-            "scenario": scenario,
-            "mtf_wavelengths": self.mtf_wavelengths,
-            "mtf_weights": self.mtf_weights,
-            "interp": self.interp,
-        }
+        cfg = super().get_config()
+
+        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
+        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg["mtf_wavelengths"] = self.mtf_wavelengths
+        cfg["mtf_weights"] = self.mtf_weights
+        cfg["interp"] = self.interp
+
+        return cfg
 
     @classmethod
     def is_usable(cls) -> bool:

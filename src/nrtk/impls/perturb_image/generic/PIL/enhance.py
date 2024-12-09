@@ -58,8 +58,9 @@ class _Enhancement(Protocol):  # Used for type checking only  # pragma: no cover
 
 
 class _PILEnhancePerturber(PerturbImage):
-    def __init__(self, factor: float = 1.0) -> None:
+    def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
         """:param factor: Enhancement factor."""
+        super().__init__(box_alignment_mode=box_alignment_mode)
         if factor < 0.0:
             raise ValueError(
                 f"{type(self).__name__} invalid factor ({factor}). Must be >= 0.0",
@@ -71,7 +72,7 @@ class _PILEnhancePerturber(PerturbImage):
         self,
         enhancement: type[_Enhancement],
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
+        additional_params: dict[str, Any] = None,
     ) -> np.ndarray:
         """Call appropriate enhancement interface and perform any necessary data type conversion.
 
@@ -105,7 +106,9 @@ class _PILEnhancePerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        return {"factor": self.factor}
+        cfg = super().get_config()
+        cfg["factor"] = self.factor
+        return cfg
 
 
 class BrightnessPerturber(_PILEnhancePerturber):
@@ -115,9 +118,9 @@ class BrightnessPerturber(_PILEnhancePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted brightness."""
         if additional_params is None:
             additional_params = dict()
@@ -137,9 +140,9 @@ class ColorPerturber(_PILEnhancePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted color balance."""
         if additional_params is None:
             additional_params = dict()
@@ -159,9 +162,9 @@ class ContrastPerturber(_PILEnhancePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted contrast."""
         if additional_params is None:
             additional_params = dict()
@@ -177,22 +180,22 @@ class ContrastPerturber(_PILEnhancePerturber):
 class SharpnessPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus sharpness."""
 
-    def __init__(self, factor: float = 1.0) -> None:
+    def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
         """:param rng: Enhancement factor."""
         if factor < 0.0 or factor > 2.0:
             raise ValueError(
                 f"{type(self).__name__} invalid sharpness factor ({factor}). Must be in [0.0, 2.0]",
             )
 
-        super().__init__(factor=factor)
+        super().__init__(factor=factor, box_alignment_mode=box_alignment_mode)
 
     @override
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted sharpness."""
         if additional_params is None:
             additional_params = dict()

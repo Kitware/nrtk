@@ -162,7 +162,7 @@ class TestCircularApertureOTFPerturber:
         perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, None, additional_params)
+            _ = perturber(image, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "interp", "expectation"),
@@ -217,7 +217,7 @@ class TestCircularApertureOTFPerturber:
         perturber = CircularApertureOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params)
+            _ = perturber(image, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights"),

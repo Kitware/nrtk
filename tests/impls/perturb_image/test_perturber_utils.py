@@ -29,7 +29,7 @@ def perturber_assertions(
     dtype = image.dtype
     copy = np.copy(image)
 
-    out_image, _ = perturb(image, None, additional_params)
+    out_image, _ = perturb(image, additional_params=additional_params)
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)
     assert out_image.dtype == dtype
@@ -61,7 +61,7 @@ def pybsm_perturber_assertions(
         additional_params = dict()
     copy = np.copy(image)
 
-    out_image, _ = perturb(image, None, additional_params)
+    out_image, _ = perturb(image, additional_params=additional_params)
 
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)

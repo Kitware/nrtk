@@ -25,8 +25,6 @@ Example:
     perturbed_image = perturber(image_data)
 """
 
-from __future__ import annotations
-
 import abc
 from collections.abc import Hashable, Iterable
 from typing import Any
@@ -39,13 +37,25 @@ from smqtk_image_io import AxisAlignedBoundingBox
 class PerturbImage(Plugfigurable):
     """Algorithm that generates a perturbed image for given input image stimulus as a ``numpy.ndarray`` type array."""
 
+    def __init__(self, box_alignment_mode: str = "extent") -> None:
+        """Initializes the PerturbImage.
+
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
+        """
+        self.box_alignment_mode = box_alignment_mode
+
     @abc.abstractmethod
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Generate a perturbed image for the given image stimulus.
 
         Note perturbers that resize, rotate, or similarly affect the dimensions of an image may impact
@@ -69,13 +79,13 @@ class PerturbImage(Plugfigurable):
     def __call__(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Calls ``perturb()`` with the given input image."""
         if additional_params is None:
             additional_params = dict()
-        return self.perturb(image, boxes, additional_params)
+        return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 
     @classmethod
     def get_type_string(cls) -> str:
@@ -86,3 +96,12 @@ class PerturbImage(Plugfigurable):
                  For example, "my_module.CustomPerturbImage".
         """
         return f"{cls.__module__}.{cls.__name__}"
+
+    def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the PerturbImage instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
+        return {"box_alignment_mode": self.box_alignment_mode}

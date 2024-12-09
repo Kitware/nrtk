@@ -164,7 +164,7 @@ class TestPyBSMPerturber:
         perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5]))
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
-            _ = perturber(image, None, additional_params)
+            _ = perturber(image, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         "boxes",

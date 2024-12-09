@@ -104,7 +104,7 @@ class TestDetectorOTFPerturber:
         perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, None, additional_params)
+            _ = perturber.perturb(img, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),

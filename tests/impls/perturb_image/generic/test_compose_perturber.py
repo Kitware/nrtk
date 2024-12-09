@@ -2,7 +2,7 @@ import json
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pytest
@@ -21,9 +21,9 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 def _perturb(
     image: np.ndarray,
-    _: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-    __: Optional[dict[str, Any]] = None,
-) -> np.ndarray:  # pragma: no cover
+    boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,  # noqa: ARG001
+    additional_params: dict[str, Any] = None,  # noqa: ARG001
+) -> tuple[np.ndarray, None]:  # pragma: no cover
     return np.copy(image) + 1, None
 
 

@@ -19,8 +19,6 @@ Example usage:
     perturbed_image = perturber.perturb(image)
 """
 
-from __future__ import annotations
-
 from collections.abc import Hashable, Iterable
 from typing import Any, TypeVar
 
@@ -78,21 +76,27 @@ class JitterOTFPerturber(PerturbImage):
 
     def __init__(
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
-        s_x: float | None = None,
-        s_y: float | None = None,
+        sensor: PybsmSensor = None,
+        scenario: PybsmScenario = None,
+        s_x: float = None,
+        s_y: float = None,
         interp: bool = True,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
-        :param name: string representation of object
         :param sensor: pyBSM sensor object.
         :param scenario: pyBSM scenario object
         :param s_x: root-mean-squared jitter amplitudes in the x direction (rad).
         :param s_y: root-mean-squared jitter amplitudes in the y direction (rad).
         :param interp: a boolean determining whether load_database_atmosphere is used with or without
                        interpolation
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
 
         If both sensor and scenario parameters are not present, then default values
         will be used for their parameters
@@ -113,6 +117,8 @@ class JitterOTFPerturber(PerturbImage):
             raise ImportError(
                 "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
+
+        super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
             if interp:
@@ -155,9 +161,9 @@ class JitterOTFPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -250,13 +256,13 @@ class JitterOTFPerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        sensor = to_config_dict(self.sensor) if self.sensor else None
-        scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        return {
-            "sensor": sensor,
-            "scenario": scenario,
-            "s_x": self.s_x,
-            "s_y": self.s_y,
-            "interp": self.interp,
-        }
+        cfg = super().get_config()
+
+        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
+        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg["s_x"] = self.s_x
+        cfg["s_y"] = self.s_y
+        cfg["interp"] = self.interp
+
+        return cfg

@@ -21,8 +21,6 @@ Example usage:
     perturbed_image = perturber.perturb(image)
 """
 
-from __future__ import annotations
-
 import copy
 from collections.abc import Hashable, Iterable
 from importlib.util import find_spec
@@ -73,6 +71,7 @@ class PybsmPerturber(PerturbImage):
         scenario: PybsmScenario,
         reflectance_range: np.ndarray = DEFAULT_REFLECTANCE_RANGE,
         rng_seed: int = 1,
+        box_alignment_mode: str = "extent",
         **kwargs: Any,
     ) -> None:
         """Initializes the PybsmPerturber.
@@ -81,6 +80,12 @@ class PybsmPerturber(PerturbImage):
         :param scenario: pyBSM scenario object.
         :param reflectance_range: Array of reflectances that correspond to pixel values.
         :param rng_seed: integer seed value that will be used for the random number generator
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
 
         :raises: ImportError if pyBSM with OpenCV not found,
         installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
@@ -91,6 +96,7 @@ class PybsmPerturber(PerturbImage):
             raise ImportError(
                 "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
+        super().__init__(box_alignment_mode=box_alignment_mode)
         self._rng_seed = rng_seed
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
@@ -128,9 +134,9 @@ class PybsmPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:  # Cannot have mutable data structure in argument default
             additional_params = dict()
@@ -215,12 +221,14 @@ class PybsmPerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        return {
-            "sensor": to_config_dict(self.sensor),
-            "scenario": to_config_dict(self.scenario),
-            "reflectance_range": self.reflectance_range.tolist(),
-            "rng_seed": self._rng_seed,
-        }
+        cfg = super().get_config()
+
+        cfg["sensor"] = to_config_dict(self.sensor)
+        cfg["scenario"] = to_config_dict(self.scenario)
+        cfg["reflectance_range"] = self.reflectance_range.tolist()
+        cfg["rng_seed"] = self._rng_seed
+
+        return cfg
 
     @classmethod
     def is_usable(cls) -> bool:

@@ -112,7 +112,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
                     perturbed = image.copy()
 
                     for perturber in perturbers:
-                        perturbed, _ = perturber(perturbed, None, extra)
+                        perturbed, _ = perturber(perturbed, additional_params=extra)
 
                     batch_images.append(perturbed)
                     batch_gt.append(actual)

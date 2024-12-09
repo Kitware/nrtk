@@ -3,8 +3,6 @@ This module provides the ComposePerturber class, which allows for composing mult
 image perturbations by sequentially applying a list of PerturbImage instances.
 """
 
-from __future__ import annotations
-
 from collections.abc import Hashable, Iterable
 from typing import Any, TypeVar
 
@@ -31,22 +29,23 @@ class ComposePerturber(PerturbImage):
         to work with perturber factories.
     """
 
-    def __init__(self, perturbers: list[PerturbImage]) -> None:
+    def __init__(self, perturbers: list[PerturbImage], box_alignment_mode: str = "extent") -> None:
         """Initializes the ComposePerturber.
 
         This has not been tested with perturber factories and is not expected to work wit perturber factories.
 
         :param perturbers: list of perturbers to apply
         """
+        super().__init__(box_alignment_mode=box_alignment_mode)
         self.perturbers = perturbers
 
     @override
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """
         Apply the sequence of perturbers to the input image.
 
@@ -65,7 +64,7 @@ class ComposePerturber(PerturbImage):
             additional_params = dict()
 
         for perturber in self.perturbers:
-            out_img, _ = perturber(out_img, boxes, additional_params)
+            out_img, _ = perturber(image=out_img, boxes=boxes, additional_params=additional_params)
 
         return out_img, boxes
 
@@ -76,7 +75,9 @@ class ComposePerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary containing perturber configurations.
         """
-        return {"perturbers": [to_config_dict(perturber) for perturber in self.perturbers]}
+        cfg = super().get_config()
+        cfg["perturbers"] = [to_config_dict(perturber) for perturber in self.perturbers]
+        return cfg
 
     @classmethod
     def from_config(

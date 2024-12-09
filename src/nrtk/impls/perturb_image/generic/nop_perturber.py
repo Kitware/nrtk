@@ -21,8 +21,6 @@ Example:
     output_image = nop_perturber.perturb(input_image)
 """
 
-from __future__ import annotations
-
 from collections.abc import Hashable, Iterable
 from typing import Any
 
@@ -47,19 +45,10 @@ class NOPPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return unperturbed image."""
         if additional_params is None:
             additional_params = dict()
         return np.copy(image), boxes
-
-    def get_config(self) -> dict[str, Any]:
-        """
-        Get the configuration dictionary of the ComposePerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing perturber configurations.
-        """
-        return {}

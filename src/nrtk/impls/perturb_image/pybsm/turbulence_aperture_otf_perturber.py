@@ -23,8 +23,6 @@ Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
-from __future__ import annotations
-
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any, TypeVar
 
@@ -88,19 +86,20 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
-        mtf_wavelengths: Sequence[float] | None = None,
-        mtf_weights: Sequence[float] | None = None,
-        altitude: float | None = None,
-        slant_range: float | None = None,
-        D: float | None = None,  # noqa: N803
-        ha_wind_speed: float | None = None,
-        cn2_at_1m: float | None = None,
-        int_time: float | None = None,
-        n_tdi: float | None = None,
-        aircraft_speed: float | None = None,
+        sensor: PybsmSensor = None,
+        scenario: PybsmScenario = None,
+        mtf_wavelengths: Sequence[float] = None,
+        mtf_weights: Sequence[float] = None,
+        altitude: float = None,
+        slant_range: float = None,
+        D: float = None,  # noqa: N803
+        ha_wind_speed: float = None,
+        cn2_at_1m: float = None,
+        int_time: float = None,
+        n_tdi: float = None,
+        aircraft_speed: float = None,
         interp: bool = True,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
@@ -123,6 +122,12 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             at the sensor position if the sensor is stationary
         :param interp: a boolean determining whether load_database_atmosphere is used with or without
                        interpolation
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
 
         If both sensor and scenario parameters are absent, then default values will be used for
         their parameters.
@@ -157,6 +162,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             raise ImportError(
                 "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
+
+        super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
             if interp:
@@ -233,9 +240,9 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """
         Applies turbulence and aperture-based perturbation to the provided image.
 
@@ -350,24 +357,23 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        sensor = to_config_dict(self.sensor) if self.sensor else None
-        scenario = to_config_dict(self.scenario) if self.scenario else None
+        cfg = super().get_config()
 
-        return {
-            "sensor": sensor,
-            "scenario": scenario,
-            "mtf_wavelengths": self.mtf_wavelengths,
-            "mtf_weights": self.mtf_weights,
-            "altitude": self.altitude,
-            "slant_range": self.slant_range,
-            "D": self.D,
-            "ha_wind_speed": self.ha_wind_speed,
-            "cn2_at_1m": self.cn2_at_1m,
-            "int_time": self.int_time,
-            "n_tdi": self.n_tdi,
-            "aircraft_speed": self.aircraft_speed,
-            "interp": self.interp,
-        }
+        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
+        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg["mtf_wavelengths"] = self.mtf_wavelengths
+        cfg["mtf_weights"] = self.mtf_weights
+        cfg["altitude"] = self.altitude
+        cfg["slant_range"] = self.slant_range
+        cfg["D"] = self.D
+        cfg["ha_wind_speed"] = self.ha_wind_speed
+        cfg["cn2_at_1m"] = self.cn2_at_1m
+        cfg["int_time"] = self.int_time
+        cfg["n_tdi"] = self.n_tdi
+        cfg["aircraft_speed"] = self.aircraft_speed
+        cfg["interp"] = self.interp
+
+        return cfg
 
     @classmethod
     def is_usable(cls) -> bool:
