@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import unittest.mock as mock
-from collections.abc import Sequence
+from collections.abc import Hashable, Iterable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
@@ -13,6 +13,7 @@ import pytest
 from PIL import Image
 from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
@@ -149,7 +150,7 @@ class TestTurbulenceApertureOTFPerturber:
         perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, additional_params)
+            _ = perturber.perturb(img, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "expectation"),
@@ -440,6 +441,23 @@ class TestTurbulenceApertureOTFPerturber:
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
 
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = TurbulenceApertureOTFPerturber()
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        assert boxes == out_boxes
 
 
 @mock.patch.object(TurbulenceApertureOTFPerturber, "is_usable")

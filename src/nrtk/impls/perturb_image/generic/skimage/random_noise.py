@@ -25,23 +25,29 @@ Usage:
 
 Example:
     gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
-    noisy_image = gaussian_perturber.perturb(image_data)
+    noisy_image, boxes = gaussian_perturber.perturb(image_data, boxes)
+
+Notes:
+    - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
 from __future__ import annotations
 
+from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
 import skimage.util  # type:ignore
+from smqtk_image_io import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = None) -> None:
+    def __init__(self, rng: np.random.Generator | int = None, box_alignment_mode: str = "extent") -> None:
         """:param rng: Pseudo-random number generator or seed."""
+        super().__init__(box_alignment_mode=box_alignment_mode)
         self.rng = rng
 
     def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
@@ -84,14 +90,17 @@ class _SKImageNoisePerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        return {"rng": self.rng}
+        cfg = super().get_config()
+        cfg["rng"] = self.rng
+        return cfg
 
 
 class _SPNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
-        rng: np.random.Generator | int | None = None,
+        rng: np.random.Generator | int = None,
         amount: float = 0.05,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the SPNoisePerturber.
 
@@ -103,7 +112,7 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
                 f"{type(self).__name__} invalid amount ({amount}). Must be in [0.0, 1.0]",
             )
 
-        super().__init__(rng=rng)
+        super().__init__(rng=rng, box_alignment_mode=box_alignment_mode)
 
         self.amount = amount
 
@@ -126,12 +135,13 @@ class SaltNoisePerturber(_SPNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with salt noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="salt", amount=self.amount)
+        return self._perturb(image, mode="salt", amount=self.amount), boxes
 
 
 class PepperNoisePerturber(_SPNoisePerturber):
@@ -141,12 +151,13 @@ class PepperNoisePerturber(_SPNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with pepper noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="pepper", amount=self.amount)
+        return self._perturb(image, mode="pepper", amount=self.amount), boxes
 
 
 class SaltAndPepperNoisePerturber(_SPNoisePerturber):
@@ -154,9 +165,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     def __init__(
         self,
-        rng: np.random.Generator | int | None = None,
+        rng: np.random.Generator | int = None,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
@@ -170,7 +182,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
                 f"{type(self).__name__} invalid salt_vs_pepper ({salt_vs_pepper}). Must be in [0.0, 1.0]",
             )
 
-        super().__init__(amount=amount, rng=rng)
+        super().__init__(amount=amount, rng=rng, box_alignment_mode=box_alignment_mode)
 
         self.salt_vs_pepper = salt_vs_pepper
 
@@ -178,8 +190,9 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with S&P noise."""
         if additional_params is None:
             additional_params = dict()
@@ -188,7 +201,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
             mode="s&p",
             amount=self.amount,
             salt_vs_pepper=self.salt_vs_pepper,
-        )
+        ), boxes
 
     def get_config(self) -> dict[str, Any]:
         """
@@ -205,9 +218,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 class _GSNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
-        rng: np.random.Generator | int | None = None,
+        rng: np.random.Generator | int = None,
         mean: float = 0.0,
         var: float = 0.05,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the GSNoisePerturber.
 
@@ -220,7 +234,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
                 f"{type(self).__name__} invalid var ({var}). Must be >= 0.0",
             )
 
-        super().__init__(rng=rng)
+        super().__init__(rng=rng, box_alignment_mode=box_alignment_mode)
 
         self.mean = mean
         self.var = var
@@ -245,12 +259,13 @@ class GaussianNoisePerturber(_GSNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with Gaussian noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean)
+        return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean), boxes
 
 
 class SpeckleNoisePerturber(_GSNoisePerturber):
@@ -260,9 +275,10 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with multiplicative noise."""
         if additional_params is None:
             additional_params = dict()
-        return self._perturb(image, mode="speckle", var=self.var, mean=self.mean)
+        return self._perturb(image, mode="speckle", var=self.var, mean=self.mean), boxes

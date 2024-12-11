@@ -1,3 +1,4 @@
+from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
@@ -5,6 +6,7 @@ from typing import Any
 import numpy as np
 import pytest
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generic.PIL.enhance import (
     BrightnessPerturber,
@@ -87,6 +89,23 @@ class TestBrightnessPerturber:
         with expectation:
             BrightnessPerturber(**kwargs)
 
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = BrightnessPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
+
 
 class TestColorPerturber:
     def test_consistency(self) -> None:
@@ -153,6 +172,23 @@ class TestColorPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             ColorPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = ColorPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 class TestContrastPerturber:
@@ -224,6 +260,23 @@ class TestContrastPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             ContrastPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = ContrastPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 class TestSharpnessPerturber:
@@ -306,6 +359,23 @@ class TestSharpnessPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             SharpnessPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = SharpnessPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 EXPECTED_BRIGHTNESS = np.array([[0, 0, 0], [0, 1, 1], [1, 1, 1]], dtype=np.uint8)

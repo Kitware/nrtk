@@ -23,23 +23,26 @@ Usage:
 
 Example:
     brightness_perturber = BrightnessPerturber(factor=1.5)
-    brighter_image = brightness_perturber.perturb(input_image)
+    brighter_image, boxes = brightness_perturber.perturb(input_image, boxes)
 
     contrast_perturber = ContrastPerturber(factor=0.8)
-    contrasted_image = contrast_perturber.perturb(input_image)
+    contrasted_image, boxes = contrast_perturber.perturb(input_image, boxes)
 
 Notes:
     - Each enhancement class has a default factor of 1.0, which applies no change to the image.
     - `SharpnessPerturber` enforces a factor range of [0.0, 2.0].
+    - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
 from __future__ import annotations
 
+from collections.abc import Hashable, Iterable
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import numpy as np
 from PIL import Image, ImageEnhance
 from PIL.Image import Image as PILImage
+from smqtk_image_io import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -55,8 +58,9 @@ class _Enhancement(Protocol):  # Used for type checking only  # pragma: no cover
 
 
 class _PILEnhancePerturber(PerturbImage):
-    def __init__(self, factor: float = 1.0) -> None:
+    def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
         """:param factor: Enhancement factor."""
+        super().__init__(box_alignment_mode=box_alignment_mode)
         if factor < 0.0:
             raise ValueError(
                 f"{type(self).__name__} invalid factor ({factor}). Must be >= 0.0",
@@ -68,7 +72,7 @@ class _PILEnhancePerturber(PerturbImage):
         self,
         enhancement: type[_Enhancement],
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
+        additional_params: dict[str, Any] = None,
     ) -> np.ndarray:
         """Call appropriate enhancement interface and perform any necessary data type conversion.
 
@@ -102,7 +106,9 @@ class _PILEnhancePerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        return {"factor": self.factor}
+        cfg = super().get_config()
+        cfg["factor"] = self.factor
+        return cfg
 
 
 class BrightnessPerturber(_PILEnhancePerturber):
@@ -112,8 +118,9 @@ class BrightnessPerturber(_PILEnhancePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted brightness."""
         if additional_params is None:
             additional_params = dict()
@@ -123,7 +130,7 @@ class BrightnessPerturber(_PILEnhancePerturber):
             _Enhancement,
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image)
+        return self._perturb(enhancement=enhancement, image=image), boxes
 
 
 class ColorPerturber(_PILEnhancePerturber):
@@ -133,8 +140,9 @@ class ColorPerturber(_PILEnhancePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted color balance."""
         if additional_params is None:
             additional_params = dict()
@@ -144,7 +152,7 @@ class ColorPerturber(_PILEnhancePerturber):
             _Enhancement,
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image)
+        return self._perturb(enhancement=enhancement, image=image), boxes
 
 
 class ContrastPerturber(_PILEnhancePerturber):
@@ -154,8 +162,9 @@ class ContrastPerturber(_PILEnhancePerturber):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted contrast."""
         if additional_params is None:
             additional_params = dict()
@@ -165,27 +174,28 @@ class ContrastPerturber(_PILEnhancePerturber):
             _Enhancement,
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image)
+        return self._perturb(enhancement=enhancement, image=image), boxes
 
 
 class SharpnessPerturber(_PILEnhancePerturber):
     """Adjusts image stimulus sharpness."""
 
-    def __init__(self, factor: float = 1.0) -> None:
+    def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
         """:param rng: Enhancement factor."""
         if factor < 0.0 or factor > 2.0:
             raise ValueError(
                 f"{type(self).__name__} invalid sharpness factor ({factor}). Must be in [0.0, 2.0]",
             )
 
-        super().__init__(factor=factor)
+        super().__init__(factor=factor, box_alignment_mode=box_alignment_mode)
 
     @override
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return image stimulus with adjusted sharpness."""
         if additional_params is None:
             additional_params = dict()
@@ -195,4 +205,4 @@ class SharpnessPerturber(_PILEnhancePerturber):
             _Enhancement,
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image)
+        return self._perturb(enhancement=enhancement, image=image), boxes

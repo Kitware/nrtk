@@ -21,11 +21,11 @@ Example:
     output_image = nop_perturber.perturb(input_image)
 """
 
-from __future__ import annotations
-
+from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
+from smqtk_image_io import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -45,18 +45,10 @@ class NOPPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
-    ) -> np.ndarray:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """Return unperturbed image."""
         if additional_params is None:
             additional_params = dict()
-        return np.copy(image)
-
-    def get_config(self) -> dict[str, Any]:
-        """
-        Get the configuration dictionary of the ComposePerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing perturber configurations.
-        """
-        return {}
+        return np.copy(image), boxes

@@ -17,12 +17,16 @@ Example usage:
     sensor = PybsmSensor(...)
     scenario = PybsmScenario(...)
     perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
-    perturbed_image = perturber.perturb(image)
+    perturbed_image, boxes = perturber.perturb(image, boxes)
+
+Notes:
+    - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
-from __future__ import annotations
-
+from collections.abc import Hashable, Iterable
 from typing import Any, TypeVar
+
+from smqtk_image_io import AxisAlignedBoundingBox
 
 try:
     import cv2
@@ -74,12 +78,13 @@ class DetectorOTFPerturber(PerturbImage):
 
     def __init__(
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
-        w_x: float | None = None,
-        w_y: float | None = None,
-        f: float | None = None,
+        sensor: PybsmSensor = None,
+        scenario: PybsmScenario = None,
+        w_x: float = None,
+        w_y: float = None,
+        f: float = None,
         interp: bool = True,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -90,6 +95,12 @@ class DetectorOTFPerturber(PerturbImage):
         :param f: Focal length (m).
         :param interp: a boolean determining whether load_database_atmosphere is used with or without
                        interpolation
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
 
         If a value is provided for w_x, w_y and/or f that value(s) will be used in
         the otf calculation.
@@ -111,6 +122,7 @@ class DetectorOTFPerturber(PerturbImage):
             raise ImportError(
                 "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
+        super().__init__(box_alignment_mode=box_alignment_mode)
         if sensor and scenario:
             if interp:
                 atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
@@ -154,16 +166,25 @@ class DetectorOTFPerturber(PerturbImage):
         self.interp = interp
 
     @override
-    def perturb(self, image: np.ndarray, additional_params: dict[str, Any] | None = None) -> np.ndarray:
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
         """
         Applies the OTF-based perturbation to the provided image.
 
         Args:
             image (np.ndarray): The image to be perturbed.
+            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], optional): bounding boxes
+                for detections in input image
             additional_params (dict[str, Any], optional): Additional parameters, including 'img_gsd'.
 
         Returns:
             np.ndarray: The perturbed image.
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: unmodified bounding boxes
+                for detections in input image
 
         Raises:
             ValueError: If 'img_gsd' is not present in `additional_params`.
@@ -202,7 +223,7 @@ class DetectorOTFPerturber(PerturbImage):
 
             sim_img = cv2.filter2D(image, -1, psf)
 
-        return sim_img.astype(np.uint8)
+        return sim_img.astype(np.uint8), boxes
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
@@ -246,17 +267,17 @@ class DetectorOTFPerturber(PerturbImage):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        sensor = to_config_dict(self.sensor) if self.sensor else None
-        scenario = to_config_dict(self.scenario) if self.scenario else None
 
-        return {
-            "sensor": sensor,
-            "scenario": scenario,
-            "w_x": self.w_x,
-            "w_y": self.w_y,
-            "f": self.f,
-            "interp": self.interp,
-        }
+        cfg = super().get_config()
+
+        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
+        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg["w_x"] = self.w_x
+        cfg["w_y"] = self.w_y
+        cfg["f"] = self.f
+        cfg["interp"] = self.interp
+
+        return cfg
 
     @classmethod
     def is_usable(cls) -> bool:
