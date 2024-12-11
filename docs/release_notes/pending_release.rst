@@ -17,5 +17,9 @@ Interfaces
 
 * Updated ``perturb`` to return the image in addition to the modified bounding boxes.
 
+Implementations
+
+* Added ``DefocusOTFPerturber`` based on pybsm ``defocus_otf`` along with tests
+
 Fixes
 -----
