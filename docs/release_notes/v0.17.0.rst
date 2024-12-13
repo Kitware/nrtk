@@ -1,0 +1,30 @@
+v0.17.0
+=======
+
+New ability to pass ``boxes`` to PerturbImage implementations and have the boxes
+updated to reflect the translational change resulting from the perturbation. Also
+removed ``pybsm`` hinges that were no longer needed because ``pybsm`` dropped the
+need for ``opencv``.
+
+Updates / New Features
+----------------------
+
+CI/CD
+
+* Updated and applied ruff configuration.
+
+Interfaces
+
+* Exposed random seed parameter to ``PybsmPerturber`` allowing users to control the randomness
+  of pybsm pertubations
+
+* Updated ``perturb`` to include optional ``boxes`` argument which contains the bounding boxes for the given image.
+
+* Updated ``perturb`` to return the image in addition to the modified bounding boxes.
+
+Implementations
+
+* Added ``DefocusOTFPerturber`` based on pybsm ``defocus_otf`` along with tests
+
+Fixes
+-----

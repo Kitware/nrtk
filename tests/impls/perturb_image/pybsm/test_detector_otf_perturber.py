@@ -1,20 +1,25 @@
+from __future__ import annotations
+
 import unittest.mock as mock
+from collections.abc import Hashable, Iterable
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Optional
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
-
-from ...test_pybsm_utils import (
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import (
     TIFFImageSnapshotExtension,
     create_sample_sensor_and_scenario,
 )
-from ..test_perturber_utils import pybsm_perturber_assertions
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
@@ -53,10 +58,10 @@ class TestDetectorOTFPerturber:
     def test_reproducibility(
         self,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
-        f: Optional[float],
-        interp: Optional[bool],
+        w_x: float | None,
+        w_y: float | None,
+        f: float | None,
+        interp: bool,
     ) -> None:
         """Ensure results are reproducible."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -88,8 +93,8 @@ class TestDetectorOTFPerturber:
     def test_additional_params(
         self,
         use_sensor_scenario: bool,
-        additional_params: Dict[str, Any],
-        expectation: ContextManager,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
     ) -> None:
         """Test that exceptions are appropriately raised based on available metadata."""
         sensor = None
@@ -99,7 +104,7 @@ class TestDetectorOTFPerturber:
         perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, additional_params)
+            _ = perturber.perturb(img, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),
@@ -110,13 +115,13 @@ class TestDetectorOTFPerturber:
             (False, 3e-6, 20e-6, 30e-3, True),
         ],
     )
-    def test_configuration(
+    def test_configuration(  # noqa: C901
         self,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
-        f: Optional[float],
-        interp: Optional[bool],
+        w_x: float | None,
+        w_y: float | None,
+        f: float | None,
+        interp: bool,
     ) -> None:
         """Test configuration stability."""
         sensor = None
@@ -202,10 +207,10 @@ class TestDetectorOTFPerturber:
         self,
         snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
-        f: Optional[float],
-        interp: Optional[bool],
+        w_x: float | None,
+        w_y: float | None,
+        f: float | None,
+        interp: bool,
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -222,9 +227,26 @@ class TestDetectorOTFPerturber:
 
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = DetectorOTFPerturber()
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        assert boxes == out_boxes
+
 
 @mock.patch.object(DetectorOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not DetectorOTFPerturber.is_usable()

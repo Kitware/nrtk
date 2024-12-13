@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 import unittest.mock as mock
+from collections.abc import Hashable, Iterable, Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict, Optional, Sequence
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pybsm.radiance as radiance
@@ -8,17 +13,17 @@ import pytest
 from PIL import Image
 from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
     TurbulenceApertureOTFPerturber,
 )
-
-from ...test_pybsm_utils import (
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import (
     TIFFImageSnapshotExtension,
     create_sample_sensor_and_scenario,
 )
-from ..test_perturber_utils import pybsm_perturber_assertions
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
@@ -78,17 +83,17 @@ class TestTurbulenceApertureOTFPerturber:
     def test_reproducibility(
         self,
         use_sensor_scenario: bool,
-        mtf_wavelengths: Optional[Sequence[float]],
-        mtf_weights: Optional[Sequence[float]],
-        altitude: Optional[float],
-        slant_range: Optional[float],
-        D: Optional[float],  # noqa: N803
-        ha_wind_speed: Optional[float],
-        cn2_at_1m: Optional[float],
-        int_time: Optional[float],
-        n_tdi: Optional[float],
-        aircraft_speed: Optional[float],
-        interp: Optional[bool],
+        mtf_wavelengths: Sequence[float] | None,
+        mtf_weights: Sequence[float] | None,
+        altitude: float | None,
+        slant_range: float | None,
+        D: float | None,  # noqa: N803
+        ha_wind_speed: float | None,
+        cn2_at_1m: float | None,
+        int_time: float | None,
+        n_tdi: float | None,
+        aircraft_speed: float | None,
+        interp: bool,
     ) -> None:
         """Ensure results are reproducible."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -106,7 +111,7 @@ class TestTurbulenceApertureOTFPerturber:
             mtf_weights=mtf_weights,
             altitude=altitude,
             slant_range=slant_range,
-            D=D,  # noqa: N803
+            D=D,
             ha_wind_speed=ha_wind_speed,
             cn2_at_1m=cn2_at_1m,
             int_time=int_time,
@@ -134,8 +139,8 @@ class TestTurbulenceApertureOTFPerturber:
     def test_additional_params(
         self,
         use_sensor_scenario: bool,
-        additional_params: Dict[str, Any],
-        expectation: ContextManager,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
     ) -> None:
         """Test that exceptions are appropriately raised based on available metadata."""
         sensor = None
@@ -145,7 +150,7 @@ class TestTurbulenceApertureOTFPerturber:
         perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, additional_params)
+            _ = perturber.perturb(img, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "expectation"),
@@ -188,7 +193,7 @@ class TestTurbulenceApertureOTFPerturber:
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
         cn2_at_1m: float,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         """Raise appropriate errors for specific parameters."""
         with expectation:
@@ -221,20 +226,20 @@ class TestTurbulenceApertureOTFPerturber:
             (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
         ],
     )
-    def test_configuration(
+    def test_configuration(  # noqa: C901
         self,
         use_sensor_scenario: bool,
-        mtf_wavelengths: Optional[Sequence[float]],
-        mtf_weights: Optional[Sequence[float]],
-        altitude: Optional[float],
-        slant_range: Optional[float],
-        D: Optional[float],  # noqa: N803
-        ha_wind_speed: Optional[float],
-        cn2_at_1m: Optional[float],
-        int_time: Optional[float],
-        n_tdi: Optional[float],
-        aircraft_speed: Optional[float],
-        interp: Optional[bool],
+        mtf_wavelengths: Sequence[float] | None,
+        mtf_weights: Sequence[float] | None,
+        altitude: float | None,
+        slant_range: float | None,
+        D: float | None,  # noqa: N803
+        ha_wind_speed: float | None,
+        cn2_at_1m: float | None,
+        int_time: float | None,
+        n_tdi: float | None,
+        aircraft_speed: float | None,
+        interp: bool,
     ) -> None:
         """Test configuration stability."""
         sensor = None
@@ -257,7 +262,7 @@ class TestTurbulenceApertureOTFPerturber:
             mtf_weights=mtf_weights,
             altitude=altitude,
             slant_range=slant_range,
-            D=D,  # noqa: N803
+            D=D,
             ha_wind_speed=ha_wind_speed,
             cn2_at_1m=cn2_at_1m,
             int_time=int_time,
@@ -282,12 +287,12 @@ class TestTurbulenceApertureOTFPerturber:
                 assert np.allclose(i.mtf_weights, np.array([1.0, 1.0]))
 
             # Sensor parameters
-            if D is not None:  # noqa: N806
-                assert i.D == D  # noqa: N806
+            if D is not None:
+                assert i.D == D
             elif sensor is not None and scenario is not None:
-                assert i.D == sensor.D  # noqa: N806
+                assert i.D == sensor.D
             else:  # Default value
-                assert i.D == 40e-3  # noqa: N806
+                assert i.D == 40e-3
             if int_time is not None:
                 assert i.int_time == int_time
             elif sensor is not None and scenario is not None:
@@ -396,17 +401,17 @@ class TestTurbulenceApertureOTFPerturber:
         self,
         snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
-        mtf_wavelengths: Optional[Sequence[float]],
-        mtf_weights: Optional[Sequence[float]],
-        altitude: Optional[float],
-        slant_range: Optional[float],
-        D: Optional[float],  # noqa: N803
-        ha_wind_speed: Optional[float],
-        cn2_at_1m: Optional[float],
-        int_time: Optional[float],
-        n_tdi: Optional[float],
-        aircraft_speed: Optional[float],
-        interp: Optional[bool],
+        mtf_wavelengths: Sequence[float] | None,
+        mtf_weights: Sequence[float] | None,
+        altitude: float | None,
+        slant_range: float | None,
+        D: float | None,  # noqa: N803
+        ha_wind_speed: float | None,
+        cn2_at_1m: float | None,
+        int_time: float | None,
+        n_tdi: float | None,
+        aircraft_speed: float | None,
+        interp: bool,
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
@@ -424,7 +429,7 @@ class TestTurbulenceApertureOTFPerturber:
             mtf_weights=mtf_weights,
             altitude=altitude,
             slant_range=slant_range,
-            D=D,  # noqa: N803
+            D=D,
             ha_wind_speed=ha_wind_speed,
             cn2_at_1m=cn2_at_1m,
             int_time=int_time,
@@ -437,9 +442,26 @@ class TestTurbulenceApertureOTFPerturber:
 
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = TurbulenceApertureOTFPerturber()
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        assert boxes == out_boxes
+
 
 @mock.patch.object(TurbulenceApertureOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not TurbulenceApertureOTFPerturber.is_usable()

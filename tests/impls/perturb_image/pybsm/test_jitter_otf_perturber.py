@@ -1,16 +1,19 @@
 import unittest.mock as mock
+from collections.abc import Hashable, Iterable
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
-
-from ...test_pybsm_utils import create_sample_sensor_and_scenario
-from ..test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
@@ -128,13 +131,17 @@ class TestJitterOTFPerturber:
             ),
         ],
     )
-    def test_provided_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_provided_additional_params(
+        self,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
         perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params)
+            _ = perturber(image, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -142,12 +149,16 @@ class TestJitterOTFPerturber:
             ({}, does_not_raise()),
         ],
     )
-    def test_default_additional_params(self, additional_params: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_default_additional_params(
+        self,
+        additional_params: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test variations of additional params."""
         perturber = JitterOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params)
+            _ = perturber(image, additional_params=additional_params)
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
     @pytest.mark.parametrize("s_y", [0.5, 1.5])
@@ -278,9 +289,26 @@ class TestJitterOTFPerturber:
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = JitterOTFPerturber()
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        assert boxes == out_boxes
+
 
 @mock.patch.object(JitterOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not JitterOTFPerturber.is_usable()

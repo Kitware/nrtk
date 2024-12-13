@@ -1,9 +1,12 @@
+from collections.abc import Hashable, Iterable
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, ContextManager, Dict
+from typing import Any
 
 import numpy as np
 import pytest
 from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generic.PIL.enhance import (
     BrightnessPerturber,
@@ -11,8 +14,9 @@ from nrtk.impls.perturb_image.generic.PIL.enhance import (
     ContrastPerturber,
     SharpnessPerturber,
 )
+from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
-from ...test_perturber_utils import perturber_assertions
+rng = np.random.default_rng()
 
 
 class TestBrightnessPerturber:
@@ -23,7 +27,11 @@ class TestBrightnessPerturber:
 
         # Test perturb interface directly
         inst = BrightnessPerturber(factor=factor)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_BRIGHTNESS)
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=EXPECTED_BRIGHTNESS,
+        )
 
         # Test callable
         perturber_assertions(
@@ -35,7 +43,7 @@ class TestBrightnessPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -44,7 +52,11 @@ class TestBrightnessPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = BrightnessPerturber(factor=factor)
-        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -68,10 +80,31 @@ class TestBrightnessPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             BrightnessPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = BrightnessPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 class TestColorPerturber:
@@ -85,12 +118,16 @@ class TestColorPerturber:
         perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_COLOR)
 
         # Test callable
-        perturber_assertions(perturb=ColorPerturber(factor=factor), image=image, expected=EXPECTED_COLOR)
+        perturber_assertions(
+            perturb=ColorPerturber(factor=factor),
+            image=image,
+            expected=EXPECTED_COLOR,
+        )
 
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -99,7 +136,11 @@ class TestColorPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = ColorPerturber(factor=factor)
-        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -123,10 +164,31 @@ class TestColorPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             ColorPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = ColorPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 class TestContrastPerturber:
@@ -137,7 +199,11 @@ class TestContrastPerturber:
 
         # Test perturb interface directly
         inst = ContrastPerturber(factor=factor)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_CONTRAST)
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=EXPECTED_CONTRAST,
+        )
 
         # Test callable
         perturber_assertions(
@@ -149,7 +215,7 @@ class TestContrastPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -158,7 +224,11 @@ class TestContrastPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = ContrastPerturber(factor=factor)
-        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -182,10 +252,31 @@ class TestContrastPerturber:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             ContrastPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = ContrastPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 class TestSharpnessPerturber:
@@ -196,7 +287,11 @@ class TestSharpnessPerturber:
 
         # Test perturb interface directly
         inst = SharpnessPerturber(factor=factor)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SHARPNESS)
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=EXPECTED_SHARPNESS,
+        )
 
         # Test callable
         perturber_assertions(
@@ -208,7 +303,7 @@ class TestSharpnessPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -217,7 +312,11 @@ class TestSharpnessPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         inst = SharpnessPerturber(factor=factor)
-        out_image = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
         perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
         # Test callable
@@ -235,24 +334,54 @@ class TestSharpnessPerturber:
         [
             (
                 {"factor": 5},
-                pytest.raises(ValueError, match=r"SharpnessPerturber invalid sharpness factor"),
+                pytest.raises(
+                    ValueError,
+                    match=r"SharpnessPerturber invalid sharpness factor",
+                ),
             ),
             ({"factor": 2.0}, does_not_raise()),
             ({"factor": 1.5}, does_not_raise()),
             ({"factor": 0.0}, does_not_raise()),
             (
                 {"factor": -1.2},
-                pytest.raises(ValueError, match=r"SharpnessPerturber invalid sharpness factor"),
+                pytest.raises(
+                    ValueError,
+                    match=r"SharpnessPerturber invalid sharpness factor",
+                ),
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             SharpnessPerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = SharpnessPerturber(factor=0.5)
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
 
 
 EXPECTED_BRIGHTNESS = np.array([[0, 0, 0], [0, 1, 1], [1, 1, 1]], dtype=np.uint8)
 EXPECTED_COLOR = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
 EXPECTED_CONTRAST = np.array([[4, 4, 4], [4, 5, 5], [5, 5, 5]], dtype=np.uint8)
-EXPECTED_SHARPNESS = np.array([[100, 20, 30], [40, 66, 60], [70, 80, 255]], dtype=np.uint8)
+EXPECTED_SHARPNESS = np.array(
+    [[100, 20, 30], [40, 66, 60], [70, 80, 255]],
+    dtype=np.uint8,
+)

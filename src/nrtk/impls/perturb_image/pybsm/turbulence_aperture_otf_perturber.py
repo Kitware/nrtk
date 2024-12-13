@@ -1,6 +1,32 @@
-from __future__ import annotations
+"""
+This module provides the `TurbulenceApertureOTFPerturber` class, which applies image perturbations
+based on Optical Transfer Function (OTF) calculations considering turbulence and aperture effects.
+The class supports configurations with specific sensor and scenario parameters, leveraging pyBSM
+and OpenCV for realistic image simulations.
 
-from typing import Any, Dict, Optional, Sequence, Type, TypeVar
+Classes:
+    TurbulenceApertureOTFPerturber: Applies OTF-based perturbations with turbulence and aperture
+    effects to images, utilizing pyBSM and OpenCV functionalities.
+
+Dependencies:
+    - OpenCV for image processing.
+    - pyBSM for radiance and OTF-related calculations.
+    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+
+Example usage:
+    sensor = PybsmSensor(...)
+    scenario = PybsmScenario(...)
+    perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
+    perturbed_image, boxes = perturber.perturb(image, boxes)
+
+Notes:
+    - The boxes returned from `perturb` are identical to the boxes passed in.
+"""
+
+from collections.abc import Hashable, Iterable, Sequence
+from typing import Any, TypeVar
+
+from smqtk_image_io import AxisAlignedBoundingBox
 
 try:
     import cv2
@@ -24,6 +50,7 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
+from typing_extensions import override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -33,21 +60,46 @@ C = TypeVar("C", bound="TurbulenceApertureOTFPerturber")
 
 
 class TurbulenceApertureOTFPerturber(PerturbImage):
-    def __init__(
+    """
+    Implements OTF-based image perturbation with turbulence and aperture effects.
+
+    The `TurbulenceApertureOTFPerturber` class simulates image degradation due to atmospheric
+    turbulence and optical aperture effects, using pyBSM sensor and scenario configurations.
+    It supports adjustable wavelengths, weights, and other environmental parameters for
+    realistic perturbations.
+
+    Attributes:
+        sensor (PybsmSensor | None): Sensor configuration for the perturbation.
+        scenario (PybsmScenario | None): Scenario settings applied during perturbation.
+        mtf_wavelengths (Sequence[float]): Wavelengths used in MTF calculations.
+        mtf_weights (Sequence[float]): Weights associated with each wavelength.
+        altitude (float): Altitude of the imaging platform.
+        slant_range (float): Line-of-sight distance between platform and target.
+        D (float): Effective aperture diameter.
+        ha_wind_speed (float): High-altitude wind speed affecting turbulence profile.
+        cn2_at_1m (float): Refractive index structure parameter at ground level.
+        int_time (float): Integration time for imaging.
+        n_tdi (float): Number of time-delay integration stages.
+        aircraft_speed (float): Apparent atmospheric velocity.
+        interp (bool): Indicates whether to use interpolated atmospheric data.
+    """
+
+    def __init__(  # noqa: C901
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        mtf_wavelengths: Optional[Sequence[float]] = None,
-        mtf_weights: Optional[Sequence[float]] = None,
-        altitude: Optional[float] = None,
-        slant_range: Optional[float] = None,
-        D: Optional[float] = None,  # noqa: N803
-        ha_wind_speed: Optional[float] = None,
-        cn2_at_1m: Optional[float] = None,
-        int_time: Optional[float] = None,
-        n_tdi: Optional[float] = None,
-        aircraft_speed: Optional[float] = None,
-        interp: Optional[float] = True,
+        sensor: PybsmSensor = None,
+        scenario: PybsmScenario = None,
+        mtf_wavelengths: Sequence[float] = None,
+        mtf_weights: Sequence[float] = None,
+        altitude: float = None,
+        slant_range: float = None,
+        D: float = None,  # noqa: N803
+        ha_wind_speed: float = None,
+        cn2_at_1m: float = None,
+        int_time: float = None,
+        n_tdi: float = None,
+        aircraft_speed: float = None,
+        interp: bool = True,
+        box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
@@ -68,6 +120,14 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             are used. For CMOS cameras, the value can be assumed to be 1.0)
         :param aircraft_speed: apparent atmospheric velocity (m/s); this can just be the windspeed
             at the sensor position if the sensor is stationary
+        :param interp: a boolean determining whether load_database_atmosphere is used with or without
+                       interpolation
+        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+                extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                median: median between extent and extant
+            Default value is extent
 
         If both sensor and scenario parameters are absent, then default values will be used for
         their parameters.
@@ -100,8 +160,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'."
+                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
             )
+
+        super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
             if interp:
@@ -109,7 +171,9 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             else:
                 atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
-                atm, sensor.create_sensor(), sensor.int_time
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
             )
 
             wavelengths = spectral_weights[0]
@@ -123,7 +187,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.mtf_weights = np.asarray(mtf_weights) if mtf_weights is not None else weights[pos_weights]
 
             # Sensor paramaters
-            self.D = D if D is not None else sensor.D  # noqa: N806
+            self.D = D if D is not None else sensor.D
             self.int_time = int_time if int_time is not None else sensor.int_time
             self.n_tdi = n_tdi if n_tdi is not None else sensor.n_tdi
 
@@ -143,7 +207,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             )
 
             # Sensor paramaters
-            self.D = D if D is not None else 40e-3  # noqa: N806
+            self.D = D if D is not None else 40e-3
             self.int_time = int_time if int_time is not None else 30e-3
             self.n_tdi = n_tdi if n_tdi is not None else 1.0
 
@@ -172,12 +236,34 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self.scenario = scenario
         self.interp = interp
 
-    def perturb(self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None) -> np.ndarray:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        """
+        Applies turbulence and aperture-based perturbation to the provided image.
+
+        Args:
+            image (np.ndarray): The image to be perturbed.
+            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], optional): bounding boxes
+                for detections in input image
+            additional_params (dict[str, Any], optional): Additional parameters, including 'img_gsd'.
+
+        Returns:
+            np.ndarray: The perturbed image.
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: unmodified bounding boxes
+                for detections in input image
+
+        Raises:
+            ValueError: If 'img_gsd' is not provided in `additional_params`.
+        """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
-        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)  # noqa: N806
+        cutoff_frequency = self.D / np.min(self.mtf_wavelengths)
         u_rng = np.linspace(-1.0, 1.0, 1501) * cutoff_frequency
         v_rng = np.linspace(1.0, -1.0, 1501) * cutoff_frequency
 
@@ -227,17 +313,33 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
             sim_img = cv2.filter2D(image, -1, psf)
 
-        return sim_img.astype(np.uint8)
+        return sim_img.astype(np.uint8), boxes
 
     @classmethod
-    def get_default_config(cls) -> Dict[str, Any]:
+    def get_default_config(cls) -> dict[str, Any]:
+        """
+        Provides the default configuration for TurbulenceApertureOTFPerturber instances.
+
+        Returns:
+            dict[str, Any]: A dictionary with the default configuration values.
+        """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
         cfg["scenario"] = make_default_config([PybsmScenario])
         return cfg
 
     @classmethod
-    def from_config(cls: Type[C], config_dict: Dict, merge_default: bool = True) -> C:
+    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+        """
+        Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
+
+        Args:
+            config_dict (dict): Configuration dictionary with initialization parameters.
+            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+
+        Returns:
+            C: An instance of TurbulenceApertureOTFPerturber configured according to `config_dict`.
+        """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
         if sensor is not None:
@@ -248,29 +350,38 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    def get_config(self) -> Dict[str, Any]:
-        sensor = to_config_dict(self.sensor) if self.sensor else None
-        scenario = to_config_dict(self.scenario) if self.scenario else None
+    def get_config(self) -> dict[str, Any]:
+        """
+        Returns the current configuration of the TurbulenceApertureOTFPerturber instance.
 
-        config = {
-            "sensor": sensor,
-            "scenario": scenario,
-            "mtf_wavelengths": self.mtf_wavelengths,
-            "mtf_weights": self.mtf_weights,
-            "altitude": self.altitude,
-            "slant_range": self.slant_range,
-            "D": self.D,  # noqa: N803
-            "ha_wind_speed": self.ha_wind_speed,
-            "cn2_at_1m": self.cn2_at_1m,
-            "int_time": self.int_time,
-            "n_tdi": self.n_tdi,
-            "aircraft_speed": self.aircraft_speed,
-            "interp": self.interp,
-        }
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
+        cfg = super().get_config()
 
-        return config
+        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
+        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg["mtf_wavelengths"] = self.mtf_wavelengths
+        cfg["mtf_weights"] = self.mtf_weights
+        cfg["altitude"] = self.altitude
+        cfg["slant_range"] = self.slant_range
+        cfg["D"] = self.D
+        cfg["ha_wind_speed"] = self.ha_wind_speed
+        cfg["cn2_at_1m"] = self.cn2_at_1m
+        cfg["int_time"] = self.int_time
+        cfg["n_tdi"] = self.n_tdi
+        cfg["aircraft_speed"] = self.aircraft_speed
+        cfg["interp"] = self.interp
+
+        return cfg
 
     @classmethod
     def is_usable(cls) -> bool:
+        """
+        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+
+        Returns:
+            bool: True if both pyBSM and OpenCV are available; False otherwise.
+        """
         # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available

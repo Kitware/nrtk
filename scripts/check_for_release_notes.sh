@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Check if any RST files in the release notes space were modified.
 # If any have been modified, then this check criterion has passed.
 # Otherwise if nothing has been modified then we exit non-zero to indicate

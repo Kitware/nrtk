@@ -1,5 +1,33 @@
+"""
+This module defines the `ScoreClassifications` interface, which provides an abstract
+method for scoring classification outputs based on a chosen metric. This interface is
+intended for implementations that compute metric scores by comparing actual and predicted
+classification results.
+
+Classes:
+    ScoreClassifications: Interface for scoring classification outputs against ground truth
+    data, with an expectation of producing metric-based scores.
+
+Dependencies:
+    - smqtk_core for providing a configurable plugin interface.
+    - smqtk_classifier for handling classification dictionary typing.
+
+Usage:
+    To create a custom classification scoring class, inherit from `ScoreClassifications`
+    and implement the `score` method, ensuring the input data is validated as required.
+
+Example:
+    class CustomClassificationScorer(ScoreClassifications):
+        def score(self, actual, predicted):
+            # Implement custom scoring logic
+            pass
+
+    scorer = CustomClassificationScorer()
+    scores = scorer(actual_classifications, predicted_classifications)
+"""
+
 import abc
-from typing import Sequence
+from collections.abc import Sequence
 
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
 from smqtk_core import Plugfigurable

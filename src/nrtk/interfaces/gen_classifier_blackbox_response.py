@@ -1,11 +1,51 @@
+"""
+This module defines the `GenerateClassifierBlackboxResponse` interface, which provides
+functionality for generating item-response curves and scores for image classification tasks
+in a blackbox context. The interface allows images to be perturbed and then classified,
+with scores computed based on the classification results.
+
+Classes:
+    GenerateClassifierBlackboxResponse: An interface for generating item-response curves
+    and scores for perturbed image classifications using a specified classifier and scoring mechanism.
+
+Dependencies:
+    - numpy for handling image data and computations.
+    - smqtk_classifier for image classification.
+    - tqdm for progress tracking.
+    - smqtk_core for plugin configuration.
+    - nrtk.interfaces for blackbox response generation, perturbation, and scoring interfaces.
+
+Usage:
+    To create an instance of `GenerateClassifierBlackboxResponse`, implement the required
+    abstract methods, such as `__getitem__`, and use the `generate` method to produce
+    item-response curves and scores.
+
+Example:
+    class CustomClassifierResponse(GenerateClassifierBlackboxResponse):
+        def __getitem__(self, idx):
+            # Implementation of data retrieval
+            pass
+
+    generator = CustomClassifierResponse()
+    response_curve, scores = generator.generate(
+        blackbox_perturber_factories=[factory1, factory2],
+        blackbox_classifier=classifier,
+        blackbox_scorer=scorer,
+        img_batch_size=32,
+        verbose=True
+    )
+"""
+
 import abc
+from collections.abc import Sequence
 from contextlib import nullcontext
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 from smqtk_classifier import ClassifyImage
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
 from tqdm import tqdm
+from typing_extensions import override
 
 from nrtk.interfaces.gen_blackbox_response import (
     GenerateBlackboxResponse,
@@ -25,18 +65,22 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
     these detections is computed with the given blackbox scorer.
     """
 
+    @override
     @abc.abstractmethod
-    def __getitem__(self, idx: int) -> Tuple[np.ndarray, CLASSIFICATION_DICT_T, Dict[str, Any]]:
+    def __getitem__(
+        self,
+        idx: int,
+    ) -> tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]:
         """Get the ``idx``th image and ground_truth pair."""
 
-    def generate(
+    def generate(  # noqa C901:
         self,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_classifier: ClassifyImage,
         blackbox_scorer: ScoreClassifications,
         img_batch_size: int,
         verbose: bool = False,
-    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
+    ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         """Generate item-response curves for given parameters.
 
         :param blackbox_perturber_factories: Sequence of factories to perturb stimuli.
@@ -48,15 +92,15 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         :return: Item-response curve
         :return: Scores for each input stimuli
         """
-        curve: List[Tuple[Dict[str, Any], float]] = list()
-        full: List[Sequence[float]] = list()
+        curve: list[tuple[dict[str, Any], float]] = list()
+        full: list[Sequence[float]] = list()
 
         def process(perturbers: Sequence[PerturbImage]) -> None:
             """Generate item-response curve and individual stimuli scores for this set of perturbers.
 
             :param perturbers: Set of perturbers to perturb image stimuli.
             """
-            image_scores: List[float] = list()
+            image_scores: list[float] = list()
 
             # Generate batch of images and GT detections so we can predict
             # and score in batches
@@ -68,7 +112,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
                     perturbed = image.copy()
 
                     for perturber in perturbers:
-                        perturbed = perturber(perturbed, extra)
+                        perturbed, _ = perturber(perturbed, additional_params=extra)
 
                     batch_images.append(perturbed)
                     batch_gt.append(actual)
@@ -77,7 +121,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
 
                 scores = blackbox_scorer(
                     actual=batch_gt,
-                    predicted=[b for b in batch_predicted],  # Interface requires list not iterator
+                    predicted=list(batch_predicted),  # Interface requires list not iterator
                 )
                 image_scores.extend(scores)
 
@@ -110,7 +154,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         blackbox_scorer: ScoreClassifications,
         img_batch_size: int,
         verbose: bool = False,
-    ) -> Tuple[Sequence[Tuple[Dict[str, Any], float]], Sequence[Sequence[float]]]:
+    ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         """Alias for :meth: ``.GenerateClassifierBlackboxResponse.generate``."""
         return self.generate(
             blackbox_perturber_factories=blackbox_perturber_factories,

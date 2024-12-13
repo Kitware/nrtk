@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Optional
 
 import numpy as np
 import pytest
@@ -71,9 +73,9 @@ def test_sensor_call() -> None:
 )
 def test_verify_parameters(
     opt_trans_wavelengths: np.ndarray,
-    optics_transmission: Optional[np.ndarray],
+    optics_transmission: np.ndarray | None,
     name: str,
-    expectation: ContextManager,
+    expectation: AbstractContextManager,
 ) -> None:
     D = 0  # noqa:N806
     f = 0
@@ -140,8 +142,8 @@ def test_config() -> None:
         assert np.array_equal(i.qe, inst.qe)
 
 
-@mock.patch.object(PybsmSensor, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+@mock.patch.object(PybsmSensor, "is_usable", return_value=False)
+def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmSensor.is_usable()
@@ -151,4 +153,49 @@ def test_missing_deps(mock_is_usable) -> None:
     p_x = 0
     opt_trans_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
     with pytest.raises(ImportError, match=r"pybsm not found"):
-        PybsmSensor(name, D, f, p_x, opt_trans_wavelengths)
+        PybsmSensor(name, D, f, p_x, opt_trans_wavelengths).create_sensor()
+
+
+@pytest.fixture()  # noqa:PT001
+def sensor_instance() -> PybsmSensor:
+    """Fixture to provide a PybsmSensor instance with basic parameters."""
+    return PybsmSensor(name="test_sensor", D=0.3, f=1.1, p_x=0.4, opt_trans_wavelengths=np.array([0.1, 0.4]) * 1.0e-6)
+
+
+# Test cases for the `_check_opt_trans_wavelengths` method
+def test_check_opt_trans_wavelengths_valid(sensor_instance: PybsmSensor) -> None:
+    """Test that valid opt_trans_wavelengths passes without errors."""
+    sensor_instance._check_opt_trans_wavelengths(np.array([0.1, 0.2, 0.4]) * 1.0e-6)
+
+
+def test_check_opt_trans_wavelengths_too_few_elements(sensor_instance: PybsmSensor) -> None:
+    """Test that opt_trans_wavelengths with fewer than two elements raises ValueError."""
+    with pytest.raises(ValueError, match="At minimum, at least the start and end wavelengths"):
+        sensor_instance._check_opt_trans_wavelengths(np.array([0.1]) * 1.0e-6)
+
+
+def test_check_opt_trans_wavelengths_not_ascending(sensor_instance: PybsmSensor) -> None:
+    """Test that opt_trans_wavelengths not in ascending order raises ValueError."""
+    with pytest.raises(ValueError, match="opt_trans_wavelengths must be ascending"):
+        sensor_instance._check_opt_trans_wavelengths(np.array([0.4, 0.2, 0.1]) * 1.0e-6)
+
+
+# Test cases for the `_set_optics_transmission` method
+def test_set_optics_transmission_none(sensor_instance: PybsmSensor) -> None:
+    """Test that optics_transmission is set to an array of ones if None is provided."""
+    sensor_instance._set_optics_transmission()
+    assert np.array_equal(sensor_instance.optics_transmission, np.ones(sensor_instance.opt_trans_wavelengths.shape))
+
+
+def test_set_optics_transmission_valid_array(sensor_instance: PybsmSensor) -> None:
+    """Test that a valid optics_transmission array is assigned correctly."""
+    valid_transmission = np.array([0.8, 0.9])
+    sensor_instance._set_optics_transmission(valid_transmission)
+    assert np.array_equal(sensor_instance.optics_transmission, valid_transmission)
+
+
+def test_set_optics_transmission_mismatched_length(sensor_instance: PybsmSensor) -> None:
+    """Test that optics_transmission array with mismatched length raises ValueError."""
+    invalid_transmission = np.array([0.8])  # Only one element
+    with pytest.raises(ValueError, match="optics_transmission and opt_trans_wavelengths must have the same length"):
+        sensor_instance._set_optics_transmission(invalid_transmission)

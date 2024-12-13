@@ -1,5 +1,5 @@
 import unittest.mock as mock
-from collections.abc import Hashable, Iterable, Sequence
+from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
@@ -11,34 +11,28 @@ from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io import AxisAlignedBoundingBox
 
-from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
-    CircularApertureOTFPerturber,
-)
+from nrtk.impls.perturb_image.pybsm.defocus_otf_perturber import DefocusOTFPerturber
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
-EXPECTED_DEFAULT_IMG_FILE_PATH = (
-    "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_default_expected_output.tiff"
-)
-EXPECTED_PROVIDED_IMG_FILE_PATH = (
-    "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_provided_expected_output.tiff"
-)
+EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_default_expected_output.tiff"
+EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_provided_expected_output.tiff"
 
 
 @pytest.mark.skipif(
-    not CircularApertureOTFPerturber.is_usable(),
+    not DefocusOTFPerturber.is_usable(),
     reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
 )
-class TestCircularApertureOTFPerturber:
+class TestDefocusOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
-        inst2 = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
+        inst2 = DefocusOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -69,7 +63,7 @@ class TestCircularApertureOTFPerturber:
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=interp)
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, interp=interp)
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -79,7 +73,7 @@ class TestCircularApertureOTFPerturber:
 
         # Test callable
         pybsm_perturber_assertions(
-            perturb=CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=interp),
+            perturb=DefocusOTFPerturber(sensor=sensor, scenario=scenario),
             image=image,
             expected=expected,
             additional_params={"img_gsd": img_gsd},
@@ -90,36 +84,21 @@ class TestCircularApertureOTFPerturber:
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE_PATH))
         # Test perturb interface directly
-        inst = CircularApertureOTFPerturber()
+        inst = DefocusOTFPerturber()
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
 
         # Test callable
-        pybsm_perturber_assertions(perturb=CircularApertureOTFPerturber(), image=image, expected=expected)
+        pybsm_perturber_assertions(perturb=DefocusOTFPerturber(), image=image, expected=expected)
 
-    @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights", "interp"),
-        [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5], True),
-            ([0.2e-6, 0.4e-6, 0.6e-6], [1.0, 0.5, 1.0], False),
-        ],
-    )
-    def test_provided_reproducibility(
-        self,
-        mtf_wavelengths: Sequence[float],
-        mtf_weights: Sequence[float],
-        interp: bool,
-    ) -> None:
+    @pytest.mark.parametrize("w_x", [0.5, 1.5])
+    @pytest.mark.parametrize("w_y", [0.5, 1.5])
+    @pytest.mark.parametrize("interp", [True, False])
+    def test_provided_reproducibility(self, w_x: float, w_y: float, interp: bool) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = CircularApertureOTFPerturber(
-            sensor=sensor,
-            scenario=scenario,
-            mtf_wavelengths=mtf_wavelengths,
-            mtf_weights=mtf_weights,
-            interp=interp,
-        )
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, interp=interp)
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
@@ -138,7 +117,7 @@ class TestCircularApertureOTFPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        inst = CircularApertureOTFPerturber()
+        inst = DefocusOTFPerturber()
         out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None)
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
 
@@ -159,48 +138,10 @@ class TestCircularApertureOTFPerturber:
     ) -> None:
         """Test variations of additional params."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
+        perturber = DefocusOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
-
-    @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights", "interp", "expectation"),
-        [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5], True, does_not_raise()),
-            (
-                [0.5e-6, 0.6e-6],
-                [],
-                False,
-                pytest.raises(ValueError, match=r"mtf_weights is empty"),
-            ),
-            (
-                [],
-                [0.5, 0.5],
-                True,
-                pytest.raises(ValueError, match=r"mtf_wavelengths is empty"),
-            ),
-            (
-                [0.5e-6, 0.6e-6],
-                [0.5],
-                True,
-                pytest.raises(
-                    ValueError,
-                    match=r"mtf_wavelengths and mtf_weights are not the same length",
-                ),
-            ),
-        ],
-    )
-    def test_configuration_bounds(
-        self,
-        mtf_wavelengths: Sequence[float],
-        mtf_weights: Sequence[float],
-        interp: bool,
-        expectation: AbstractContextManager,
-    ) -> None:
-        """Test variations of additional params."""
-        with expectation:
-            _ = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights, interp=interp)
+            _ = perturber(image=image, boxes=None, additional_params=additional_params)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -214,32 +155,54 @@ class TestCircularApertureOTFPerturber:
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
-        perturber = CircularApertureOTFPerturber()
+        perturber = DefocusOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, additional_params)
 
-    @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights"),
-        [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
-        ],
-    )
-    def test_mtf_wavelength_and_weight_configuration(
+    @pytest.mark.parametrize("w_x", [0.5, 1.5])
+    @pytest.mark.parametrize("w_y", [0.5, 1.5])
+    def test_provided_wx_wy_reproducibility(
         self,
-        mtf_wavelengths: Sequence[float],
-        mtf_weights: Sequence[float],
+        w_x: float,
+        w_y: float,
+    ) -> None:
+        """Ensure results are reproducible."""
+        # Test perturb interface directly
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        sensor, scenario = create_sample_sensor_and_scenario()
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y)
+        img_gsd = 3.19 / 160.0
+        out_image = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            additional_params={"img_gsd": img_gsd},
+        )
+        pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+            additional_params={"img_gsd": img_gsd},
+        )
+
+    @pytest.mark.parametrize("w_x", [0.5])
+    @pytest.mark.parametrize("w_y", [0.5])
+    def test_wx_wy_configuration(
+        self,
+        w_x: float,
+        w_y: float,
     ) -> None:
         """Test configuration stability."""
-        inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights)
+        inst = DefocusOTFPerturber(w_x=w_x, w_y=w_y)
         for i in configuration_test_helper(inst):
-            assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
-            assert np.array_equal(i.mtf_weights, mtf_weights)
+            assert i.w_x == w_x
+            assert i.w_y == w_y
 
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario)
         for i in configuration_test_helper(inst):
             if i.sensor:
                 assert i.sensor.name == sensor.name
@@ -257,8 +220,8 @@ class TestCircularApertureOTFPerturber:
                 assert i.sensor.max_n == sensor.max_n
                 assert i.sensor.bit_depth == sensor.bit_depth
                 assert i.sensor.max_well_fill == sensor.max_well_fill
-                assert i.sensor.s_x == sensor.s_x
-                assert i.sensor.s_y == sensor.s_y
+                assert i.sensor.w_x == sensor.w_x
+                assert i.sensor.w_y == sensor.w_y
                 assert i.sensor.da_x == sensor.da_x
                 assert i.sensor.da_y == sensor.da_y
                 assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
@@ -276,28 +239,21 @@ class TestCircularApertureOTFPerturber:
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
-    @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights"),
-        [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
-        ],
-    )
+    @pytest.mark.parametrize("w_x", [0.5])
+    @pytest.mark.parametrize("w_y", [0.5])
+    @pytest.mark.parametrize("interp", [True, False])
     def test_overall_configuration(
         self,
-        mtf_wavelengths: Sequence[float],
-        mtf_weights: Sequence[float],
+        w_x: float,
+        w_y: float,
+        interp: bool,
     ) -> None:
         """Test configuration stability."""
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = CircularApertureOTFPerturber(
-            sensor=sensor,
-            scenario=scenario,
-            mtf_wavelengths=mtf_wavelengths,
-            mtf_weights=mtf_weights,
-        )
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, interp=interp)
         for i in configuration_test_helper(inst):
-            assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
-            assert np.array_equal(i.mtf_weights, mtf_weights)
+            assert i.w_x == w_x
+            assert i.w_y == w_y
             if i.sensor:
                 assert i.sensor.name == sensor.name
                 assert i.sensor.D == sensor.D
@@ -346,15 +302,15 @@ class TestCircularApertureOTFPerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = CircularApertureOTFPerturber()
+        inst = DefocusOTFPerturber()
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
         assert boxes == out_boxes
 
 
-@mock.patch.object(CircularApertureOTFPerturber, "is_usable")
+@mock.patch.object(DefocusOTFPerturber, "is_usable")
 def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
-    assert not CircularApertureOTFPerturber.is_usable()
+    assert not DefocusOTFPerturber.is_usable()
     with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
-        CircularApertureOTFPerturber()
+        DefocusOTFPerturber()

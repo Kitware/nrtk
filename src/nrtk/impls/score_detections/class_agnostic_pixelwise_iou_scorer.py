@@ -1,9 +1,31 @@
+"""
+This module provides the `ClassAgnosticPixelwiseIoUScorer` class, which calculates pixelwise
+Intersection over Union (IoU) scores in a class-agnostic manner. It is intended for evaluating
+object detection results based on IoU between predicted and actual bounding boxes, without
+differentiating between object classes.
+
+Classes:
+    ClassAgnosticPixelwiseIoUScorer: Computes pixelwise IoU scores for bounding boxes in a
+    class-agnostic fashion.
+
+Dependencies:
+    - numpy for numerical operations.
+    - smqtk_image_io for handling bounding boxes.
+    - nrtk.interfaces.score_detections.ScoreDetections for the detection scoring interface.
+
+Example usage:
+    scorer = ClassAgnosticPixelwiseIoUScorer()
+    scores = scorer.score(actual_detections, predicted_detections)
+"""
+
 # standard library imports
-from typing import Any, Dict, Hashable, Sequence, Tuple
+from collections.abc import Hashable, Sequence
+from typing import Any
 
 # 3rd party imports
 import numpy as np
 from smqtk_image_io import AxisAlignedBoundingBox
+from typing_extensions import override
 
 # local imports
 from nrtk.interfaces.score_detections import ScoreDetections
@@ -16,10 +38,11 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
     scores for the specified ground truth and predictions inputs.
     """
 
-    def score(
+    @override
+    def score(  # noqa: C901
         self,
-        actual: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, Any]]]],
-        predicted: Sequence[Sequence[Tuple[AxisAlignedBoundingBox, Dict[Hashable, float]]]],
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
         """Computes pixelwise IoU scores and returns sequence of float values equal to the length of the input data."""
         if len(actual) != len(predicted):
@@ -49,14 +72,17 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
             for act_bbox, _ in act:
                 x_1, y_1 = act_bbox.min_vertex
                 x_2, y_2 = act_bbox.max_vertex
-                actual_mask[int(y_1) : int(y_2), int(x_1) : int(x_2)] = 1  # noqa: E203
+                # Black formatting keeps moving the noqa comment down a line, which causes flake8 error
+                # fmt: off
+                actual_mask[int(y_1): int(y_2), int(x_1): int(x_2)] = 1
+                # fmt: on
 
             for pred_bbox, _ in pred:
                 x_1, y_1 = pred_bbox.min_vertex
                 x_2, y_2 = pred_bbox.max_vertex
                 # Black formatting keeps moving the noqa comment down a line, which causes flake8 error
                 # fmt: off
-                predicted_mask[int(y_1) : int(y_2), int(x_1) : int(x_2)] = (  # noqa: E203
+                predicted_mask[int(y_1):int(y_2), int(x_1):int(x_2)] = (
                     1
                 )
                 # fmt: on
@@ -68,5 +94,11 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
 
         return ious
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
+        """
+        Generates a serializable config that can be used to rehydrate object
+
+        Returns:
+            dict[str, Any]: serializable config containing all instance parameters
+        """
         return {}

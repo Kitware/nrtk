@@ -1,13 +1,15 @@
-from typing import Any, Callable, Dict, Optional
+from __future__ import annotations
+
+from typing import Any, Callable
 
 import numpy as np
 
 
 def perturber_assertions(
-    perturb: Callable[[np.ndarray, Dict[str, Any]], np.ndarray],
+    perturb: Callable[[np.ndarray, dict[str, Any]], np.ndarray],
     image: np.ndarray,
-    expected: Optional[np.ndarray] = None,
-    additional_params: Optional[Dict[str, Any]] = None,
+    expected: np.ndarray | None = None,
+    additional_params: dict[str, Any] | None = None,
 ) -> np.ndarray:
     """Test several blanket assertions for perturbers.
 
@@ -27,7 +29,7 @@ def perturber_assertions(
     dtype = image.dtype
     copy = np.copy(image)
 
-    out_image = perturb(image, additional_params)
+    out_image, _ = perturb(image, additional_params=additional_params)
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)
     assert out_image.dtype == dtype
@@ -38,11 +40,10 @@ def perturber_assertions(
 
 
 def pybsm_perturber_assertions(
-    perturb: Callable[[np.ndarray, Dict[str, Any]], np.ndarray],
+    perturb: Callable[[np.ndarray, dict[str, Any]], np.ndarray],
     image: np.ndarray,
-    expected: Optional[np.ndarray] = None,
-    random_seed: int = 0,
-    additional_params: Optional[Dict[str, Any]] = None,
+    expected: np.ndarray | None = None,
+    additional_params: dict[str, Any] | None = None,
 ) -> np.ndarray:
     """Test some blanket assertions for perturbers.
 
@@ -59,8 +60,8 @@ def pybsm_perturber_assertions(
     if additional_params is None:
         additional_params = dict()
     copy = np.copy(image)
-    np.random.seed(random_seed)
-    out_image = perturb(image, additional_params)
+
+    out_image, _ = perturb(image, additional_params=additional_params)
 
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)

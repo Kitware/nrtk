@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import json
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Any, ContextManager, Dict, Optional, Tuple, Type
+from typing import Any
 
 import numpy as np
 import pytest
@@ -21,16 +24,18 @@ DATA_DIR = Path(__file__).parents[3] / "data"
 
 
 class DummyFloatPerturber(PerturbImage):
-    def __init__(self, param1: float = 1, param2: float = 2):
+    def __init__(self, param1: float = 1, param2: float = 2) -> None:
         self.param1 = param1
         self.param2 = param2
 
     def perturb(
-        self, image: np.ndarray, additional_params: Optional[Dict[str, Any]] = None
+        self,
+        image: np.ndarray,
+        _: dict[str, Any] | None = None,
     ) -> np.ndarray:  # pragma: no cover
         return np.copy(image)
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         return {"param1": self.param1, "param2": self.param2}
 
 
@@ -45,16 +50,20 @@ class TestFloatStepPertubImageFactory:
     )
     def test_iteration(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: int,
         stop: int,
         step: int,
-        expected: Tuple[int, ...],
+        expected: tuple[int, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
         factory = LinSpacePerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
         )
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
@@ -83,18 +92,22 @@ class TestFloatStepPertubImageFactory:
     )
     def test_indexing(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: int,
         stop: int,
         step: int,
         idx: int,
         expected_val: int,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
         factory = LinSpacePerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
         )
         with expectation:
             print(idx, factory[idx].get_config(), expected_val)
@@ -109,7 +122,7 @@ class TestFloatStepPertubImageFactory:
     )
     def test_configuration(
         self,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
@@ -149,7 +162,7 @@ class TestFloatStepPertubImageFactory:
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: Dict[str, Any], expectation: ContextManager) -> None:
+    def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             LinSpacePerturbImageFactory(**kwargs)
@@ -164,7 +177,7 @@ class TestFloatStepPertubImageFactory:
     def test_hydration(
         self,
         tmp_path: Path,
-        perturber: Type[PerturbImage],
+        perturber: type[PerturbImage],
         theta_key: str,
         start: float,
         stop: float,
@@ -172,7 +185,11 @@ class TestFloatStepPertubImageFactory:
     ) -> None:
         """Test configuration hydration using from_config_dict."""
         original_factory = LinSpacePerturbImageFactory(
-            perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
         )
 
         original_factory_config = original_factory.get_config()
@@ -203,9 +220,8 @@ class TestFloatStepPertubImageFactory:
             ),
         ],
     )
-    def test_hydration_bounds(self, config_file_name: str, expectation: ContextManager) -> None:
+    def test_hyrdation_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
-        with expectation:
-            with open(str(DATA_DIR / config_file_name)) as config_file:
-                config = json.load(config_file)
-                from_config_dict(config, PerturbImageFactory.get_impls())
+        with expectation, open(str(DATA_DIR / config_file_name)) as config_file:
+            config = json.load(config_file)
+            from_config_dict(config, PerturbImageFactory.get_impls())

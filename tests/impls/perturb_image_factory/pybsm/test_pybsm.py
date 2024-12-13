@@ -1,8 +1,11 @@
 import json
 import unittest.mock as mock
+from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Any, ContextManager, Sequence, Tuple
+from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -14,8 +17,7 @@ from smqtk_core.configuration import (
 
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-
-from ...test_pybsm_utils import create_sample_sensor_and_scenario
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 DATA_DIR = Path(__file__).parents[3] / "data"
 NRTK_PYBSM_CONFIG = DATA_DIR / "nrtk_pybsm_config.json"
@@ -45,7 +47,7 @@ class TestStepPerturbImageFactory:
         self,
         theta_keys: Sequence[str],
         thetas: Sequence[Any],
-        expected: Tuple[Tuple[int, ...]],
+        expected: tuple[tuple[int, ...]],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
         sensor, scenario = create_sample_sensor_and_scenario()
@@ -105,8 +107,8 @@ class TestStepPerturbImageFactory:
         theta_keys: Sequence[str],
         thetas: Sequence[Any],
         idx: int,
-        expected_val: Tuple[int, ...],
-        expectation: ContextManager,
+        expected_val: tuple[int, ...],
+        expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
         sensor, scenario = create_sample_sensor_and_scenario()
@@ -209,7 +211,10 @@ class TestStepPerturbImageFactory:
         """Test configuration hydration using from_config_dict."""
         sensor, scenario = create_sample_sensor_and_scenario()
         original_factory = CustomPybsmPerturbImageFactory(
-            sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas
+            sensor=sensor,
+            scenario=scenario,
+            theta_keys=theta_keys,
+            thetas=thetas,
         )
 
         original_factory_config = original_factory.get_config()
@@ -227,7 +232,7 @@ class TestStepPerturbImageFactory:
 
 
 @mock.patch.object(CustomPybsmPerturbImageFactory, "is_usable")
-def test_missing_deps(mock_is_usable) -> None:
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not CustomPybsmPerturbImageFactory.is_usable()
