@@ -59,10 +59,8 @@ opencv-python = {version = ">=4.6", optional = true}
 opencv-python-headless = {version = ">=4.6", optional = true}
 
 [tool.poetry.extras]
-# opencv based dependencies
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
-# pybsm based dependencies
 pybsm = ["pybsm"]
 
 # :auto linting:
