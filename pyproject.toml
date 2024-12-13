@@ -54,14 +54,7 @@ pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 typing-extensions = ">=4.5.0"
 
-# This does not work with poetry install but does work with pip. Poetry
-# has a PR working on it and hopefully won't be too far into the future
-# https://github.com/python-poetry/poetry/pull/9553
-pybsm = [
-    {version = "^0.9.0,!=0.10.0", optional = true},
-    {version = "^0.9.0,!=0.10.0", extras=["graphics"], markers = "extra == 'pybsm-graphics'", optional = true},
-    {version = "^0.9.0,!=0.10.0", extras=["headless"], markers = "extra == 'pybsm-headless'", optional = true},
-]
+pybsm = {version = ">=0.10.1", optional = true}
 opencv-python = {version = ">=4.6", optional = true}
 opencv-python-headless = {version = ">=4.6", optional = true}
 
@@ -71,8 +64,6 @@ graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 # pybsm based dependencies
 pybsm = ["pybsm"]
-pybsm-graphics = ["pybsm"]
-pybsm-headless = ["pybsm"]
 
 # :auto linting:
 # Linting
