@@ -12,11 +12,7 @@
 .test-setup:
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests
-    # This does not work with poetry install but does work with pip. Poetry
-    # has a PR working on it and hopefully won't be too far into the future
-    # https://github.com/python-poetry/poetry/pull/9553
-    - poetry run pip install -e .[headless,pybsm-headless]
+    - poetry install --sync --only main,tests --extras "pybsm"
 
 notebooks:
   parallel:
