@@ -1,6 +1,11 @@
 v0.17.0
 =======
 
+New ability to pass ``boxes`` to PerturbImage implementations and have the boxes
+updated to reflect the translational change resulting from the perturbation. Also
+removed ``pybsm`` hinges that were no longer needed because ``pybsm`` dropped the
+need for ``opencv``.
+
 Updates / New Features
 ----------------------
 
