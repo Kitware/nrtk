@@ -12,7 +12,7 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.defocus_otf_perturber import DefocusOTFPerturber
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
@@ -302,9 +302,18 @@ class TestDefocusOTFPerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = DefocusOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
-        assert boxes == out_boxes
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        img_gsd = 3.19 / 160.0
+        sensor, scenario = create_sample_sensor_and_scenario()
+        # Test perturb interface directly
+        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
+        bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            boxes=boxes,
+            additional_params={"img_gsd": img_gsd},
+        )
 
 
 @mock.patch.object(DefocusOTFPerturber, "is_usable")
