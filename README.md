@@ -29,7 +29,7 @@ pip install nrtk[<extra1>,<extra2>,...]
 
 Alternatively, you can use [Poetry](https://python-poetry.org/):
 ```bash
-poetry install --with main,linting,tests,docs
+poetry install --with main,linting,tests,docs --extras "<extra1> <extra2> ..."
 ```
 
 Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://nrtk.readthedocs.io/en/latest/implementations.html).
@@ -70,7 +70,7 @@ Pre-commit hooks ensure that code complies with required linting and formatting 
 To install and use pre-commit hooks:
 ```bash
 # Install required dependencies
-poetry install --sync --with main,linting,tests,docs --extras "<extra1> <extra2> ..."
+poetry install --sync --with main,linting,tests,docs
 # Initialize pre-commit hooks for the repository
 poetry run pre-commit install
 # Run pre-commit checks on all files
