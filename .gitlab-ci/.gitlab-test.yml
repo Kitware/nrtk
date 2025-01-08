@@ -12,7 +12,7 @@
 .test-setup:
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests --extras "pybsm"
+    - poetry install --sync --only main,tests --extras "pybsm headless"
 
 notebooks:
   parallel:
