@@ -1,8 +1,5 @@
 """Define the nrtk package"""
 
-import pkg_resources
+import importlib.metadata
 
-# It is known that this will fail if package is not "installed" in the
-# current environment. Additional support is pending defined use-case-driven
-# requirements.
-__version__ = pkg_resources.get_distribution(__name__).version
+__version__ = importlib.metadata.version(__name__)
