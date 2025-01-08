@@ -4,14 +4,12 @@ requires = ["poetry-core>=1.9"]
 build-backend = "poetry.core.masonry.api"
 # :auto build-system:
 
+# :auto package-meta:
 [tool.poetry]
 name = "nrtk"
-version = "0.17.0"
-description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
 license = "Apache-2.0"
 documentation = "https://nrtk.readthedocs.io/"
 readme = "README.md"
-authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 packages = [{include = "nrtk", from="src"}]
 classifiers = [
     'Development Status :: 3 - Alpha',
@@ -25,6 +23,11 @@ classifiers = [
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
 ]
+# :auto package-meta:
+# package-specific meta, don't put this in "generated package-meta"
+authors = ["Kitware, Inc. <nrtk@kitware.com>"]
+version = "0.17.0"
+description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
 
 [tool.poetry.dependencies]
 # :auto python-version:
