@@ -61,28 +61,6 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
     poetry install --sync --with linting,tests,docs
 
-Installing with OpenCV
-^^^^^^^^^^^^^^^^^^^^^^
-One of the optional packages for nrtk is OpenCV. To give users the option
-to use either ``opencv-python`` or ``opencv-python-headless``,
-nrtk has the ``graphics`` and ``headless`` extras for ``opencv-python`` and
-``opencv-python-headless`` respectively. The following commands will install
-the ``opencv-python`` version.
-
-For `Poetry`_:
-
-.. prompt:: bash
-
-    poetry install --sync --extras graphics
-
-For :command:`pip`:
-
-.. prompt:: bash
-
-    pip install nrtk[graphics]
-
-To install the ``opencv-python-headless`` version, replace ``graphics``
-with ``headless`` in the previous two commands.
 
 Building the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
