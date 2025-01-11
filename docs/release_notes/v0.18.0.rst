@@ -1,6 +1,9 @@
 v0.18.0
 =======
 
+Added a new ``CropPerturber`` to randomly crop images and handle bounding
+boxes changes. Also a few number of small documentation updates.
+
 Updates / New Features
 ----------------------
 
