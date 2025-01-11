@@ -86,3 +86,9 @@ We adopt a "Verb-Noun" convention for class names. This structure highlights the
 ### Examples
 - Classes performing similar actions on different subjects should clearly differentiate the subjects in their names.  
 - Names should be concise and intuitive, aiding user understanding.
+
+## Issue Reporting
+If an issue is found, it can be reported on the [Issue Reporting Page](https://github.com/Kitware/nrtk/issues/new). In the description, provide an outline of the problem in as much detail as possible being sure to include any relevant logs and error tracebacks. Once the issue is created, it will be triaged by a maintainer in a timely manner.
+
+## Feature Requests
+If a user wants to request a new feature, it can be reported in the same location as the issues. In the issue created for feature requests, begin the title with `FEATURE REQUEST`. The issue should also include a `Use Case` section describing the intended use case of the new feature.

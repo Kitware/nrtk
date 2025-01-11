@@ -1,12 +1,13 @@
 # :auto build-system:
 [build-system]
-requires = ["poetry-core>=1.9"]
+requires = ["poetry-core>=1.9,<2.0"]
 build-backend = "poetry.core.masonry.api"
 # :auto build-system:
 
 # :auto package-meta:
 [tool.poetry]
 name = "nrtk"
+license = "Apache-2.0"
 readme = "README.md"
 packages = [{include = "nrtk", from="src"}]
 documentation = "https://nrtk.readthedocs.io/"
@@ -25,9 +26,8 @@ classifiers = [
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
-license = "Apache-2.0"
-version = "0.17.0"
-description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
+version = "0.18.0"
+description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 
 [tool.poetry.dependencies]
 # :auto python-version:
@@ -54,7 +54,7 @@ pycocotools = ">=2.0.6"
 setuptools = ">=65.6.1"
 typing-extensions = ">=4.5.0"
 
-pybsm = {version = ">=0.10.1", optional = true}
+pybsm = {version = ">=0.10.2", optional = true}
 opencv-python = {version = ">=4.6", optional = true}
 opencv-python-headless = {version = ">=4.6", optional = true}
 
