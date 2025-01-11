@@ -27,7 +27,7 @@ classifiers = [
 # package-specific meta, don't put this in "generated package-meta"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 version = "0.17.0"
-description = "An open source toolkit for evaluating the natural robustness of computer vision algorithms."
+description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 
 [tool.poetry.dependencies]
 # :auto python-version:
