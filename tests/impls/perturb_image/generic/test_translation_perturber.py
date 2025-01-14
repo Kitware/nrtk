@@ -4,15 +4,20 @@ from contextlib import nullcontext as does_not_raise
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_image_io import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.translation_perturber import TranslationPerturber
+from nrtk.impls.perturb_image.generic.translation_perturber import RandomTranslationPerturber
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
 
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
-class TestTranslationPerturber:
+
+class TestRandomTranslationPerturber:
     @pytest.mark.parametrize(
         ("input_test_box", "expected"),
         [
@@ -37,7 +42,7 @@ class TestTranslationPerturber:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
         # Test perturb interface directly
-        inst = TranslationPerturber()
+        inst = RandomTranslationPerturber()
         out_img_1, out_boxes_1 = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -47,7 +52,7 @@ class TestTranslationPerturber:
 
         # Test callable
         out_img_2, out_boxes_2 = bbox_perturber_assertions(
-            perturb=TranslationPerturber(),
+            perturb=RandomTranslationPerturber(),
             image=image,
             boxes=input_test_box,
             expected=expected,
@@ -69,21 +74,21 @@ class TestTranslationPerturber:
     def test_reproducibility(self, image: np.ndarray) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        inst = TranslationPerturber()
+        inst = RandomTranslationPerturber()
         out_image, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=None,
         )
-        inst = TranslationPerturber()  # Create new instances to reset random seed
+        inst = RandomTranslationPerturber()  # Create new instances to reset random seed
         bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=(out_image, []),
         )
-        inst = TranslationPerturber()
+        inst = RandomTranslationPerturber()
         # Test callable
         bbox_perturber_assertions(
             perturb=inst,
@@ -115,7 +120,7 @@ class TestTranslationPerturber:
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure the max translation limit image output is consistent"""
-        inst = TranslationPerturber()
+        inst = RandomTranslationPerturber()
         with expectation:
             _, _ = bbox_perturber_assertions(
                 perturb=inst.perturb,
@@ -124,3 +129,15 @@ class TestTranslationPerturber:
                 expected=None,
                 additional_params={"max_translation_limit": max_translation_limit},
             )
+
+    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+        """Regression testing results to detect API changes."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        inst = RandomTranslationPerturber()
+        out_img, _ = bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=None,
+        )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)

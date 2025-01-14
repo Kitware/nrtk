@@ -2,15 +2,20 @@ from collections.abc import Hashable, Iterable
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_image_io import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.crop_perturber import CropPerturber
+from nrtk.impls.perturb_image.generic.crop_perturber import RandomCropPerturber
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
 
+INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
-class TestCropPerturber:
+
+class TestRandomCropPerturber:
     @pytest.mark.parametrize(
         ("input_test_box", "expected"),
         [
@@ -35,7 +40,7 @@ class TestCropPerturber:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
         # Test perturb interface directly
-        inst = CropPerturber()
+        inst = RandomCropPerturber()
         out_img_1, out_boxes_1 = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -46,7 +51,7 @@ class TestCropPerturber:
 
         # Test callable
         out_img_2, out_boxes_2 = bbox_perturber_assertions(
-            perturb=CropPerturber(),
+            perturb=RandomCropPerturber(),
             image=image,
             boxes=input_test_box,
             expected=expected,
@@ -69,7 +74,7 @@ class TestCropPerturber:
     def test_reproducibility(self, image: np.ndarray) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        inst = CropPerturber()
+        inst = RandomCropPerturber()
         out_image, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -77,7 +82,7 @@ class TestCropPerturber:
             expected=None,
             additional_params={"crop_size": (20, 20)},
         )
-        inst = CropPerturber()  # Create new instances to reset random seed
+        inst = RandomCropPerturber()  # Create new instances to reset random seed
         bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -85,7 +90,7 @@ class TestCropPerturber:
             expected=(out_image, []),
             additional_params={"crop_size": (20, 20)},
         )
-        inst = CropPerturber()
+        inst = RandomCropPerturber()
         # Test callable
         bbox_perturber_assertions(
             perturb=inst,
@@ -94,3 +99,16 @@ class TestCropPerturber:
             expected=(out_image, []),
             additional_params={"crop_size": (20, 20)},
         )
+
+    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+        """Regression testing results to detect API changes."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        inst = RandomCropPerturber()
+        out_img, _ = bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=None,
+            additional_params={"crop_size": (20, 20)},
+        )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)

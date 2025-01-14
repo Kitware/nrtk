@@ -6,7 +6,7 @@ Updates / New Features
 
 Implementations
 
-* Added ``TranslationPerturber`` to randomly translate an image and handle modifying
+* Added ``RandomTranslationPerturber`` to randomly translate an image and handle modifying
   bounding boxes
 
 Fixes

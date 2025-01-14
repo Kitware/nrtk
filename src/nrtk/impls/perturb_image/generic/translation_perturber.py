@@ -1,11 +1,11 @@
 """
-This module defines the `TranslationPerturber` class, which implements a random
+This module defines the `RandomTranslationPerturber` class, which implements a random
 translation perturbation on input images. The class supports adjusting bounding
 boxes to match the translated region, making it suitable for tasks involving
 labeled datasets.
 
 Classes:
-    TranslationPerturber: A perturbation class for applying random translation
+    RandomTranslationPerturber: A perturbation class for applying random translation
     on images and the corresponding bounding boxes.
 
 Dependencies:
@@ -23,13 +23,13 @@ from smqtk_image_io import AxisAlignedBoundingBox
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
-class TranslationPerturber(PerturbImage):
+class RandomTranslationPerturber(PerturbImage):
     """
-    TranslationPerturber randomly translates an image and adjusts bounding boxes accordingly.
+    RandomTranslationPerturber randomly translates an image and adjusts bounding boxes accordingly.
     Methods:
     perturb: Applies a random translation to an input image and adjusts bounding boxes.
     __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the TranslationPerturber instance.
+    get_config: Returns the current configuration of the RandomTranslationPerturber instance.
     """
 
     def __init__(
@@ -39,7 +39,7 @@ class TranslationPerturber(PerturbImage):
         color_fill: Optional[Sequence[int]] = [0, 0, 0],
     ) -> None:
         """
-        TranslationPerturber applies a random translation perturbation to an input image.
+        RandomTranslationPerturber applies a random translation perturbation to an input image.
         It ensures that bounding boxes are adjusted correctly to reflect the translated
         image coordinates.
 
@@ -134,7 +134,7 @@ class TranslationPerturber(PerturbImage):
 
     def get_config(self) -> dict[str, Any]:
         """
-        Returns the current configuration of the TranslationPerturber instance.
+        Returns the current configuration of the RandomTranslationPerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
