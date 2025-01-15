@@ -86,12 +86,12 @@ class DefocusOTFPerturber(PerturbImage):
             w_x (float | None): the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
             w_y (float | None): the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
             interp (bool): Whether to interpolate atmosphere data. Defaults to True.
-            box_alignment_mode (string) Mode for how to handle how bounding boxes change.
-                Should be one of the following options:
-                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                    median: median between extent and extant
-                Default value is extent
+            box_alignment_mode (string): Mode for how to handle how bounding boxes change.
+            Should be one of the following options:
+            - extent: a new axis-aligned bounding box that encases the transformed misaligned box
+            - extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+            - median: median between extent and extant
+            Default value is extent
         Raises:
             ImportError: If pybsm or OpenCV is not available.
         """
