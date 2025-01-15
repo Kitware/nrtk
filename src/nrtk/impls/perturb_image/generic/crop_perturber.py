@@ -1,10 +1,10 @@
 """
-This module defines the `CropPerturber` class, which implements a random cropping perturbation
+This module defines the `RandomCropPerturber` class, which implements a random cropping perturbation
 on input images. The class supports adjusting bounding boxes to match the cropped region,
 making it suitable for tasks involving labeled datasets.
 
 Classes:
-    CropPerturber: A perturbation class for randomly cropping images and modifying bounding boxes.
+    RandomCropPerturber: A perturbation class for randomly cropping images and modifying bounding boxes.
 
 Dependencies:
     - numpy: For numerical operations and random number generation.
@@ -21,18 +21,18 @@ from smqtk_image_io import AxisAlignedBoundingBox
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
-class CropPerturber(PerturbImage):
+class RandomCropPerturber(PerturbImage):
     """
-    CropPerturber randomly crops an image and adjusts bounding boxes accordingly.
+    RandomCropPerturber randomly crops an image and adjusts bounding boxes accordingly.
     Methods:
     perturb: Applies a random crop to an input image and adjusts bounding boxes.
     __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the CropPerturber instance.
+    get_config: Returns the current configuration of the RandomCropPerturber instance.
     """
 
     def __init__(self, box_alignment_mode: str = "extent", seed: Optional[Union[int, np.random.Generator]] = 1) -> None:
         """
-        CropPerturber applies a random cropping perturbation to an input image.
+        RandomCropPerturber applies a random cropping perturbation to an input image.
         It ensures that bounding boxes are adjusted correctly to reflect the new cropped region.
 
         Attributes:
@@ -58,8 +58,7 @@ class CropPerturber(PerturbImage):
 
         :return: Cropped image as numpy array with the modified bounding boxes
         """
-        if additional_params is None:
-            additional_params = {}
+        super().perturb(image=image)
 
         # Extract additional parameters
         crop_size = additional_params.get("crop_size", (image.shape[0] // 2, image.shape[1] // 2))
