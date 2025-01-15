@@ -2290,6 +2290,23 @@ files = [
 ]
 
 [[package]]
+name = "nodejs-wheel-binaries"
+version = "22.13.0"
+description = "unoffical Node.js package"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-macosx_11_0_arm64.whl", hash = "sha256:646ab3e65296de9c578db9a1dcfbca26386d2ead70a49008f75d02e960593b2f"},
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-macosx_11_0_x86_64.whl", hash = "sha256:38c689d556f428415a77655f70d2046ddbe11604039489f029b12f317042eaf4"},
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:61885cbcfff0a6d40353c8ea3d861ccb65dba7ce4b19f22427719aeeb35d42f1"},
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e358439ff830db766006e6eeb85ababb94b8c41c7325c9eb1f873a52d3df3016"},
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:1e26d39448cbb2969da10f5e62e53101591e4d6c6a6ae8d623c65f56bf28ce6b"},
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-win_amd64.whl", hash = "sha256:cd9c6cdfd00ec48c55cbcd21a98af1fc9c2a18f039aede729de319346ed8675d"},
+    {file = "nodejs_wheel_binaries-22.13.0-py2.py3-none-win_arm64.whl", hash = "sha256:aa8af75d30c3132bc4e998126a78b11c269abc3060f1c7c697907299b21ae0e1"},
+    {file = "nodejs_wheel_binaries-22.13.0.tar.gz", hash = "sha256:dd811e3e5b92f2e5d4eb236cdf1ff814c91d3d3533d90d63b4af41d07a8bb2fc"},
+]
+
+[[package]]
 name = "notebook"
 version = "7.2.2"
 description = "Jupyter Notebook - A web-based notebook environment for interactive computing"
@@ -2969,6 +2986,27 @@ files = [
 
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
+
+[[package]]
+name = "pyright"
+version = "1.1.391"
+description = "Command line wrapper for pyright"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pyright-1.1.391-py3-none-any.whl", hash = "sha256:54fa186f8b3e8a55a44ebfa842636635688670c6896dcf6cf4a7fc75062f4d15"},
+    {file = "pyright-1.1.391.tar.gz", hash = "sha256:66b2d42cdf5c3cbab05f2f4b76e8bec8aa78e679bfa0b6ad7b923d9e027cadb2"},
+]
+
+[package.dependencies]
+nodeenv = ">=1.6.0"
+nodejs-wheel-binaries = {version = "*", optional = true, markers = "extra == \"nodejs\""}
+typing-extensions = ">=4.1"
+
+[package.extras]
+all = ["nodejs-wheel-binaries", "twine (>=3.4.1)"]
+dev = ["twine (>=3.4.1)"]
+nodejs = ["nodejs-wheel-binaries"]
 
 [[package]]
 name = "pytest"
@@ -4533,4 +4571,4 @@ pybsm = ["pybsm"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "d44b5e734d2f328fc51386d3327a835564970c154856fd8ec28b214ad6d281ad"
+content-hash = "45b3fdf863035bb060281512ab96fce0612ae68412cd47f7877212d459fa85e3"
