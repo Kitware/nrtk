@@ -80,8 +80,11 @@ class RandomTranslationPerturber(PerturbImage):
             raise ValueError(f"Max translation limit should be less than or equal to {image.shape[:2]}")
 
         # Randomly select the translation magnitude for each direction
-        translate_x = self.rng.integers(-translate_w, translate_w)
-        translate_y = self.rng.integers(-translate_h, translate_h)
+        translate_x, translate_y = (0, 0)
+        if translate_w > 0:
+            translate_x = self.rng.integers(-translate_w, translate_w)
+        if translate_h > 0:
+            translate_y = self.rng.integers(-translate_h, translate_h)
 
         # Apply background color fill based on the number of image dimensions
         if image.ndim == 3:

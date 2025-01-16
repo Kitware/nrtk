@@ -101,6 +101,8 @@ class TestRandomTranslationPerturber:
         ("image", "max_translation_limit", "expectation"),
         [
             (np.ones((256, 256, 3), dtype=np.float32), (100, 200), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (257, 100),
@@ -130,14 +132,22 @@ class TestRandomTranslationPerturber:
                 additional_params={"max_translation_limit": max_translation_limit},
             )
 
-    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+    @pytest.mark.parametrize(
+        ("max_translation_limit"),
+        [None, (0, 0), (0, 1), (1, 0), (100, 100)],
+    )
+    def test_regression(self, snapshot: SnapshotAssertion, max_translation_limit: tuple[int, int]) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
+        additional_params = None
+        if max_translation_limit is not None:
+            additional_params = {"max_translation_limit": max_translation_limit}
         out_img, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=None,
+            additional_params=additional_params,
         )
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
