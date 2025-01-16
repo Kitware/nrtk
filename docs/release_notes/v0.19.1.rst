@@ -1,6 +1,8 @@
 v0.19.1
 =======
 
+Small bug fix for ``RandomTranslationPerturber``.
+
 Updates / New Features
 ----------------------
 
