@@ -30,7 +30,7 @@ try:
 except ImportError:
     pybsm_available = False
 
-from smqtk_core import Configurable
+from smqtk_core.configuration import Configurable
 
 C = TypeVar("C", bound="PybsmSensor")
 
@@ -320,7 +320,8 @@ class PybsmSensor(Configurable):
         """
         if not self.is_usable():
             raise ImportError("pybsm not found")
-        S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # noqa:N806
+        # type ignore for pyright handling of guarded import
+        S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # type: ignore # noqa:N806
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta
         S.p_y = self.p_y

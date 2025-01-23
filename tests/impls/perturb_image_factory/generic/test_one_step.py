@@ -1,4 +1,5 @@
 import json
+from collections.abc import Hashable, Iterable
 from pathlib import Path
 from typing import Any, Optional
 
@@ -9,6 +10,7 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image_factory.generic.one_step import OneStepPerturbImageFactory
@@ -27,9 +29,10 @@ class DummyPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
         additional_params: Optional[dict[str, Any]] = None,  # noqa: ARG002
-    ) -> np.ndarray:  # pragma: no cover
-        return np.copy(image)
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        return np.copy(image), boxes
 
     def get_config(self) -> dict[str, Any]:
         return {"param_1": self.param_1, "param_2": self.param_2}

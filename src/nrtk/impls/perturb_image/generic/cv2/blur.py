@@ -37,16 +37,17 @@ Note:
 """
 
 from collections.abc import Hashable, Iterable
-from typing import Any
+from typing import Any, Optional
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
     cv2_available = True
 except ImportError:
     cv2_available = False
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -70,9 +71,9 @@ class AverageBlurPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """Return image stimulus after applying average blurring."""
         if additional_params is None:
             additional_params = dict()
@@ -81,7 +82,7 @@ class AverageBlurPerturber(PerturbImage):
         if image.ndim == 3 and image.shape[2] > 4:
             raise ValueError("Image is not in expected format (H, W, C)")
 
-        return cv2.blur(image, ksize=(self.ksize, self.ksize)), boxes
+        return cv2.blur(image, ksize=(self.ksize, self.ksize)), boxes  # type: ignore
 
     def get_config(self) -> dict[str, Any]:
         """
@@ -124,9 +125,9 @@ class GaussianBlurPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """Return image stimulus after applying Gaussian blurring."""
         if additional_params is None:
             additional_params = dict()
@@ -135,7 +136,7 @@ class GaussianBlurPerturber(PerturbImage):
         if image.ndim == 3 and image.shape[2] > 4:
             raise ValueError("Image is not in expected format (H, W, C)")
 
-        return cv2.GaussianBlur(image, ksize=(self.ksize, self.ksize), sigmaX=0), boxes
+        return cv2.GaussianBlur(image, ksize=(self.ksize, self.ksize), sigmaX=0), boxes  # type: ignore
 
     def get_config(self) -> dict[str, Any]:
         """
@@ -178,9 +179,9 @@ class MedianBlurPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """Return image stimulus after applying Gaussian blurring."""
         if additional_params is None:
             additional_params = dict()
@@ -189,7 +190,7 @@ class MedianBlurPerturber(PerturbImage):
         if image.ndim == 3 and image.shape[2] > 4:
             raise ValueError("Image is not in expected format (H, W, C)")
 
-        return cv2.medianBlur(image, ksize=self.ksize), boxes
+        return cv2.medianBlur(image, ksize=self.ksize), boxes  # type: ignore
 
     def get_config(self) -> dict[str, Any]:
         """

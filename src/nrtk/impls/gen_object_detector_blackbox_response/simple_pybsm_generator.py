@@ -25,7 +25,7 @@ from importlib.util import find_spec
 from typing import Any
 
 import numpy as np
-from smqtk_detection import DetectImageObjects
+from smqtk_detection.interfaces.detect_image_objects import DetectImageObjects
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 

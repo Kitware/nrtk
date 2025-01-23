@@ -2,7 +2,7 @@ import json
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 import pytest
@@ -11,7 +11,7 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generic.compose_perturber import ComposePerturber
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
@@ -21,8 +21,8 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 def _perturb(
     image: np.ndarray,
-    boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,  # noqa: ARG001
-    additional_params: dict[str, Any] = None,  # noqa: ARG001
+    boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,  # noqa: ARG001
+    additional_params: Optional[dict[str, Any]] = None,  # noqa: ARG001
 ) -> tuple[np.ndarray, None]:  # pragma: no cover
     return np.copy(image) + 1, None
 

@@ -24,7 +24,7 @@ from typing import Any
 
 # 3rd party imports
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 # local imports

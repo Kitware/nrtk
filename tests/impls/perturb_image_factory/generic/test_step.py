@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
@@ -14,6 +15,7 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
@@ -31,20 +33,22 @@ INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319
 
 @pytest.fixture()  # noqa:PT001
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
+    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class DummyPerturber(PerturbImage):
     def __init__(self, param_1: int = 1, param_2: int = 2) -> None:
+        super().__init__()
         self.param_1 = param_1
         self.param_2 = param_2
 
     def perturb(
         self,
         image: np.ndarray,
-        _: dict[str, Any] | None = None,
-    ) -> np.ndarray:  # pragma: no cover
-        return np.copy(image)
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,  # noqa: ARG002
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        return np.copy(image), boxes
 
     def get_config(self) -> dict[str, Any]:
         return {"param_1": self.param_1, "param_2": self.param_2}
@@ -262,7 +266,12 @@ class TestStepPerturbImageFactory:
         )
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
-        for perturber in perturber_factory:
+        for perturber_inst in perturber_factory:
             setattr(perturber, modifying_param, modifying_val)
-            out_img = pybsm_perturber_assertions(perturb=perturber, image=img, expected=None, additional_params=img_md)
+            out_img = pybsm_perturber_assertions(
+                perturb=perturber_inst,
+                image=img,
+                expected=None,
+                additional_params=img_md,
+            )
             snapshot_custom.assert_match(out_img)

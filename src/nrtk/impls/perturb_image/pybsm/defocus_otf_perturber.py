@@ -13,13 +13,14 @@ Dependencies:
 """
 
 from collections.abc import Hashable, Iterable
-from typing import Any, TypeVar
+from typing import Any, Optional, TypeVar
 
 import numpy as np
 from scipy.signal import fftconvolve
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import pybsm.radiance as radiance
     from pybsm.otf.functional import defocus_OTF, otf_to_psf, resample_2D
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
@@ -70,10 +71,10 @@ class DefocusOTFPerturber(PerturbImage):
 
     def __init__(
         self,
-        sensor: PybsmSensor = None,
-        scenario: PybsmScenario = None,
-        w_x: float = None,
-        w_y: float = None,
+        sensor: Optional[PybsmSensor] = None,
+        scenario: Optional[PybsmScenario] = None,
+        w_x: Optional[float] = None,
+        w_y: Optional[float] = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -103,14 +104,14 @@ class DefocusOTFPerturber(PerturbImage):
 
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             (
                 _,
                 _,
                 spectral_weights,
-            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)
+            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)  # type: ignore
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -142,9 +143,9 @@ class DefocusOTFPerturber(PerturbImage):
     def perturb(  # noqa:C901
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -157,7 +158,7 @@ class DefocusOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.defocus_otf = defocus_OTF(uu, vv, self.w_x, self.w_y)
+        self.defocus_otf = defocus_OTF(uu, vv, self.w_x, self.w_y)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -168,36 +169,24 @@ class DefocusOTFPerturber(PerturbImage):
                                   for this perturber",
                 )
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(self.defocus_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
+            psf = otf_to_psf(self.defocus_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
             # Perform convolution using scipy.ndimage.convolve
             blur_img = fftconvolve(image, psf, mode="same")
             # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)
+            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))
+            psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))  # type: ignore
             if image.ndim == 2:
                 sim_img = fftconvolve(image, psf, mode="same")
             elif image.ndim == 3:
                 sim_img = np.zeros_like(image, dtype=float)
                 for c in range(image.shape[2]):
                     sim_img[..., c] = fftconvolve(image[..., c], psf, mode="same")
-        return sim_img.astype(np.uint8), boxes
-
-    @override
-    def __call__(
-        self,
-        image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
-        """Alias for :meth:`.NIIRS.apply`."""
-        if additional_params is None:
-            additional_params = dict()
-        return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
+        return sim_img.astype(np.uint8), boxes  # type: ignore
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:

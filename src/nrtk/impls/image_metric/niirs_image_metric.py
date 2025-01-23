@@ -92,7 +92,8 @@ class NIIRSImageMetric(ImageMetric):
 
         :return: Returns the NIIRS metric for the given pyBSMSensor and pyBSMScenario.
         """
-        metrics = niirs5(self.sensor(), self.scenario())
+        # type ignore for pyright's handling of guarded import
+        metrics = niirs5(self.sensor(), self.scenario())  # type: ignore
         return metrics.niirs
 
     @override

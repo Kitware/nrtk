@@ -18,7 +18,7 @@ from collections.abc import Hashable, Iterable, Sequence
 from typing import Any, Optional, Union
 
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -54,9 +54,9 @@ class RandomTranslationPerturber(PerturbImage):
     def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """
         Randomly translates an image and adjusts bounding boxes.
 
@@ -71,7 +71,8 @@ class RandomTranslationPerturber(PerturbImage):
         :return: Translated image as numpy array with the modified bounding boxes
         """
         super().perturb(image=image)
-
+        if additional_params is None:
+            additional_params = dict()
         translate_h, translate_w = additional_params.get(
             "max_translation_limit",
             (image.shape[0], image.shape[1]),
@@ -129,9 +130,9 @@ class RandomTranslationPerturber(PerturbImage):
     def __call__(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Union[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], None]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """Calls `perturb` with the given input image."""
         return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 
