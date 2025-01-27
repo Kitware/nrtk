@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
@@ -59,12 +59,13 @@ class TestPyBSMPerturber:
             ("ihaze", 2, 2),
         ],
     )
-    def test_reproducibility(self, param_name: str, param_value: int, rng_seed: float) -> None:
+    def test_reproducibility(self, param_name: str, param_value: int, rng_seed: int) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = create_sample_sensor_and_scenario()
-        inst = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})
+        # For type: ignore below, see https://github.com/microsoft/pyright/issues/5545#issuecomment-1644027877
+        inst = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})  # type: ignore
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,

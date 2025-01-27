@@ -22,13 +22,14 @@ Attributes:
 from typing import Any
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from pybsm.simulation.scenario import Scenario
 
     pybsm_available = True
 except ImportError:
     pybsm_available = False
 
-from smqtk_core import Configurable
+from smqtk_core.configuration import Configurable
 
 
 class PybsmScenario(Configurable):
@@ -158,7 +159,7 @@ class PybsmScenario(Configurable):
         """
         return self.name
 
-    def create_scenario(self) -> Scenario:
+    def create_scenario(self) -> Scenario:  # type: ignore
         """
         Creates and returns a pybsm.Scenario object based on the
         provided parameters.
@@ -166,7 +167,7 @@ class PybsmScenario(Configurable):
         Returns:
             Scenario: pybsm.Scenario object populated with instance parameters
         """
-        S = Scenario(  # noqa:N806
+        S = Scenario(  # type: ignore # noqa:N806
             self.name,
             self.ihaze,
             self.altitude,

@@ -13,7 +13,7 @@ import pytest
 from PIL import Image
 from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
@@ -244,10 +244,17 @@ class TestTurbulenceApertureOTFPerturber:
         """Test configuration stability."""
         sensor = None
         scenario = None
+        wavelengths = np.asarray([])
+        weights = np.asarray([])
+        pos_weights = np.asarray([])
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
             atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(atm, sensor, sensor.int_time)
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
+            )
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]

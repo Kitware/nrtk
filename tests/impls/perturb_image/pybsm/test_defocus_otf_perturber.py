@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.defocus_otf_perturber import DefocusOTFPerturber
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
@@ -158,7 +158,7 @@ class TestDefocusOTFPerturber:
         perturber = DefocusOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params)
+            _ = perturber(image=image, additional_params=additional_params)
 
     @pytest.mark.parametrize("w_x", [0.5, 1.5])
     @pytest.mark.parametrize("w_y", [0.5, 1.5])

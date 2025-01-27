@@ -32,7 +32,7 @@ from typing import Any
 # 3rd party imports
 from pycocotools.coco import COCO  # type: ignore
 from pycocotools.cocoeval import COCOeval  # type: ignore
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.score_detections import ScoreDetections
@@ -133,8 +133,9 @@ class COCOScorer(ScoreDetections):
             return [0] * len(actual)
 
         with contextlib.redirect_stdout(None):
-            actual_coco_dt = self.coco_gt.loadRes(actual_entries)
-            predicted_coco_dt = self.coco_gt.loadRes(predicted_entries)
+            # type ignores added for loadRes accepting lists but no existing overload/type hinting in COCO
+            actual_coco_dt = self.coco_gt.loadRes(actual_entries)  # type: ignore
+            predicted_coco_dt = self.coco_gt.loadRes(predicted_entries)  # type: ignore
 
         coco_eval = COCOeval(actual_coco_dt, predicted_coco_dt, "bbox")
 

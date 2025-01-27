@@ -16,7 +16,7 @@ from collections.abc import Hashable, Iterable
 from typing import Any, Optional, Union
 
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -44,9 +44,9 @@ class RandomCropPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """
         Randomly crops an image and adjusts bounding boxes.
 
@@ -59,6 +59,9 @@ class RandomCropPerturber(PerturbImage):
         :return: Cropped image as numpy array with the modified bounding boxes
         """
         super().perturb(image=image)
+
+        if additional_params is None:
+            additional_params = dict()
 
         # Extract additional parameters
         crop_size = additional_params.get("crop_size", (image.shape[0] // 2, image.shape[1] // 2))
@@ -96,15 +99,6 @@ class RandomCropPerturber(PerturbImage):
                     adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
                     adjusted_bboxes.append((adjusted_box, metadata))
         return cropped_image, adjusted_bboxes
-
-    def __call__(
-        self,
-        image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Union[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], None]]:
-        """Calls `perturb` with the given input image."""
-        return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 
     def get_config(self) -> dict[str, Any]:
         """

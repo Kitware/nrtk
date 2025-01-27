@@ -24,11 +24,12 @@ Notes:
 """
 
 from collections.abc import Hashable, Iterable
-from typing import Any, TypeVar
+from typing import Any, Optional, TypeVar
 
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
     cv2_available = True
@@ -78,11 +79,11 @@ class DetectorOTFPerturber(PerturbImage):
 
     def __init__(
         self,
-        sensor: PybsmSensor = None,
-        scenario: PybsmScenario = None,
-        w_x: float = None,
-        w_y: float = None,
-        f: float = None,
+        sensor: Optional[PybsmSensor] = None,
+        scenario: Optional[PybsmScenario] = None,
+        w_x: Optional[float] = None,
+        w_y: Optional[float] = None,
+        f: Optional[float] = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -125,11 +126,11 @@ class DetectorOTFPerturber(PerturbImage):
         super().__init__(box_alignment_mode=box_alignment_mode)
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
 
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
                 atm,
                 sensor.create_sensor(),
                 sensor.int_time,
@@ -169,9 +170,9 @@ class DetectorOTFPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """
         Applies the OTF-based perturbation to the provided image.
 
@@ -200,7 +201,7 @@ class DetectorOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.det_OTF = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)
+        self.det_OTF = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -210,18 +211,18 @@ class DetectorOTFPerturber(PerturbImage):
                 raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(self.det_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
+            psf = otf_to_psf(self.det_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)
+            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
             # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)
+            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df))
+            psf = otf_to_psf(self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df))  # type: ignore
 
-            sim_img = cv2.filter2D(image, -1, psf)
+            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
         return sim_img.astype(np.uint8), boxes
 

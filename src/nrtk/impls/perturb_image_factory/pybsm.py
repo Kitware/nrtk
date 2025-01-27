@@ -166,8 +166,8 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
 
         return PybsmPerturber(self.sensor, self.scenario, **kwargs)
 
-    @override
     @property
+    @override
     def thetas(self) -> Sequence[Sequence[Any]]:
         """
         Provides the current values for each parameter to be varied.
@@ -177,8 +177,8 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         """
         return self._thetas
 
-    @override
     @property
+    @override
     def theta_key(self) -> str:
         """
         Returns the parameter key associated with the perturbation settings.

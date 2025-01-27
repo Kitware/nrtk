@@ -74,8 +74,8 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
         self.stop = stop
         self.step = step
 
-    @override
     @property
+    @override
     def thetas(self) -> Sequence[float]:
         if self.start == self.stop:
             return []

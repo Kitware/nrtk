@@ -3,7 +3,7 @@ from collections.abc import Hashable, Iterable
 import numpy as np
 import pytest
 from PIL import Image
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.crop_perturber import RandomCropPerturber
@@ -59,9 +59,10 @@ class TestRandomCropPerturber:
         )
         assert np.array_equal(out_img_1, out_img_2)
 
-        for (box_1, meta_1), (box_2, meta_2) in zip(out_boxes_1, out_boxes_2):
-            assert box_1 == box_2
-            assert meta_1 == meta_2
+        if out_boxes_1 is not None and out_boxes_2 is not None:
+            for (box_1, meta_1), (box_2, meta_2) in zip(out_boxes_1, out_boxes_2):
+                assert box_1 == box_2
+                assert meta_1 == meta_2
 
     @pytest.mark.parametrize(
         ("image"),

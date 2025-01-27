@@ -42,8 +42,8 @@ from contextlib import nullcontext
 from typing import Any
 
 import numpy as np
-from smqtk_classifier import ClassifyImage
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
+from smqtk_classifier.interfaces.classify_image import ClassifyImage
 from tqdm import tqdm
 from typing_extensions import override
 

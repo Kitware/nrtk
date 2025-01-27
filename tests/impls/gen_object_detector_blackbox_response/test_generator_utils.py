@@ -1,8 +1,8 @@
 from collections.abc import Hashable, Sequence
 
 import numpy as np
-from smqtk_detection import DetectImageObjects
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_detection.interfaces.detect_image_objects import DetectImageObjects
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.interfaces.gen_object_detector_blackbox_response import (
     GenerateObjectDetectorBlackboxResponse,
