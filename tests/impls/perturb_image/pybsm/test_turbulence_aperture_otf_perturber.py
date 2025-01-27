@@ -396,12 +396,17 @@ class TestTurbulenceApertureOTFPerturber:
             "n_tdi",
             "aircraft_speed",
             "interp",
+            "is_rgb",
         ),
         [
-            (False, None, None, None, None, None, None, None, None, None, None, None),
-            (True, None, None, None, None, None, None, None, None, None, None, None),
-            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True),
-            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
+            (False, None, None, None, None, None, None, None, None, None, None, None, True),
+            (True, None, None, None, None, None, None, None, None, None, None, None, False),
+            (False, None, None, None, None, None, None, None, None, None, None, None, False),
+            (True, None, None, None, None, None, None, None, None, None, None, None, True),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True, True),
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False, False),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True, False),
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False, True),
         ],
     )
     def test_regression(
@@ -419,9 +424,12 @@ class TestTurbulenceApertureOTFPerturber:
         n_tdi: float | None,
         aircraft_speed: float | None,
         interp: bool,
+        is_rgb: bool,
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        if is_rgb:
+            img = np.stack((img,) * 3, axis=-1)
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None

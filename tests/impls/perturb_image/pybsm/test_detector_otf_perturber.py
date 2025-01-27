@@ -195,12 +195,16 @@ class TestDetectorOTFPerturber:
                 assert scenario is None
 
     @pytest.mark.parametrize(
-        ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),
+        ("use_sensor_scenario", "w_x", "w_y", "f", "interp", "is_rgb"),
         [
-            (False, None, None, None, None),
-            (True, None, None, None, None),
-            (True, 3e-6, 20e-6, 30e-3, False),
-            (False, 3e-6, 20e-6, 30e-3, True),
+            (False, None, None, None, None, True),
+            (True, None, None, None, None, False),
+            (False, None, None, None, None, False),
+            (True, None, None, None, None, True),
+            (True, 3e-6, 20e-6, 30e-3, False, True),
+            (False, 3e-6, 20e-6, 30e-3, True, False),
+            (True, 3e-6, 20e-6, 30e-3, False, False),
+            (False, 3e-6, 20e-6, 30e-3, True, True),
         ],
     )
     def test_regression(
@@ -211,9 +215,12 @@ class TestDetectorOTFPerturber:
         w_y: float | None,
         f: float | None,
         interp: bool,
+        is_rgb: bool,
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        if is_rgb:
+            img = np.stack((img,) * 3, axis=-1)
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None
