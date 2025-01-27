@@ -240,7 +240,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self.interp = interp
 
     @override
-    def perturb(
+    def perturb(  # noqa: C901
         self,
         image: np.ndarray,
         boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
@@ -304,8 +304,18 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
             # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, ref_gsd / self.altitude)  # type: ignore
-
+            if image.ndim == 3:
+                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, ref_gsd / self.altitude)  # type: ignore
+                sim_img = np.empty((*resampled_img.shape, 3))
+                sim_img[:, :, 0] = resampled_img
+                for channel in range(1, 3):
+                    sim_img[:, :, channel] = resample_2D(  # type: ignore
+                        blur_img[:, :, channel],
+                        ref_gsd / self.slant_range,
+                        ref_gsd / self.altitude,
+                    )
+            else:
+                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, ref_gsd / self.altitude)  # type: ignore
         else:
             # Default is to set dxout param to same value as dxin
             psf = otf_to_psf(  # type: ignore
