@@ -172,10 +172,26 @@ class DefocusOTFPerturber(PerturbImage):
             psf = otf_to_psf(self.defocus_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
-            # Perform convolution using scipy.ndimage.convolve
-            blur_img = fftconvolve(image, psf, mode="same")
-            # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
+            if image.ndim == 3:
+                blur_img = np.empty((*image.shape,))
+                # Perform convolution using scipy.signal.fftconvolve
+                blur_img[:, :, 0] = fftconvolve(image[:, :, 0], psf, mode="same")
+                # resample the image to the camera's ifov
+                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = np.empty((*resampled_img.shape, 3))
+                sim_img[:, :, 0] = resampled_img
+                for channel in range(1, 3):
+                    blur_img[:, :, channel] = fftconvolve(image[:, :, channel], psf, mode="same")
+                    sim_img[:, :, channel] = resample_2D(  # type: ignore
+                        blur_img[:, :, channel],
+                        ref_gsd / self.slant_range,
+                        self.ifov,
+                    )
+            else:
+                # Perform convolution using scipy.signal.fftconvolve
+                blur_img = fftconvolve(image, psf, mode="same")
+                # resample the image to the camera's ifov
+                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
         else:
             # Default is to set dxout param to same value as dxin
