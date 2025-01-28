@@ -13,7 +13,7 @@ import pytest
 from PIL import Image
 from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
@@ -244,10 +244,17 @@ class TestTurbulenceApertureOTFPerturber:
         """Test configuration stability."""
         sensor = None
         scenario = None
+        wavelengths = np.asarray([])
+        weights = np.asarray([])
+        pos_weights = np.asarray([])
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
             atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(atm, sensor, sensor.int_time)
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
+            )
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -389,12 +396,17 @@ class TestTurbulenceApertureOTFPerturber:
             "n_tdi",
             "aircraft_speed",
             "interp",
+            "is_rgb",
         ),
         [
-            (False, None, None, None, None, None, None, None, None, None, None, None),
-            (True, None, None, None, None, None, None, None, None, None, None, None),
-            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True),
-            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False),
+            (False, None, None, None, None, None, None, None, None, None, None, None, True),
+            (True, None, None, None, None, None, None, None, None, None, None, None, False),
+            (False, None, None, None, None, None, None, None, None, None, None, None, False),
+            (True, None, None, None, None, None, None, None, None, None, None, None, True),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True, True),
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False, False),
+            (True, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, True, False),
+            (False, [0.50e-6, 0.66e-6], [1.0, 1.0], 250, 250, 40e-3, 0, 1.7e-14, 30e-3, 1.0, 0, False, True),
         ],
     )
     def test_regression(
@@ -412,9 +424,12 @@ class TestTurbulenceApertureOTFPerturber:
         n_tdi: float | None,
         aircraft_speed: float | None,
         interp: bool,
+        is_rgb: bool,
     ) -> None:
         """Regression testing results to detect API changes."""
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        if is_rgb:
+            img = np.stack((img,) * 3, axis=-1)
         img_md = {"img_gsd": 3.19 / 160.0}
 
         sensor = None

@@ -24,13 +24,15 @@ Example usage:
 import copy
 from collections.abc import Hashable, Iterable
 from importlib.util import find_spec
-from typing import Any, TypeVar
+from typing import Any, Optional, TypeVar
 
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 try:
-    from pybsm.simulation import RefImage, simulate_image
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from pybsm.simulation import simulate_image
+    from pybsm.simulation.ref_image import RefImage
 
     pybsm_available = True
 except ImportError:
@@ -134,23 +136,23 @@ class PybsmPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:  # Cannot have mutable data structure in argument default
             additional_params = dict()
         if "img_gsd" not in additional_params:
             raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
-        ref_img = RefImage(
+        ref_img = RefImage(  # type: ignore
             image,
             additional_params["img_gsd"],
             np.array([image.min(), image.max()]),
             self.reflectance_range,
         )
 
-        perturbed = simulate_image(ref_img, self.sensor(), self.scenario(), self._rng_seed)[-1]
+        perturbed = simulate_image(ref_img, self.sensor(), self.scenario(), self._rng_seed)[-1]  # type: ignore
 
         min_perturbed_val = perturbed.min()
         den = perturbed.max() - min_perturbed_val

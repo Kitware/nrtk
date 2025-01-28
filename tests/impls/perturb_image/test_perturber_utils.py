@@ -4,11 +4,18 @@ from collections.abc import Hashable, Iterable
 from typing import Any, Callable
 
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 
 def perturber_assertions(
-    perturb: Callable[[np.ndarray, dict[str, Any]], np.ndarray],
+    perturb: Callable[
+        [
+            np.ndarray,
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
+            dict[str, Any] | None,
+        ],
+        tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None],
+    ],
     image: np.ndarray,
     expected: np.ndarray | None = None,
     additional_params: dict[str, Any] | None = None,
@@ -31,7 +38,7 @@ def perturber_assertions(
     dtype = image.dtype
     copy = np.copy(image)
 
-    out_image, _ = perturb(image, additional_params=additional_params)
+    out_image, _ = perturb(image, None, additional_params)
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)
     assert out_image.dtype == dtype
@@ -42,10 +49,17 @@ def perturber_assertions(
 
 
 def bbox_perturber_assertions(
-    perturb: Callable[[np.ndarray, dict[str, Any]], np.ndarray],
+    perturb: Callable[
+        [
+            np.ndarray,
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
+            dict[str, Any] | None,
+        ],
+        tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None],
+    ],
     image: np.ndarray,
-    boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
-    expected: tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None] = None,
+    boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+    expected: tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] | None = None,
     additional_params: dict[str, Any] | None = None,
 ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
     """Test several blanket assertions for perturbers.
@@ -72,6 +86,7 @@ def bbox_perturber_assertions(
     assert out_image.dtype == dtype
     if expected is not None:
         assert np.array_equal(out_image, expected[0])
+        assert out_boxes is not None
         for (expected_box, expected_meta), (out_box, out_meta) in zip(expected[1], out_boxes):
             assert expected_box != out_box
             assert expected_meta == out_meta
@@ -80,7 +95,14 @@ def bbox_perturber_assertions(
 
 
 def pybsm_perturber_assertions(
-    perturb: Callable[[np.ndarray, dict[str, Any]], np.ndarray],
+    perturb: Callable[
+        [
+            np.ndarray,
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
+            dict[str, Any] | None,
+        ],
+        tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None],
+    ],
     image: np.ndarray,
     expected: np.ndarray | None = None,
     additional_params: dict[str, Any] | None = None,
@@ -101,7 +123,7 @@ def pybsm_perturber_assertions(
         additional_params = dict()
     copy = np.copy(image)
 
-    out_image, _ = perturb(image, additional_params=additional_params)
+    out_image, _ = perturb(image, None, additional_params)
 
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)

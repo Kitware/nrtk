@@ -2,18 +2,22 @@ import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any
+from typing import Any, Optional
 from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
+from tests.impls.test_pybsm_utils import (
+    TIFFImageSnapshotExtension,
+    create_sample_sensor_and_scenario,
+)
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
@@ -288,6 +292,45 @@ class TestJitterOTFPerturber:
                 assert i.scenario.background_temperature == scenario.background_temperature
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
+
+    @pytest.mark.parametrize(
+        ("use_sensor_scenario", "s_x", "s_y", "interp", "is_rgb"),
+        [
+            (False, None, None, None, True),
+            (True, None, None, None, False),
+            (False, None, None, None, False),
+            (True, None, None, None, True),
+            (True, 0.5, 0.5, False, True),
+            (False, 0.5, 0.5, True, False),
+            (True, 0.5, 0.5, False, False),
+            (False, 0.5, 0.5, True, True),
+        ],
+    )
+    def test_regression(
+        self,
+        snapshot: SnapshotAssertion,
+        use_sensor_scenario: bool,
+        s_x: Optional[float],
+        s_y: Optional[float],
+        interp: bool,
+        is_rgb: bool,
+    ) -> None:
+        """Regression testing results to detect API changes."""
+        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        if is_rgb:
+            img = np.stack((img,) * 3, axis=-1)
+        img_md = {"img_gsd": 3.19 / 160.0}
+
+        sensor = None
+        scenario = None
+        if use_sensor_scenario:
+            sensor, scenario = create_sample_sensor_and_scenario()
+
+        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
+
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         "boxes",

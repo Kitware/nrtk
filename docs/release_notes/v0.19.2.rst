@@ -1,0 +1,14 @@
+v0.19.2
+=======
+
+Addresses a few different bugs.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Fixed pyright errors
+
+* Fixed RGB-image error for the PyBSM-based ``resample_2D`` OTF function.

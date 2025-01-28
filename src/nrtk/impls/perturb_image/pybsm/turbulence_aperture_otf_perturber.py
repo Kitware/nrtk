@@ -26,9 +26,10 @@ Notes:
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any, TypeVar
 
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
     cv2_available = True
@@ -44,6 +45,8 @@ try:
     pybsm_available = True
 except ImportError:
     pybsm_available = False
+
+from typing import Optional
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -86,18 +89,18 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor = None,
-        scenario: PybsmScenario = None,
-        mtf_wavelengths: Sequence[float] = None,
-        mtf_weights: Sequence[float] = None,
-        altitude: float = None,
-        slant_range: float = None,
-        D: float = None,  # noqa: N803
-        ha_wind_speed: float = None,
-        cn2_at_1m: float = None,
-        int_time: float = None,
-        n_tdi: float = None,
-        aircraft_speed: float = None,
+        sensor: Optional[PybsmSensor] = None,
+        scenario: Optional[PybsmScenario] = None,
+        mtf_wavelengths: Optional[Sequence[float]] = None,
+        mtf_weights: Optional[Sequence[float]] = None,
+        altitude: Optional[float] = None,
+        slant_range: Optional[float] = None,
+        D: Optional[float] = None,  # noqa: N803
+        ha_wind_speed: Optional[float] = None,
+        cn2_at_1m: Optional[float] = None,
+        int_time: Optional[float] = None,
+        n_tdi: Optional[float] = None,
+        aircraft_speed: Optional[float] = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -167,10 +170,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
                 atm,
                 sensor.create_sensor(),
                 sensor.int_time,
@@ -237,12 +240,12 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self.interp = interp
 
     @override
-    def perturb(
+    def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """
         Applies turbulence and aperture-based perturbation to the provided image.
 
@@ -271,7 +274,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
 
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.turbulence_otf, _ = polychromatic_turbulence_OTF(
+        self.turbulence_otf, _ = polychromatic_turbulence_OTF(  # type: ignore
             uu,
             vv,
             self.mtf_wavelengths,
@@ -291,27 +294,37 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             if "img_gsd" not in additional_params:
                 raise ValueError("'img_gsd' must be present in image metadata for this perturber")
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(
+            psf = otf_to_psf(  # type: ignore
                 self.turbulence_otf,
                 self.df,
                 2 * np.arctan(ref_gsd / 2 / self.slant_range),
             )
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)
+            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
             # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, ref_gsd / self.altitude)
-
+            if image.ndim == 3:
+                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, ref_gsd / self.altitude)  # type: ignore
+                sim_img = np.empty((*resampled_img.shape, 3))
+                sim_img[:, :, 0] = resampled_img
+                for channel in range(1, 3):
+                    sim_img[:, :, channel] = resample_2D(  # type: ignore
+                        blur_img[:, :, channel],
+                        ref_gsd / self.slant_range,
+                        ref_gsd / self.altitude,
+                    )
+            else:
+                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, ref_gsd / self.altitude)  # type: ignore
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(
+            psf = otf_to_psf(  # type: ignore
                 self.turbulence_otf,
                 self.df,
                 1 / (self.turbulence_otf.shape[0] * self.df),
             )
 
-            sim_img = cv2.filter2D(image, -1, psf)
+            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
         return sim_img.astype(np.uint8), boxes
 

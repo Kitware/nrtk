@@ -24,11 +24,12 @@ Notes:
 """
 
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any, TypeVar
+from typing import Any, Optional, TypeVar
 
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
     cv2_available = True
@@ -87,10 +88,10 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor = None,
-        scenario: PybsmScenario = None,
-        mtf_wavelengths: Sequence[float] = None,
-        mtf_weights: Sequence[float] = None,
+        sensor: Optional[PybsmSensor] = None,
+        scenario: Optional[PybsmScenario] = None,
+        mtf_wavelengths: Optional[Sequence[float]] = None,
+        mtf_weights: Optional[Sequence[float]] = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -135,14 +136,14 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
+                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             (
                 _,
                 _,
                 spectral_weights,
-            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)
+            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)  # type: ignore
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -189,12 +190,12 @@ class CircularApertureOTFPerturber(PerturbImage):
         self.interp = interp
 
     @override
-    def perturb(
+    def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
-        additional_params: dict[str, Any] = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """
         Applies the circular aperture-based perturbation to the provided image.
 
@@ -225,9 +226,9 @@ class CircularApertureOTFPerturber(PerturbImage):
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
         def ap_function(wavelengths: float) -> np.ndarray:
-            return circular_aperture_OTF(uu, vv, wavelengths, self.D, self.eta)
+            return circular_aperture_OTF(uu, vv, wavelengths, self.D, self.eta)  # type: ignore
 
-        self.ap_OTF = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)
+        self.ap_OTF = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -238,19 +239,30 @@ class CircularApertureOTFPerturber(PerturbImage):
                                   for this perturber",
                 )
             ref_gsd = additional_params["img_gsd"]
-            psf = otf_to_psf(self.ap_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))
+            psf = otf_to_psf(self.ap_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)
+            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
             # resample the image to the camera's ifov
-            sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)
+            if image.ndim == 3:
+                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = np.empty((*resampled_img.shape, 3))
+                sim_img[:, :, 0] = resampled_img
+                for channel in range(1, 3):
+                    sim_img[:, :, channel] = resample_2D(  # type: ignore
+                        blur_img[:, :, channel],
+                        ref_gsd / self.slant_range,
+                        self.ifov,
+                    )
+            else:
+                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
         else:
             # Default is to set dxout param to same value as dxin
-            psf = otf_to_psf(self.ap_OTF, self.df, 1 / (self.ap_OTF.shape[0] * self.df))
+            psf = otf_to_psf(self.ap_OTF, self.df, 1 / (self.ap_OTF.shape[0] * self.df))  # type: ignore
 
-            sim_img = cv2.filter2D(image, -1, psf)
+            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
         return sim_img.astype(np.uint8), boxes
 

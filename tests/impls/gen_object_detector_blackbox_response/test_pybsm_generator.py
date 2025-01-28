@@ -8,7 +8,7 @@ import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_detection.impls.detect_image_objects.random_detector import RandomDetector
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator import (
     SimplePybsmGenerator,

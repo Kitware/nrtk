@@ -82,8 +82,8 @@ class StepPerturbImageFactory(PerturbImageFactory):
         self.stop = stop
         self.step = step
 
-    @override
     @property
+    @override
     def thetas(self) -> Sequence[float] | Sequence[int]:
         if not self.to_int:
             return [self.start + i * self.step for i in range(math.ceil((self.stop - self.start) / self.step))]

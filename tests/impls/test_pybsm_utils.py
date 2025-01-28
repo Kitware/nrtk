@@ -3,7 +3,7 @@ import io
 import numpy as np
 from PIL import Image
 from pybsm.otf import dark_current_from_density
-from syrupy.extensions.image import SingleFileSnapshotExtension
+from syrupy.extensions.single_file import SingleFileSnapshotExtension
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -48,7 +48,7 @@ def create_sample_sensor() -> PybsmSensor:
     read_noise = 25.0
 
     # maximum ADC level (electrons)
-    max_n = 96000.0
+    max_n = 96000
 
     # bit depth
     bitdepth = 11.9
