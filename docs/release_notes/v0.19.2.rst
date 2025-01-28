@@ -1,6 +1,8 @@
 v0.19.2
 =======
 
+Addresses a few different bugs.
+
 Updates / New Features
 ----------------------
 
