@@ -1,0 +1,14 @@
+###############################################################################
+# Stage -- Docs
+###############################################################################
+#
+# Overrides:
+#
+# 1) Poetry install for opencv-python-headless and pybsm[headless]
+#
+###############################################################################
+
+.docs-setup:
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry install --sync --only main,docs,tests,linting --extras "pybsm headless"
