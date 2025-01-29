@@ -4,7 +4,7 @@
 #
 # Overrides:
 #
-# 1) Poetry install for opencv-python-headless and pybsm[headless]
+# 1) Poetry install for nrtk optional dependencies
 #
 ###############################################################################
 
