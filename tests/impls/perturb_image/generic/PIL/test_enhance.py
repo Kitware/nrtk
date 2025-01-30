@@ -1,7 +1,10 @@
+import re
+import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -14,11 +17,13 @@ from nrtk.impls.perturb_image.generic.PIL.enhance import (
     ContrastPerturber,
     SharpnessPerturber,
 )
+from nrtk.utils._exceptions import PillowImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 rng = np.random.default_rng()
 
 
+@pytest.mark.skipif(not BrightnessPerturber.is_usable(), reason=str(PillowImportError()))
 class TestBrightnessPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -107,6 +112,7 @@ class TestBrightnessPerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not ColorPerturber.is_usable(), reason=str(PillowImportError()))
 class TestColorPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -191,6 +197,7 @@ class TestColorPerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not ContrastPerturber.is_usable(), reason=str(PillowImportError()))
 class TestContrastPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -279,6 +286,7 @@ class TestContrastPerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not SharpnessPerturber.is_usable(), reason=str(PillowImportError()))
 class TestSharpnessPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -376,6 +384,42 @@ class TestSharpnessPerturber:
         inst = SharpnessPerturber(factor=0.5)
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
+
+
+@mock.patch.object(BrightnessPerturber, "is_usable")
+def test_missing_deps_brightness_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not BrightnessPerturber.is_usable()
+    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+        BrightnessPerturber()
+
+
+@mock.patch.object(ColorPerturber, "is_usable")
+def test_missing_deps_color_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not ColorPerturber.is_usable()
+    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+        ColorPerturber()
+
+
+@mock.patch.object(ContrastPerturber, "is_usable")
+def test_missing_deps_contrast_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not ContrastPerturber.is_usable()
+    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+        ContrastPerturber()
+
+
+@mock.patch.object(SharpnessPerturber, "is_usable")
+def test_missing_deps_sharpness_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SharpnessPerturber.is_usable()
+    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+        SharpnessPerturber()
 
 
 EXPECTED_BRIGHTNESS = np.array([[0, 0, 0], [0, 1, 1], [1, 1, 1]], dtype=np.uint8)

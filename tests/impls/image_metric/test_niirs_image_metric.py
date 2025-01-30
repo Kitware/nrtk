@@ -9,7 +9,7 @@ from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 @pytest.mark.skipif(
     not NIIRSImageMetric.is_usable(),
-    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
+    reason="not NIIRSImageMetric.is_usable()",
 )
 class TestSNRImageMetric:
     """This class contains the unit tests for the functionality of the NIIRSImageMetric impl."""

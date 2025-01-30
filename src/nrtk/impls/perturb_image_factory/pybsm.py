@@ -27,7 +27,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Sequence
 from importlib.util import find_spec
-from typing import Any, TypeVar
+from typing import Any
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -36,13 +36,21 @@ from smqtk_core.configuration import (
 )
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
-C = TypeVar("C", bound="_PybsmPerturbImageFactory")
+from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
+from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
+from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+from nrtk.utils._exceptions import PyBSMImportError
+
+_needed_classes = [PybsmPerturber, PybsmScenario, PybsmSensor]
+
+pybsm_available = True
+for c in _needed_classes:
+    if not c.is_usable():
+        raise PyBSMImportError
 
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
@@ -92,12 +100,12 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         :param theta_keys: Perturber parameter(s) to vary between instances.
         :param theta_keys: Perturber parameter(s) values to vary between instances.
 
-        :raises: ImportError if pyBSM with OpenCV not found,
+        :raises: ImportError if pyBSM is not found,
         installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
             raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
+                "pybsm not found. Please install 'nrtk[pybsm]'.",
             )
         self.sensor = sensor
         self.scenario = scenario
@@ -210,10 +218,10 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @override
     @classmethod
     def from_config(
-        cls: type[C],
+        cls,
         config_dict: dict,
         merge_default: bool = True,
-    ) -> C:
+    ) -> _PybsmPerturbImageFactory:
         """
         Instantiates a `_PybsmPerturbImageFactory` from a configuration dictionary.
 
@@ -254,9 +262,6 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         Returns:
             bool: True if `pybsm` is available; False otherwise.
         """
-        # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
-        # we don't need to check for opencv because this can run with
-        # a non-opencv pybsm based perturber
         return find_spec("pybsm") is not None
 
 

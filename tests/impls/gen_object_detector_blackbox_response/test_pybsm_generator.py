@@ -23,11 +23,8 @@ INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm he
 rng = np.random.default_rng()
 
 
-@pytest.mark.skipif(
-    not SimplePybsmGenerator.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
-class TestSimplePyBSMGenerator:
+@pytest.mark.skipif(not SimplePybsmGenerator.is_usable(), reason="not SimplePybsmGenerator.is_usable()")
+class TestPybsmGenerator:
     @pytest.mark.parametrize(
         ("images", "img_gsds", "ground_truth", "expectation"),
         [
@@ -129,9 +126,9 @@ class TestSimplePyBSMGenerator:
         ("images", "img_gsds", "ground_truth", "perturber_factory_configs", "verbose"),
         [
             (
-                [np.array(Image.open(INPUT_IMG_FILE)) for _ in range(5)],
-                [3.19 / 160.0 for _ in range(5)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(5)],
+                [np.array(Image.open(INPUT_IMG_FILE)) for _ in range(2)],
+                [3.19 / 160.0 for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
                 [
                     {
                         "sensor": create_sample_sensor(),

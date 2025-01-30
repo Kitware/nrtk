@@ -23,11 +23,11 @@ Example usage:
 
 import copy
 from collections.abc import Hashable, Iterable
-from importlib.util import find_spec
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 import numpy as np
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from smqtk_image_io import AxisAlignedBoundingBox
+from typing_extensions import override
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
@@ -47,8 +47,7 @@ from smqtk_core.configuration import (
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="PybsmPerturber")
+from nrtk.utils._exceptions import PyBSMImportError
 
 DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call np.array within argument defaults
 
@@ -89,15 +88,12 @@ class PybsmPerturber(PerturbImage):
                 median: median between extent and extant
             Default value is extent
 
-        :raises: ImportError if pyBSM with OpenCV not found,
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+        :raises: ImportError if pyBSM is not found, install via `pip install nrtk[pybsm]`.
         :raises: ValueError if reflectance_range length != 2
         :raises: ValueError if reflectance_range not strictly ascending
         """
         if not self.is_usable():
-            raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
-            )
+            raise PyBSMImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
         self._rng_seed = rng_seed
         self.sensor = copy.deepcopy(sensor)
@@ -133,6 +129,7 @@ class PybsmPerturber(PerturbImage):
 
         return self.thetas
 
+    @override
     def perturb(
         self,
         image: np.ndarray,
@@ -195,7 +192,7 @@ class PybsmPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> "PybsmPerturber":
         """
         Instantiates a PybsmPerturber from a configuration dictionary.
 
@@ -235,11 +232,9 @@ class PybsmPerturber(PerturbImage):
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Checks if the necessary dependencies (pybsm and OpenCV) are available.
+        Checks if the necessary dependency (pyBSM) is available.
 
         Returns:
-            bool: True if both pybsm and OpenCV are available; False otherwise.
+            bool: True pyBSM is available; False otherwise.
         """
-        # Requires pybsm[graphics] or pybsm[headless]
-        cv2_check = find_spec("cv2") is not None
-        return cv2_check and pybsm_available
+        return pybsm_available

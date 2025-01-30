@@ -1,3 +1,4 @@
+import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -13,7 +14,11 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
+
+if PybsmPerturber.is_usable():
+    from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
+
+from nrtk.utils._exceptions import PyBSMImportError
 
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
@@ -21,10 +26,7 @@ EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff
 np.random.seed(42)  # noqa: NPY002
 
 
-@pytest.mark.skipif(
-    not PybsmPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not PybsmPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestPyBSMPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -192,6 +194,11 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PybsmPerturber.is_usable()
-    sensor, scenario = create_sample_sensor_and_scenario()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
+    # pybsm wouldn't be installed at this point so we can't run this
+    # so instead we'll set them to None. The typing doesn't match here
+    # but we override it for this specific test given it is supposed
+    # to return the specific PyBSMImportError error
+    # sensor, scenario = create_sample_sensor_and_scenario()
+    sensor, scenario = None, None
+    with pytest.raises(PyBSMImportError, match=re.escape(str(PyBSMImportError()))):
         PybsmPerturber(sensor=sensor, scenario=scenario)

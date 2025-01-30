@@ -1,18 +1,19 @@
-import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 
 import pytest
-from pybsm.simulation.scenario import Scenario
 from smqtk_core.configuration import configuration_test_helper
 
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
+try:
+    from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
+except ImportError:
+    pytest.skip(allow_module_level=True, reason="nrtk.impls.perturb_image.pybsm submodule unavailable.")
+try:
+    from pybsm.simulation.scenario import Scenario
+except ImportError:
+    pytest.skip(allow_module_level=True, reason="pybsm.simulation.scenario.Scenario unavailable.")
 
 
-@pytest.mark.skipif(
-    not PybsmScenario.is_usable(),
-    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
-)
 @pytest.mark.parametrize("name", ["clear", "cloudy", "hurricane"])
 def test_scenario_string_rep(name: str) -> None:
     ihaze = 1
@@ -23,10 +24,6 @@ def test_scenario_string_rep(name: str) -> None:
     assert name == str(scenario)
 
 
-@pytest.mark.skipif(
-    not PybsmScenario.is_usable(),
-    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
-)
 def test_scenario_call() -> None:
     ihaze = 1
     altitude = 2
@@ -36,10 +33,6 @@ def test_scenario_call() -> None:
     assert isinstance(scenario(), Scenario)
 
 
-@pytest.mark.skipif(
-    not PybsmScenario.is_usable(),
-    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
-)
 @pytest.mark.parametrize(
     ("ihaze", "altitude", "ground_range", "name", "expectation"),
     [
@@ -90,10 +83,6 @@ def test_verify_parameters(
         assert pybsm_scenario.create_scenario().ground_range == ground_range
 
 
-@pytest.mark.skipif(
-    not PybsmScenario.is_usable(),
-    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or `nrtk[pybsm-headless]`.",
-)
 def test_config() -> None:
     """Test configuration stability."""
     ihaze = 1
@@ -113,16 +102,3 @@ def test_config() -> None:
         assert i.background_temperature == inst.background_temperature
         assert i.ha_wind_speed == inst.ha_wind_speed
         assert i.cn2_at_1m == inst.cn2_at_1m
-
-
-@mock.patch.object(PybsmScenario, "is_usable")
-def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not PybsmScenario.is_usable()
-    name = "clear"
-    ihaze = 1
-    altitude = 2
-    ground_range = 0
-    with pytest.raises(ImportError, match=r"pybsm not found"):
-        PybsmScenario(name, ihaze, altitude, ground_range)

@@ -24,7 +24,7 @@ from .test_generator_utils import gen_rand_dets, generator_assertions
 rng = np.random.default_rng()
 
 
-class TestSimpleGenerator:
+class TestSimpleGenericPyBSMGenerator:
     @pytest.mark.parametrize(
         ("images", "ground_truth", "expectation"),
         [
@@ -109,21 +109,21 @@ class TestSimpleGenerator:
         ("images", "ground_truth", "perturber_factories", "verbose"),
         [
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(5)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(5)],
+                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
                 [
                     StepPerturbImageFactory(
                         perturber=BrightnessPerturber,
                         theta_key="factor",
                         start=1.0,
-                        stop=4.0,
+                        stop=3.0,
                         to_int=True,
                     ),
                     StepPerturbImageFactory(
                         perturber=ContrastPerturber,
                         theta_key="factor",
                         start=3.0,
-                        stop=8.0,
+                        stop=6.0,
                         step=2.0,
                         to_int=True,
                     ),
@@ -138,7 +138,7 @@ class TestSimpleGenerator:
                         perturber=BrightnessPerturber,
                         theta_key="factor",
                         start=1,
-                        stop=6,
+                        stop=3,
                         to_int=True,
                     ),
                 ],

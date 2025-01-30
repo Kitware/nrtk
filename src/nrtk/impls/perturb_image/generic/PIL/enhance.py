@@ -2,11 +2,11 @@
 This module provides classes for enhancing image properties, such as brightness, color,
 contrast, and sharpness, by implementing the `PerturbImage` interface. These classes use
 the PIL library to adjust the enhancement level for a given image, allowing for customized
-image modifications. The `_Enhancement` protocol and `_PILEnhancePerturber` base class
+image modifications. The `_Enhancement` protocol and `_PerturbImage` base class
 facilitate this by defining common behavior for all enhancement-based perturbations.
 
 Classes:
-    _PILEnhancePerturber: Base class for applying a specific PIL enhancement to an image.
+    _PerturbImage: Base class for applying a specific PIL enhancement to an image.
     BrightnessPerturber: Adjusts the brightness of an image.
     ColorPerturber: Adjusts the color balance of an image.
     ContrastPerturber: Adjusts the contrast of an image.
@@ -41,12 +41,21 @@ from collections.abc import Hashable, Iterable
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import numpy as np
-from PIL import Image, ImageEnhance
-from PIL.Image import Image as PILImage
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
+
+try:
+    from PIL import Image, ImageEnhance
+    from PIL.Image import Image as PILImage
+
+    pillow_available = True
+except ImportError:
+    pillow_available = False
+
+
+from smqtk_image_io import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.utils._exceptions import PillowImportError
 
 
 @runtime_checkable
@@ -59,9 +68,11 @@ class _Enhancement(Protocol):  # Used for type checking only  # pragma: no cover
         pass
 
 
-class _PILEnhancePerturber(PerturbImage):
+class _PerturbImage(PerturbImage):
     def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
         """:param factor: Enhancement factor."""
+        if not self.is_usable():
+            raise PillowImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
         if factor < 0.0:
             raise ValueError(
@@ -74,7 +85,6 @@ class _PILEnhancePerturber(PerturbImage):
         self,
         enhancement: type[_Enhancement],
         image: np.ndarray,
-        additional_params: dict[str, Any] | None = None,
     ) -> np.ndarray:
         """Call appropriate enhancement interface and perform any necessary data type conversion.
 
@@ -83,8 +93,6 @@ class _PILEnhancePerturber(PerturbImage):
 
         :return: Peturbed image as numpy array, including matching shape and dtype.
         """
-        if additional_params is None:
-            additional_params = dict()
         dtype = image.dtype
         # PIL does not support RGB floating point images so we must do an
         # intermediary conversion
@@ -101,9 +109,10 @@ class _PILEnhancePerturber(PerturbImage):
 
         return image_np
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """
-        Returns the current configuration of the _PILEnhancePerturber instance.
+        Returns the current configuration of the _PerturbImage instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -112,8 +121,19 @@ class _PILEnhancePerturber(PerturbImage):
         cfg["factor"] = self.factor
         return cfg
 
+    @classmethod
+    def is_usable(cls) -> bool:
+        """
+        Checks if the required PIL module is available.
 
-class BrightnessPerturber(_PILEnhancePerturber):
+        Returns:
+            bool: True if pillow is installed; False otherwise.
+        """
+        # Requires opencv to be installed
+        return pillow_available
+
+
+class BrightnessPerturber(_PerturbImage):
     """Adjusts image stimulus brightness."""
 
     @override
@@ -124,18 +144,18 @@ class BrightnessPerturber(_PILEnhancePerturber):
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted brightness."""
-        if additional_params is None:
-            additional_params = dict()
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
         enhancement = ImageEnhance.Brightness
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image), boxes
+        return super()._perturb(enhancement=enhancement, image=_image), _boxes
 
 
-class ColorPerturber(_PILEnhancePerturber):
+class ColorPerturber(_PerturbImage):
     """Adjusts image stimulus color balance."""
 
     @override
@@ -146,18 +166,18 @@ class ColorPerturber(_PILEnhancePerturber):
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted color balance."""
-        if additional_params is None:
-            additional_params = dict()
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
         enhancement = ImageEnhance.Color
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image), boxes
+        return super()._perturb(enhancement=enhancement, image=_image), _boxes
 
 
-class ContrastPerturber(_PILEnhancePerturber):
+class ContrastPerturber(_PerturbImage):
     """Adjusts image stimulus contrast."""
 
     @override
@@ -168,18 +188,18 @@ class ContrastPerturber(_PILEnhancePerturber):
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted contrast."""
-        if additional_params is None:
-            additional_params = dict()
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
         enhancement = ImageEnhance.Contrast
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image), boxes
+        return super()._perturb(enhancement=enhancement, image=_image), _boxes
 
 
-class SharpnessPerturber(_PILEnhancePerturber):
+class SharpnessPerturber(_PerturbImage):
     """Adjusts image stimulus sharpness."""
 
     def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
@@ -199,12 +219,12 @@ class SharpnessPerturber(_PILEnhancePerturber):
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted sharpness."""
-        if additional_params is None:
-            additional_params = dict()
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
         enhancement = ImageEnhance.Sharpness
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return self._perturb(enhancement=enhancement, image=image), boxes
+        return super()._perturb(enhancement=enhancement, image=_image), _boxes

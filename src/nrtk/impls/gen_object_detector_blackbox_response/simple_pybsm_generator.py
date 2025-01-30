@@ -74,7 +74,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         """
         if not self.is_usable():
             raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
+                "pybsm not found. Please install 'nrtk[pybsm]'.",
             )
         if len(images) != len(ground_truth):
             raise ValueError("Size mismatch. ground_truth must be provided for each image.")
@@ -170,7 +170,4 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         Returns:
             bool: True if pybsm is installed; False otherwise.
         """
-        # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
-        # we don't need to check for opencv because this can run with
-        # a non-opencv pybsm based perturber
         return find_spec("pybsm") is not None

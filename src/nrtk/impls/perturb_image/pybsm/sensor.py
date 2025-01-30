@@ -12,16 +12,16 @@ Typical usage example:
                          opt_trans_wavelengths=np.array([0.1, 0.4])*1.0e-6)
     out = sensor.create_sensor()
 
-Attributes:
-    pybsm_available (bool): Indicates if the pybsm module is available for use.
-
 """
 
 from __future__ import annotations
 
-from typing import Any, TypeVar
+from typing import Any
 
 import numpy as np
+from typing_extensions import Self, override
+
+from nrtk.utils._exceptions import PyBSMImportError
 
 try:
     from pybsm.simulation.sensor import Sensor
@@ -31,8 +31,6 @@ except ImportError:
     pybsm_available = False
 
 from smqtk_core.configuration import Configurable
-
-C = TypeVar("C", bound="PybsmSensor")
 
 
 class PybsmSensor(Configurable):
@@ -51,10 +49,10 @@ class PybsmSensor(Configurable):
         f: float,
         p_x: float,
         opt_trans_wavelengths: np.ndarray,
-        optics_transmission: np.ndarray | None = None,
+        optics_transmission: np.ndarray = None,
         eta: float = 0.0,
-        w_x: float | None = None,
-        w_y: float | None = None,
+        w_x: float = None,
+        w_y: float = None,
         int_time: float = 1.0,
         n_tdi: float = 1.0,
         dark_current: float = 0.0,
@@ -66,8 +64,8 @@ class PybsmSensor(Configurable):
         s_y: float = 0.0,
         da_x: float = 0.0,
         da_y: float = 0.0,
-        qe_wavelengths: np.ndarray | None = None,
-        qe: np.ndarray | None = None,
+        qe_wavelengths: np.ndarray = None,
+        qe: np.ndarray = None,
     ) -> None:
         """
         Initializes a PybsmSensor instance with specified configuration parameters.
@@ -163,8 +161,9 @@ class PybsmSensor(Configurable):
             error)^2
         :param pv_wavelength:
             wavelength at which pv is obtained (m)
-
         """
+        if not self.is_usable():
+            raise PyBSMImportError
         self._check_opt_trans_wavelengths(opt_trans_wavelengths)
 
         # required parameters
@@ -250,7 +249,7 @@ class PybsmSensor(Configurable):
 
     def _set_optics_transmission(
         self,
-        optics_transmission: np.ndarray | None = None,
+        optics_transmission: np.ndarray = None,
     ) -> None:
         """
         This method assigns the `optics_transmission` array to the instance. If no array is provided,
@@ -308,18 +307,11 @@ class PybsmSensor(Configurable):
             Sensor: A configured instance of pybsm.sensor.Sensor, if pybsm is available.
 
         Raises:
-            ImportError: If the pybsm module is unavailable.
-            ValueError: If configuration parameters are invalid.
-
-        Example:
-            >>> sensor = PybsmSensor(
-            ...     name="example", D=0.3, f=1.1, p_x=0.4, opt_trans_wavelengths=np.array([0.1, 0.4]) * 1.0e-6
-            ... )
-            >>> sensor_instance = sensor.create_sensor()
-
+            ImportError: If pybsm is not available.
         """
         if not self.is_usable():
-            raise ImportError("pybsm not found")
+            raise PyBSMImportError
+
         # type ignore for pyright handling of guarded import
         S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # type: ignore # noqa:N806
         S.optics_transmission = self.optics_transmission
@@ -343,7 +335,7 @@ class PybsmSensor(Configurable):
         return self.create_sensor()
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
         """
         Rehydrates an object instance from a serializable config dictionary
 
@@ -376,6 +368,7 @@ class PybsmSensor(Configurable):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """
         Generates a serializable config that can be used to rehydrate object
@@ -411,9 +404,9 @@ class PybsmSensor(Configurable):
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Indicates if the pybsm module is available and usable.
+        Checks if the necessary dependencies pyBSM is available.
 
         Returns:
-            bool: True if pybsm is installed and accessible, False otherwise.
+            bool: True if pyBSM is available; False otherwise.
         """
         return pybsm_available

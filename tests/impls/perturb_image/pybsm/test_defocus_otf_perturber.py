@@ -1,3 +1,4 @@
+import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -13,21 +14,18 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.defocus_otf_perturber import DefocusOTFPerturber
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import (
-    TIFFImageSnapshotExtension,
-    create_sample_sensor_and_scenario,
-)
+
+if DefocusOTFPerturber.is_usable():
+    from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_provided_expected_output.tiff"
 
 
-@pytest.mark.skipif(
-    not DefocusOTFPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not DefocusOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestDefocusOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -369,6 +367,8 @@ class TestDefocusOTFPerturber:
 def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
+
     assert not DefocusOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
+
+    with pytest.raises(PyBSMImportError, match=re.escape(str(PyBSMImportError()))):
         DefocusOTFPerturber()

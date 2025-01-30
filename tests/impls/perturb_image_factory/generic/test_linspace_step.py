@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
@@ -14,7 +13,6 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image_factory.generic.linspace_step import (
     LinSpacePerturbImageFactory,
@@ -33,10 +31,9 @@ class DummyFloatPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,  # noqa: ARG002
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        return np.copy(image), boxes
+        _: dict[str, Any] | None = None,
+    ) -> np.ndarray:  # pragma: no cover
+        return np.copy(image)
 
     def get_config(self) -> dict[str, Any]:
         return {"param1": self.param1, "param2": self.param2}

@@ -8,12 +8,11 @@ Classes:
 
 Dependencies:
     - pybsm: Required for radiance calculations, OTF/PSF handling, and atmosphere loading.
-    - OpenCV (cv2): Used for image filtering and resampling.
     - numpy: For numerical computations.
 """
 
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 import numpy as np
 from scipy.signal import fftconvolve
@@ -34,13 +33,12 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="DefocusOTFPerturber")
+from nrtk.utils._exceptions import PyBSMImportError
 
 
 class DefocusOTFPerturber(PerturbImage):
@@ -65,7 +63,6 @@ class DefocusOTFPerturber(PerturbImage):
         __call__: Alias for the perturb method.
         get_default_config: Provides the default configuration for the perturber.
         from_config: Instantiates the perturber from a configuration dictionary.
-        is_usable: Checks if the required dependencies are available.
         get_config: Retrieves the current configuration of the perturber instance.
     """
 
@@ -87,19 +84,15 @@ class DefocusOTFPerturber(PerturbImage):
             w_x (float | None): the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
             w_y (float | None): the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
             interp (bool): Whether to interpolate atmosphere data. Defaults to True.
-            box_alignment_mode (string): Mode for how to handle how bounding boxes change.
-            Should be one of the following options:
-            - extent: a new axis-aligned bounding box that encases the transformed misaligned box
-            - extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-            - median: median between extent and extant
-            Default value is extent
-        Raises:
-            ImportError: If pybsm or OpenCV is not available.
+            box_alignment_mode (string) Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
         """
         if not self.is_usable():
-            raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
-            )
+            raise PyBSMImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
@@ -218,7 +211,7 @@ class DefocusOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
         """
         Instantiates a DefocusOTFPerturber from a configuration dictionary.
 
@@ -239,17 +232,7 @@ class DefocusOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
-    @classmethod
-    def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies (pybsm and OpenCV) are available.
-
-        Returns:
-            bool: True if both pybsm and OpenCV are available; False otherwise.
-        """
-        # Requires pybsm[graphics] or pybsm[headless]
-        return pybsm_available
-
+    @override
     def get_config(self) -> dict[str, Any]:
         """
         Returns the current configuration of the DefocusOTFPerturber instance.
@@ -268,3 +251,13 @@ class DefocusOTFPerturber(PerturbImage):
             "interp": self.interp,
             "box_alignment_mode": self.box_alignment_mode,
         }
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        """
+        Checks if the necessary dependencies pyBSM is available.
+
+        Returns:
+            bool: True if pyBSM is available; False otherwise.
+        """
+        return pybsm_available

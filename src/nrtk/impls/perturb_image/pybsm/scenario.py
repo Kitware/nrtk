@@ -29,7 +29,10 @@ try:
 except ImportError:
     pybsm_available = False
 
-from smqtk_core.configuration import Configurable
+from smqtk_core import Configurable
+from typing_extensions import override
+
+from nrtk.utils._exceptions import PyBSMImportError
 
 
 class PybsmScenario(Configurable):
@@ -112,11 +115,9 @@ class PybsmScenario(Configurable):
             the refractive index structure parameter "near the ground"
             (e.g. at h = 1 m) used to calculate the turbulence profile; the
             default, 1.7e-14, is the HV 5/7 profile value
-
         """
         if not self.is_usable():
-            raise ImportError("pybsm not found")
-
+            raise PyBSMImportError
         if ihaze not in PybsmScenario.ihaze_values:
             raise ValueError(
                 f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}",
@@ -159,7 +160,7 @@ class PybsmScenario(Configurable):
         """
         return self.name
 
-    def create_scenario(self) -> Scenario:  # type: ignore
+    def create_scenario(self) -> "Scenario":
         """
         Creates and returns a pybsm.Scenario object based on the
         provided parameters.
@@ -186,6 +187,7 @@ class PybsmScenario(Configurable):
         """Alias for :meth:`.StoreScenario.create_scenario`."""
         return self.create_scenario()
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """
         Generates a serializable config that can be used to rehydrate object
@@ -210,9 +212,9 @@ class PybsmScenario(Configurable):
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Indicator variable for whether pybsm package is properly installed
+        Checks if the necessary dependencies pyBSM is available.
 
         Returns:
-            bool: True if pybsm is properly installed, False otherwise
+            bool: True if pyBSM is available; False otherwise.
         """
         return pybsm_available

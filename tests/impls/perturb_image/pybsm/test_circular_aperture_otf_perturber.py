@@ -1,3 +1,4 @@
+import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable, Sequence
 from contextlib import AbstractContextManager
@@ -16,10 +17,11 @@ from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
     CircularApertureOTFPerturber,
 )
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import (
-    TIFFImageSnapshotExtension,
-    create_sample_sensor_and_scenario,
-)
+
+if CircularApertureOTFPerturber.is_usable():
+    from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
+
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = (
@@ -30,10 +32,7 @@ EXPECTED_PROVIDED_IMG_FILE_PATH = (
 )
 
 
-@pytest.mark.skipif(
-    not CircularApertureOTFPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not CircularApertureOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
 class TestCircularApertureOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -405,5 +404,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not CircularApertureOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
+    with pytest.raises(PyBSMAndOpenCVImportError, match=re.escape(str(PyBSMAndOpenCVImportError()))):
         CircularApertureOTFPerturber()

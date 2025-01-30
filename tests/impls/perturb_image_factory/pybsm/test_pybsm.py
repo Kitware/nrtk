@@ -25,7 +25,7 @@ NRTK_PYBSM_CONFIG = DATA_DIR / "nrtk_pybsm_config.json"
 
 @pytest.mark.skipif(
     not CustomPybsmPerturbImageFactory.is_usable(),
-    reason="pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
+    reason="not CustomPybsmPerturbImageFactory.is_usable()",
 )
 class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(

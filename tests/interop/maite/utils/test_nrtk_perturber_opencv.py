@@ -1,0 +1,63 @@
+import numpy as np
+import pytest
+
+try:
+    from nrtk.impls.perturb_image.generic.cv2.blur import AverageBlurPerturber
+except ImportError:
+    pytest.skip(allow_module_level=True, reason="nrtk.impls.perturb_image.generic.cv2 submodule unavailable.")
+
+from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+
+try:
+    from nrtk.interop.maite.interop.object_detection.dataset import (
+        JATICDetectionTarget,
+        JATICObjectDetectionDataset,
+    )
+    from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
+except ImportError:
+    pytest.skip(allow_module_level=True, reason="nrtk.interop.maite submodule unavailable.")
+
+
+class TestNRTKPerturberOpenCV:
+    """These tests make use of the `tmpdir` fixture from `pytest`.
+
+    Find more information here: https://docs.pytest.org/en/6.2.x/tmpdir.html
+    """
+
+    @pytest.mark.parametrize(
+        ("perturber_factory", "img_dirs"),
+        [
+            (
+                StepPerturbImageFactory(
+                    perturber=AverageBlurPerturber,
+                    theta_key="ksize",
+                    start=1,
+                    stop=5,
+                    step=2,
+                ),
+                ["_ksize-1", "_ksize-3"],
+            ),
+        ],
+    )
+    def test_nrtk_perturber(self, perturber_factory: PerturbImageFactory, img_dirs: list[str]) -> None:
+        """Test if the perturber returns the intended number of datasets."""
+        num_imgs = 4
+        dataset = JATICObjectDetectionDataset(
+            imgs=[np.random.default_rng().integers(0, 255, (3, 256, 256), dtype=np.uint8)] * num_imgs,
+            dets=[
+                JATICDetectionTarget(
+                    boxes=np.array([[1.0, 2.0, 3.0, 4.0]]),
+                    labels=np.array([0]),
+                    scores=np.array([0.5]),
+                ),
+            ]
+            * num_imgs,
+            metadata=[{"img_metadata": 0.3}] * num_imgs,
+        )
+
+        augmented_datasets = nrtk_perturber(maite_dataset=dataset, perturber_factory=perturber_factory)
+
+        for perturber_params, aug_dataset in augmented_datasets:
+            assert perturber_params in list(img_dirs)
+            assert len(aug_dataset) == num_imgs
