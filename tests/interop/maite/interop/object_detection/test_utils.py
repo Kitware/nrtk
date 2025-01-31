@@ -1,4 +1,5 @@
 import json
+import re
 import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
@@ -17,21 +18,19 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
 )
 from nrtk.interop.maite.interop.object_detection.utils import is_usable
 
-try:
+if is_usable:
     import kwcoco  # type: ignore
 
-    from nrtk.interop.maite.interop.object_detection.dataset import (
-        COCOJATICObjectDetectionDataset,
-    )
-    from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
-except ImportError:
-    # Won't use above imports when not importable
-    pass
+from nrtk.interop.maite.interop.object_detection.dataset import (
+    COCOJATICObjectDetectionDataset,
+)
+from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
+from nrtk.utils._exceptions import KWCocoImportError
 
 random = np.random.default_rng()
 
 
-@pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
+@pytest.mark.skipif(not is_usable, reason=str(KWCocoImportError()))
 @pytest.mark.parametrize(
     ("dataset", "img_filenames", "categories", "expectation"),
     [
@@ -134,10 +133,9 @@ def test_dataset_to_coco(
 
 
 @mock.patch.object(COCOJATICObjectDetectionDataset, "is_usable")
-@pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jati[tools]' not installed.")
 def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not COCOJATICObjectDetectionDataset.is_usable()
-    with pytest.raises(ImportError, match=r"kwcoco not found. Please install 'nrtk-jatic\[tools\]'."):
+    with pytest.raises(ImportError, match=re.escape(str(KWCocoImportError()))):
         COCOJATICObjectDetectionDataset(None, None, None)

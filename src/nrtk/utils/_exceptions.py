@@ -22,6 +22,12 @@ class PyBSMImportError(ImportError):
         super().__init__("pyBSM must be installed. Please install via `nrtk[pybsm]`.")
 
 
+class KWCocoImportError(ImportError):
+    def __init__(self) -> None:
+        # Call the base class constructor with the parameters it needs
+        super().__init__("kwcoco must be installed. Please install via `nrtk[tools]`.")
+
+
 class PyBSMAndOpenCVImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs

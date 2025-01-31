@@ -15,13 +15,14 @@ try:
     is_usable = True
 except ImportError:
     is_usable = False
+from nrtk.utils._exceptions import KWCocoImportError
 
 
 def _xywh_bbox_xform(x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:
     return x1, y1, x2 - x1, y2 - y1
 
 
-def _create_annotations(dataset_categories: list[dict[str, Any]]) -> kwcoco.CocoDataset:
+def _create_annotations(dataset_categories: list[dict[str, Any]]) -> "kwcoco.CocoDataset":
     annotations = kwcoco.CocoDataset()
     for cat in dataset_categories:
         annotations.add_category(name=cat["name"], supercategory=cat["supercategory"], id=cat["id"])
@@ -42,10 +43,11 @@ def dataset_to_coco(
     :param dataset_categories: A list of the categories related to this dataset.
         Each dictionary should contain the following keys: id, name, supercategory.
     """
+    if not is_usable:
+        raise KWCocoImportError
     if len(img_filenames) != len(dataset):
         raise ValueError(f"Image filename and dataset length mismatch ({len(img_filenames)} != {len(dataset)})")
-    if not is_usable:
-        raise ImportError("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
+
     mod_metadata = list()
 
     annotations = _create_annotations(dataset_categories)

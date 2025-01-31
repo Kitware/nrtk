@@ -27,6 +27,7 @@ try:
     is_usable = True
 except ImportError:
     is_usable = False
+from nrtk.utils._exceptions import KWCocoImportError
 
 OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 
@@ -78,7 +79,7 @@ class COCOJATICObjectDetectionDataset(Dataset):
             ValueError: If metadata is missing for any image in the dataset.
         """
         if not self.is_usable():
-            raise ImportError("kwcoco not found. Please install 'nrtk-jatic[tools]'.")
+            raise KWCocoImportError
 
         self._kwcoco_dataset = kwcoco_dataset
 
