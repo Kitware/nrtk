@@ -41,11 +41,10 @@ def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObj
         with open(metadata_file) as f:
             metadata = json.load(f)
     else:
-        metadata = [dict()] * len(kwcoco_dataset.imgs)
+        metadata = [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]
 
     # Initialize dataset object
     return COCOJATICObjectDetectionDataset(
-        root=str(DATASET_FOLDER),
         kwcoco_dataset=kwcoco_dataset,
         image_metadata=metadata,
     )

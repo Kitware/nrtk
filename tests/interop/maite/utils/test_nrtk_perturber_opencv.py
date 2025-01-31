@@ -53,7 +53,8 @@ class TestNRTKPerturberOpenCV:
                 ),
             ]
             * num_imgs,
-            metadata=[{"img_metadata": 0.3}] * num_imgs,
+            datum_metadata=[{"id": idx} for idx in range(num_imgs)],
+            dataset_id="test_dataset",
         )
 
         augmented_datasets = nrtk_perturber(maite_dataset=dataset, perturber_factory=perturber_factory)
