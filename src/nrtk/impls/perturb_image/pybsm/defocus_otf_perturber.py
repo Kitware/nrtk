@@ -15,7 +15,6 @@ from collections.abc import Hashable, Iterable
 from typing import Any, Optional
 
 import numpy as np
-from scipy.signal import fftconvolve
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 try:
@@ -23,6 +22,7 @@ try:
     import pybsm.radiance as radiance
     from pybsm.otf.functional import defocus_OTF, otf_to_psf, resample_2D
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
+    from scipy.signal import fftconvolve
 
     pybsm_available = True
 except ImportError:
