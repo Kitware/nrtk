@@ -26,7 +26,6 @@ Example usage:
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Sequence
-from importlib.util import find_spec
 from typing import Any
 
 from smqtk_core.configuration import (
@@ -48,7 +47,8 @@ _needed_classes = [PybsmPerturber, PybsmScenario, PybsmSensor]
 pybsm_available = True
 for c in _needed_classes:
     if not c.is_usable():
-        raise PyBSMImportError
+        # raise PyBSMImportError
+        pybsm_available = False
 
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
@@ -102,9 +102,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]'.",
-            )
+            raise PyBSMImportError
         self.sensor = sensor
         self.scenario = scenario
         self.theta_keys = theta_keys
@@ -255,12 +253,13 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Checks if the required `pybsm` module is available.
+        Checks if the required pybsm module is available.
 
         Returns:
-            bool: True if `pybsm` is available; False otherwise.
+            bool: True if pybsm is installed; False otherwise.
         """
-        return find_spec("pybsm") is not None
+        # Requires opencv to be installed
+        return pybsm_available
 
 
 class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):

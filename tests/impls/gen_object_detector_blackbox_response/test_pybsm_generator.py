@@ -1,7 +1,10 @@
+import re
+import unittest.mock as mock
 from collections.abc import Hashable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -15,15 +18,21 @@ from nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator imp
 )
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.impls.score_detections.random_scorer import RandomScorer
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.gen_object_detector_blackbox_response.test_generator_utils import gen_rand_dets, generator_assertions
-from tests.impls.test_pybsm_utils import create_sample_scenario, create_sample_sensor
+from tests.impls.test_pybsm_utils import is_usable
+
+if is_usable:
+    from tests.impls.test_pybsm_utils import create_sample_scenario, create_sample_sensor
+else:
+    pytest.skip(allow_module_level=True, reason="tests.impls.test_pybsm_utils is unavailable.")
 
 INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 rng = np.random.default_rng()
 
 
-@pytest.mark.skipif(not SimplePybsmGenerator.is_usable(), reason="not SimplePybsmGenerator.is_usable()")
+@pytest.mark.skipif(not SimplePybsmGenerator.is_usable(), reason=str(PyBSMImportError()))
 class TestPybsmGenerator:
     @pytest.mark.parametrize(
         ("images", "img_gsds", "ground_truth", "expectation"),
@@ -184,3 +193,14 @@ class TestPybsmGenerator:
             batch_size=1,
             verbose=verbose,
         )
+
+
+@mock.patch.object(SimplePybsmGenerator, "is_usable")
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+
+    assert not SimplePybsmGenerator.is_usable()
+
+    with pytest.raises(PyBSMImportError, match=re.escape(str(PyBSMImportError()))):
+        SimplePybsmGenerator(None, None, None)  # type: ignore

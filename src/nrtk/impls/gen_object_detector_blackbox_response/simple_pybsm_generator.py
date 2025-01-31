@@ -34,6 +34,7 @@ from nrtk.interfaces.gen_object_detector_blackbox_response import (
 )
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interfaces.score_detections import ScoreDetections
+from nrtk.utils._exceptions import PyBSMImportError
 
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
@@ -73,9 +74,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
             ValueError: If `images` and `ground_truth` do not have the same length.
         """
         if not self.is_usable():
-            raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]'.",
-            )
+            raise PyBSMImportError
         if len(images) != len(ground_truth):
             raise ValueError("Size mismatch. ground_truth must be provided for each image.")
         if len(images) != len(img_gsds):

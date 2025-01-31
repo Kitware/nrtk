@@ -2,11 +2,19 @@ import io
 
 import numpy as np
 from PIL import Image
-from pybsm.otf import dark_current_from_density
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+
+is_usable = True
+if not PybsmScenario or not PybsmSensor:
+    is_usable = False
+
+try:
+    from pybsm.otf import dark_current_from_density
+except ImportError:
+    is_usable = False
 
 
 def create_sample_sensor() -> PybsmSensor:
