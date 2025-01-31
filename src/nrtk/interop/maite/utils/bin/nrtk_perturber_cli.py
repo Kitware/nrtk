@@ -13,24 +13,23 @@ from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 
 try:
     import kwcoco  # type: ignore
-
-    from nrtk.interop.maite.interop.object_detection.dataset import (
+    from nrtk_jatic.interop.object_detection.dataset import (
         COCOJATICObjectDetectionDataset,
     )
-    from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
+    from nrtk_jatic.interop.object_detection.utils import dataset_to_coco
 
     is_usable = True
 except ImportError:
     is_usable = False
 
 
-def _load_metadata(dataset_dir: str, kwcoco_dataset: kwcoco.CocoDataset) -> list[dict[str, Any]]:
+def _load_metadata(dataset_dir: str, kwcoco_dataset: "kwcoco.CocoDataset") -> list[dict[str, Any]]:
     metadata_file = Path(dataset_dir) / "image_metadata.json"
     if not metadata_file.is_file():
         logging.warn(
             "Could not identify metadata file, assuming no metadata. Expected at '[dataset_dir]/image_metadata.json'",
         )
-        return [dict() for _ in range(len(kwcoco_dataset.imgs))]
+        return [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]
     logging.info(f"Loading metadata from {metadata_file}")
     with open(metadata_file) as f:
         return json.load(f)
@@ -105,10 +104,10 @@ def nrtk_perturber_cli(
     perturber_factory = from_config_dict(config["PerturberFactory"], PerturbImageFactory.get_impls())
 
     # Initialize dataset object
+    # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
     input_dataset = COCOJATICObjectDetectionDataset(
-        root=dataset_dir,
         kwcoco_dataset=kwcoco_dataset,
-        image_metadata=metadata,
+        image_metadata=metadata,  # type: ignore
     )
 
     # Augment input dataset

@@ -31,7 +31,7 @@ class NrtkPerturbInputSchema(BaseModel):
                     "dataset_dir": "path/to/dataset/dir",
                     "output_dir": "path/to/output/dir",
                     "label_file": "path/to/label_file",
-                    "image_metadata": [{"gsd": gsd} for gsd in range(11)],
+                    "image_metadata": [{"id": idx, "gsd": idx} for idx in range(11)],
                     "is_factory": True,
                     "config": "path/to/config_file",
                 },

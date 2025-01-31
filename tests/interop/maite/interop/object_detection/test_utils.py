@@ -1,8 +1,10 @@
 import json
+import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import py  # type: ignore
@@ -43,7 +45,8 @@ random = np.random.default_rng()
                         scores=random.random(2),
                     ),
                 ],
-                metadata=[{"test": "rand_metadata"}],
+                datum_metadata=[{"id": 0}],
+                dataset_id="dummy_dataset",
             ),
             ["images/img1.png"],
             [
@@ -63,7 +66,8 @@ random = np.random.default_rng()
                     ),
                 ]
                 * 2,
-                metadata=[{"test": "rand_metadata"}] * 2,
+                datum_metadata=[{"id": idx} for idx in range(2)],
+                dataset_id="dummy_dataset",
             ),
             ["images/img1.png"],
             [
@@ -108,7 +112,6 @@ def test_dataset_to_coco(
 
         # Re-create MAITE dataset from file
         coco_dataset = COCOJATICObjectDetectionDataset(
-            root=tmpdir,
             kwcoco_dataset=kwcoco.CocoDataset(label_file),
             image_metadata=metadata,
         )
@@ -128,3 +131,13 @@ def test_dataset_to_coco(
             # loaded dataset.
             for k, v in md.items():
                 assert v == c_md[k]
+
+
+@mock.patch.object(COCOJATICObjectDetectionDataset, "is_usable")
+@pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jati[tools]' not installed.")
+def test_missing_deps(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not COCOJATICObjectDetectionDataset.is_usable()
+    with pytest.raises(ImportError, match=r"kwcoco not found. Please install 'nrtk-jatic\[tools\]'."):
+        COCOJATICObjectDetectionDataset(None, None, None)

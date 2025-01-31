@@ -19,7 +19,7 @@ class JATICDetectionTarget:
     scores: np.ndarray
 
 
-class TestJATICImageClassificationDataset:
+class TestJATICObjectDetectionDataset:
     @pytest.mark.parametrize(
         ("dataset", "expected_dets_out"),
         [
@@ -41,7 +41,9 @@ class TestJATICImageClassificationDataset:
                             scores=np.asarray([1]),
                         ),
                     ],
-                    [{"some_metadata": 0}, {"some_metadata": 1}],
+                    [{"id": 0}, {"id": 1}],
+                    "dummy_dataset",
+                    {0: "cat1", 1: "cat2"},
                 ),
                 [
                     [
@@ -74,7 +76,7 @@ class TestJATICImageClassificationDataset:
         by the augmentation adapter object.
         """
         perturber = ResizePerturber(w=64, h=512)
-        augmentation = JATICDetectionAugmentation(augment=perturber)
+        augmentation = JATICDetectionAugmentation(augment=perturber, augment_id="test_augment")
         for idx in range(len(dataset)):
             img_in = dataset[idx][0]
             det_in = dataset[idx][1]
@@ -85,7 +87,7 @@ class TestJATICImageClassificationDataset:
             # Channel last to channel first
             expected_img_out = np.transpose(expected_img_out, (2, 0, 1))
             expected_md_out = dict(md_in)
-            expected_md_out["nrtk::perturber"] = perturber.get_config()
+            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]
 
             # Apply augmentation via adapter
             img_out, det_out, md_out = augmentation(([img_in], [det_in], [md_in]))

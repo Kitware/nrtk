@@ -26,7 +26,21 @@ class TestJATICImageClassificationDataset:
                         random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
                     ],
                     [np.asarray([0]), np.asarray([1])],
-                    [{"some_metadata": 0}, {"some_metadata": 1}],
+                    [{"id": 0}, {"id": 1}],
+                    "dummy_dataset",
+                    {0: "cat0", 1: "cat1"},
+                ),
+                [np.asarray([0]), np.asarray([1])],
+            ),
+            (
+                JATICImageClassificationDataset(
+                    [
+                        random.integers(0, 255, (3, 256, 256), dtype=np.uint8),
+                        random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
+                    ],
+                    [np.asarray([0]), np.asarray([1])],
+                    [{"id": 0}, {"id": 1}],
+                    "dummy_dataset",
                 ),
                 [np.asarray([0]), np.asarray([1])],
             ),
@@ -43,7 +57,7 @@ class TestJATICImageClassificationDataset:
         and metadata and can be ingested by the augmentation adapter object.
         """
         perturber = ResizePerturber(w=64, h=512)
-        augmentation = JATICClassificationAugmentation(augment=perturber)
+        augmentation = JATICClassificationAugmentation(augment=perturber, augment_id="test_augment")
         for idx in range(len(dataset)):
             img_in = dataset[idx][0]
             lbl_in = dataset[idx][1]
@@ -53,7 +67,7 @@ class TestJATICImageClassificationDataset:
             input_image, _ = perturber(np.transpose(np.asarray(img_in), (1, 2, 0)))
             expected_img_out = np.transpose(input_image, (2, 0, 1))
             expected_md_out = dict(md_in)
-            expected_md_out["nrtk::perturber"] = perturber.get_config()
+            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]
 
             # Apply augmentation via adapter
             img_out, lbl_out, md_out = augmentation(([img_in], [lbl_in], [md_in]))

@@ -103,7 +103,7 @@ class VisDroneDataset:
         "motor",
     )
 
-    def __init__(self, root: Path | str, subset_ids: Sequence[str] = None) -> None:
+    def __init__(self, root: Path | str, subset_ids: Sequence[str] | None = None) -> None:
         """Load and initialize VisDroneDataset"""
         self._root: Path = Path(root)
 

@@ -4,9 +4,9 @@ import json
 import logging
 import os
 
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from smqtk_core.configuration import from_config_dict
 
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
 
 try:
@@ -37,23 +37,30 @@ def build_factory(data: NrtkPerturbInputSchema) -> PerturbImageFactory:
         return from_config_dict(config["PerturberFactory"], PerturbImageFactory.get_impls())
 
 
-if not is_usable:
-    LOG.warning("load_COCOJATIC_dataset requires additional dependencies, please install 'nrtk-jatic[tools]'")
-else:
+def load_COCOJATIC_dataset(  # noqa: N802
+    data: NrtkPerturbInputSchema,
+) -> "COCOJATICObjectDetectionDataset":
+    """Returns a COCOJATICObjectDetectionDataset based on dataset parameters in data.
 
-    def load_COCOJATIC_dataset(  # noqa: N802
-        data: NrtkPerturbInputSchema,
-    ) -> COCOJATICObjectDetectionDataset:
-        """Returns a COCOJATICObjectDetectionDataset based on dataset parameters in data.
+    :param data: dictionary of Schema from schema.py
+    """
+    if not is_usable:
+        raise ImportError("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
 
-        :param data: dictionary of Schema from schema.py
-        """
-        if not is_usable:
-            raise ImportError("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
-        kwcoco_dataset = kwcoco.CocoDataset(data.label_file)
+    for md in data.image_metadata:
+        if "id" not in md:
+            raise ValueError("ID not present in image metadata. Is it a DatumMetadataType?")
 
-        return COCOJATICObjectDetectionDataset(
-            root=data.dataset_dir,
-            kwcoco_dataset=kwcoco_dataset,
-            image_metadata=data.image_metadata,
-        )
+    # PyRight reports that kwcoco and COCOJATICObjectDetectionDataset are possibly unbound due to
+    # guarded imports, but we've confirmed they are available with our is_usable check
+    kwcoco_dataset = kwcoco.CocoDataset(data.label_file)  # pyright: ignore [reportPossiblyUnboundVariable]
+    return COCOJATICObjectDetectionDataset(  # pyright: ignore [reportPossiblyUnboundVariable]
+        kwcoco_dataset=kwcoco_dataset,
+        # Pydantic doesn't fully support TypedDicts until 3.12+
+        # See https://docs.pydantic.dev/2.3/usage/types/dicts_mapping/#typeddict
+        # MAITE does not currently import TypedDict via typing_extensions, so we get runtime errors
+        #
+        # The above ValueError aims to try and error out when the only required key is not present, as that
+        # is our only indicator that the metadata is not a DatumMetadataType
+        image_metadata=data.image_metadata,  # type: ignore
+    )

@@ -1,16 +1,11 @@
 from collections.abc import Generator
 from pathlib import Path
 
-from nrtk.utils._exceptions import MaiteImportError
-
-try:
-    import py  # type: ignore
-    import pytest
-    import responses
-    from fastapi.encoders import jsonable_encoder
-    from starlette.testclient import TestClient
-except ImportError:
-    pytest.skip(allow_module_level=True, reason=str(MaiteImportError()))
+import py  # type: ignore
+import pytest
+import responses
+from fastapi.encoders import jsonable_encoder
+from starlette.testclient import TestClient
 
 from nrtk.interop.maite.api.aukus_app import AUKUS_app, Settings
 from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema

@@ -42,7 +42,10 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
         # Load dataset
         if not is_usable:
             raise ImportError("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
-        input_dataset = load_COCOJATIC_dataset(data)
+
+        # PyRight reports that load_COCOJATIC_dataset is possibly unbound due to guarded import, but confirmed via
+        # is_usable check
+        input_dataset = load_COCOJATIC_dataset(data)  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Call nrtk_perturber
         augmented_datasets = nrtk_perturber(maite_dataset=input_dataset, perturber_factory=perturber_factory)

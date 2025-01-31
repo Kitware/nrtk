@@ -9,8 +9,8 @@ from collections.abc import Iterable
 
 import numpy as np
 from maite.protocols.object_detection import Dataset
-
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+
 from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation
 from nrtk.interop.maite.interop.object_detection.dataset import JATICObjectDetectionDataset
 
@@ -51,7 +51,7 @@ def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactor
         aug_dets = []
         aug_metadata = []
 
-        jatic_perturber = JATICDetectionAugmentation(augment=perturber)
+        jatic_perturber = JATICDetectionAugmentation(augment=perturber, augment_id=output_perturb_params[i])
 
         # Formatting data to be of batch_size=1 in order to support MAITE
         # detection protocol's expected input for Augmentation
@@ -69,5 +69,12 @@ def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactor
             aug_dets.append(aug_det[0])
             aug_metadata.append(aug_md[0])
 
-        augmented_datasets.append(JATICObjectDetectionDataset(aug_imgs, aug_dets, aug_metadata))
+        augmented_datasets.append(
+            JATICObjectDetectionDataset(
+                imgs=aug_imgs,
+                dets=aug_dets,
+                datum_metadata=aug_metadata,
+                dataset_id=output_perturb_params[i],
+            ),
+        )
     return zip(output_perturb_params, augmented_datasets)

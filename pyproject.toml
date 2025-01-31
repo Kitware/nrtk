@@ -63,7 +63,7 @@ scikit-image = [
 #################################
 # nrtk.interop.maite dependencies
 #################################
-maite = {version = ">=0.6.0", optional = true}
+maite = {version = ">=0.7.1", optional = true}
 # REST API deps
 fastapi = {version = ">=0.110.0", optional = true}
 # httpx = {version = ">=0.27.0", optional = true}
@@ -83,7 +83,6 @@ graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 pybsm = ["pybsm"]
 maite =["maite", "fastapi", "pydantic", "pydantic_settings", "responses", "uvicorn"]
-# maite =["maite", "fastapi", "httpx", "uvicorn", "pydantic", "pydantic_settings", "pyyaml", "responses"]
 tools = ["kwcoco", "Pillow"]
 scikit-image = ["scikit-image"]
 Pillow = ["Pillow"]
@@ -134,7 +133,7 @@ papermill = ">=2.4.0"
 #########################################
 # nrtk.interop.maite testing dependencies
 #########################################
-maite = {version = "^0.6.0", extras = ["test"]}
+maite = {version = "^0.7.1", extras = ["test"]}
 starlette = ">=0.40.0"
 Pillow = ">=10.3.0" # CVE-2024-28219
 

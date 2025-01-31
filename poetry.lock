@@ -2316,19 +2316,19 @@ tornado = "*"
 
 [[package]]
 name = "maite"
-version = "0.6.1"
+version = "0.7.1"
 description = "Library of common types, protocols (a.k.a. structural subtypes), and utilities to support AI test and evaluation"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "maite-0.6.1-py3-none-any.whl", hash = "sha256:c04c0b6ab9f9fa15ac304f6064447c23b39e343f10298186a905b178eead870f"},
-    {file = "maite-0.6.1.tar.gz", hash = "sha256:d3e77f348c178f6e94f76399ee336ccaf71dac89293b9539c550d069e99e1388"},
+    {file = "maite-0.7.1-py3-none-any.whl", hash = "sha256:81a87d2f6cfa90ddc4c8411c631d358edeea7adadd3de951eb860569f115b0e8"},
+    {file = "maite-0.7.1.tar.gz", hash = "sha256:ea00f55d75c0fa853900d36f71bfb851fba6f27cb84acefab40b1c5fceccfa88"},
 ]
 
 [package.dependencies]
 hypothesis = {version = ">=6.61.0,<=6.113", optional = true, markers = "extra == \"test\""}
 jupytext = {version = ">=1.14.0", optional = true, markers = "extra == \"test\""}
-numpy = ">=1.17,<2"
+numpy = ">=1.24.2,<2"
 numpydoc = {version = ">=1.5.0", optional = true, markers = "extra == \"test\""}
 pyright = {version = ">=1.1.280", optional = true, markers = "extra == \"test\""}
 pytest = {version = ">=7.0.0", optional = true, markers = "extra == \"test\""}
@@ -2337,7 +2337,7 @@ torch = {version = ">=1.7,<1.12.0 || >1.12.0", optional = true, markers = "extra
 typing-extensions = ">=4.5,<4.6 || >4.6"
 
 [package.extras]
-build-docs = ["pytest (>=7.0.0)", "torch (>=1.7,!=1.12.0)"]
+builddocs = ["jupyter", "kornia", "matplotlib", "nbconvert", "pycocotools", "pytest (>=7.0.0)", "torch (>=1.7,!=1.12.0)", "torchmetrics", "torchvision"]
 test = ["hypothesis (>=6.61.0,<=6.113)", "jupytext (>=1.14.0)", "numpydoc (>=1.5.0)", "pyright (>=1.1.280)", "pytest (>=7.0.0)", "pytest-mock (>=3.10.0)", "torch (>=1.7,!=1.12.0)"]
 
 [[package]]
@@ -6068,4 +6068,4 @@ tools = ["Pillow", "kwcoco"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "f9548380e39f35559e4402d7b6e385c512d13a0189618ef86aedd7ba574bf512"
+content-hash = "b62dbd151e847439f364ed6d3c105f7886e7a0dfe3b18d3424dfdafee05d4a78"
