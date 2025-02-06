@@ -42,14 +42,6 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.utils._exceptions import PyBSMImportError
 
-_needed_classes = [PybsmPerturber, PybsmScenario, PybsmSensor]
-
-pybsm_available = True
-for c in _needed_classes:
-    if not c.is_usable():
-        # raise PyBSMImportError
-        pybsm_available = False
-
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
     """
@@ -259,7 +251,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
             bool: True if pybsm is installed; False otherwise.
         """
         # Requires opencv to be installed
-        return pybsm_available
+        return all([PybsmPerturber.is_usable(), PybsmScenario.is_usable(), PybsmSensor.is_usable()])
 
 
 class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):

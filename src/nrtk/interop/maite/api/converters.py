@@ -4,10 +4,11 @@ import json
 import logging
 import os
 
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from smqtk_core.configuration import from_config_dict
 
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
+from nrtk.utils._exceptions import KWCocoImportError
 
 try:
     import kwcoco  # type: ignore
@@ -45,7 +46,7 @@ def load_COCOJATIC_dataset(  # noqa: N802
     :param data: dictionary of Schema from schema.py
     """
     if not is_usable:
-        raise ImportError("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
+        raise KWCocoImportError
 
     for md in data.image_metadata:
         if "id" not in md:

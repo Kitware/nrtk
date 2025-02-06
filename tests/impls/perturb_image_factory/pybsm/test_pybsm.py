@@ -17,6 +17,7 @@ from smqtk_core.configuration import (
 
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 DATA_DIR = Path(__file__).parents[3] / "data"
@@ -230,14 +231,13 @@ class TestStepPerturbImageFactory:
 
             assert original_factory_config == hydrated_factory_config
 
-
-@mock.patch.object(CustomPybsmPerturbImageFactory, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not CustomPybsmPerturbImageFactory.is_usable()
-    sensor, scenario = create_sample_sensor_and_scenario()
-    theta_keys = ["altitude"]
-    thetas = [[1000, 2000, 3000, 4000]]
-    with pytest.raises(ImportError, match=r"pybsm not found"):
-        CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)
+    @mock.patch.object(CustomPybsmPerturbImageFactory, "is_usable")
+    def test_missing_deps(self, mock_is_usable: MagicMock) -> None:
+        """Test that an exception is raised when required dependencies are not installed."""
+        mock_is_usable.return_value = False
+        assert not CustomPybsmPerturbImageFactory.is_usable()
+        sensor, scenario = create_sample_sensor_and_scenario()
+        theta_keys = ["altitude"]
+        thetas = [[1000, 2000, 3000, 4000]]
+        with pytest.raises(PyBSMImportError):
+            CustomPybsmPerturbImageFactory(sensor=sensor, scenario=scenario, theta_keys=theta_keys, thetas=thetas)

@@ -2,7 +2,16 @@
 
 from typing import Any, Optional
 
-from pydantic import BaseModel
+from nrtk.utils._exceptions import PydanticImportError
+
+BaseModel: type = object
+try:
+    # TODO: Remove once mypy is dropped (no redef)  # noqa: FIX002
+    from pydantic import BaseModel  # type: ignore
+
+    pydantic_available = True
+except ImportError:
+    pydantic_available = False
 
 
 class AukusdataCollectionSchema(BaseModel):
@@ -27,6 +36,13 @@ class AukusdataCollectionSchema(BaseModel):
     data_entries: Optional[int] = None
     source: Optional[dict[str, str]] = None
     data_formats: Optional[list[dict[str, Any]]] = None
+
+    def __init__(self, /, **data: Any) -> None:
+        """Raise import error if pydantic isn't available"""
+        if not pydantic_available:
+            raise PydanticImportError
+
+        super().__init__(**data)
 
 
 class AukusDatasetSchema(BaseModel):
@@ -55,3 +71,10 @@ class AukusDatasetSchema(BaseModel):
 
     # Optional Dataset Params
     tags: Optional[list[str]] = None
+
+    def __init__(self, /, **data: Any) -> None:
+        """Raise import error if pydantic isn't available"""
+        if not pydantic_available:
+            raise PydanticImportError
+
+        super().__init__(**data)

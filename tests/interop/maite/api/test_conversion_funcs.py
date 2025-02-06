@@ -4,12 +4,13 @@ from typing import Any
 
 import numpy as np
 import pytest
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from smqtk_core.configuration import to_config_dict
 
+from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
+from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interop.maite.api.converters import build_factory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
+from nrtk.utils._exceptions import KWCocoImportError
 from tests.interop.maite import (
     BAD_NRTK_CONFIG,
     DATASET_FOLDER,
@@ -27,7 +28,7 @@ except ImportError:
 
 
 @pytest.mark.skipif(
-    not (PybsmScenario.is_usable() and PybsmSensor.is_usable()),
+    not PybsmScenario.is_usable() or not PybsmSensor.is_usable(),
     reason="pybsm not found. Please install `nrtk[pybsm]`.",
 )
 class TestAPIConversionFunctions:
@@ -77,7 +78,9 @@ class TestAPIConversionFunctions:
                             ),
                             qe=np.asarray([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0]),
                         ),
-                    ),
+                    )
+                    if PybsmSensor.is_usable()
+                    else {},
                     "scenario": to_config_dict(
                         PybsmScenario(
                             name="niceday",
@@ -86,7 +89,9 @@ class TestAPIConversionFunctions:
                             ground_range=0,
                             cn2_at_1m=0,
                         ),
-                    ),
+                    )
+                    if PybsmScenario.is_usable()
+                    else {},
                 },
             ),
         ],
@@ -200,7 +205,7 @@ class TestAPIConversionFunctions:
         """Test that ImportError appropriately raised when imports missing"""
         schema = NrtkPerturbInputSchema.model_validate(data)
 
-        with pytest.raises(ImportError, match=r"This tool requires additional dependencies"):
+        with pytest.raises(KWCocoImportError):
             _ = load_COCOJATIC_dataset(schema)
 
     @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")

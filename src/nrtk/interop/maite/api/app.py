@@ -1,8 +1,14 @@
 """This module contains handle_post, which is the endpoint for NRTK API requests"""
 
 from pathlib import Path
+from typing import Callable, Union
 
-from fastapi import FastAPI, HTTPException
+try:
+    from fastapi import FastAPI, HTTPException
+
+    fastapi_available = True
+except ImportError:
+    fastapi_available = False
 
 from nrtk.interop.maite.api.converters import build_factory
 from nrtk.interop.maite.api.schema import (
@@ -12,6 +18,7 @@ from nrtk.interop.maite.api.schema import (
 )
 from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
+from nrtk.utils._exceptions import FastApiImportError
 
 try:
     from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset
@@ -21,7 +28,18 @@ except ImportError:
     is_usable = False
 
 
-app = FastAPI()
+class _UnusableFastApi:
+    def post(self, _: str) -> Callable:
+        def wrapper(_: str) -> None:
+            return None
+
+        return wrapper
+
+
+if fastapi_available:
+    app: Union[FastAPI, _UnusableFastApi] = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+else:
+    app = _UnusableFastApi()
 
 
 # Define a route for handling POST requests
@@ -35,13 +53,12 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
 
     :raises: HTTPException upon failure
     """
+    if not is_usable:
+        raise HTTPException(status_code=400, detail=str(FastApiImportError()))
+
     try:
         # Build pybsm factory
         perturber_factory = build_factory(data)
-
-        # Load dataset
-        if not is_usable:
-            raise ImportError("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
 
         # PyRight reports that load_COCOJATIC_dataset is possibly unbound due to guarded import, but confirmed via
         # is_usable check
@@ -74,4 +91,5 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
             datasets=datasets_out,
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+        # If we made it to this point, we know we do have FastAPI imports
+        raise HTTPException(status_code=400, detail=str(e)) from e  # pyright: ignore [reportPossiblyUnboundVariable]

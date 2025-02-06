@@ -1,24 +1,27 @@
+from importlib.util import find_spec
+
 import numpy as np
 import pytest
 
-try:
-    from nrtk.impls.perturb_image.generic.cv2.blur import AverageBlurPerturber
-except ImportError:
-    pytest.skip(allow_module_level=True, reason="nrtk.impls.perturb_image.generic.cv2 submodule unavailable.")
-
+from nrtk.impls.perturb_image.generic.cv2.blur import AverageBlurPerturber
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interop.maite.interop.object_detection.dataset import (
+    JATICDetectionTarget,
+    JATICObjectDetectionDataset,
+)
+from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 
-try:
-    from nrtk.interop.maite.interop.object_detection.dataset import (
-        JATICDetectionTarget,
-        JATICObjectDetectionDataset,
-    )
-    from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
-except ImportError:
-    pytest.skip(allow_module_level=True, reason="nrtk.interop.maite submodule unavailable.")
+deps = ["maite"]
+specs = [find_spec(dep) for dep in deps]
+maite_available = all(spec is not None for spec in specs)
 
 
+@pytest.mark.skipif(
+    not AverageBlurPerturber.is_usable(),
+    reason="nrtk.impls.perturb_image.generic.cv2 submodule unavailable.",
+)
+@pytest.mark.skipif(not maite_available, reason="maite unavailable.")
 class TestNRTKPerturberOpenCV:
     """These tests make use of the `tmpdir` fixture from `pytest`.
 

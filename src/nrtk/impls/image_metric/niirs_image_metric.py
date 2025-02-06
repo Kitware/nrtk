@@ -38,6 +38,7 @@ from typing_extensions import override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.image_metric import ImageMetric
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class NIIRSImageMetric(ImageMetric):
@@ -67,9 +68,7 @@ class NIIRSImageMetric(ImageMetric):
             installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
-            )
+            raise PyBSMAndOpenCVImportError
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 

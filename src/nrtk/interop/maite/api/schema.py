@@ -2,7 +2,16 @@
 
 from typing import Any
 
-from pydantic import BaseModel
+from nrtk.utils._exceptions import PydanticImportError
+
+BaseModel: type = object
+try:
+    # TODO: Remove once mypy is dropped (no redef) # noqa: FIX002
+    from pydantic import BaseModel  # type: ignore
+
+    pydantic_available = True
+except ImportError:
+    pydantic_available = False
 
 
 class NrtkPerturbInputSchema(BaseModel):
@@ -38,6 +47,13 @@ class NrtkPerturbInputSchema(BaseModel):
             ],
         }
 
+    def __init__(self, /, **data: Any) -> None:
+        """Raise import error if pydantic isn't available"""
+        if not pydantic_available:
+            raise PydanticImportError
+
+        super().__init__(**data)
+
 
 class DatasetSchema(BaseModel):
     """Dataset schema for NRTK perturber API"""
@@ -57,6 +73,13 @@ class DatasetSchema(BaseModel):
                 },
             ],
         }
+
+    def __init__(self, /, **data: Any) -> None:
+        """Raise import error if pydantic isn't available"""
+        if not pydantic_available:
+            raise PydanticImportError
+
+        super().__init__(**data)
 
 
 class NrtkPerturbOutputSchema(BaseModel):
@@ -81,3 +104,10 @@ class NrtkPerturbOutputSchema(BaseModel):
                 },
             ],
         }
+
+    def __init__(self, /, **data: Any) -> None:
+        """Raise import error if pydantic isn't available"""
+        if not pydantic_available:
+            raise PydanticImportError
+
+        super().__init__(**data)

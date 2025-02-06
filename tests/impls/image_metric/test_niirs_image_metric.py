@@ -4,6 +4,7 @@ import unittest.mock as mock
 import pytest
 
 from nrtk.impls.image_metric.niirs_image_metric import NIIRSImageMetric
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
@@ -55,12 +56,11 @@ class TestSNRImageMetric:
         niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
         assert niirs_metric.name == "NIIRSImageMetric"
 
-
-@mock.patch.object(NIIRSImageMetric, "is_usable")
-def test_missing_deps(mock_is_usable: mock.MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not NIIRSImageMetric.is_usable()
-    sensor, scenario = create_sample_sensor_and_scenario()
-    with pytest.raises(ImportError, match=r"pybsm not found"):
-        NIIRSImageMetric(sensor=sensor, scenario=scenario)
+    @mock.patch.object(NIIRSImageMetric, "is_usable")
+    def test_missing_deps(self, mock_is_usable: mock.MagicMock) -> None:
+        """Test that an exception is raised when required dependencies are not installed."""
+        mock_is_usable.return_value = False
+        assert not NIIRSImageMetric.is_usable()
+        sensor, scenario = create_sample_sensor_and_scenario()
+        with pytest.raises(PyBSMAndOpenCVImportError):
+            NIIRSImageMetric(sensor=sensor, scenario=scenario)

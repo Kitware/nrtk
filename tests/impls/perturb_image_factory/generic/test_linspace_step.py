@@ -14,6 +14,7 @@ from smqtk_core.configuration import (
     to_config_dict,
 )
 
+from nrtk.impls.perturb_image.generic.skimage.random_noise import SaltNoisePerturber
 from nrtk.impls.perturb_image_factory.generic.linspace_step import (
     LinSpacePerturbImageFactory,
 )
@@ -210,17 +211,18 @@ class TestFloatStepPertubImageFactory:
     @pytest.mark.parametrize(
         ("config_file_name", "expectation"),
         [
-            (
+            pytest.param(
                 "nrtk_noise_config.json",
                 does_not_raise(),
+                marks=pytest.mark.skipif(not SaltNoisePerturber.is_usable(), reason="SaltNoisePerturber unusable."),
             ),
             (
                 "nrtk_bad_linspace_config.json",
-                pytest.raises(ValueError, match=r"not a perturber is not a valid perturber."),
+                pytest.raises(ValueError, match=r"is not a valid perturber."),
             ),
         ],
     )
-    def test_hyrdation_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
+    def test_hydration_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation, open(str(DATA_DIR / config_file_name)) as config_file:
             config = json.load(config_file)

@@ -8,24 +8,33 @@ import logging
 from collections.abc import Iterable
 
 import numpy as np
-from maite.protocols.object_detection import Dataset
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
+try:
+    from maite.protocols.object_detection import Dataset
+
+    maite_available = True
+except ImportError:
+    maite_available = False
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation
 from nrtk.interop.maite.interop.object_detection.dataset import JATICObjectDetectionDataset
+from nrtk.utils._exceptions import MaiteImportError
 
 
-def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:
+def nrtk_perturber(maite_dataset: "Dataset", perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:
     """Generate augmented dataset(s) of type maite.protocols.object_detection.Dataset.
 
     Generate augmented dataset(s) of type maite.protocols.object_detection.Dataset
     given an input dataset of the same type and a perturber factory
-    implementation. Each perturber combination will result in a newly
+    implementation. Each perturber dcombination will result in a newly
     generated dataset.
 
     :param maite_dataset: A dataset object of type maite.protocols.object_detection.Dataset
     :param perturber_factory: PerturbImageFactory implementation.
     """
+    if not maite_available:
+        raise MaiteImportError
+
     perturber_factory_config = perturber_factory.get_config()
     if "theta_keys" in perturber_factory_config:  # pyBSM doesn't follow interface rules
         perturb_factory_keys = perturber_factory_config["theta_keys"]
