@@ -8,10 +8,10 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 from maite.protocols.object_detection import Augmentation, TargetBatchType
+
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
-
 from nrtk.interop.maite.interop.object_detection.augmentation import (
     JATICDetectionAugmentation,
     JATICDetectionAugmentationWithMetric,

@@ -12,11 +12,11 @@ from maite.protocols.object_detection import (
     InputBatchType,
     TargetBatchType,
 )
-from nrtk.interop.maite.interop.object_detection.dataset import JATICDetectionTarget
 
 from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.interop.generic import NRTKDatumMetadata, _forward_md_keys
+from nrtk.interop.maite.interop.object_detection.dataset import JATICDetectionTarget
 
 OBJ_DETECTION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]
 
