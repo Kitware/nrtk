@@ -80,7 +80,7 @@ kwcoco = {version = ">=0.2.18", optional = true}
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 pybsm = ["pybsm"]
-maite =["maite", "fastapi", "pydantic", "pydantic_settings", "responses", "uvicorn"]
+maite =["maite", "fastapi", "pydantic", "pydantic_settings", "uvicorn"]
 tools = ["kwcoco", "Pillow"]
 scikit-image = ["scikit-image"]
 Pillow = ["Pillow"]

@@ -6073,4 +6073,4 @@ tools = ["Pillow", "kwcoco"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "ec549ab513b1fc8ae7264d8872ea2ab6ff623d21ff4e8dc7260feb99394e1035"
+content-hash = "263ba6c75aad7fcd8b1c22dcf235cdd211d81f36156adbd382cedc8abdf49b30"
