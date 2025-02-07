@@ -10,7 +10,7 @@ try:
 except ImportError:
     fastapi_available = False
 
-from nrtk.interop.maite.api.converters import build_factory
+from nrtk.interop.maite.api.converters import build_factory, load_COCOJATIC_dataset
 from nrtk.interop.maite.api.schema import (
     DatasetSchema,
     NrtkPerturbInputSchema,
@@ -19,13 +19,6 @@ from nrtk.interop.maite.api.schema import (
 from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import FastApiImportError
-
-try:
-    from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset
-
-    is_usable = True
-except ImportError:
-    is_usable = False
 
 
 class _UnusableFastApi:
@@ -53,16 +46,14 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
 
     :raises: HTTPException upon failure
     """
-    if not is_usable:
+    if not fastapi_available:
         raise HTTPException(status_code=400, detail=str(FastApiImportError()))
 
     try:
         # Build pybsm factory
         perturber_factory = build_factory(data)
 
-        # PyRight reports that load_COCOJATIC_dataset is possibly unbound due to guarded import, but confirmed via
-        # is_usable check
-        input_dataset = load_COCOJATIC_dataset(data)  # pyright: ignore [reportPossiblyUnboundVariable]
+        input_dataset = load_COCOJATIC_dataset(data)
 
         # Call nrtk_perturber
         augmented_datasets = nrtk_perturber(maite_dataset=input_dataset, perturber_factory=perturber_factory)

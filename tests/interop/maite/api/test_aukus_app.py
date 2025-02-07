@@ -4,20 +4,19 @@ from pathlib import Path
 import py  # type: ignore
 import pytest
 import responses
+from starlette.testclient import TestClient
+
+from nrtk.interop.maite.api.aukus_app import AUKUS_app, Settings
+from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema
+from nrtk.interop.maite.api.schema import DatasetSchema, NrtkPerturbOutputSchema
+from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG
 
 try:
     from fastapi.encoders import jsonable_encoder
 
-    from nrtk.interop.maite.api.aukus_app import AUKUS_app, Settings
-    from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema
-    from nrtk.interop.maite.api.schema import DatasetSchema, NrtkPerturbOutputSchema
-
     is_usable = True
 except ImportError:
     is_usable = False
-from starlette.testclient import TestClient
-
-from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG
 
 
 @pytest.fixture

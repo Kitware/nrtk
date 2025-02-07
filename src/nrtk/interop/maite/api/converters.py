@@ -8,14 +8,11 @@ from smqtk_core.configuration import from_config_dict
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
+from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectDetectionDataset
 from nrtk.utils._exceptions import KWCocoImportError
 
 try:
     import kwcoco  # type: ignore
-
-    from nrtk.interop.maite.interop.object_detection.dataset import (
-        COCOJATICObjectDetectionDataset,
-    )
 
     is_usable = True
 except ImportError:

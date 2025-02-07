@@ -80,7 +80,7 @@ class TestAPIConversionFunctions:
                         ),
                     )
                     if PybsmSensor.is_usable()
-                    else {},
+                    else dict(),
                     "scenario": to_config_dict(
                         PybsmScenario(
                             name="niceday",
@@ -91,7 +91,7 @@ class TestAPIConversionFunctions:
                         ),
                     )
                     if PybsmScenario.is_usable()
-                    else {},
+                    else dict(),
                 },
             ),
         ],

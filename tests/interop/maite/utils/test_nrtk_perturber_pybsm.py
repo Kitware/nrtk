@@ -4,32 +4,19 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-try:
-    from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-    from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
-except ImportError:
-    pytest.skip(allow_module_level=True, reason="nrtk.impls.perturb_image.pybsm submodule unavailable.")
+from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
+from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
+from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectDetectionDataset
+from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
+from nrtk.utils._exceptions import KWCocoImportError
+from tests.interop.maite import DATASET_FOLDER
 
-try:
-    from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
-except ImportError:
-    pytest.skip(allow_module_level=True, reason="nrtk.impls.perturb_image_factory.pybsm submodule unavailable.")
-
-try:
-    from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
-except ImportError:
-    pytest.skip(allow_module_level=True, reason="nrtk.interop.maite submodule unavailable.")
-
+kwcoco_available = True
 try:
     import kwcoco  # type: ignore
-
-    from nrtk.interop.maite.interop.object_detection.dataset import (
-        COCOJATICObjectDetectionDataset,
-    )
 except ImportError:
-    pytest.skip(allow_module_level=True, reason="kwcoco module unavailable.")
-
-from tests.interop.maite import DATASET_FOLDER
+    kwcoco_available = False
 
 
 def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObjectDetectionDataset:
@@ -50,6 +37,14 @@ def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObj
     )
 
 
+@pytest.mark.skipif(
+    not COCOJATICObjectDetectionDataset.is_usable(),
+    reason="COCOJATICObjectDetectionDataset not usable",
+)
+@pytest.mark.skipif(not CustomPybsmPerturbImageFactory.is_usable(), reason="CustomPybsmPerturbImageFactory not usable")
+@pytest.mark.skipif(not PybsmSensor.is_usable(), reason="PybsmSensor not usable")
+@pytest.mark.skipif(not PybsmScenario.is_usable(), reason="PybsmScenario not usable")
+@pytest.mark.skipif(not kwcoco_available, reason=str(KWCocoImportError()))
 class TestNRTKPerturberPyBSM:
     """These tests make use of the `tmpdir` fixture from `pytest`.
 

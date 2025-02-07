@@ -19,15 +19,14 @@ from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
     TurbulenceApertureOTFPerturber,
 )
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.test_pybsm_utils import (
+    TIFFImageSnapshotExtension,
+    create_sample_sensor_and_scenario,
+)
 
 if TurbulenceApertureOTFPerturber.is_usable():
     import pybsm.radiance as radiance
     from pybsm.utils import load_database_atmosphere
-
-    from tests.impls.test_pybsm_utils import (
-        TIFFImageSnapshotExtension,
-        create_sample_sensor_and_scenario,
-    )
 
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 

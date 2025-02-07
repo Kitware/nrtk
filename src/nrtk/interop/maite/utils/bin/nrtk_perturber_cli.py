@@ -9,14 +9,15 @@ import click  # type: ignore
 from smqtk_core.configuration import from_config_dict, make_default_config
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interop.maite.interop.object_detection.dataset import (
+    COCOJATICObjectDetectionDataset,
+)
+from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
+from nrtk.utils._exceptions import KWCocoImportError
 
 try:
     import kwcoco  # type: ignore
-    from nrtk_jatic.interop.object_detection.dataset import (
-        COCOJATICObjectDetectionDataset,
-    )
-    from nrtk_jatic.interop.object_detection.utils import dataset_to_coco
 
     is_usable = True
 except ImportError:
@@ -92,8 +93,7 @@ def nrtk_perturber_cli(
         raise ValueError("Could not identify annotations file. Expected at '[dataset_dir]/annotations.json'")
     logging.info(f"Loading kwcoco annotations from {coco_file}")
     if not is_usable:
-        print("This tool requires additional dependencies, please install `nrtk-jatic[tools]`")
-        exit(-1)
+        raise KWCocoImportError
     kwcoco_dataset = kwcoco.CocoDataset(coco_file)
 
     # Load metadata, if it exists

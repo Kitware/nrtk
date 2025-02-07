@@ -235,7 +235,7 @@ class TestApp:
             == "Configuration dictionary given does not have an implementation type specification."
         )
 
-    @mock.patch("nrtk.interop.maite.api.app.is_usable", False)
+    @mock.patch("nrtk.interop.maite.api.app.fastapi_available", False)
     def test_missing_deps(self, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Test that an exception is raised when required dependencies are not installed."""
         test_data = NrtkPerturbInputSchema(

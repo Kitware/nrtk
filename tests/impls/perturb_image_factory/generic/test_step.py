@@ -233,18 +233,48 @@ class TestStepPerturbImageFactory:
             config = json.load(config_file)
             from_config_dict(config, PerturbImageFactory.get_impls())
 
-    @pytest.mark.skipif(not JitterOTFPerturber.is_usable(), reason="not JitterOTFPerturber.is_usable()")
-    @pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason="not DetectorOTFPerturber.is_usable()")
-    @pytest.mark.skipif(
-        not TurbulenceApertureOTFPerturber.is_usable(),
-        reason="not TurbulenceApertureOTFPerturber.is_usable()",
-    )
     @pytest.mark.parametrize(
         ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),
         [
-            (JitterOTFPerturber, "s_y", 0, "s_x", 2e-3, 6e-3, 1e-3),
-            (DetectorOTFPerturber, "w_x", 0, "w_y", 3e-3, 9e-3, 1e-3),
-            (TurbulenceApertureOTFPerturber, "altitude", 250, "D", 40e-5, 40e-3, 66e-4),
+            pytest.param(
+                JitterOTFPerturber,
+                "s_y",
+                0,
+                "s_x",
+                2e-3,
+                6e-3,
+                1e-3,
+                marks=pytest.mark.skipif(
+                    not JitterOTFPerturber.is_usable(),
+                    reason="JitterOTFPerturber not usable",
+                ),
+            ),
+            pytest.param(
+                DetectorOTFPerturber,
+                "w_x",
+                0,
+                "w_y",
+                3e-3,
+                9e-3,
+                1e-3,
+                marks=pytest.mark.skipif(
+                    not DetectorOTFPerturber.is_usable(),
+                    reason="DetectorOTFPerturber not usable",
+                ),
+            ),
+            pytest.param(
+                TurbulenceApertureOTFPerturber,
+                "altitude",
+                250,
+                "D",
+                40e-5,
+                40e-3,
+                66e-4,
+                marks=pytest.mark.skipif(
+                    not TurbulenceApertureOTFPerturber.is_usable(),
+                    reason="TurbulenceApertureOTFPerturber not usable",
+                ),
+            ),
         ],
     )
     def test_perturb_instance_modification(

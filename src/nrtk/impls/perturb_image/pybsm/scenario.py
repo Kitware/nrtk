@@ -22,7 +22,6 @@ Attributes:
 from typing import Any
 
 try:
-    # Multiple type ignores added for pyright's handling of guarded imports
     from pybsm.simulation.scenario import Scenario
 
     pybsm_available = True
@@ -168,7 +167,7 @@ class PybsmScenario(Configurable):
         Returns:
             Scenario: pybsm.Scenario object populated with instance parameters
         """
-        S = Scenario(  # type: ignore # noqa:N806
+        S = Scenario(  # noqa:N806
             self.name,
             self.ihaze,
             self.altitude,
