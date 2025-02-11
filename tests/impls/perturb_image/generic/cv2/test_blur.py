@@ -15,15 +15,13 @@ from nrtk.impls.perturb_image.generic.cv2.blur import (
     GaussianBlurPerturber,
     MedianBlurPerturber,
 )
+from nrtk.utils._exceptions import OpenCVImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 rng = np.random.default_rng()
 
 
-@pytest.mark.skipif(
-    not AverageBlurPerturber.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
-)
+@pytest.mark.skipif(not AverageBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestAverageBlurPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -118,10 +116,7 @@ class TestAverageBlurPerturber:
         assert boxes == out_boxes
 
 
-@pytest.mark.skipif(
-    not GaussianBlurPerturber.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
-)
+@pytest.mark.skipif(not GaussianBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestGaussianBlurPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -224,10 +219,7 @@ class TestGaussianBlurPerturber:
         assert boxes == out_boxes
 
 
-@pytest.mark.skipif(
-    not MedianBlurPerturber.is_usable(),
-    reason="OpenCV not found. Please install 'nrtk[graphics]' or `nrtk[headless]`.",
-)
+@pytest.mark.skipif(not MedianBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestMedianBlurPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -329,12 +321,30 @@ class TestMedianBlurPerturber:
         assert boxes == out_boxes
 
 
+@mock.patch.object(AverageBlurPerturber, "is_usable")
+def test_missing_deps_average_blur_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not AverageBlurPerturber.is_usable()
+    with pytest.raises(OpenCVImportError):
+        AverageBlurPerturber()
+
+
+@mock.patch.object(GaussianBlurPerturber, "is_usable")
+def test_missing_deps_gaussian_blur_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not GaussianBlurPerturber.is_usable()
+    with pytest.raises(OpenCVImportError):
+        GaussianBlurPerturber()
+
+
 @mock.patch.object(MedianBlurPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
+def test_missing_deps_median_blur_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not MedianBlurPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
+    with pytest.raises(OpenCVImportError):
         MedianBlurPerturber()
 
 

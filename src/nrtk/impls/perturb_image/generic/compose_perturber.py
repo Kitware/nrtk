@@ -4,7 +4,7 @@ image perturbations by sequentially applying a list of PerturbImage instances.
 """
 
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 import numpy as np
 from smqtk_core.configuration import (
@@ -12,11 +12,9 @@ from smqtk_core.configuration import (
     to_config_dict,
 )
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="ComposePerturber")
 
 
 class ComposePerturber(PerturbImage):
@@ -81,10 +79,10 @@ class ComposePerturber(PerturbImage):
 
     @classmethod
     def from_config(
-        cls: type[C],
+        cls,
         config_dict: dict,
         merge_default: bool = True,
-    ) -> C:
+    ) -> Self:
         """
         Create a ComposePerturber instance from a configuration dictionary.
 

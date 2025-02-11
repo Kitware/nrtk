@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -18,6 +20,7 @@ from nrtk.impls.perturb_image.generic.skimage.random_noise import (
     SpeckleNoisePerturber,
     _SKImageNoisePerturber,
 )
+from nrtk.utils._exceptions import ScikitImageImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 test_rng = np.random.default_rng()
@@ -53,6 +56,7 @@ def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
     assert np.array_equal(out_3b, out_4b)
 
 
+@pytest.mark.skipif(not SaltNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSaltNoisePerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -168,6 +172,7 @@ class TestSaltNoisePerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not PepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestPepperNoisePerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -287,6 +292,7 @@ class TestPepperNoisePerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not SaltAndPepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSaltAndPepperNoisePerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -440,6 +446,7 @@ class TestSaltAndPepperNoisePerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not GaussianNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestGaussianNoisePerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -557,6 +564,7 @@ class TestGaussianNoisePerturber:
         assert boxes == out_boxes
 
 
+@pytest.mark.skipif(not SpeckleNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSpeckleNoisePerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -672,6 +680,51 @@ class TestSpeckleNoisePerturber:
         inst = SpeckleNoisePerturber(rng=42, mean=0.3, var=0.5)
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
+
+
+@mock.patch.object(SaltNoisePerturber, "is_usable")
+def test_missing_deps_salt_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SaltNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        SaltNoisePerturber()
+
+
+@mock.patch.object(PepperNoisePerturber, "is_usable")
+def test_missing_deps_pepper_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not PepperNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        PepperNoisePerturber()
+
+
+@mock.patch.object(SaltAndPepperNoisePerturber, "is_usable")
+def test_missing_deps_salt_and_pepper_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SaltAndPepperNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        SaltAndPepperNoisePerturber()
+
+
+@mock.patch.object(GaussianNoisePerturber, "is_usable")
+def test_missing_deps_gaussian_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not GaussianNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        GaussianNoisePerturber()
+
+
+@mock.patch.object(SpeckleNoisePerturber, "is_usable")
+def test_missing_deps_speckle_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SpeckleNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        SpeckleNoisePerturber()
 
 
 EXPECTED_SALT = np.array([[0, 255, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)

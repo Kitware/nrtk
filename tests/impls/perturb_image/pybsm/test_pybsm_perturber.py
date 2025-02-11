@@ -12,6 +12,7 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
@@ -21,10 +22,7 @@ EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff
 np.random.seed(42)  # noqa: NPY002
 
 
-@pytest.mark.skipif(
-    not PybsmPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not PybsmPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestPyBSMPerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -186,12 +184,11 @@ class TestPyBSMPerturber:
         _, out_boxes = inst.perturb(image, boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
         assert boxes == out_boxes
 
-
-@mock.patch.object(PybsmPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not PybsmPerturber.is_usable()
-    sensor, scenario = create_sample_sensor_and_scenario()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
-        PybsmPerturber(sensor=sensor, scenario=scenario)
+    @mock.patch.object(PybsmPerturber, "is_usable")
+    def test_missing_deps(self, mock_is_usable: MagicMock) -> None:
+        """Test that an exception is raised when required dependencies are not installed."""
+        mock_is_usable.return_value = False
+        assert not PybsmPerturber.is_usable()
+        sensor, scenario = create_sample_sensor_and_scenario()
+        with pytest.raises(PyBSMImportError):
+            PybsmPerturber(sensor=sensor, scenario=scenario)

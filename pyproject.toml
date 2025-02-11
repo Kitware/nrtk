@@ -40,11 +40,6 @@ numpy = [
     {version = ">=1.22,<2.0", python = "<3.12" }, # CVE-2021-34141
     {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
-Pillow = ">=10.3.0" # CVE-2024-28219
-scikit-image = [
-    {version = ">=0.20", python = "<3.12"},
-    {version = ">=0.22", python = ">=3.12"}
-]
 smqtk-classifier = ">=0.19.0"
 smqtk-core = ">=0.19"
 smqtk-detection = ">=0.19.0"
@@ -58,10 +53,36 @@ pybsm = {version = ">=0.10.2", optional = true}
 opencv-python = {version = ">=4.6", optional = true}
 opencv-python-headless = {version = ">=4.6", optional = true}
 
+Pillow = {version=">=10.3.0", optional=true} # CVE-2024-28219
+
+scikit-image = [
+    {version = ">=0.20", python = "<3.12", optional=true},
+    {version = ">=0.22", python = ">=3.12", optional=true}
+]
+
+#################################
+# nrtk.interop.maite dependencies
+#################################
+maite = {version = ">=0.7.1", optional = true}
+# REST API deps
+fastapi = {version = ">=0.110.0", optional = true}
+# httpx = {version = ">=0.27.0", optional = true}
+uvicorn = {version = ">=0.29.0", optional = true}
+# JSON Schema
+pydantic = {version = ">=2.6.4", optional = true}
+pydantic_settings = {version = ">=2.2.1", optional = true}
+
+# Optional for tools extra
+kwcoco = {version = ">=0.2.18", optional = true}
+
 [tool.poetry.extras]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 pybsm = ["pybsm"]
+maite =["maite", "fastapi", "pydantic", "pydantic_settings", "uvicorn"]
+tools = ["kwcoco", "Pillow"]
+scikit-image = ["scikit-image"]
+Pillow = ["Pillow"]
 
 # :auto linting:
 # Linting
@@ -69,13 +90,14 @@ pybsm = ["pybsm"]
 optional = true
 
 [tool.poetry.group.linting.dependencies]
-mypy = ">=0.991,!=1.11.0"
+mypy = ">=1.12.0"
 pre-commit = ">=2.20"
 ruff = "^0.5.6"
 types-setuptools = ">=65.6.0.1"
 sphinx-lint = ">=1.0.0"
 pyright = {version=">=1.1.320",extras=["nodejs"]}
 # :auto linting:
+types-requests = ">=2.31.0.10"
 
 # :auto docs:
 # Docs
@@ -105,6 +127,13 @@ syrupy = ">=4.0.0"
 notebook = ">=7.2.2"
 papermill = ">=2.4.0"
 # :auto tests:
+#########################################
+# nrtk.interop.maite testing dependencies
+#########################################
+maite = {version = "^0.7.1", extras = ["test"]}
+starlette = ">=0.40.0"
+responses = ">=0.25.0"
+Pillow = ">=10.3.0" # CVE-2024-28219
 
 [tool.poetry.plugins."smqtk_plugins"]
 # Add implementation sub-module exposure here.
@@ -129,6 +158,9 @@ papermill = ">=2.4.0"
 "impls.score_detections.nop_scorer" = "nrtk.impls.score_detections.nop_scorer"
 "impls.score_detections.random_scorer" = "nrtk.impls.score_detections.random_scorer"
 "impls.image_metric.snr_image_metric" = "nrtk.impls.image_metric.snr_image_metric"
+
+[tool.poetry.scripts]
+nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber_cli"
 
 # :auto pytest:
 [tool.pytest.ini_options]

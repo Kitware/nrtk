@@ -8,10 +8,8 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
-import pybsm.radiance as radiance
 import pytest
 from PIL import Image
-from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
@@ -25,13 +23,16 @@ from tests.impls.test_pybsm_utils import (
     create_sample_sensor_and_scenario,
 )
 
+if TurbulenceApertureOTFPerturber.is_usable():
+    import pybsm.radiance as radiance
+    from pybsm.utils import load_database_atmosphere
+
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
-@pytest.mark.skipif(
-    not TurbulenceApertureOTFPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
 class TestTurbulenceApertureOTFPerturber:
     @pytest.mark.parametrize(
         (
@@ -480,5 +481,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not TurbulenceApertureOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
+    with pytest.raises(PyBSMAndOpenCVImportError):
         TurbulenceApertureOTFPerturber()

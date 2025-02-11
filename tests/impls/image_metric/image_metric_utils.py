@@ -12,8 +12,8 @@ def image_metric_assertions(
         float,
     ],
     img_1: np.ndarray,
-    img_2: np.ndarray | None = None,
-    additional_params: dict[str, Any] | None = None,
+    img_2: np.ndarray = None,
+    additional_params: dict[str, Any] = None,
 ) -> float:
     """Test that the inputs are not modified while computing an image metric.
 

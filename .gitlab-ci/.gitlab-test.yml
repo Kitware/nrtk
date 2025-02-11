@@ -1,18 +1,18 @@
 ###############################################################################
 # Stage -- Unit Testing
 ###############################################################################
-# 
+#
 # Overrides:
-# 
+#
 # 1) nrtk specific notebooks.
-# 2) Poetry install for opencv-python-headless and pybsm[headless]
+# 2) Poetry install for optional dependencies
 #
 ###############################################################################
 
 .test-setup:
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests --extras "pybsm headless"
+    - poetry install --sync --only main,tests --extras "pybsm maite tools headless Pillow scikit-image"
 
 notebooks:
   parallel:
@@ -28,4 +28,16 @@ notebooks:
       - NOTEBOOK_DIR: "examples/pybsm"
         NOTEBOOK_FILE: [
           "pybsm_test.ipynb"
+        ]
+      - NOTEBOOK_DIR: "examples/maite"
+        NOTEBOOK_FILE: [
+          "augmentations.ipynb",
+          #"compute_image_metric.ipynb",
+          "jatic-perturbations-saliency.ipynb",
+          "nrtk_brightness_perturber_demo.ipynb",
+          "nrtk_turbulence_perturber_demo.ipynb",
+        ]
+      - NOTEBOOK_DIR: "examples/maite/gradio"
+        NOTEBOOK_FILE: [
+          "nrtk-gradio.ipynb"
         ]

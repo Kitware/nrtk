@@ -16,18 +16,19 @@ from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import (
-    TIFFImageSnapshotExtension,
-    create_sample_sensor_and_scenario,
-)
+
+if DetectorOTFPerturber.is_usable():
+    from tests.impls.test_pybsm_utils import (
+        TIFFImageSnapshotExtension,
+        create_sample_sensor_and_scenario,
+    )
+
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
-@pytest.mark.skipif(
-    not DetectorOTFPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
 class TestDetectorOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -257,5 +258,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not DetectorOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
+    with pytest.raises(PyBSMAndOpenCVImportError):
         DetectorOTFPerturber()

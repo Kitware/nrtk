@@ -24,7 +24,7 @@ Notes:
 """
 
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
@@ -33,7 +33,7 @@ try:
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
 import numpy as np
 
@@ -43,7 +43,7 @@ try:
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
 from smqtk_core.configuration import (
@@ -51,13 +51,12 @@ from smqtk_core.configuration import (
     make_default_config,
     to_config_dict,
 )
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="DetectorOTFPerturber")
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class DetectorOTFPerturber(PerturbImage):
@@ -116,13 +115,11 @@ class DetectorOTFPerturber(PerturbImage):
         If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
         the absent value(s) will default to 4um for w_x/w_y and 50mm for f
 
-         :raises: ImportError if pyBSM with OpenCV not found,
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+        :raises: ImportError if OpenCV or pyBSM is not found,
+        install via `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
         """
         if not self.is_usable():
-            raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
-            )
+            raise PyBSMAndOpenCVImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
         if sensor and scenario:
             if interp:
@@ -187,7 +184,7 @@ class DetectorOTFPerturber(PerturbImage):
             Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: unmodified bounding boxes
                 for detections in input image
 
-        Raises:
+        :raises:
             ValueError: If 'img_gsd' is not present in `additional_params`.
         """
         # Assume if nothing else cuts us off first, diffraction will set the
@@ -251,7 +248,7 @@ class DetectorOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
         """
         Instantiates a DetectorOTFPerturber from a configuration dictionary.
 
@@ -272,6 +269,7 @@ class DetectorOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """
         Returns the current configuration of the DetectorOTFPerturber instance.
@@ -299,5 +297,4 @@ class DetectorOTFPerturber(PerturbImage):
         Returns:
             bool: True if both pyBSM and OpenCV are available; False otherwise.
         """
-        # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available

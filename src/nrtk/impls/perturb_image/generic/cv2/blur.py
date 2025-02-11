@@ -44,26 +44,21 @@ try:
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.utils._exceptions import OpenCVImportError
 
 
-class AverageBlurPerturber(PerturbImage):
-    """Applies average blurring to the image stimulus."""
-
+class _PerturbImage(PerturbImage):
     def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
-        """:param ksize: Blurring kernel size."""
         if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
+            raise OpenCVImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
-        min_k_size = 1
-        if ksize < min_k_size:
-            raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size}")
 
         self.ksize = ksize
 
@@ -75,122 +70,13 @@ class AverageBlurPerturber(PerturbImage):
         additional_params: Optional[dict[str, Any]] = None,
     ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
         """Return image stimulus after applying average blurring."""
-        if additional_params is None:
-            additional_params = dict()
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
         # Check for channel last format
-        if image.ndim == 3 and image.shape[2] > 4:
+        if _image.ndim == 3 and _image.shape[2] > 4:
             raise ValueError("Image is not in expected format (H, W, C)")
 
-        return cv2.blur(image, ksize=(self.ksize, self.ksize)), boxes  # type: ignore
-
-    def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the AverageBlurPerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
-        cfg = super().get_config()
-        cfg["ksize"] = self.ksize
-        return cfg
-
-    @classmethod
-    def is_usable(cls) -> bool:
-        """
-        Checks if the required pybsm module is available.
-
-        Returns:
-            bool: True if pybsm is installed; False otherwise.
-        """
-        # Requires opencv to be installed
-        return cv2_available
-
-
-class GaussianBlurPerturber(PerturbImage):
-    """Applies Gaussian blurring to the image stimulus."""
-
-    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
-        """:param ksize: Blurring kernel size."""
-        if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
-        super().__init__(box_alignment_mode=box_alignment_mode)
-        min_k_size = 1
-        if ksize < min_k_size or ksize % 2 == 0:
-            raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size} and odd.")
-
-        self.ksize = ksize
-
-    @override
-    def perturb(
-        self,
-        image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
-        """Return image stimulus after applying Gaussian blurring."""
-        if additional_params is None:
-            additional_params = dict()
-
-        # Check for channel last format
-        if image.ndim == 3 and image.shape[2] > 4:
-            raise ValueError("Image is not in expected format (H, W, C)")
-
-        return cv2.GaussianBlur(image, ksize=(self.ksize, self.ksize), sigmaX=0), boxes  # type: ignore
-
-    def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the GaussianBlurPerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
-        cfg = super().get_config()
-        cfg["ksize"] = self.ksize
-        return cfg
-
-    @classmethod
-    def is_usable(cls) -> bool:
-        """
-        Checks if the required pybsm module is available.
-
-        Returns:
-            bool: True if pybsm is installed; False otherwise.
-        """
-        # Requires opencv to be installed
-        return cv2_available
-
-
-class MedianBlurPerturber(PerturbImage):
-    """Applies median blurring to the image stimulus."""
-
-    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
-        """:param ksize: Blurring kernel size."""
-        if not self.is_usable():
-            raise ImportError("OpenCV not found. Please install 'nrtk[graphics]' or 'nrtk[headless]'.")
-        super().__init__(box_alignment_mode=box_alignment_mode)
-        min_k_size = 3
-        if ksize < min_k_size or ksize % 2 == 0:
-            raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size} and odd.")
-
-        self.ksize = ksize
-
-    @override
-    def perturb(
-        self,
-        image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
-        """Return image stimulus after applying Gaussian blurring."""
-        if additional_params is None:
-            additional_params = dict()
-
-        # Check for channel last format
-        if image.ndim == 3 and image.shape[2] > 4:
-            raise ValueError("Image is not in expected format (H, W, C)")
-
-        return cv2.medianBlur(image, ksize=self.ksize), boxes  # type: ignore
+        return _image, _boxes
 
     def get_config(self) -> dict[str, Any]:
         """
@@ -206,10 +92,79 @@ class MedianBlurPerturber(PerturbImage):
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Checks if the required pybsm module is available.
+        Checks if the required cv2 module is available.
 
         Returns:
-            bool: True if pybsm is installed; False otherwise.
+            bool: True if opencv is installed; False otherwise.
         """
         # Requires opencv to be installed
         return cv2_available
+
+
+class AverageBlurPerturber(_PerturbImage):
+    """Applies average blurring to the image stimulus."""
+
+    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
+        """:param ksize: Blurring kernel size."""
+        super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
+        min_k_size = 1
+        if ksize < min_k_size:
+            raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size}")
+
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        """Return image stimulus after applying average blurring."""
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
+        return cv2.blur(_image, ksize=(self.ksize, self.ksize)), _boxes
+
+
+class GaussianBlurPerturber(_PerturbImage):
+    """Applies Gaussian blurring to the image stimulus."""
+
+    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
+        """:param ksize: Blurring kernel size."""
+        super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
+        min_k_size = 1
+        if ksize < min_k_size or ksize % 2 == 0:
+            raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size} and odd.")
+
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = None,
+        additional_params: dict[str, Any] = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]:
+        """Return image stimulus after applying Gaussian blurring."""
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
+        return cv2.GaussianBlur(_image, ksize=(self.ksize, self.ksize), sigmaX=0), _boxes
+
+
+class MedianBlurPerturber(_PerturbImage):
+    """Applies median blurring to the image stimulus."""
+
+    def __init__(self, ksize: int = 3, box_alignment_mode: str = "extent") -> None:
+        """:param ksize: Blurring kernel size."""
+        super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
+        min_k_size = 3
+        if ksize < min_k_size or ksize % 2 == 0:
+            raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size} and odd.")
+
+    @override
+    def perturb(
+        self,
+        image: np.ndarray,
+        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
+    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        """Return image stimulus after applying Gaussian blurring."""
+        _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
+
+        return cv2.medianBlur(_image, ksize=self.ksize), _boxes

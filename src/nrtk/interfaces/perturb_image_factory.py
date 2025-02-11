@@ -21,13 +21,12 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterator, Sequence
-from typing import Any, TypeVar
+from typing import Any
 
 from smqtk_core import Plugfigurable
+from typing_extensions import Self
 
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="PerturbImageFactory")
 
 
 class PerturbImageFactory(Plugfigurable):
@@ -101,10 +100,10 @@ class PerturbImageFactory(Plugfigurable):
 
     @classmethod
     def from_config(
-        cls: type[C],
+        cls,
         config_dict: dict,
         merge_default: bool = True,
-    ) -> C:
+    ) -> Self:
         """
         Instantiates a PerturbImageFactory from a configuration dictionary.
 
@@ -112,7 +111,7 @@ class PerturbImageFactory(Plugfigurable):
             config_dict (dict[str, Any]): Configuration dictionary with parameters for instantiation.
 
         Returns:
-            C: An instance of the PerturbImageFactory class.
+            An instance of the PerturbImageFactory class.
         """
         config_dict = dict(config_dict)
 
