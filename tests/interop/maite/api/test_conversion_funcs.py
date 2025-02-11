@@ -154,7 +154,7 @@ class TestAPIConversionFunctions:
     def test_build_factory_bad_config(self, data: dict[str, Any]) -> None:
         """Test if build_factory throws ."""
         schema = NrtkPerturbInputSchema.model_validate(data)
-        with pytest.raises(ValueError):  # noqa: PT011
+        with pytest.raises(ValueError, match=r"Config"):
             build_factory(schema)
 
     @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")

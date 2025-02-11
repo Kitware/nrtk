@@ -42,7 +42,7 @@ try:
     import skimage.util  # type:ignore
 
     skimage_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     skimage_available = False
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox

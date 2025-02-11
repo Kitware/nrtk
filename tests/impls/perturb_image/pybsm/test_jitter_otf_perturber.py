@@ -1,4 +1,3 @@
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -351,5 +350,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not JitterOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(PyBSMAndOpenCVImportError()))):
+    with pytest.raises(PyBSMAndOpenCVImportError):
         JitterOTFPerturber()

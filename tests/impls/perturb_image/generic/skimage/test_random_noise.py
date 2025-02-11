@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -688,7 +687,7 @@ def test_missing_deps_salt_noise_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not SaltNoisePerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(ScikitImageImportError()))):
+    with pytest.raises(ScikitImageImportError):
         SaltNoisePerturber()
 
 
@@ -697,7 +696,7 @@ def test_missing_deps_pepper_noise_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not PepperNoisePerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(ScikitImageImportError()))):
+    with pytest.raises(ScikitImageImportError):
         PepperNoisePerturber()
 
 
@@ -706,7 +705,7 @@ def test_missing_deps_salt_and_pepper_noise_perturber(mock_is_usable: MagicMock)
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not SaltAndPepperNoisePerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(ScikitImageImportError()))):
+    with pytest.raises(ScikitImageImportError):
         SaltAndPepperNoisePerturber()
 
 
@@ -715,7 +714,7 @@ def test_missing_deps_gaussian_noise_perturber(mock_is_usable: MagicMock) -> Non
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not GaussianNoisePerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(ScikitImageImportError()))):
+    with pytest.raises(ScikitImageImportError):
         GaussianNoisePerturber()
 
 
@@ -724,7 +723,7 @@ def test_missing_deps_speckle_noise_perturber(mock_is_usable: MagicMock) -> None
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not SpeckleNoisePerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(ScikitImageImportError()))):
+    with pytest.raises(ScikitImageImportError):
         SpeckleNoisePerturber()
 
 

@@ -45,7 +45,7 @@ try:
     from PIL.Image import Image as PILImage
 
     pillow_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pillow_available = False
 
 

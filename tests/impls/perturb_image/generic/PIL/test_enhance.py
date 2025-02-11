@@ -1,4 +1,3 @@
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -391,7 +390,7 @@ def test_missing_deps_brightness_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not BrightnessPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+    with pytest.raises(PillowImportError):
         BrightnessPerturber()
 
 
@@ -400,7 +399,7 @@ def test_missing_deps_color_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not ColorPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+    with pytest.raises(PillowImportError):
         ColorPerturber()
 
 
@@ -409,7 +408,7 @@ def test_missing_deps_contrast_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not ContrastPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+    with pytest.raises(PillowImportError):
         ContrastPerturber()
 
 
@@ -418,7 +417,7 @@ def test_missing_deps_sharpness_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not SharpnessPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(PillowImportError()))):
+    with pytest.raises(PillowImportError):
         SharpnessPerturber()
 
 

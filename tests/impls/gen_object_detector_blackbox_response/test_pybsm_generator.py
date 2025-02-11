@@ -1,4 +1,3 @@
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Sequence
 from contextlib import AbstractContextManager
@@ -207,5 +206,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
 
     assert not SimplePybsmGenerator.is_usable()
 
-    with pytest.raises(PyBSMImportError, match=re.escape(str(PyBSMImportError()))):
+    with pytest.raises(PyBSMImportError):
         SimplePybsmGenerator(None, None, None)  # type: ignore

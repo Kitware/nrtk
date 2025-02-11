@@ -44,7 +44,7 @@ try:
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox

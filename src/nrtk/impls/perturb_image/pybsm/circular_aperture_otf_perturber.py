@@ -24,16 +24,17 @@ Notes:
 """
 
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import Self
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
 
 try:
@@ -47,7 +48,7 @@ try:
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
 import numpy as np
@@ -62,8 +63,6 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
-
-C = TypeVar("C", bound="CircularApertureOTFPerturber")
 
 
 class CircularApertureOTFPerturber(PerturbImage):
@@ -278,7 +277,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
         """
         Instantiates a CircularApertureOTFPerturber from a configuration dictionary.
 
@@ -287,7 +286,7 @@ class CircularApertureOTFPerturber(PerturbImage):
             merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            C: An instance of CircularApertureOTFPerturber.
+            An instance of CircularApertureOTFPerturber.
         """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)

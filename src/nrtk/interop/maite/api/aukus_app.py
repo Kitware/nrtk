@@ -16,7 +16,7 @@ try:
     from fastapi.encoders import jsonable_encoder
 
     fastapi_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     fastapi_available = False
 
 BaseSettings: type = object
@@ -25,7 +25,7 @@ try:
     from pydantic_settings import BaseSettings  # type: ignore
 
     pydantic_settings_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pydantic_settings_available = False
 
 

@@ -29,7 +29,7 @@ try:
     from pybsm.metrics import niirs5
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
 from smqtk_core.configuration import to_config_dict

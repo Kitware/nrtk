@@ -1,4 +1,3 @@
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -368,5 +367,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
 
     assert not DefocusOTFPerturber.is_usable()
 
-    with pytest.raises(PyBSMImportError, match=re.escape(str(PyBSMImportError()))):
+    with pytest.raises(PyBSMImportError):
         DefocusOTFPerturber()

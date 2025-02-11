@@ -1,4 +1,3 @@
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -327,7 +326,7 @@ def test_missing_deps_average_blur_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not AverageBlurPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(OpenCVImportError()))):
+    with pytest.raises(OpenCVImportError):
         AverageBlurPerturber()
 
 
@@ -336,7 +335,7 @@ def test_missing_deps_gaussian_blur_perturber(mock_is_usable: MagicMock) -> None
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not GaussianBlurPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(OpenCVImportError()))):
+    with pytest.raises(OpenCVImportError):
         GaussianBlurPerturber()
 
 
@@ -345,7 +344,7 @@ def test_missing_deps_median_blur_perturber(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not MedianBlurPerturber.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(OpenCVImportError()))):
+    with pytest.raises(OpenCVImportError):
         MedianBlurPerturber()
 
 

@@ -25,7 +25,7 @@ try:
     import kwcoco  # type: ignore
 
     is_usable = True
-except ImportError:
+except ImportError:  # pragma: no cover
     is_usable = False
 from nrtk.utils._exceptions import KWCocoImportError
 

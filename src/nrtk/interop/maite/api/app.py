@@ -7,7 +7,7 @@ try:
     from fastapi import FastAPI, HTTPException
 
     fastapi_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     fastapi_available = False
 
 from nrtk.interop.maite.api.converters import build_factory, load_COCOJATIC_dataset

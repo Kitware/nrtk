@@ -33,7 +33,7 @@ try:
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
 import numpy as np
 
@@ -43,7 +43,7 @@ try:
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
 from smqtk_core.configuration import (

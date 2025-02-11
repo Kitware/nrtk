@@ -1,5 +1,4 @@
 import json
-import re
 import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
@@ -137,5 +136,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not COCOJATICObjectDetectionDataset.is_usable()
-    with pytest.raises(ImportError, match=re.escape(str(KWCocoImportError()))):
+    with pytest.raises(KWCocoImportError):
         COCOJATICObjectDetectionDataset(None, None, None)

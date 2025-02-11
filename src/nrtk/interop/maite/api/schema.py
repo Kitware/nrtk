@@ -10,7 +10,7 @@ try:
     from pydantic import BaseModel  # type: ignore
 
     pydantic_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pydantic_available = False
 
 

@@ -24,7 +24,7 @@ from .test_generator_utils import gen_rand_dets, generator_assertions
 rng = np.random.default_rng()
 
 
-class TestSimpleGenericPyBSMGenerator:
+class TestSimpleGenericGenerator:
     @pytest.mark.parametrize(
         ("images", "ground_truth", "expectation"),
         [

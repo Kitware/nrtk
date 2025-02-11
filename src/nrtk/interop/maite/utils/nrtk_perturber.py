@@ -13,7 +13,7 @@ try:
     from maite.protocols.object_detection import Dataset
 
     maite_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     maite_available = False
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation

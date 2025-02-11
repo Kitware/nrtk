@@ -1,4 +1,3 @@
-import re
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
@@ -185,17 +184,11 @@ class TestPyBSMPerturber:
         _, out_boxes = inst.perturb(image, boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
         assert boxes == out_boxes
 
-
-@mock.patch.object(PybsmPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not PybsmPerturber.is_usable()
-    # pybsm wouldn't be installed at this point so we can't run this
-    # so instead we'll set them to None. The typing doesn't match here
-    # but we override it for this specific test given it is supposed
-    # to return the specific PyBSMImportError error
-    # sensor, scenario = create_sample_sensor_and_scenario()
-    sensor, scenario = None, None
-    with pytest.raises(PyBSMImportError, match=re.escape(str(PyBSMImportError()))):
-        PybsmPerturber(sensor=sensor, scenario=scenario)
+    @mock.patch.object(PybsmPerturber, "is_usable")
+    def test_missing_deps(self, mock_is_usable: MagicMock) -> None:
+        """Test that an exception is raised when required dependencies are not installed."""
+        mock_is_usable.return_value = False
+        assert not PybsmPerturber.is_usable()
+        sensor, scenario = create_sample_sensor_and_scenario()
+        with pytest.raises(PyBSMImportError):
+            PybsmPerturber(sensor=sensor, scenario=scenario)

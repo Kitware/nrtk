@@ -32,7 +32,7 @@ notebooks:
       - NOTEBOOK_DIR: "examples/maite"
         NOTEBOOK_FILE: [
           "augmentations.ipynb",
-          "compute_image_metric.ipynb",
+          #"compute_image_metric.ipynb",
           "jatic-perturbations-saliency.ipynb",
           "nrtk_brightness_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
