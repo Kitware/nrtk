@@ -18,6 +18,7 @@ Image Perturbation
    nrtk.impls.perturb_image.generic.compose_perturber
    nrtk.impls.perturb_image.generic.crop_perturber
    nrtk.impls.perturb_image.generic.translation_perturber
+   nrtk.impls.perturb_image.generic.haze_perturber
    nrtk.impls.perturb_image.pybsm.perturber
    nrtk.impls.perturb_image.pybsm.scenario
    nrtk.impls.perturb_image.pybsm.sensor
