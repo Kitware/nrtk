@@ -39,6 +39,7 @@ extensions = [
     "sphinx-prompt",
     "sphinx_copybutton",
     "sphinx_click",
+    "myst_nb",
 ]
 
 suppress_warnings = [

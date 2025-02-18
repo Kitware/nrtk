@@ -39,7 +39,7 @@ For more detailed installation instructions, visit the [installation documentati
 
 <!-- :auto getting-started: -->
 ## Getting Started
-Explore usage examples of the `nrtk` package in various contexts using the Jupyter notebooks provided in the `./examples/` directory.
+Explore usage examples of the `nrtk` package in various contexts using the Jupyter notebooks provided in the `./docs/examples/` directory.
 
 Contributions are encouraged! For more details, refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
 <!-- :auto getting-started: -->
