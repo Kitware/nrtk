@@ -17,7 +17,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
 
-INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_provided_expected_output.tiff"
 

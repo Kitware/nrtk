@@ -281,7 +281,6 @@ typeCheckingMode = "standard"
 include = [
     "src/nrtk",
     "tests",
-    "examples",
     "demos",
     "scripts",
     "docs",

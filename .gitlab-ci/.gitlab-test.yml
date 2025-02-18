@@ -18,18 +18,18 @@ notebooks:
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
-      - NOTEBOOK_DIR: "examples"
+      - NOTEBOOK_DIR: "docs/examples"
         NOTEBOOK_FILE: [
           "coco_scorer.ipynb",
           "perturbers.ipynb",
           "simple_generic_generator.ipynb",
           "simple_pybsm_generator.ipynb"
         ]
-      - NOTEBOOK_DIR: "examples/pybsm"
+      - NOTEBOOK_DIR: "docs/examples/pybsm"
         NOTEBOOK_FILE: [
           "pybsm_test.ipynb"
         ]
-      - NOTEBOOK_DIR: "examples/maite"
+      - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
           "augmentations.ipynb",
           #"compute_image_metric.ipynb",
@@ -37,7 +37,7 @@ notebooks:
           "nrtk_brightness_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
         ]
-      - NOTEBOOK_DIR: "examples/maite/gradio"
+      - NOTEBOOK_DIR: "docs/examples/maite/gradio"
         NOTEBOOK_FILE: [
           "nrtk-gradio.ipynb"
         ]

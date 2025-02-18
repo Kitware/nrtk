@@ -23,7 +23,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.gen_object_detector_blackbox_response.test_generator_utils import gen_rand_dets, generator_assertions
 from tests.impls.test_pybsm_utils import create_sample_scenario, create_sample_sensor
 
-INPUT_IMG_FILE = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 rng = np.random.default_rng()
 
