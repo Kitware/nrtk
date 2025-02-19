@@ -145,5 +145,5 @@ cython_debug/
 # :auto shared:
 
 # Example notebooks
-examples/data
-examples/pybsm/data
+docs/examples/data
+docs/examples/pybsm/data

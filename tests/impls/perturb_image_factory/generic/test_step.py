@@ -26,7 +26,7 @@ from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_asser
 from tests.test_utils import CustomFloatSnapshotExtension
 
 DATA_DIR = Path(__file__).parents[3] / "data"
-INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.fixture()  # noqa:PT001

@@ -25,7 +25,7 @@ if DetectorOTFPerturber.is_usable():
 
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
-INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))

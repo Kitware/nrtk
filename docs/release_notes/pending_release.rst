@@ -8,6 +8,8 @@ Updates
 
 * Majority of dependencies are now optional
 
+* Moved ``examples`` directory to ``docs/examples``
+
 New Features
 
 * ``nrtk-jatic`` is now a submodule of ``nrtk``
