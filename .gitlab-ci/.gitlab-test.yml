@@ -22,6 +22,7 @@ notebooks:
         NOTEBOOK_FILE: [
           "coco_scorer.ipynb",
           "perturbers.ipynb",
+          "nrtk_tutorial.ipynb",
           "simple_generic_generator.ipynb",
           "simple_pybsm_generator.ipynb"
         ]
