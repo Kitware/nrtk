@@ -14,6 +14,8 @@ New Features
 
 * ``nrtk-jatic`` is now a submodule of ``nrtk``
 
+* Added ``HazePerturber`` that applies haze using Shree Nayar weathering.
+
 Documentation
 
 * Updated documentation format to have ``Quick Start``, ``Tutorial``, ``Explanation``, ``How-To``, and ``Reference``
