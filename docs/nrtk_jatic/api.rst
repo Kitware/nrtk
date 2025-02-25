@@ -11,7 +11,7 @@ In addition to the dependencies in Poetry, the user will need to install the uvi
 Usage
 =====
 
-To run the app, open a command prompt and navigate to ``nrtk-jatic/api/``, then run the command::
+To run the app, open a command prompt and navigate to ``src/nrtk/interop/maite/api/``, then run the command::
 
     uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 
