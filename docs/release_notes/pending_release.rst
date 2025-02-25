@@ -21,6 +21,8 @@ Documentation
 * Updated documentation format to have ``Quick Start``, ``Tutorial``, ``Explanation``, ``How-To``, and ``Reference``
   sections
 
+* Updated ``nrtk_tutorial`` to be a notebook in documentation.
+
 Fixes
 -----
 
