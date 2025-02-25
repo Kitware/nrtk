@@ -1,6 +1,6 @@
-##########
-NRTK-JATIC
-##########
+################
+Interoperability
+################
 
 .. toctree::
     :maxdepth: 1
