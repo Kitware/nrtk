@@ -23,6 +23,8 @@ Documentation
 
 * Updated ``nrtk_tutorial`` to be a notebook in documentation.
 
+* Added JATIC interop documentation from ``nrtk-jatic``
+
 Fixes
 -----
 
