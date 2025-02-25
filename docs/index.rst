@@ -57,7 +57,7 @@ Documentation Contents:
 
    interfaces
    implementations
-   jatic_interoperability
+   nrtk_jatic
    glossary
    release_notes
    style_sheet
