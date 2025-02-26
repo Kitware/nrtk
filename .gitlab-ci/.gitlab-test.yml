@@ -37,6 +37,7 @@ notebooks:
           "jatic-perturbations-saliency.ipynb",
           "nrtk_brightness_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
+          "nrtk_translation_perturber_demo.ipynb",
         ]
       - NOTEBOOK_DIR: "docs/examples/maite/gradio"
         NOTEBOOK_FILE: [
