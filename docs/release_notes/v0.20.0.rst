@@ -1,6 +1,10 @@
 v0.20.0
 =======
 
+``nrtk-jatic`` functionality now exists in ``nrtk.interop.maite``, ``nrtk-jatic`` will be deprecated. Majority of
+dependencies are now optional; it may be necessary to install an extra for certain perturber functionality. Added a new
+Haze Perturber. Example notebooks moved to ``docs/examples``.
+
 Updates / New Features
 ----------------------
 
