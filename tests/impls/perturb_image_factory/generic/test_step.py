@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
@@ -15,7 +14,6 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
@@ -28,7 +26,7 @@ from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_asser
 from tests.test_utils import CustomFloatSnapshotExtension
 
 DATA_DIR = Path(__file__).parents[3] / "data"
-INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.fixture()  # noqa:PT001
@@ -45,10 +43,9 @@ class DummyPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,  # noqa: ARG002
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        return np.copy(image), boxes
+        _: dict[str, Any] | None = None,
+    ) -> np.ndarray:  # pragma: no cover
+        return np.copy(image)
 
     def get_config(self) -> dict[str, Any]:
         return {"param_1": self.param_1, "param_2": self.param_2}
@@ -239,9 +236,45 @@ class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(
         ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),
         [
-            (JitterOTFPerturber, "s_y", 0, "s_x", 2e-3, 6e-3, 1e-3),
-            (DetectorOTFPerturber, "w_x", 0, "w_y", 3e-3, 9e-3, 1e-3),
-            (TurbulenceApertureOTFPerturber, "altitude", 250, "D", 40e-5, 40e-3, 66e-4),
+            pytest.param(
+                JitterOTFPerturber,
+                "s_y",
+                0,
+                "s_x",
+                2e-3,
+                6e-3,
+                1e-3,
+                marks=pytest.mark.skipif(
+                    not JitterOTFPerturber.is_usable(),
+                    reason="JitterOTFPerturber not usable",
+                ),
+            ),
+            pytest.param(
+                DetectorOTFPerturber,
+                "w_x",
+                0,
+                "w_y",
+                3e-3,
+                9e-3,
+                1e-3,
+                marks=pytest.mark.skipif(
+                    not DetectorOTFPerturber.is_usable(),
+                    reason="DetectorOTFPerturber not usable",
+                ),
+            ),
+            pytest.param(
+                TurbulenceApertureOTFPerturber,
+                "altitude",
+                250,
+                "D",
+                40e-5,
+                40e-3,
+                66e-4,
+                marks=pytest.mark.skipif(
+                    not TurbulenceApertureOTFPerturber.is_usable(),
+                    reason="TurbulenceApertureOTFPerturber not usable",
+                ),
+            ),
         ],
     )
     def test_perturb_instance_modification(

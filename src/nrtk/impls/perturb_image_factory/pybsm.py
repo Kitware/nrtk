@@ -26,8 +26,7 @@ Example usage:
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Sequence
-from importlib.util import find_spec
-from typing import Any, TypeVar
+from typing import Any
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -41,8 +40,7 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-
-C = TypeVar("C", bound="_PybsmPerturbImageFactory")
+from nrtk.utils._exceptions import PyBSMImportError
 
 
 class _PybsmPerturbImageFactory(PerturbImageFactory):
@@ -92,13 +90,11 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         :param theta_keys: Perturber parameter(s) to vary between instances.
         :param theta_keys: Perturber parameter(s) values to vary between instances.
 
-        :raises: ImportError if pyBSM with OpenCV not found,
+        :raises: ImportError if pyBSM is not found,
         installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
-            )
+            raise PyBSMImportError
         self.sensor = sensor
         self.scenario = scenario
         self.theta_keys = theta_keys
@@ -210,10 +206,10 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @override
     @classmethod
     def from_config(
-        cls: type[C],
+        cls,
         config_dict: dict,
         merge_default: bool = True,
-    ) -> C:
+    ) -> _PybsmPerturbImageFactory:
         """
         Instantiates a `_PybsmPerturbImageFactory` from a configuration dictionary.
 
@@ -249,15 +245,13 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @classmethod
     def is_usable(cls) -> bool:
         """
-        Checks if the required `pybsm` module is available.
+        Checks if the required pybsm module is available.
 
         Returns:
-            bool: True if `pybsm` is available; False otherwise.
+            bool: True if pybsm is installed; False otherwise.
         """
-        # Requires nrtk[pybsm], nrtk[pybsm-graphics], or nrtk[pybsm-headless]
-        # we don't need to check for opencv because this can run with
-        # a non-opencv pybsm based perturber
-        return find_spec("pybsm") is not None
+        # Requires opencv to be installed
+        return all([PybsmPerturber.is_usable(), PybsmScenario.is_usable(), PybsmSensor.is_usable()])
 
 
 class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):

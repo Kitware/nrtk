@@ -5,3 +5,4 @@ include:
 
   # job overrides specific to this repo
   - local: .gitlab-ci/.gitlab-test.yml
+  - local: .gitlab-ci/.gitlab-docs.yml

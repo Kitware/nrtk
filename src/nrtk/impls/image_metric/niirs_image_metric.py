@@ -29,7 +29,7 @@ try:
     from pybsm.metrics import niirs5
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
 from smqtk_core.configuration import to_config_dict
@@ -38,6 +38,7 @@ from typing_extensions import override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.image_metric import ImageMetric
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class NIIRSImageMetric(ImageMetric):
@@ -67,18 +68,16 @@ class NIIRSImageMetric(ImageMetric):
             installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
         """
         if not self.is_usable():
-            raise ImportError(
-                "pybsm not found. Please install 'nrtk[pybsm]', 'nrtk[pybsm-graphics]', or 'nrtk[pybsm-headless]'.",
-            )
+            raise PyBSMAndOpenCVImportError
         self.sensor = copy.deepcopy(sensor)
         self.scenario = copy.deepcopy(scenario)
 
     @override
     def compute(
         self,
-        img_1: np.ndarray | None = None,
-        img_2: np.ndarray | None = None,
-        additional_params: dict[str, Any] | None = None,
+        img_1: np.ndarray = None,
+        img_2: np.ndarray = None,
+        additional_params: dict[str, Any] = None,
     ) -> float:
         """
         Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
@@ -99,9 +98,9 @@ class NIIRSImageMetric(ImageMetric):
     @override
     def __call__(
         self,
-        img_1: np.ndarray | None = None,
-        img_2: np.ndarray | None = None,
-        additional_params: dict[str, Any] | None = None,
+        img_1: np.ndarray = None,
+        img_2: np.ndarray = None,
+        additional_params: dict[str, Any] = None,
     ) -> float:
         """
         Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.

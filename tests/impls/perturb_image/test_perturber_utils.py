@@ -17,8 +17,8 @@ def perturber_assertions(
         tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None],
     ],
     image: np.ndarray,
-    expected: np.ndarray | None = None,
-    additional_params: dict[str, Any] | None = None,
+    expected: np.ndarray = None,
+    additional_params: dict[str, Any] = None,
 ) -> np.ndarray:
     """Test several blanket assertions for perturbers.
 
@@ -104,8 +104,8 @@ def pybsm_perturber_assertions(
         tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None],
     ],
     image: np.ndarray,
-    expected: np.ndarray | None = None,
-    additional_params: dict[str, Any] | None = None,
+    expected: np.ndarray = None,
+    additional_params: dict[str, Any] = None,
 ) -> np.ndarray:
     """Test some blanket assertions for perturbers.
 

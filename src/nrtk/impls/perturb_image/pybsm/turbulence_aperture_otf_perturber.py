@@ -24,7 +24,7 @@ Notes:
 """
 
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any, TypeVar
+from typing import Any
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
@@ -33,7 +33,7 @@ try:
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
 import numpy as np
 
@@ -43,7 +43,7 @@ try:
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
 from typing import Optional
@@ -58,8 +58,7 @@ from typing_extensions import override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="TurbulenceApertureOTFPerturber")
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class TurbulenceApertureOTFPerturber(PerturbImage):
@@ -155,17 +154,14 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         If individial parameter values are provided by the user, those values will be used
         in the otf calculation.
 
-        :raises: ImportError if pyBSM with OpenCV not found,
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+        :raises: ImportError if OpenCV is not found,
+        install via `pip install nrtk[graphics]` or `pip install nrtk[headless]`.
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         :raises: ValueError if cn2at1m <= 0.0
         """
         if not self.is_usable():
-            raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
-            )
-
+            raise PyBSMAndOpenCVImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
@@ -342,7 +338,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> "TurbulenceApertureOTFPerturber":
         """
         Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
 
@@ -396,5 +392,4 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         Returns:
             bool: True if both pyBSM and OpenCV are available; False otherwise.
         """
-        # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available

@@ -13,21 +13,16 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import (
-    TIFFImageSnapshotExtension,
-    create_sample_sensor_and_scenario,
-)
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
 
-INPUT_IMG_FILE_PATH = "./examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
 
 
-@pytest.mark.skipif(
-    not JitterOTFPerturber.is_usable(),
-    reason="pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or `nrtk[pybsm-headless]`.",
-)
+@pytest.mark.skipif(not JitterOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
 class TestJitterOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -355,5 +350,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not JitterOTFPerturber.is_usable()
-    with pytest.raises(ImportError, match=r"pyBSM with OpenCV not found"):
+    with pytest.raises(PyBSMAndOpenCVImportError):
         JitterOTFPerturber()

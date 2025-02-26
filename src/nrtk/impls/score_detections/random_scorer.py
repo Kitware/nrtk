@@ -45,7 +45,7 @@ class RandomScorer(ScoreDetections):
     This class, in particular, implements a random scorer that returns random float values.
     """
 
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int = None) -> None:
         """
         Initializes the `RandomScorer` with an optional random seed.
 

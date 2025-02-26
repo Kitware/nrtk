@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
@@ -14,8 +13,8 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
+from nrtk.impls.perturb_image.generic.skimage.random_noise import SaltNoisePerturber
 from nrtk.impls.perturb_image_factory.generic.linspace_step import (
     LinSpacePerturbImageFactory,
 )
@@ -33,10 +32,9 @@ class DummyFloatPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,  # noqa: ARG002
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        return np.copy(image), boxes
+        _: dict[str, Any] | None = None,
+    ) -> np.ndarray:  # pragma: no cover
+        return np.copy(image)
 
     def get_config(self) -> dict[str, Any]:
         return {"param1": self.param1, "param2": self.param2}
@@ -213,17 +211,18 @@ class TestFloatStepPertubImageFactory:
     @pytest.mark.parametrize(
         ("config_file_name", "expectation"),
         [
-            (
+            pytest.param(
                 "nrtk_noise_config.json",
                 does_not_raise(),
+                marks=pytest.mark.skipif(not SaltNoisePerturber.is_usable(), reason="SaltNoisePerturber unusable."),
             ),
             (
                 "nrtk_bad_linspace_config.json",
-                pytest.raises(ValueError, match=r"not a perturber is not a valid perturber."),
+                pytest.raises(ValueError, match=r"is not a valid perturber."),
             ),
         ],
     )
-    def test_hyrdation_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
+    def test_hydration_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation, open(str(DATA_DIR / config_file_name)) as config_file:
             config = json.load(config_file)

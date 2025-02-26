@@ -2,14 +2,23 @@ import io
 
 import numpy as np
 from PIL import Image
-from pybsm.otf import dark_current_from_density
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+from nrtk.utils._exceptions import PyBSMImportError
+
+is_usable = True
+try:
+    from pybsm.otf import dark_current_from_density
+except ImportError:
+    is_usable = False
 
 
 def create_sample_sensor() -> PybsmSensor:
+    if not is_usable:
+        raise PyBSMImportError
+
     name = "L32511x"
 
     # telescope focal length (m)
@@ -97,6 +106,9 @@ def create_sample_sensor() -> PybsmSensor:
 
 
 def create_sample_scenario() -> PybsmScenario:
+    if not is_usable:
+        raise PyBSMImportError
+
     altitude = 9000.0
     # range to target
     ground_range = 60000.0

@@ -24,18 +24,18 @@ Notes:
 """
 
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import Self
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
     cv2_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     cv2_available = False
-import numpy as np
 
 try:
     import pybsm.radiance as radiance
@@ -48,9 +48,10 @@ try:
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
     pybsm_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     pybsm_available = False
 
+import numpy as np
 from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
@@ -61,8 +62,7 @@ from typing_extensions import override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-
-C = TypeVar("C", bound="CircularApertureOTFPerturber")
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class CircularApertureOTFPerturber(PerturbImage):
@@ -122,16 +122,13 @@ class CircularApertureOTFPerturber(PerturbImage):
         If mtf_wavelengths and mtf_weights are provided by the user, those values will be used
         in the otf caluclattion
 
-        :raises: ImportError if pyBSM with OpenCV not found,
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+        :raises: ImportError if OpenCV or pyBSM is not found,
+        install via `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
         :raises: ValueError if mtf_wavelengths and mtf_weights are not equal length
         :raises: ValueError if mtf_wavelengths is empty or mtf_weights is empty
         """
         if not self.is_usable():
-            raise ImportError(
-                "pyBSM with OpenCV not found. Please install 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.",
-            )
-
+            raise PyBSMAndOpenCVImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
 
         if sensor and scenario:
@@ -280,7 +277,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls: type[C], config_dict: dict, merge_default: bool = True) -> C:
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
         """
         Instantiates a CircularApertureOTFPerturber from a configuration dictionary.
 
@@ -289,7 +286,7 @@ class CircularApertureOTFPerturber(PerturbImage):
             merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            C: An instance of CircularApertureOTFPerturber.
+            An instance of CircularApertureOTFPerturber.
         """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
@@ -301,6 +298,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         return super().from_config(config_dict, merge_default=merge_default)
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """
         Returns the current configuration of the CircularApertureOTFPerturber instance.
@@ -327,5 +325,4 @@ class CircularApertureOTFPerturber(PerturbImage):
         Returns:
             bool: True if both pyBSM and OpenCV are available; False otherwise.
         """
-        # Requires pybsm[graphics] or pybsm[headless]
         return cv2_available and pybsm_available
