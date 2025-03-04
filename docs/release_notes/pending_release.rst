@@ -12,6 +12,12 @@ CI/CD
 
 * Added pyright static checking for example jupyter notebooks under ``tests/examples``.
 
+Documentation
+
+* Added new ``otf_visualization`` notebooks for existing OTF perturbers
+
+* Updated ``otf_examples.rst`` to render notebooks in docs
+
 Fixes
 -----
 

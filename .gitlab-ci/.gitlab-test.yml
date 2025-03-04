@@ -24,7 +24,8 @@ notebooks:
           "perturbers.ipynb",
           "nrtk_tutorial.ipynb",
           "simple_generic_generator.ipynb",
-          "simple_pybsm_generator.ipynb"
+          "simple_pybsm_generator.ipynb",
+          "otf_visualization.ipynb",
         ]
       - NOTEBOOK_DIR: "docs/examples/pybsm"
         NOTEBOOK_FILE: [

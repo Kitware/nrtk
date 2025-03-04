@@ -26,6 +26,7 @@ class TestPyrightNotebook:
             ("docs/examples/pybsm/pybsm_test.ipynb", 0),
             ("docs/examples/coco_scorer.ipynb", 0),
             ("docs/examples/nrtk_tutorial.ipynb", 0),
+            ("docs/examples/otf_visualization.ipynb", 0),
             ("docs/examples/perturbers.ipynb", 0),
             ("docs/examples/simple_generic_generator.ipynb", 0),
             ("docs/examples/simple_pybsm_generator.ipynb", 0),
