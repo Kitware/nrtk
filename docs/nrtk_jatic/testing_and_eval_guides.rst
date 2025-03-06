@@ -6,7 +6,7 @@
 .. _PybsmPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.pybsm.perturber.PybsmPerturber.html#nrtk.impls.perturb_image.pybsm.perturber.PybsmPerturber
 .. _nrtk_translation_perturber_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_translation_perturber_demo.ipynb?ref_type=heads
 .. _RandomTranslationPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.generic.translation_perturber.html#module-nrtk.impls.perturb_image.generic.translation_perturber
-.. _nrtk_turbulence_perturber_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_focus_perturber_demo.ipynb?ref_type=heads
+.. _nrtk_turbulence_perturber_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_turbulence_perturber_demo.ipynb?ref_type=heads
 .. _TurbulenceApertureOTFPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber.html#module-nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber
 
 Testing & Evaluation (T&E) Guides
