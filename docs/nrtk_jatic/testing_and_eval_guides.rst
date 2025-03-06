@@ -2,6 +2,8 @@
 .. _BrightnessPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.generic.PIL.enhance.BrightnessPerturber.html#nrtk.impls.perturb_image.generic.PIL.enhance.BrightnessPerturber
 .. _nrtk_focus_perturber_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_focus_perturber_demo.ipynb?ref_type=heads
 .. _DefocusOTFPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.pybsm.defocus_otf_perturber.html#module-nrtk.impls.perturb_image.pybsm.defocus_otf_perturber
+.. _nrtk_sensor_transformation_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_sensor_transformation_demo.ipynb?ref_type=heads
+.. _PybsmPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.pybsm.perturber.PybsmPerturber.html#nrtk.impls.perturb_image.pybsm.perturber.PybsmPerturber
 .. _nrtk_translation_perturber_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_translation_perturber_demo.ipynb?ref_type=heads
 .. _RandomTranslationPerturber: https://jatic.pages.jatic.net/kitware/nrtk/_implementations/nrtk.impls.perturb_image.generic.translation_perturber.html#module-nrtk.impls.perturb_image.generic.translation_perturber
 .. _nrtk_turbulence_perturber_demo: https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/docs/examples/maite/nrtk_focus_perturber_demo.ipynb?ref_type=heads
@@ -19,6 +21,7 @@ Below are a list of notebooks with a short description:
 
 * `nrtk_brightness_perturber_demo`_ modifies illumination conditions using ``NRTK's`` `BrightnessPerturber`_.
 * `nrtk_focus_perturber_demo`_ modifies visual focus using ``NRTK's`` `DefocusOTFPerturber`_.
+* `nrtk_sensor_transformation_demo`_ modifies the resolution and noise of a sensor using ``NRTK's`` `PybsmPerturber`_.
 * `nrtk_translation_perturber_demo`_ performs random translations of the image using ``NRTK's``
   `RandomTranslationPerturber`_.
 * `nrtk_turbulence_perturber_demo`_ modifies atmospheric turbulence using ``NRTK's`` `TurbulenceApertureOTFPerturber`_.
