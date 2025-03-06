@@ -253,8 +253,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
         Returns:
             np.ndarray: The perturbed image.
-            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: unmodified bounding boxes
-                for detections in input image
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: Bounding boxes scaled to perturbed image
+                shape.
 
         Raises:
             ValueError: If 'img_gsd' is not provided in `additional_params`.
@@ -321,6 +321,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             )
 
             sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
+
+        if boxes:
+            scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
+            return sim_img.astype(np.uint8), scaled_boxes
 
         return sim_img.astype(np.uint8), boxes
 

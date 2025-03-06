@@ -26,7 +26,7 @@ from collections.abc import Hashable, Iterable
 from typing import Any, Optional
 
 import numpy as np
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 try:
@@ -156,6 +156,10 @@ class PybsmPerturber(PerturbImage):
         perturbed -= min_perturbed_val
         perturbed /= den
         perturbed *= 255
+
+        if boxes:
+            scaled_boxes = self._rescale_boxes(boxes, image.shape, perturbed.shape)
+            return perturbed.astype(np.uint8), scaled_boxes
 
         return perturbed.astype(np.uint8), boxes
 

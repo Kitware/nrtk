@@ -10,6 +10,7 @@ import pytest
 from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
 from nrtk.utils._exceptions import PyBSMImportError
@@ -169,20 +170,24 @@ class TestPyBSMPerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox((0, 0), (123, 236)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox((132, 222), (444, 352)), {"test": 0.7}),
+                (AxisAlignedBoundingBox((231, 111), (333, 212)), {"test2": 1.0}),
             ],
         ],
     )
-    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
-        """Test that bounding boxes do not change during perturb."""
+    def test_perturb_with_boxes(
+        self,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        """Test that bounding boxes scale as expected during perturb."""
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = create_sample_sensor_and_scenario()
         inst = PybsmPerturber(sensor=sensor, scenario=scenario)
         _, out_boxes = inst.perturb(image, boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
-        assert boxes == out_boxes
+        assert out_boxes == snapshot
 
     @mock.patch.object(PybsmPerturber, "is_usable")
     def test_missing_deps(self, mock_is_usable: MagicMock) -> None:

@@ -1,0 +1,30 @@
+# serializer version: 1
+# name: TestPyBSMPerturber.test_perturb_with_boxes[None]
+  None
+# ---
+# name: TestPyBSMPerturber.test_perturb_with_boxes[boxes1]
+  list([
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[0. 0.] max_vertex=[20.1796875 38.71875  ]>,
+      dict({
+        'test': 0.0,
+      }),
+    ),
+  ])
+# ---
+# name: TestPyBSMPerturber.test_perturb_with_boxes[boxes2]
+  list([
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[21.65625  36.421875] max_vertex=[72.84375 57.75   ]>,
+      dict({
+        'test': 0.7,
+      }),
+    ),
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[37.8984375 18.2109375] max_vertex=[54.6328125 34.78125  ]>,
+      dict({
+        'test2': 1.0,
+      }),
+    ),
+  ])
+# ---

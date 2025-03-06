@@ -181,8 +181,8 @@ class DetectorOTFPerturber(PerturbImage):
 
         Returns:
             np.ndarray: The perturbed image.
-            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: unmodified bounding boxes
-                for detections in input image
+            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: Bounding boxes scaled to perturbed image
+                shape.
 
         :raises:
             ValueError: If 'img_gsd' is not present in `additional_params`.
@@ -231,6 +231,10 @@ class DetectorOTFPerturber(PerturbImage):
             psf = otf_to_psf(self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df))  # type: ignore
 
             sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
+
+        if boxes:
+            scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
+            return sim_img.astype(np.uint8), scaled_boxes
 
         return sim_img.astype(np.uint8), boxes
 
