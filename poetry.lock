@@ -114,7 +114,6 @@ files = [
 [package.dependencies]
 aiohappyeyeballs = ">=2.3.0"
 aiosignal = ">=1.1.2"
-async-timeout = {version = ">=4.0,<6.0", markers = "python_version < \"3.11\""}
 attrs = ">=17.3.0"
 frozenlist = ">=1.1.1"
 multidict = ">=4.5,<7.0"
@@ -311,17 +310,6 @@ files = [
 
 [package.dependencies]
 typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.11\""}
-
-[[package]]
-name = "async-timeout"
-version = "5.0.1"
-description = "Timeout context manager for asyncio programs"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c"},
-    {file = "async_timeout-5.0.1.tar.gz", hash = "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3"},
-]
 
 [[package]]
 name = "attrs"
@@ -2909,9 +2897,6 @@ files = [
     {file = "multidict-6.1.0-py3-none-any.whl", hash = "sha256:48e171e52d1c4d33888e529b999e5900356b9ae588c2f09a52dcefb158b27506"},
     {file = "multidict-6.1.0.tar.gz", hash = "sha256:22ae2ebf9b0c69d206c003e2f6a914ea33f0a932d4aa16f236afc049d9958f4a"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "multiprocess"
@@ -7028,7 +7013,7 @@ type = ["pytest-mypy"]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 maite = ["fastapi", "maite", "pydantic", "pydantic_settings", "uvicorn"]
-notebook-testing = ["datasets", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics", "xaitk-jatic"]
+notebook-testing = ["datasets", "matplotlib", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics", "xaitk-jatic"]
 pillow = ["Pillow"]
 pybsm = ["pybsm"]
 scikit-image = ["scikit-image", "scikit-image"]
@@ -7037,4 +7022,4 @@ tools = ["Pillow", "kwcoco"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "f13bb884d6282e5ac0f9ca5cd2f1eef2f80f4ef7fae32c075c4984e20052b468"
+content-hash = "09fc963bbde3b66179cd5851c13892f3fd7b9b0c255e3c1eb20ad09864dee43b"
