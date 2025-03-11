@@ -4,6 +4,10 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+CI/CD
+
+* Added pyright static checking for example jupyter notebooks under ``tests/examples``.
+
 Fixes
 -----
 

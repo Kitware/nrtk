@@ -12,7 +12,7 @@
 .test-setup:
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests --extras "pybsm maite tools headless Pillow scikit-image"
+    - poetry install --sync --only main,tests --extras "pybsm maite tools headless Pillow scikit-image notebook-testing"
 
 notebooks:
   parallel:
@@ -33,12 +33,15 @@ notebooks:
       - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
           "augmentations.ipynb",
+          # The image metric notebook needs to be updated
+          # as part of nrtk#322 before adding to CI.
           #"compute_image_metric.ipynb",
           "jatic-perturbations-saliency.ipynb",
           "nrtk_brightness_perturber_demo.ipynb",
+          "nrtk_focus_perturber_demo.ipynb",
           "nrtk_sensor_transformation_demo.ipynb",
-          "nrtk_turbulence_perturber_demo.ipynb",
           "nrtk_translation_perturber_demo.ipynb",
+          "nrtk_turbulence_perturber_demo.ipynb",
         ]
       - NOTEBOOK_DIR: "docs/examples/maite/gradio"
         NOTEBOOK_FILE: [
