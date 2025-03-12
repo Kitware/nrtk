@@ -61,7 +61,7 @@ class COCOJATICObjectDetectionDataset(Dataset):
 
     def __init__(  # noqa: C901
         self,
-        kwcoco_dataset: "kwcoco.CocoDataset",
+        kwcoco_dataset: "kwcoco.CocoDataset",  # pyright: ignore [reportGeneralTypeIssues]
         image_metadata: Sequence[DatumMetadataType],
         skip_no_anns: bool = False,
         dataset_id: Optional[str] = None,

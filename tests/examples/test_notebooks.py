@@ -1,15 +1,8 @@
 import pytest
 
-from nrtk.utils._exceptions import MaiteImportError
-
-maite_available = True
-try:
-    from maite.testing.pyright import list_error_messages, pyright_analyze
-except ImportError:  # pragma: no cover
-    maite_available = False
+from .test_notebook_utils import list_error_messages, pyright_analyze
 
 
-@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestPyrightNotebook:
     @pytest.mark.filterwarnings("ignore:Jupyter is migrating its paths")
     @pytest.mark.parametrize(
@@ -33,5 +26,5 @@ class TestPyrightNotebook:
         ],
     )
     def test_pyright_nb(self, filepath: str, expected_num_errors: int) -> None:
-        results = pyright_analyze(filepath)[0]  # type: ignore
+        results = pyright_analyze(filepath)  # type: ignore
         assert results["summary"]["errorCount"] <= expected_num_errors, list_error_messages(results)  # type: ignore
