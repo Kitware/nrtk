@@ -168,13 +168,17 @@ class DefocusOTFPerturber(PerturbImage):
             if image.ndim == 3:
                 blur_img = np.empty((*image.shape,))
                 # Perform convolution using scipy.signal.fftconvolve
-                blur_img[:, :, 0] = fftconvolve(image[:, :, 0], psf, mode="same")
+                # PyRight reports that fftconvolve is possibly unbound due to
+                # the guarded import at the top of this file, but an object of
+                # this class is only instantiable if it has been successfully
+                # imported, so we can igore this
+                blur_img[:, :, 0] = fftconvolve(image[:, :, 0], psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
                 # resample the image to the camera's ifov
                 resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    blur_img[:, :, channel] = fftconvolve(image[:, :, channel], psf, mode="same")
+                    blur_img[:, :, channel] = fftconvolve(image[:, :, channel], psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
                     sim_img[:, :, channel] = resample_2D(  # type: ignore
                         blur_img[:, :, channel],
                         ref_gsd / self.slant_range,
@@ -182,7 +186,7 @@ class DefocusOTFPerturber(PerturbImage):
                     )
             else:
                 # Perform convolution using scipy.signal.fftconvolve
-                blur_img = fftconvolve(image, psf, mode="same")
+                blur_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
                 # resample the image to the camera's ifov
                 sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
@@ -190,12 +194,18 @@ class DefocusOTFPerturber(PerturbImage):
             # Default is to set dxout param to same value as dxin
             psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))  # type: ignore
             if image.ndim == 2:
-                sim_img = fftconvolve(image, psf, mode="same")
-            elif image.ndim == 3:
+                sim_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+            else:
+                # image.ndim must be 3
                 sim_img = np.zeros_like(image, dtype=float)
                 for c in range(image.shape[2]):
-                    sim_img[..., c] = fftconvolve(image[..., c], psf, mode="same")
-        return sim_img.astype(np.uint8), boxes  # type: ignore
+                    sim_img[..., c] = fftconvolve(image[..., c], psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+
+        if boxes:
+            scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
+            return sim_img.astype(np.uint8), scaled_boxes
+
+        return sim_img.astype(np.uint8), boxes
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:

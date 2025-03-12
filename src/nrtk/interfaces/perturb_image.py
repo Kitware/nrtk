@@ -30,6 +30,7 @@ from collections.abc import Hashable, Iterable
 from typing import Any, Optional
 
 import numpy as np
+from numpy.typing import ArrayLike
 from smqtk_core import Plugfigurable
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
@@ -75,6 +76,41 @@ class PerturbImage(Plugfigurable):
         if additional_params is None:
             additional_params = dict()
         return image, boxes
+
+    def _rescale_boxes(
+        self,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
+        orig_shape: ArrayLike,
+        new_shape: ArrayLike,
+    ) -> Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]:
+        """
+        Utility function to rescale set of bounding boxes based on provided old
+        and new image sizes.
+
+        :param boxes: Bounding boxes as input to the ``perturb()`` method.
+        :param orig_shape: Original shape of the image that the provided bounding boxes belong to. It is assumed that
+            first two members of this represent the height and width respectively.
+        :param new_shape: New image shape to scale boxes to. It is assumed that first two members of this represent the
+            height and width respectively.
+
+        :returns: Rescaled bounding boxes in the same format as input.
+        """
+        y_factor, x_factor = np.array(new_shape)[0:2] / np.array(orig_shape)[0:2]
+        if x_factor == y_factor == 1:
+            # no scaling needed
+            return boxes
+
+        scaled_boxes = list()
+        for box, score_dict in boxes:
+            x0, y0 = box.min_vertex
+            x1, y1 = box.max_vertex
+            scaled_box = AxisAlignedBoundingBox(
+                (x0 * x_factor, y0 * y_factor),
+                (x1 * x_factor, y1 * y_factor),
+            )
+            scaled_boxes.append((scaled_box, score_dict))
+
+        return scaled_boxes
 
     def __call__(
         self,

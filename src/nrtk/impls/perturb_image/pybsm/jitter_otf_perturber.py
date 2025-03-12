@@ -210,6 +210,10 @@ class JitterOTFPerturber(PerturbImage):
 
             sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
+        if boxes:
+            scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
+            return sim_img.astype(np.uint8), scaled_boxes
+
         return sim_img.astype(np.uint8), boxes
 
     @classmethod
