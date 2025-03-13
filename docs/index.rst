@@ -46,7 +46,7 @@ Documentation Contents:
    :maxdepth: 1
    :caption: How-To
 
-   otf_examples
+   examples/otf_visualization.ipynb
    review_process
    releasing
    creating_public_release_request
