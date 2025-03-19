@@ -40,6 +40,7 @@ notebooks:
           "jatic-perturbations-saliency.ipynb",
           "nrtk_brightness_perturber_demo.ipynb",
           "nrtk_focus_perturber_demo.ipynb",
+          "nrtk_haze_perturber_demo.ipynb",
           "nrtk_sensor_transformation_demo.ipynb",
           "nrtk_translation_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",

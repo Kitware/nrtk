@@ -32,3 +32,5 @@ Fixes
 Examples
 --------
 * Added ``nrtk_sensor_transformation_demo`` notebook from ``nrtk_jatic``
+
+* Added an example notebook exploring the HazePerturber and its use.
