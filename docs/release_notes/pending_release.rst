@@ -18,6 +18,12 @@ Documentation
 
 * Updated ``otf_examples.rst`` to render notebooks in docs
 
+Documentation
+
+* Updated ``README.md``, ``getting_started.rst``, ``index.rst``, and ``installation.rst`` as part of Diataxis refactor.
+
+* Added ``nrtk-explorer`` section to ``README.md``.
+
 Fixes
 -----
 

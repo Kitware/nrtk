@@ -1,11 +1,15 @@
 Installation
 ============
 
-There are two ways to obtain the nrtk package.
+There are multiple ways to obtain the nrtk package.
 The simplest is to install via the :command:`pip` command.
-Alternatively, you can use `Poetry`_ (`installation`_ and `usage`_) to acquire the source tree and
-develop locally.
+Alternatively, you can install via :command:`conda-forge` command.
+For local development, you can use `Poetry`_.
 
+NRTK installation has been tested on Unix and Linux systems.
+
+.. note::
+    To install with OpenCV, see instructions `below <#installing-with-opencv>`_.
 
 .. _installation: Poetry-installation_
 .. _usage: Poetry-usage_
@@ -18,16 +22,20 @@ From :command:`pip`
 
     pip install nrtk
 
-This method will install all of the same functionality as when installing from source.
-If you have an existing installation and would like to upgrade your version,
-provide the ``-U``/``--upgrade`` `option`__.
+From :command:`conda-forge`
+---------------------------
 
-__ Pip-install-upgrade_
+.. prompt:: bash
+
+    conda install -c conda-forge nrtk
 
 
 From Source
 -----------
-The following assumes `Poetry`_ is already installed.
+The following assumes `Poetry`_ (`installation`_ and `usage`_) is already installed.
+
+`Poetry`_ is used for development of NRTK. Unlike the previous options, `Poetry`_ will not only allows developers to
+install any extras they need, but also install developmental dependencies like ``pytest`` and NRTK's linting tools.
 
 Quick Start
 ^^^^^^^^^^^
@@ -37,30 +45,18 @@ Quick Start
     cd /where/things/should/go/
     git clone https://github.com/kitware/nrtk.git ./
     poetry install
-    poetry run pytest
-    cd docs
-    poetry run make html
 
 
-Installing Python Dependencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This project uses `Poetry`_ for dependency management, environment consistency,
-package building, version management, and publishing to PyPI.
-Dependencies are `abstractly defined`_ in the :file:`pyproject.toml` file, as
-well as `specifically pinned versions`_ in the :file:`poetry.lock` file, both
-of which can be found in the root of the source tree.
+Installing Developer Dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _abstractly defined: Poetry-dependencies_
-.. _specifically pinned versions: Poetry-poetrylock_
-
-The following installs both installation and development dependencies as
+The following installs both core and development dependencies as
 specified in the :file:`pyproject.toml` file, with versions specified
 (including for transitive dependencies) in the :file:`poetry.lock` file:
 
 .. prompt:: bash
 
     poetry install --sync --with linting,tests,docs
-
 
 Building the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,8 +69,12 @@ Within the :file:`docs/` directory is a Unix :file:`Makefile` (for Windows
 systems, a :file:`make.bat` file with similar capabilities exists).
 This :file:`Makefile` takes care of the work required to run :program:`Sphinx`
 to convert the raw documentation to an attractive output format.
-For example, as shown in the Quick Start section (above), calling ``make html`` will generate
+For example, calling the command below will generate
 HTML format documentation rooted at :file:`docs/_build/html/index.html`.
+
+.. prompt:: bash
+
+    poetry run make html
 
 Calling the command ``make help`` here will show the other documentation
 formats that may be available (although be aware that some of them require
@@ -101,6 +101,38 @@ as well as the source files in :file:`src/nrtk/`, for changes.
 This will serve the resulting HTML files at http://localhost:5500.
 Having this URL open in a browser will provide you with an up-to-date
 preview of the rendered documentation.
+
+Installing with OpenCV
+----------------------
+One of the optional packages for nrtk is OpenCV. OpenCV is required for
+:py:mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers and
+:ref:`Optical Transfer Functions <Optical Transfer Function Examples>`. To give users the option
+to use either ``opencv-python`` or ``opencv-python-headless``,
+nrtk has the ``graphics`` and ``headless`` extras for ``opencv-python`` and
+``opencv-python-headless`` respectively. The following commands will install
+the ``opencv-python`` version.
+
+For :command:`pip`:
+
+.. prompt:: bash
+
+    pip install nrtk[graphics]
+
+For :command:`conda-forge`:
+
+.. prompt:: bash
+
+    conda install -c conda-forge nrtk-graphics
+
+For `Poetry`_:
+
+.. prompt:: bash
+
+    poetry install --sync --extras graphics
+
+
+To install the ``opencv-python-headless`` version, replace ``graphics``
+with ``headless`` in the above commands.
 
 
 .. _Pip-install-upgrade: https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-U
