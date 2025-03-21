@@ -77,8 +77,6 @@ class HazePerturber(PerturbImage):
         else:
             sky_color = np.mean(image, axis=(0, 1))
 
-        print(sky_color)
-
         attenuation = np.exp(-self.factor * depth_map)
         output = image * attenuation + sky_color * (1 - attenuation)
 

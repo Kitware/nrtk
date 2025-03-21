@@ -12,6 +12,7 @@ class TestPyrightNotebook:
             ("docs/examples/maite/augmentations.ipynb", 0),
             ("docs/examples/maite/jatic-perturbations-saliency.ipynb", 0),
             ("docs/examples/maite/nrtk_brightness_perturber_demo.ipynb", 0),
+            ("docs/examples/maite/nrtk_haze_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_focus_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_sensor_transformation_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_translation_perturber_demo.ipynb", 0),
