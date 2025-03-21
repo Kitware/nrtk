@@ -12,6 +12,8 @@ CI/CD
 
 * Added pyright static checking for example jupyter notebooks under ``tests/examples``.
 
+* Removed dependency on ``maite`` for static type checking.
+
 Documentation
 
 * Added new ``otf_visualization`` notebooks for existing OTF perturbers
