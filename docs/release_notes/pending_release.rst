@@ -30,6 +30,8 @@ Documentation
 
 * Added ``Extras`` section to ``installation.rst``.
 
+* Replaced ``introduction.rst``  with ``nrtk_explanation.rst`` for Explanation section of docs.
+
 Fixes
 -----
 

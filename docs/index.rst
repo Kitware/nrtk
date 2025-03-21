@@ -91,7 +91,7 @@ Documentation Contents:
    :maxdepth: 1
    :caption: Explanation
 
-   introduction
+   nrtk_explanation
 
 .. toctree::
    :maxdepth: 1
