@@ -97,7 +97,7 @@ Documentation Contents:
    :maxdepth: 1
    :caption: How-To
 
-   examples/otf_visualization.ipynb
+   nrtk_how_to_topics
    review_process
    releasing
    creating_public_release_request
