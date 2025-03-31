@@ -1,3 +1,5 @@
+.. :auto introduction:
+
 Installation
 ============
 
@@ -8,12 +10,15 @@ For local development, you can use `Poetry`_.
 
 NRTK installation has been tested on Unix and Linux systems.
 
+.. :auto introduction:
+
 .. note::
     To install with OpenCV, see instructions `below <#installing-with-opencv>`_.
 
 .. _installation: Poetry-installation_
 .. _usage: Poetry-usage_
 
+.. :auto install-commands:
 
 From :command:`pip`
 -------------------
@@ -29,6 +34,10 @@ From :command:`conda-forge`
 
     conda install -c conda-forge nrtk
 
+.. :auto install-commands:
+
+.. :auto from-source:
+
 
 From Source
 -----------
@@ -36,6 +45,10 @@ The following assumes `Poetry`_ (`installation`_ and `usage`_) is already instal
 
 `Poetry`_ is used for development of NRTK. Unlike the previous options, `Poetry`_ will not only allows developers to
 install any extras they need, but also install developmental dependencies like ``pytest`` and NRTK's linting tools.
+
+.. :auto from-source:
+
+.. :auto quick-start:
 
 Quick Start
 ^^^^^^^^^^^
@@ -45,6 +58,10 @@ Quick Start
     cd /where/things/should/go/
     git clone https://github.com/kitware/nrtk.git ./
     poetry install
+
+.. :auto quick-start:
+
+.. :auto dev-deps:
 
 
 Installing Developer Dependencies
@@ -57,6 +74,10 @@ specified in the :file:`pyproject.toml` file, with versions specified
 .. prompt:: bash
 
     poetry install --sync --with linting,tests,docs
+
+.. :auto dev-deps:
+
+.. :auto build-docs:
 
 Building the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -80,6 +101,10 @@ Calling the command ``make help`` here will show the other documentation
 formats that may be available (although be aware that some of them require
 additional dependencies such as :program:`TeX` or :program:`LaTeX`).
 
+.. :auto build-docs:
+
+.. :auto live-preview:
+
 
 Live Preview
 """"""""""""
@@ -101,6 +126,8 @@ as well as the source files in :file:`src/nrtk/`, for changes.
 This will serve the resulting HTML files at http://localhost:5500.
 Having this URL open in a browser will provide you with an up-to-date
 preview of the rendered documentation.
+
+.. :auto live-preview:
 
 Installing with OpenCV
 ----------------------
@@ -134,6 +161,8 @@ For `Poetry`_:
 To install the ``opencv-python-headless`` version, replace ``graphics``
 with ``headless`` in the above commands.
 
+.. :auto installation-links:
+
 
 .. _Pip-install-upgrade: https://pip.pypa.io/en/stable/reference/pip_install/#cmdoption-U
 .. _Poetry: https://python-poetry.org
@@ -143,3 +172,5 @@ with ``headless`` in the above commands.
 .. _Poetry-dependencies: https://python-poetry.org/docs/pyproject/#dependencies-and-dev-dependencies
 .. _Sphinx: http://sphinx-doc.org/
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
+
+.. :auto installation-links:
