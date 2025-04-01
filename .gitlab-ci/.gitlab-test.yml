@@ -15,6 +15,8 @@
     - poetry install --sync --only main,tests --extras "pybsm maite tools headless Pillow scikit-image notebook-testing"
 
 notebooks:
+  extends: .notebooks
+  rules: !reference [.notebooks, rules]
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
