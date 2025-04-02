@@ -1,0 +1,18 @@
+###############################################################################
+# Stage -- Container
+###############################################################################
+# 
+# Overrides:
+# 
+# 1) Uses this repository's Dockerfile(s)
+###############################################################################
+build-branch:
+  extends: .build
+  rules: !reference [.build, rules]
+  parallel:
+    matrix:
+      # Sequences combinatorically combine within a list entry
+      - DOCKERFILE_DIR: "."
+        DOCKERFILE_FILE: [
+          "Dockerfile"
+        ]
