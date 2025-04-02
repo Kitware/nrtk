@@ -32,9 +32,7 @@ This toolkit is intended to help data scientists, developers, and T&E engineers 
 
 <!-- :auto installation: -->
 ## Installation
-
-NRTK installation has been tested on Unix and Linux systems.
-
+`nrtk` installation has been tested on Unix and Linux systems.
 
 To install the current version via `pip`:
 ```bash
@@ -43,7 +41,7 @@ pip install nrtk[<extra1>,<extra2>,...]
 
 To install the current version via `conda-forge`:
 ```bash
-conda install -c conda-forge nrtk 
+conda install -c conda-forge nrtk
 ```
 
 Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://nrtk.readthedocs.io/en/latest/implementations.html).
@@ -127,7 +125,9 @@ The following points help ensure contributions follow development practices.
 - Adopt the Git Flow branching strategy.
 - Detailed release information is available in [docs/release_process.rst](./docs/release_process.rst).
 - Additional contribution guidelines and issue reporting steps can be found in [CONTRIBUTING.md](./CONTRIBUTING.md).
+<!-- :auto contributing: -->
 
+<!-- :auto developer-tools: -->
 ### Developer Tools
 
 Ensure the source tree is acquired locally before proceeding.
@@ -151,10 +151,6 @@ poetry run pre-commit install
 # Run pre-commit checks on all files
 poetry run pre-commit run --all-files
 ```
-<!-- :auto contributing: -->
-
-<!-- :auto developer-tools: -->
-
 <!-- :auto developer-tools: -->
 
 ## NRTK Demonstration Tool
@@ -176,13 +172,15 @@ This tool uses the [trame framework](https://kitware.github.io/trame/).
 <!-- :auto contacts: -->
 ## Contacts
 
-**Principal Investigator**: Brian Hu (Kitware) @brian.hu
+**Principal Investigator / Product Owner**: Brian Hu (Kitware) @brian.hu
 
-**Product Owner**: Austin Whitesell (MITRE) @awhitesell
+**Scrum Master / Maintainer**: Brandon RichardWebster (Kitware) @b.richardwebster
 
-**Scrum Master / Tech Lead**: Brandon RichardWebster (Kitware) @b.richardwebster
+**Deputy Scrum Master / Maintainer**: Emily Veenhuis (Kitware) @emily.veenhuis
 
-**Deputy Tech Lead**: Emily Veenhuis (Kitware) @emily.veenhuis
+**Project Manager**: Keith Fieldhouse (Kitware) @keith.fieldhouse
+
+**Program Representative**: Austin Whitesell (MITRE) @awhitesell
 <!-- :auto contacts: -->
 
 <!-- :auto acknowledgment: -->
