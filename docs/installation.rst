@@ -157,6 +157,45 @@ For `Poetry`_:
 To install the ``opencv-python-headless`` version, replace ``graphics``
 with ``headless`` in the above commands.
 
+
+
+Extras
+------
+
+NRTK has multiple optional extras to expand functionality. The list below contains the extra name and a brief
+description of the extra.
+
+    **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
+    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
+    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`, and
+    :ref:`NIIRSImageMetric`.
+
+    **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
+    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
+    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`, and
+    :ref:`NIIRSImageMetric`.
+
+    **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
+    :ref:`CustomPybsmPerturbImageFactory`, :ref:`PyBSMSensor`, :ref:`PyBSMScenario`, :ref:`PyBSMPerturber`,
+    :ref:`TurbulenceApertureOTFPerturber`, :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`,
+    :ref:`CircularApertureOTFPerturber`, :ref:`DefocusOTFPerturber`, :ref:`SimplePybsmGenerator`, and
+    :ref:`NIIRSImageMetric`.
+
+    **maite**: installs `MAITE <https://github.com/mit-ll-ai-technology/maite>`_ and its associated dependencies.
+    Required for everything in :ref:`Interoperability`.
+
+    **tools**: installs `KWCOCO <https://github.com/Kitware/kwcoco>`_ and
+    `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for :ref:`COCOJATICObjectDetectionDataset`,
+    :ref:`nrtk-perturber`, and :func:`~nrtk.interop.maite.interop.object_detection.utils.dataset_to_coco`.
+
+    **scikit-image**: installs `scikit-image <https://scikit-image.org/>`_. Required for
+    :mod:`~nrtk.impls.perturb_image.generic.skimage.random_noise` perturbers.
+
+    **Pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
+    :mod:`~nrtk.impls.perturb_image.generic.PIL.enhance` perturbers.
+
+    **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
+
 .. :auto installation-links:
 
 .. _Poetry: https://python-poetry.org
