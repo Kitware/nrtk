@@ -26,6 +26,8 @@ Documentation
 
 * Corrected Google Colab links in example notebooks
 
+* Updated ``index.rst``, ``installation.rst``, and ``README.md``  based on ``devel-jatic``.
+
 Fixes
 -----
 
