@@ -15,9 +15,6 @@ nrtk installation has been tested on Unix and Linux systems.
 .. note::
     To install with OpenCV, see instructions `below <#installing-with-opencv>`_.
 
-.. _installation: Poetry-installation_
-.. _usage: Poetry-usage_
-
 .. :auto install-commands:
 
 From :command:`pip`
