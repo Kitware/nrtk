@@ -6,9 +6,7 @@
 # 
 # 1) Uses this repository's Dockerfile(s)
 ###############################################################################
-build-branch:
-  extends: .build
-  rules: !reference [.build, rules]
+.build:
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
@@ -16,3 +14,11 @@ build-branch:
         DOCKERFILE_FILE: [
           "Dockerfile"
         ]
+
+
+build-branch:
+  extends: .build
+  rules: !reference [.build, rules]
+
+build-main:
+  extends: .build-main

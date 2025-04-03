@@ -27,11 +27,6 @@ repos:
         require_serial: true
         language: system
         types_or: [python, pyi, jupyter]
-      - id: mypy
-        name: mypy
-        entry: poetry run mypy --config-file pyproject.toml
-        types: [file, python]
-        language: system
       - id: pyright
         name: pyright
         require_serial: true
