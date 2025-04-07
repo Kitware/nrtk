@@ -108,6 +108,7 @@ Documentation Contents:
 
    interfaces
    implementations
+   interoperability
    glossary
    release_notes
    style_sheet
