@@ -85,7 +85,7 @@ Documentation Contents:
    :maxdepth: 1
    :caption: Tutorial
 
-   nrtk_tutorial
+   examples/nrtk_tutorial.ipynb
 
 .. toctree::
    :maxdepth: 1
