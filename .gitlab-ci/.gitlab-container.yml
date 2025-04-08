@@ -6,19 +6,9 @@
 # 
 # 1) Uses this repository's Dockerfile(s)
 ###############################################################################
-.build:
-  parallel:
-    matrix:
-      # Sequences combinatorically combine within a list entry
-      - DOCKERFILE_DIR: "."
-        DOCKERFILE_FILE: [
-          "Dockerfile"
-        ]
-
-
-build-branch:
-  extends: .build
-  rules: !reference [.build, rules]
-
-build-main:
-  extends: .build-main
+trigger_aukus:
+  extends: .trigger
+  variables:
+    CONTAINER_NAME: "aukus"
+    DOCKERFILE_FILE: "Dockerfile"
+    PIPELINE_CONTEXT: "$CI_PIPELINE_SOURCE"
