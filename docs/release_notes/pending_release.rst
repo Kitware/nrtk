@@ -35,6 +35,8 @@ Documentation
 Fixes
 -----
 
+* Fixed incorrect link for ``nrtk_tutorial``.
+
 Examples
 --------
 * Added ``nrtk_sensor_transformation_demo`` notebook from ``nrtk_jatic``
