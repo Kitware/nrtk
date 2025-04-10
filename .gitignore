@@ -73,6 +73,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/_implementations
+docs/nrtk_jatic/_implementations
 
 # PyBuilder
 .pybuilder/

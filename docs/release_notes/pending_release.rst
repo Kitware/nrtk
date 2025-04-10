@@ -14,6 +14,8 @@ CI/CD
 
 * Removed dependency on ``maite`` for static type checking.
 
+* Removed ``mypy`` check and dependency.
+
 Documentation
 
 * Added new ``otf_visualization`` notebooks for existing OTF perturbers
