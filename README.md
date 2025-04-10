@@ -44,7 +44,7 @@ To install the current version via `conda-forge`:
 conda install -c conda-forge nrtk
 ```
 
-Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://nrtk.readthedocs.io/en/latest/installation.html#extras).
+Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://nrtk.readthedocs.io/en/latest/implementations.html).
 
 For more detailed installation instructions, visit the [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html).
 <!-- :auto installation: -->
