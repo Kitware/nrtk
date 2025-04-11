@@ -7,12 +7,15 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.albumentations.albumentations_perturber import AlbumentationsPerturber
 from nrtk.utils._exceptions import AlbumentationsImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
 
@@ -80,18 +83,12 @@ class TestAlbumentationsPerturber:
         assert len(bbox) == len(as_list)
         assert [x == y for x, y in zip(bbox, as_list)]
 
-    def test_bbox_transform(
-        self,
-    ) -> None:
+    def test_bbox_transform(self, snapshot: SnapshotAssertion) -> None:
         label_dict_1: dict[Hashable, float] = {"label": 1.0}
         label_dict_2: dict[Hashable, float] = {"label": 2.0}
         bboxes = [
             (AxisAlignedBoundingBox((1, 1), (2, 3)), label_dict_1),
             (AxisAlignedBoundingBox((3, 2), (6, 8)), label_dict_2),
-        ]
-        bboxes_expected = [
-            (AxisAlignedBoundingBox((28, 1), (29, 3)), label_dict_1),
-            (AxisAlignedBoundingBox((24, 2), (27, 8)), label_dict_2),
         ]
         image = np.ones((30, 30, 3)).astype(np.uint8)
         inst = AlbumentationsPerturber(perturber="HorizontalFlip", parameters={"p": 1.0})
@@ -103,8 +100,8 @@ class TestAlbumentationsPerturber:
                 assert bbox[0] == reverted[0]
 
         if bboxes_transformed:
-            for transformed, expected in zip(bboxes_transformed, bboxes_expected):
-                assert transformed[0] == expected[0]
+            for transformed in bboxes_transformed:
+                assert transformed == snapshot
 
     @pytest.mark.parametrize(
         ("perturber", "parameters"),
@@ -133,6 +130,23 @@ class TestAlbumentationsPerturber:
             image=image,
             expected=out_image,
         )
+
+    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+        """Regression testing results to detect API changes."""
+        grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
+        image = Image.new("RGB", grayscale_image.size)
+        image.paste(grayscale_image)
+        image = np.array(image)
+        inst = AlbumentationsPerturber(
+            perturber="RandomRain",
+            parameters={"brightness_coefficient": 0.9, "drop_width": 1, "blur_value": 5, "p": 1.0},
+            seed=1,
+        )
+        out_img = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+        )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("perturber", "parameters", "seed"),

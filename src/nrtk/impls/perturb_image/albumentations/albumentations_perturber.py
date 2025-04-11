@@ -54,6 +54,7 @@ class AlbumentationsPerturber(PerturbImage):
         Attributes:
             perturber (string): The name of the BasicTransform perturber to apply
             parameters (dict): Keyword arguments that should be passed to the given perturber
+            seed (int): An optional seed for reproducible results
         """
         if not self.is_usable():
             raise AlbumentationsImportError
