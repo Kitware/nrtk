@@ -16,6 +16,8 @@ CI/CD
 
 * Removed ``mypy`` check and dependency.
 
+* Updated RTD build environment to match Gitlab Pages environment.
+
 Documentation
 
 * Added new ``otf_visualization`` notebooks for existing OTF perturbers
@@ -33,6 +35,8 @@ Documentation
 * Added ``Extras`` section to ``installation.rst``.
 
 * Replaced ``introduction.rst``  with ``nrtk_explanation.rst`` for Explanation section of docs.
+
+* Replaced JATIC Gitlab links with public-facing links in ``README.md``.
 
 Fixes
 -----

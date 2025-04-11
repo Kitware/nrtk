@@ -16,7 +16,7 @@
 The `nrtk` package evaluates the natural robustness of computer vision algorithms to various perturbations, including sensor-specific changes to camera focal length, aperture
 diameter, etc.
 
-We have also created the [`nrtk-jatic`](https://jatic.pages.jatic.net/kitware/nrtk/interoperability.html) module to support AI T&E
+We have also created the [`nrtk-jatic`](https://nrtk.readthedocs.io/en/latest/interoperability.html) module to support AI T&E
 use cases and workflows, through interoperability with the [`maite`](https://github.com/mit-ll-ai-technology/maite)
 library and integration with other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use NRTK to
 perturb MAITE-wrapped datasets or evaluate MAITE-wrapped models should
