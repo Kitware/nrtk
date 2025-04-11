@@ -38,6 +38,8 @@ Documentation
 
 * Replaced JATIC Gitlab links with public-facing links in ``README.md``.
 
+* Added ``nrtk_how_to_topics.rst`` to documentation.
+
 Fixes
 -----
 
