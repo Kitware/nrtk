@@ -40,6 +40,8 @@ Documentation
 
 * Added ``nrtk_how_to_topics.rst`` to documentation.
 
+* Added ``glossary.rst`` to documentation.
+
 Fixes
 -----
 
