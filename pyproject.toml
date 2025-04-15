@@ -60,6 +60,8 @@ scikit-image = [
     {version = ">=0.22", python = ">=3.12", optional=true}
 ]
 
+albumentations = {version=">=2.0.0", optional=true}
+
 #################################
 # nrtk.interop.maite dependencies
 #################################
@@ -96,10 +98,11 @@ maite =["maite", "fastapi", "pydantic", "pydantic_settings", "uvicorn"]
 tools = ["kwcoco", "Pillow"]
 scikit-image = ["scikit-image"]
 Pillow = ["Pillow"]
+albumentations = ["albumentations"]
 notebook-testing = [
     "datasets", "matplotlib", "numba", "tabulate", "torch",
     "torchmetrics", "torchvision", "transformers", "ultralytics",
-    "xaitk-jatic", "jupytext"
+    "xaitk-jatic", "jupytext", "albumentations"
 ]
 
 # :auto linting:
@@ -152,11 +155,13 @@ pyright = {version=">=1.1.320",extras=["nodejs"]}
 starlette = ">=0.40.0"
 responses = ">=0.25.0"
 Pillow = ">=10.3.0" # CVE-2024-28219
+maite = {version = ">=0.7.1"}  # !!! This needs to be removed !!!
 
 [tool.poetry.plugins."smqtk_plugins"]
 # Add implementation sub-module exposure here.
 "impls.gen_object_detector_blackbox_response.simple_generic_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator"
 "impls.gen_object_detector_blackbox_response.simple_pybsm_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator"
+"impls.perturb_image.albumentations.albumentations_perturber" = "nrtk.impls.perturb_image.albumentations.albumentations_perturber"
 "impls.perturb_image.generic.compose_perturber" = "nrtk.impls.perturb_image.generic.compose_perturber"
 "impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
 "impls.perturb_image.generic.haze_perturber" = "nrtk.impls.perturb_image.generic.haze_perturber"

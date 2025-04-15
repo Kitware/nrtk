@@ -8,11 +8,9 @@
 # 2) Poetry install for optional dependencies
 #
 ###############################################################################
-
-.test-setup:
-  before_script:
-    - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests --extras "pybsm maite tools headless Pillow scikit-image notebook-testing"
+pytest-extras:
+  variables:
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
 
 notebooks:
   extends: .notebooks
@@ -22,6 +20,7 @@ notebooks:
       # Sequences combinatorically combine within a list entry
       - NOTEBOOK_DIR: "docs/examples"
         NOTEBOOK_FILE: [
+          "albumentations_perturber.ipynb",
           "coco_scorer.ipynb",
           "perturbers.ipynb",
           "nrtk_tutorial.ipynb",

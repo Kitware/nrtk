@@ -24,6 +24,7 @@ class TestPyrightNotebook:
             ("docs/examples/perturbers.ipynb", 0),
             ("docs/examples/simple_generic_generator.ipynb", 0),
             ("docs/examples/simple_pybsm_generator.ipynb", 0),
+            ("docs/examples/albumentations_perturber.ipynb", 0),
         ],
     )
     def test_pyright_nb(self, filepath: str, expected_num_errors: int) -> None:
