@@ -42,6 +42,11 @@ Explore and visualize different Optical Transfer Functions (OTFs) to understand 
 Use various image perturbation methods to simulate real-world distortions and evaluate model robustness.
 `View notebook <examples/perturbers.html>`__.
 
+- **Applying Albumentations Perturbations via NRTK**
+
+Explore and visualize Albumentations perturbations in an NRTK context.
+`View notebook <examples/albumentations_perturber.html>`__.
+
 - **Evaluating Models with COCO Scoring**
 
 Use COCO scoring to assess object detection model performance across perturbed inputs.

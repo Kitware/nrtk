@@ -42,6 +42,8 @@ Documentation
 
 * Added ``glossary.rst`` to documentation.
 
+* Added generic ``AlbumentationsPerturber`` to use perturbers from the Albumentations module
+
 Fixes
 -----
 
@@ -52,3 +54,5 @@ Examples
 * Added ``nrtk_sensor_transformation_demo`` notebook from ``nrtk_jatic``
 
 * Added an example notebook exploring the HazePerturber and its use.
+
+* Added an example notebook demonstrating use of the new ``AlbumentationsPerturber``
