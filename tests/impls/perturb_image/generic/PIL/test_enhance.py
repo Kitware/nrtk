@@ -7,8 +7,10 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.PIL.enhance import (
     BrightnessPerturber,
@@ -18,31 +20,23 @@ from nrtk.impls.perturb_image.generic.PIL.enhance import (
 )
 from nrtk.utils._exceptions import PillowImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
+
+INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
 @pytest.mark.skipif(not BrightnessPerturber.is_usable(), reason=str(PillowImportError()))
 class TestBrightnessPerturber:
-    def test_consistency(self) -> None:
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
-        factor = 0.2
-
-        # Test perturb interface directly
-        inst = BrightnessPerturber(factor=factor)
-        perturber_assertions(
-            perturb=inst.perturb,
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        out_img = perturber_assertions(
+            perturb=BrightnessPerturber(factor=0.2),
             image=image,
-            expected=EXPECTED_BRIGHTNESS,
         )
-
-        # Test callable
-        perturber_assertions(
-            perturb=BrightnessPerturber(factor=factor),
-            image=image,
-            expected=EXPECTED_BRIGHTNESS,
-        )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "factor"),
@@ -421,7 +415,6 @@ def test_missing_deps_sharpness_perturber(mock_is_usable: MagicMock) -> None:
         SharpnessPerturber()
 
 
-EXPECTED_BRIGHTNESS = np.array([[0, 0, 0], [0, 1, 1], [1, 1, 1]], dtype=np.uint8)
 EXPECTED_COLOR = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
 EXPECTED_CONTRAST = np.array([[4, 4, 4], [4, 5, 5], [5, 5, 5]], dtype=np.uint8)
 EXPECTED_SHARPNESS = np.array(
