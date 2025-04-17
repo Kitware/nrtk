@@ -27,7 +27,7 @@ def create_sample_sensor() -> PybsmSensor:
     D = 275e-3  # noqa: N806
 
     # detector pitch (m)
-    p = 0.008e-3
+    p_x = 0.008e-3
 
     # Optical system transmission, red  band first (m)
     opt_trans_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
@@ -38,8 +38,8 @@ def create_sample_sensor() -> PybsmSensor:
     eta = 0.4  # guess
 
     # detector width is assumed to be equal to the pitch
-    w_x = p
-    w_y = p
+    w_x = p_x
+    w_y = p_x
     # integration time (s) - this is a maximum, the actual integration time will be
     # determined by the well fill percentage
     int_time = 30.0e-3
@@ -60,13 +60,13 @@ def create_sample_sensor() -> PybsmSensor:
     max_n = 96000
 
     # bit depth
-    bitdepth = 11.9
+    bit_depth = 11.9
 
     # maximum allowable well fill (see the paper for the logic behind this)
     max_well_fill = 0.6
 
     # jitter (radians) - The Olson paper says that its "good" so we'll guess 1/4 ifov rms
-    s_x = 0.25 * p / f
+    s_x = 0.25 * p_x / f
     s_y = s_x
 
     # drift (radians/s) - again, we'll guess that it's really good
@@ -80,28 +80,28 @@ def create_sample_sensor() -> PybsmSensor:
     qe = np.array([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0])
 
     return PybsmSensor(
-        name,
-        D,
-        f,
-        p,
-        opt_trans_wavelengths,
-        optics_transmission,
-        eta,
-        w_x,
-        w_y,
-        int_time,
-        n_tdi,
-        dark_current,
-        read_noise,
-        max_n,
-        bitdepth,
-        max_well_fill,
-        s_x,
-        s_y,
-        da_x,
-        da_y,
-        qe_wavelengths,
-        qe,
+        name=name,
+        D=D,
+        f=f,
+        p_x=p_x,
+        opt_trans_wavelengths=opt_trans_wavelengths,
+        optics_transmission=optics_transmission,
+        eta=eta,
+        w_x=w_x,
+        w_y=w_y,
+        int_time=int_time,
+        n_tdi=n_tdi,
+        dark_current=dark_current,
+        read_noise=read_noise,
+        max_n=max_n,
+        bit_depth=bit_depth,
+        max_well_fill=max_well_fill,
+        s_x=s_x,
+        s_y=s_y,
+        da_x=da_x,
+        da_y=da_y,
+        qe_wavelengths=qe_wavelengths,
+        qe=qe,
     )
 
 
