@@ -45,7 +45,7 @@ Use various image perturbation methods to simulate real-world distortions and ev
 - **Applying Albumentations Perturbations via NRTK**
 
 Explore and visualize Albumentations perturbations in an NRTK context.
-`View notebook <examples/albumentations_perturber.ipynb>`__.
+`View notebook <examples/albumentations_perturber.html>`__.
 
 - **Evaluating Models with COCO Scoring**
 
