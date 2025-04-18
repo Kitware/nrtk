@@ -1,17 +1,17 @@
 # serializer version: 1
 # name: TestAlbumentationsPerturber.test_bbox_transform
-  tuple(
-    <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[28.  1.] max_vertex=[29.  3.]>,
-    dict({
-      'label': 1.0,
-    }),
-  )
-# ---
-# name: TestAlbumentationsPerturber.test_bbox_transform.1
-  tuple(
-    <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[24.  2.] max_vertex=[27.  8.]>,
-    dict({
-      'label': 2.0,
-    }),
-  )
+  list([
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[28.  1.] max_vertex=[29.  3.]>,
+      dict({
+        'label': 1.0,
+      }),
+    ),
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[24.  2.] max_vertex=[27.  8.]>,
+      dict({
+        'label': 2.0,
+      }),
+    ),
+  ])
 # ---
