@@ -44,6 +44,8 @@ Documentation
 
 * Added generic ``AlbumentationsPerturber`` to use perturbers from the Albumentations module
 
+* Added ``ROADMAP.md``.
+
 Fixes
 -----
 
