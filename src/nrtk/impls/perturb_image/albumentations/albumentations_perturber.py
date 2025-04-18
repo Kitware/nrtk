@@ -116,10 +116,13 @@ class AlbumentationsPerturber(PerturbImage):
             Image with transform applied as numpy array
             Bounding boxes with their coordinates adjusted by the transform
         """
-        # Create bboxes in a format usable by Albumentations
+        # Create bboxes and labels in a format usable by Albumentations
         bboxes = list()
+        labels = list()
         if boxes:
-            bboxes = [AlbumentationsPerturber._aabb_to_bbox(box[0], image) for box in boxes]
+            for box in boxes:
+                bboxes.append(AlbumentationsPerturber._aabb_to_bbox(box[0], image))
+                labels.append(box[1])
 
         # Run transform
         output = self.transform(
@@ -131,11 +134,8 @@ class AlbumentationsPerturber(PerturbImage):
         output_boxes = None
         if boxes:
             output_boxes = [
-                (
-                    AlbumentationsPerturber._bbox_to_aabb(out_box, image),
-                    box[1],  # labels dictionary
-                )
-                for box, out_box in zip(boxes, output["bboxes"])
+                (AlbumentationsPerturber._bbox_to_aabb(bbox, image), label)
+                for bbox, label in zip(output["bboxes"], labels)
             ]
         return output["image"].astype(np.uint8), output_boxes
 

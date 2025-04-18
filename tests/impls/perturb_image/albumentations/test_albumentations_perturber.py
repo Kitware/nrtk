@@ -87,21 +87,26 @@ class TestAlbumentationsPerturber:
         label_dict_1: dict[Hashable, float] = {"label": 1.0}
         label_dict_2: dict[Hashable, float] = {"label": 2.0}
         bboxes = [
-            (AxisAlignedBoundingBox((1, 1), (2, 3)), label_dict_1),
-            (AxisAlignedBoundingBox((3, 2), (6, 8)), label_dict_2),
+            AxisAlignedBoundingBox((1, 1), (2, 3)),
+            AxisAlignedBoundingBox((3, 2), (6, 8)),
         ]
+        labels = [label_dict_1, label_dict_2]
         image = np.ones((30, 30, 3)).astype(np.uint8)
         inst = AlbumentationsPerturber(perturber="HorizontalFlip", parameters={"p": 1.0})
-        image_out, bboxes_transformed = inst.perturb(image=image, boxes=bboxes)
+        image_out, bboxes_transformed = inst.perturb(
+            image=image,
+            boxes=zip(bboxes, labels),
+        )
         _, bboxes_reverted = inst.perturb(image=image_out, boxes=bboxes_transformed)
 
         if bboxes_reverted:
-            for bbox, reverted in zip(bboxes, bboxes_reverted):
-                assert bbox[0] == reverted[0]
+            bboxes_reverted = list(bboxes_reverted)
+            assert len(bboxes_reverted) == len(bboxes)
+            for bbox, label, reverted in zip(bboxes, labels, bboxes_reverted):
+                assert bbox == reverted[0]
+                assert label == reverted[1]
 
-        if bboxes_transformed:
-            for transformed in bboxes_transformed:
-                assert transformed == snapshot
+        assert bboxes_transformed == snapshot
 
     @pytest.mark.parametrize(
         ("perturber", "parameters"),
