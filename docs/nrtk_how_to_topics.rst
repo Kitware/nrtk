@@ -53,16 +53,18 @@ Use COCO scoring to assess object detection model performance across perturbed i
 `View notebook <examples/coco_scorer.html>`__.
 
 ..
-    - **Visualize Item-Response Curves using NRTK** Explore and visualize the effect of varying perturbation strength on model prediction using NRTK components `View notebook <examples/simple_generic_generator.html>`__.
+    - **Visualize Item-Response Curves using NRTK** Explore and visualize the effect of varying perturbation strength
+    on model prediction using NRTK components `View notebook <examples/simple_generic_generator.html>`__.
 
 ..
-    - **Visualize Item-Response Curves using pyBSM via NRTK** Explore and visualize the effect of varying sensor and scenario perturbations on model prediction using pyBSM and NRTK components. `View notebook <examples/simple_pybsm_generator.html>`__.
+    - **Visualize Item-Response Curves using pyBSM via NRTK** Explore and visualize the effect of varying sensor and
+    scenario perturbations on model prediction using pyBSM and NRTK components. `View notebook <examples/simple_pybsm_generator.html>`__.
 
-MAITE Guides
-------------
+Testing & Evaluation Guides with MAITE
+--------------------------------------
 
-The following notebooks are for MAITE users. Each guide showcases how NRTK perturbations can be applied
-and how their impact measured using MAITE evaluation workflows.
+The following notebooks showcase how NRTK perturbations can be applied to simulate key operational risks within a T&E
+workflow. Each notebook illustrates potential impact on model performance, utilizing MAITE as an evaluation harness.
 
 - **Combining Perturbations with Saliency Maps**
 
