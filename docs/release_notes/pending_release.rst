@@ -46,6 +46,10 @@ Documentation
 
 * Added ``ROADMAP.md``.
 
+* Added a ``Containers`` section to documentation
+
+* Added ``AUKUS.rst`` to Containers documentations
+
 Fixes
 -----
 
