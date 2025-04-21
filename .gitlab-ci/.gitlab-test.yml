@@ -48,6 +48,7 @@ notebooks:
           "nrtk_focus_perturber_demo.ipynb",
           "nrtk_haze_perturber_demo.ipynb",
           "nrtk_sensor_transformation_demo.ipynb",
+          "nrtk_lens_flare_demo.ipynb",
           "nrtk_translation_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
         ]
