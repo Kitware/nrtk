@@ -62,3 +62,5 @@ Examples
 * Added an example notebook exploring the HazePerturber and its use.
 
 * Added an example notebook demonstrating use of the new ``AlbumentationsPerturber``
+
+* Added a guide exploring a lens flare perturber using Albumentations
