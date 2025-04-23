@@ -195,7 +195,7 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.PIL.enhance` perturbers.
 
     **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.albumentations.albumentations_perturber` perturbers.
+    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` perturbers.
 
     **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
 

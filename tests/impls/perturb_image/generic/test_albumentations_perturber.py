@@ -12,7 +12,7 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.albumentations.albumentations_perturber import AlbumentationsPerturber
+from nrtk.impls.perturb_image.generic.albumentations_perturber import AlbumentationsPerturber
 from nrtk.utils._exceptions import AlbumentationsImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
