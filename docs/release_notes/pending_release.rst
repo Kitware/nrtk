@@ -50,10 +50,16 @@ Documentation
 
 * Added ``AUKUS.rst`` to Containers documentations
 
+* Updated T&E notebook titles.
+
+* Added ``nrtk_lens_flare_demo.ipynb`` to documentation.
+
 Fixes
 -----
 
 * Fixed incorrect link for ``nrtk_tutorial``.
+
+* Fixed missing extras install for notebooks CI.
 
 Examples
 --------

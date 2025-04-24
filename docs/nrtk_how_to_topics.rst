@@ -86,6 +86,11 @@ Apply blur and focus distortions to test performance degradation from defocus.
 Evaluate model robustness under haze-like visibility conditions using synthetic perturbations.
 `View notebook <examples/maite/nrtk_haze_perturber_demo.html>`__.
 
+- **Demonstrating Lens Flare Perturbations**
+
+Simulate lens flare effects and asses the impact on model interpretation.
+`View notebook <examples/maite/nrtk_lens_flare_demo.html>`__.
+
 - **Demonstrating Resolution and Noise Transformations**
 
 Explore how camera-specific transformations affect model inputs and predictions.
