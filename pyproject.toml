@@ -42,7 +42,7 @@ numpy = [
 ]
 smqtk-classifier = ">=0.19.0"
 smqtk-core = ">=0.19"
-smqtk-detection = ">=0.19.0"
+smqtk-detection = ">=0.22.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
 pycocotools = ">=2.0.6"
