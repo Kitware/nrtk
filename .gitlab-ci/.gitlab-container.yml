@@ -7,7 +7,7 @@
 # 1) Uses this repository's Dockerfile(s)
 ###############################################################################
 trigger_aukus:
-  extends: .trigger
+  extends: .trigger_containers
   variables:
     CONTAINER_NAME: "aukus"
     DOCKERFILE_FILE: "Dockerfile"
