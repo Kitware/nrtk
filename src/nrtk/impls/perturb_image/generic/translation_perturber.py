@@ -113,16 +113,30 @@ class RandomTranslationPerturber(PerturbImage):
                 # Shift the bounding box to align with the translated image coordinates
                 shifted_min_x = bbox.min_vertex[0] + translate_x
                 shifted_min_y = bbox.min_vertex[1] + translate_y
-                shifted_min = (
-                    shifted_min_x if shifted_min_x >= 0 else 0,
-                    shifted_min_y if shifted_min_y >= 0 else 0,
-                )
+                if shifted_min_x < 0:
+                    shifted_min_x = 0
+                elif shifted_min_x > bbox.max_vertex[0]:
+                    shifted_min_x = bbox.max_vertex[0]
+
+                if shifted_min_y < 0:
+                    shifted_min_y = 0
+                elif shifted_min_y > bbox.max_vertex[1]:
+                    shifted_min_y = bbox.max_vertex[1]
+
+                shifted_min = (shifted_min_x, shifted_min_y)
                 shifted_max_x = bbox.max_vertex[0] + translate_x
                 shifted_max_y = bbox.max_vertex[1] + translate_y
-                shifted_max = (
-                    shifted_max_x if shifted_max_x <= translate_w else translate_w,
-                    shifted_max_y if shifted_max_y <= translate_h else translate_h,
-                )
+
+                if shifted_max_x < 0:
+                    shifted_max_x = 0
+                elif shifted_max_x > bbox.max_vertex[0]:
+                    shifted_max_x = bbox.max_vertex[0]
+
+                if shifted_max_y < 0:
+                    shifted_max_y = 0
+                elif shifted_max_y > bbox.max_vertex[1]:
+                    shifted_max_y = bbox.max_vertex[1]
+                shifted_max = (shifted_max_x, shifted_max_y)
                 adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
                 adjusted_bboxes.append((adjusted_box, metadata))
         return final_image, adjusted_bboxes

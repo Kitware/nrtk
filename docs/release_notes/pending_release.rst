@@ -61,6 +61,8 @@ Fixes
 
 * Fixed missing extras install for notebooks CI.
 
+* Fixed error with ``translation_perturber`` when ``max_translation_limit`` is ``(0, 0)``.
+
 Examples
 --------
 * Added ``nrtk_sensor_transformation_demo`` notebook from ``nrtk_jatic``

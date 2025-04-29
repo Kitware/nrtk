@@ -99,19 +99,48 @@ class TestRandomTranslationPerturber:
         )
 
     @pytest.mark.parametrize(
-        ("image", "max_translation_limit", "expectation"),
+        ("image", "max_translation_limit", "boxes", "expectation"),
         [
-            (np.ones((256, 256, 3), dtype=np.float32), (100, 200), does_not_raise()),
-            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), does_not_raise()),
-            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (100, 200), [], does_not_raise()),
+            (
+                np.ones((256, 256, 3), dtype=np.float32),
+                (100, 200),
+                [
+                    (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(50, 50)), {"meta": 1}),
+                    (AxisAlignedBoundingBox(min_vertex=(200, 200), max_vertex=(256, 256)), {"meta": 2}),
+                ],
+                does_not_raise(),
+            ),
+            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), [], does_not_raise()),
+            (
+                np.ones((256, 256, 3), dtype=np.float32),
+                (0, 0),
+                [
+                    (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(50, 50)), {"meta": 1}),
+                    (AxisAlignedBoundingBox(min_vertex=(200, 200), max_vertex=(256, 256)), {"meta": 2}),
+                ],
+                does_not_raise(),
+            ),
+            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), [], does_not_raise()),
+            (
+                np.ones((256, 256, 3), dtype=np.float32),
+                (256, 256),
+                [
+                    (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(50, 50)), {"meta": 1}),
+                    (AxisAlignedBoundingBox(min_vertex=(200, 200), max_vertex=(256, 256)), {"meta": 2}),
+                ],
+                does_not_raise(),
+            ),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (257, 100),
+                [],
                 pytest.raises(ValueError, match=r"Max translation limit should be less than or equal to \(256, 256\)"),
             ),
             (
                 np.ones((512, 512, 3), dtype=np.float32),
                 (100, 513),
+                [],
                 pytest.raises(ValueError, match=r"Max translation limit should be less than or equal to \(512, 512\)"),
             ),
         ],
@@ -120,6 +149,7 @@ class TestRandomTranslationPerturber:
         self,
         image: np.ndarray,
         max_translation_limit: tuple[int, int],
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure the max translation limit image output is consistent"""
@@ -128,7 +158,7 @@ class TestRandomTranslationPerturber:
             _, _ = bbox_perturber_assertions(
                 perturb=inst.perturb,
                 image=image,
-                boxes=None,
+                boxes=boxes,
                 expected=None,
                 additional_params={"max_translation_limit": max_translation_limit},
             )
