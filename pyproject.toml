@@ -160,7 +160,7 @@ Pillow = ">=10.3.0" # CVE-2024-28219
 # Add implementation sub-module exposure here.
 "impls.gen_object_detector_blackbox_response.simple_generic_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator"
 "impls.gen_object_detector_blackbox_response.simple_pybsm_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator"
-"impls.perturb_image.albumentations.albumentations_perturber" = "nrtk.impls.perturb_image.albumentations.albumentations_perturber"
+"impls.perturb_image.generic.albumentations_perturber" = "nrtk.impls.perturb_image.generic.albumentations_perturber"
 "impls.perturb_image.generic.compose_perturber" = "nrtk.impls.perturb_image.generic.compose_perturber"
 "impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
 "impls.perturb_image.generic.haze_perturber" = "nrtk.impls.perturb_image.generic.haze_perturber"
