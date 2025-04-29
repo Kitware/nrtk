@@ -50,10 +50,18 @@ Documentation
 
 * Added ``AUKUS.rst`` to Containers documentations
 
+* Updated T&E notebook titles.
+
+* Added ``nrtk_lens_flare_demo.ipynb`` to documentation.
+
 Fixes
 -----
 
 * Fixed incorrect link for ``nrtk_tutorial``.
+
+* Fixed missing extras install for notebooks CI.
+
+* Fixed error with ``translation_perturber`` when ``max_translation_limit`` is ``(0, 0)``.
 
 Examples
 --------

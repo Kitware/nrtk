@@ -20,6 +20,8 @@ pytest-extras:
 notebooks:
   extends: .notebooks
   rules: !reference [.notebooks, rules]
+  variables:
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
