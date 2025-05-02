@@ -54,6 +54,8 @@ Documentation
 
 * Added ``nrtk_lens_flare_demo.ipynb`` to documentation.
 
+* Added warning to use Poetry only in a virtual environment per Poetry documentation.
+
 Fixes
 -----
 
