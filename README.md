@@ -44,14 +44,17 @@ To install the current version via `conda-forge`:
 conda install -c conda-forge nrtk
 ```
 
-Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://nrtk.readthedocs.io/en/latest/installation.html#extras).
+Certain plugins may require additional runtime dependencies. Details on these requirements can be found
+[here](https://nrtk.readthedocs.io/en/latest/implementations.html).
 
-For more detailed installation instructions, visit the [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html).
+For more detailed installation instructions, visit the
+[installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html).
 <!-- :auto installation: -->
 
 <!-- :auto getting-started: -->
 ## Getting Started
-Explore usage examples of the `nrtk` package in various contexts using the Jupyter notebooks provided in the `./docs/examples/` directory.
+Explore usage examples of the `nrtk` package in various contexts using the Jupyter notebooks provided in the
+`./docs/examples/` directory.
 <!-- :auto getting-started: -->
 
 ## Example: A First Look at NRTK Perturbations
@@ -99,7 +102,8 @@ blur introduced due to simulated sensor jitter.
 
 <!-- :auto documentation: -->
 ## Documentation
-Documentation for both release snapshots and the latest main branch is available on [ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
+Documentation for both release snapshots and the latest main branch is available on
+[ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
 
 To build the Sphinx-based documentation locally for the latest reference:
 ```bash
@@ -135,12 +139,20 @@ Ensure the source tree is acquired locally before proceeding.
 #### Poetry Install
 
 You can install using [Poetry](https://python-poetry.org/):
+
+> [!WARNING]
+> Users unfamiliar with Poetry should use caution. See
+> [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html#from-source) for more
+> information.
+
 ```bash
 poetry install --with main,linting,tests,docs --extras "<extra1> <extra2> ..."
 ```
 
 #### Pre-commit Hooks
-Pre-commit hooks ensure that code complies with required linting and formatting guidelines. These hooks run automatically before commits but can also be executed manually. To bypass checks during a commit, use the `--no-verify` flag.
+Pre-commit hooks ensure that code complies with required linting and formatting guidelines. These hooks run
+automatically before commits but can also be executed manually. To bypass checks during a commit, use the `--no-verify`
+flag.
 
 To install and use pre-commit hooks:
 ```bash
