@@ -8,6 +8,8 @@ Updates / New Features
 * JATICDetectionAugmentation now uses configured image perturber to update
   provided bounding boxes
 
+* Updated test_blur to use Syrupy for image comparison.
+
 CI/CD
 
 * Added pyright static checking for example jupyter notebooks under ``tests/examples``.
