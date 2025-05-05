@@ -7,8 +7,10 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.cv2.blur import (
     AverageBlurPerturber,
@@ -17,27 +19,26 @@ from nrtk.impls.perturb_image.generic.cv2.blur import (
 )
 from nrtk.utils._exceptions import OpenCVImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
+
+INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
 @pytest.mark.skipif(not AverageBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestAverageBlurPerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+        """Run on a real to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         ksize = 3
 
-        # Test perturb interface directly
-        inst = AverageBlurPerturber(ksize=ksize)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_AVERAGE)
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=AverageBlurPerturber(ksize=ksize),
             image=image,
-            expected=EXPECTED_AVERAGE,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "ksize"),
@@ -118,21 +119,17 @@ class TestAverageBlurPerturber:
 
 @pytest.mark.skipif(not GaussianBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestGaussianBlurPerturber:
-    def test_consistency(self) -> None:
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         ksize = 3
 
-        # Test perturb interface directly
-        inst = GaussianBlurPerturber(ksize=ksize)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_GAUSSIAN)
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=GaussianBlurPerturber(ksize=ksize),
             image=image,
-            expected=EXPECTED_GAUSSIAN,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "ksize"),
@@ -221,21 +218,17 @@ class TestGaussianBlurPerturber:
 
 @pytest.mark.skipif(not MedianBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestMedianBlurPerturber:
-    def test_consistency(self) -> None:
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         ksize = 3
 
-        # Test perturb interface directly
-        inst = MedianBlurPerturber(ksize=ksize)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_MEDIAN)
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=MedianBlurPerturber(ksize=ksize),
             image=image,
-            expected=EXPECTED_MEDIAN,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "ksize"),
@@ -346,8 +339,3 @@ def test_missing_deps_median_blur_perturber(mock_is_usable: MagicMock) -> None:
     assert not MedianBlurPerturber.is_usable()
     with pytest.raises(OpenCVImportError):
         MedianBlurPerturber()
-
-
-EXPECTED_AVERAGE = np.array([[4, 4, 4], [5, 5, 5], [6, 6, 6]], dtype=np.uint8)
-EXPECTED_GAUSSIAN = np.array([[3, 4, 4], [5, 5, 6], [6, 7, 7]], dtype=np.uint8)
-EXPECTED_MEDIAN = np.array([[2, 3, 3], [4, 5, 6], [7, 7, 8]], dtype=np.uint8)
