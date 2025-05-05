@@ -3,8 +3,10 @@ This module provides the ComposePerturber class, which allows for composing mult
 image perturbations by sequentially applying a list of PerturbImage instances.
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_core.configuration import (
@@ -41,17 +43,17 @@ class ComposePerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Apply the sequence of perturbers to the input image.
 
         Args:
             image (np.ndarray): The input image to perturb.
-            boxes (Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]): The bounding boxes for
+            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]] | None): The bounding boxes for
                 the input image. This is the single image output from DetectImageObjects.detect_objects
-            additional_params (Optional[dict[str, Any]]): Additional parameters for perturbation.
+            additional_params (dict[str, Any] | None): Additional parameters for perturbation.
 
         Returns:
             np.ndarray: The perturbed image.

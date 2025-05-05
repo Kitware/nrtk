@@ -10,6 +10,7 @@ import py  # type: ignore
 import pytest
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from fastapi.encoders import jsonable_encoder
 
     app_deps_available = True
@@ -54,7 +55,7 @@ TEST_RETURN_VALUE = [  # repeated test return value for 3 tests, saved to var to
 @pytest.fixture
 def test_client() -> Generator:
     # Create a test client for the FastAPI application
-    with TestClient(app) as client:
+    with TestClient(app) as client:  # pyright: ignore [reportArgumentType, reportPossiblyUnboundVariable]
         yield client
 
 
@@ -79,7 +80,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))
+        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Confirm mocked nrtk_perturber was called with the correct arguments
         kwargs = patch.call_args.kwargs
@@ -182,7 +183,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))
+        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Check response status code
         assert response.status_code == 400
@@ -203,7 +204,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))
+        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Check response status code
         assert response.status_code == 400
@@ -224,7 +225,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))
+        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Check response status code
         assert response.status_code == 400
@@ -249,7 +250,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))
+        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Check response status code
         assert response.status_code == 400

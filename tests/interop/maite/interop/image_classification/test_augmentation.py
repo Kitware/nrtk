@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-from maite.protocols.image_classification import Augmentation, TargetBatchType
+from maite.protocols.image_classification import Augmentation, DatumMetadataType, TargetBatchType
 
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.image_metric import ImageMetric
@@ -42,7 +42,7 @@ class TestJATICClassificationAugmentation:
         """
         augmentation = JATICClassificationAugmentation(augment=perturber, augment_id="test_augment")
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)  # MAITE is channels-first
-        md_in: list[dict[str, Any]] = [{"id": 1}]
+        md_in: list[DatumMetadataType] = [{"id": 1}]
 
         # Get copies to check for modification
         img_copy = np.copy(img_in)
@@ -86,7 +86,7 @@ class TestJATICClassificationAugmentation:
     ) -> None:
         """Test that the adapter appends, not overrides nrtk configs when multiple perturbations are applied."""
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)  # MAITE is channels-first
-        md_in = [{"id": 1}]
+        md_in: list[DatumMetadataType] = [{"id": 1}]
 
         imgs_out = [img_in]
         targets_out = targets_in
@@ -102,7 +102,7 @@ class TestJATICClassificationAugmentation:
 
 class TestJATICClassificationAugmentationWithMetric:
     img_in = random.integers(0, 255, (256, 256, 3), dtype=np.uint8)
-    md_in = [{"id": 1}]
+    md_in: list[DatumMetadataType] = [{"id": 1}]
     md_aug_nop_pertuber = [
         {
             "nrtk_perturber_config": [{"box_alignment_mode": "extent"}],

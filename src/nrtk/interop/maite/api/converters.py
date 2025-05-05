@@ -12,7 +12,7 @@ from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectD
 from nrtk.utils._exceptions import KWCocoImportError
 
 try:
-    import kwcoco  # type: ignore
+    from kwcoco import CocoDataset  # type: ignore
 
     is_usable = True
 except ImportError:  # pragma: no cover
@@ -51,7 +51,7 @@ def load_COCOJATIC_dataset(  # noqa: N802
 
     # PyRight reports that kwcoco and COCOJATICObjectDetectionDataset are possibly unbound due to
     # guarded imports, but we've confirmed they are available with our is_usable check
-    kwcoco_dataset = kwcoco.CocoDataset(data.label_file)  # pyright: ignore [reportPossiblyUnboundVariable]
+    kwcoco_dataset = CocoDataset(data.label_file)  # pyright: ignore [reportPossiblyUnboundVariable, reportCallIssue]
     return COCOJATICObjectDetectionDataset(  # pyright: ignore [reportPossiblyUnboundVariable]
         kwcoco_dataset=kwcoco_dataset,
         # Pydantic doesn't fully support TypedDicts until 3.12+

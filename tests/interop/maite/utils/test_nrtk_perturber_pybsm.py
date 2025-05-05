@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from maite.protocols.object_detection import DatumMetadataType
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -14,6 +15,7 @@ from tests.interop.maite import DATASET_FOLDER
 
 kwcoco_available = True
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import kwcoco  # type: ignore
 except ImportError:
     kwcoco_available = False
@@ -21,14 +23,15 @@ except ImportError:
 
 def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObjectDetectionDataset:
     coco_file = Path(dataset_path) / "annotations.json"
-    kwcoco_dataset = kwcoco.CocoDataset(coco_file)
+    # Type ignore added for pyright's handling of guarded imports
+    kwcoco_dataset = kwcoco.CocoDataset(coco_file)  # pyright: ignore [reportPossiblyUnboundVariable, reportCallIssue]
 
     if load_metadata:
         metadata_file = Path(dataset_path) / "image_metadata.json"
         with open(metadata_file) as f:
-            metadata = json.load(f)
+            metadata: list[DatumMetadataType] = json.load(f)
     else:
-        metadata = [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]
+        metadata: list[DatumMetadataType] = [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]
 
     # Initialize dataset object
     return COCOJATICObjectDetectionDataset(
@@ -65,7 +68,7 @@ class TestNRTKPerturberPyBSM:
                 eta=0.4,
                 int_time=0.3,
                 read_noise=25.0,
-                max_n=96000.0,
+                max_n=96000,
                 bit_depth=11.9,
                 max_well_fill=0.005,
                 da_x=0.0001,

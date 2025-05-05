@@ -22,7 +22,7 @@ except ImportError:
 @pytest.fixture
 def test_aukus_client() -> Generator:
     # Create a test client for the FastAPI application
-    with TestClient(AUKUS_app) as client:
+    with TestClient(AUKUS_app) as client:  # pyright: ignore [reportArgumentType, reportPossiblyUnboundVariable]
         yield client
 
 
@@ -63,7 +63,7 @@ class TestAukusApp:
         responses.add(
             method="POST",
             url=Settings().NRTK_IP,
-            json=jsonable_encoder(
+            json=jsonable_encoder(  # pyright: ignore [reportPossiblyUnboundVariable]
                 NrtkPerturbOutputSchema(
                     message="Data received successfully",
                     datasets=[
@@ -77,7 +77,7 @@ class TestAukusApp:
                 ),
             ),
         )
-        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))
+        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Check if the response status code is 200 OK
         assert response.status_code == 200
@@ -120,7 +120,7 @@ class TestAukusApp:
             tags=["training", "synthetic"],
         )
 
-        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))
+        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         assert response.status_code == 400
         assert response.json()["detail"] == "Labels provided in incorrect format."
@@ -156,7 +156,7 @@ class TestAukusApp:
             tags=["training", "synthetic"],
         )
 
-        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))
+        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))  # pyright: ignore [reportPossiblyUnboundVariable]
 
         assert response.status_code == 400
         assert response.json()["detail"] == "Provided NRTK config is not a valid file."

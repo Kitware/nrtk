@@ -1,8 +1,9 @@
 """This module contains wrappers for NRTK perturbers for image classification"""
 
+from __future__ import annotations
+
 import copy
 from collections.abc import Sequence
-from typing import Optional, Union
 
 import numpy as np
 from maite.protocols import AugmentationMetadata
@@ -30,7 +31,7 @@ class JATICClassificationAugmentation(Augmentation):
     ----------
     augment : PerturbImage
         Augmentations to apply to an image.
-    name: Optional[str]
+    name: str
         Name of the augmentation. Will appear in metadata key.
     """
 
@@ -87,7 +88,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):
 
     Parameters
     ----------
-    augmentations : Optional[Sequence[Augmentation]]
+    augmentations : Sequence[Augmentation] | None
         Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
     metric : ImageMetric
         Image metric to be applied for a given image.
@@ -97,7 +98,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):
 
     def __init__(
         self,
-        augmentations: Optional[Sequence[Augmentation]],
+        augmentations: Sequence[Augmentation] | None,
         metric: ImageMetric,
         augment_id: str,
     ) -> None:
@@ -109,7 +110,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):
     def _apply_augmentations(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[Union[InputBatchType, Sequence[None]], TargetBatchType, DatumMetadataBatchType]:
+    ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:
         """Apply augmentations to given batch"""
 
         if self.augmentations:

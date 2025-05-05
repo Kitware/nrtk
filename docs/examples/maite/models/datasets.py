@@ -6,12 +6,14 @@ import csv
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import overload
+from typing import Any, overload
 
 import maite.protocols as pr
 import numpy as np
 import torch
+from numpy.typing import NDArray
 from PIL import Image
+from torch import Tensor
 from torchvision.ops.boxes import box_convert
 from torchvision.transforms.functional import pil_to_tensor
 
@@ -27,13 +29,15 @@ class ObjectDetectionData:
     def __iter__(self) -> Iterator[ObjectDetectionData]:
         """Return an iterator for object detection data"""
         self.n = 0
-        return self
+        return iter(self)
 
-    def __next__(self) -> tuple[pr.ArrayLike, pr.ArrayLike, pr.ArrayLike]:
+    def __next__(self) -> tuple[NDArray[Any] | Tensor, NDArray[Any] | Tensor, NDArray[Any] | Tensor]:
         """Get next object detection data"""
-        if self.n < len(self.boxes):
+        # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+        if self.n < len(self.boxes):  # pyright: ignore [reportArgumentType]
             self.n += 1
-            return self.boxes[self.n - 1], self.labels[self.n - 1], self.scores[self.n - 1]
+            # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+            return self.boxes[self.n - 1], self.labels[self.n - 1], self.scores[self.n - 1]  # pyright: ignore [reportIndexIssue]
         raise StopIteration
 
 
@@ -45,7 +49,8 @@ class VisdroneDatumMetadata:
     image_info: dict  # user defined datum metadata
 
 
-def _load_annotations(annotation_path: Path) -> pr.HasDataBoxesLabels:
+# TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+def _load_annotations(annotation_path: Path) -> pr.HasDataBoxesLabels:  # pyright: ignore [reportAttributeAccessIssue]
     boxes = []
     labels = []
     with open(annotation_path) as file:
@@ -173,7 +178,8 @@ class VisDroneDataset:
 
     def set_augmentation(
         self,
-        agm: pr.Augmentation[..., pr.SupportsObjectDetection],
+        # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+        agm: pr.Augmentation[..., pr.SupportsObjectDetection],  # pyright: ignore [reportAttributeAccessIssue]
     ) -> None:
         """Sets _augmentation_func for the given value."""
         self._augmentation_func = agm
@@ -186,9 +192,11 @@ class VisDroneDataset:
     def __getitem__(self, index: slice) -> VisDroneDataset: ...
 
     @overload
-    def __getitem__(self, index: int) -> pr.SupportsObjectDetection: ...
+    # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+    def __getitem__(self, index: int) -> pr.SupportsObjectDetection: ...  # pyright: ignore [reportAttributeAccessIssue]
 
-    def __getitem__(self, index: int | slice) -> VisDroneDataset | pr.SupportsObjectDetection:
+    # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+    def __getitem__(self, index: int | slice) -> VisDroneDataset | pr.SupportsObjectDetection:  # pyright: ignore [reportAttributeAccessIssue]
         """Returns the dataset object at the given index or subset of dataset at the given slice"""
         if isinstance(index, int):
             image_path = self._images[index]
@@ -204,7 +212,8 @@ class VisDroneDataset:
             # num_unique_classes = list(uniq_objects.size())[0]
             # unique_classes = [VisDroneDataset.classes[idx] for idx in uniq_objects.tolist()]
 
-            labeled_datum: pr.SupportsObjectDetection = (
+            # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
+            labeled_datum: pr.SupportsObjectDetection = (  # pyright: ignore [reportAttributeAccessIssue]
                 image,
                 self._annotations[image_id],
                 {"id": image_id},

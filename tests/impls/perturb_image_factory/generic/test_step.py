@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
@@ -14,6 +15,7 @@ from smqtk_core.configuration import (
     from_config_dict,
     to_config_dict,
 )
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
@@ -43,9 +45,13 @@ class DummyPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        _: dict[str, Any] | None = None,
-    ) -> np.ndarray:  # pragma: no cover
-        return np.copy(image)
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,  # noqa:ARG002
+        additional_params: dict[str, Any] | None = None,  # noqa:ARG002
+    ) -> tuple[
+        np.ndarray,
+        Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
+    ]:  # pragma: no cover
+        return np.copy(image), list()
 
     def get_config(self) -> dict[str, Any]:
         return {"param_1": self.param_1, "param_2": self.param_2}

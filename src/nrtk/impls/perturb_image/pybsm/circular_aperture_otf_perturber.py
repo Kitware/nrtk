@@ -23,8 +23,10 @@ Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any, Optional
+from typing import Any
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import Self
@@ -88,10 +90,10 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        mtf_wavelengths: Optional[Sequence[float]] = None,
-        mtf_weights: Optional[Sequence[float]] = None,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
+        mtf_wavelengths: Sequence[float] | None = None,
+        mtf_weights: Sequence[float] | None = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -190,9 +192,9 @@ class CircularApertureOTFPerturber(PerturbImage):
     def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies the circular aperture-based perturbation to the provided image.
 

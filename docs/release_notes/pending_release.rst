@@ -19,3 +19,5 @@ Documentation
 
 Fixes
 -----
+
+* Fixed pyright errors
