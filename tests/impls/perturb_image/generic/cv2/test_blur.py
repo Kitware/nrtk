@@ -25,6 +25,7 @@ rng = np.random.default_rng()
 
 INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
+
 @pytest.mark.skipif(not AverageBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestAverageBlurPerturber:
     def test_consistency(self, snapshot: SnapshotAssertion) -> None:
@@ -36,7 +37,6 @@ class TestAverageBlurPerturber:
         out_img = perturber_assertions(
             perturb=AverageBlurPerturber(ksize=ksize),
             image=image,
-
         )
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
