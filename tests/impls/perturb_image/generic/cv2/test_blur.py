@@ -339,8 +339,3 @@ def test_missing_deps_median_blur_perturber(mock_is_usable: MagicMock) -> None:
     assert not MedianBlurPerturber.is_usable()
     with pytest.raises(OpenCVImportError):
         MedianBlurPerturber()
-
-
-EXPECTED_AVERAGE = np.array([[4, 4, 4], [5, 5, 5], [6, 6, 6]], dtype=np.uint8)
-EXPECTED_GAUSSIAN = np.array([[3, 4, 4], [5, 5, 6], [6, 7, 7]], dtype=np.uint8)
-EXPECTED_MEDIAN = np.array([[2, 3, 3], [4, 5, 6], [7, 7, 8]], dtype=np.uint8)
