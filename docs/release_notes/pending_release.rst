@@ -12,6 +12,8 @@ Updates / New Features
 
 * Updated test_enhance to use Syrupy for image comparison.
 
+* Updated test_random_noise to use Syrupy for image comparison.
+
 CI/CD
 
 * Added pyright static checking for example jupyter notebooks under ``tests/examples``.
