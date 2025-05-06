@@ -694,16 +694,3 @@ def test_missing_deps_speckle_noise_perturber(mock_is_usable: MagicMock) -> None
     assert not SpeckleNoisePerturber.is_usable()
     with pytest.raises(ScikitImageImportError):
         SpeckleNoisePerturber()
-
-
-EXPECTED_SALT = np.array([[0, 255, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
-EXPECTED_PEPPER = np.array(
-    [[255, 0, 255], [255, 0, 255], [255, 255, 0]],
-    dtype=np.uint8,
-)
-EXPECTED_SP = np.array([[0, 255, 0], [0, 0, 0], [0, 0, 255]], dtype=np.uint8)
-EXPECTED_GAUSSIAN = np.array([[17, 0, 43], [54, 0, 0], [7, 0, 0]], dtype=np.uint8)
-EXPECTED_SPECKLE = np.array(
-    [[255, 196, 255], [255, 144, 181], [255, 237, 254]],
-    dtype=np.uint8,
-)
