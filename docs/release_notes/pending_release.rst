@@ -71,6 +71,8 @@ Fixes
 
 * Fixed error with ``translation_perturber`` when ``max_translation_limit`` is ``(0, 0)``.
 
+* Fixed minimum dependency versions to follow program standards.
+
 Examples
 --------
 * Added ``nrtk_sensor_transformation_demo`` notebook from ``nrtk_jatic``
