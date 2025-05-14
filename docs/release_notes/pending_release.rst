@@ -6,6 +6,8 @@ Updates / New Features
 
 * Added a new section to the installation guide that lists the key dependencies for each perturber.
 
+* Added a documentation page outlining operational risks
+
 Fixes
 -----
 
