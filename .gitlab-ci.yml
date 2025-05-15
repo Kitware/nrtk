@@ -7,3 +7,9 @@ include:
   - local: .gitlab-ci/.gitlab-docs.yml
   - local: .gitlab-ci/.gitlab-test.yml
   - local: .gitlab-ci/.gitlab-container.yml
+
+trigger_compliance:
+  extends: .trigger_compliance
+  rules: !reference [.trigger_compliance, rules]
+  variables:
+    PACKAGE_NAME: "nrtk"
