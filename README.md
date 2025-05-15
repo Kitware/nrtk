@@ -140,6 +140,9 @@ Ensure the source tree is acquired locally before proceeding.
 
 You can install using [Poetry](https://python-poetry.org/):
 
+> [!IMPORTANT]
+> NRTK currently requires `poetry<2.0`
+
 > [!WARNING]
 > Users unfamiliar with Poetry should use caution. See
 > [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html#from-source) for more
