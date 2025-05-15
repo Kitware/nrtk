@@ -88,7 +88,7 @@ Evaluate model robustness under haze-like visibility conditions using synthetic 
 
 - **Demonstrating Lens Flare Perturbations**
 
-Simulate lens flare effects and asses the impact on model interpretation.
+Simulate a lens flare effect on an image and analyze its average and worst case effects on model precision.
 `View notebook <examples/maite/nrtk_lens_flare_demo.html>`__.
 
 - **Demonstrating Resolution and Noise Transformations**
@@ -105,11 +105,6 @@ Introduce pixel-level translations and observe model sensitivity to spatial shif
 
 Simulate atmospheric distortion effects and assess their impact on image quality and model inference.
 `View notebook <examples/maite/nrtk_turbulence_perturber_demo.html>`__.
-
-- **Demonstrating Lens Flare Perturbations**
-
-Simulate a lens flare effect on an image and analyze its average and worst case effects on model precision.
-`View notebook <examples/maite/nrtk_lens_flare_perturber_demo.html>`__.
 
 
 Related Resources
