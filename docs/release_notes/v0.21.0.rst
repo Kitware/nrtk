@@ -1,6 +1,11 @@
 v0.21.0
 =======
 
+This release adds support for Albumentations-based augmentations and improves bounding box handling
+in JATICDetectionAugmentation. New example notebooks and significant documentation updates improve
+usability and coverage. CI/CD and testing workflows were streamlined, including migration to pyright
+and Syrupy. Several bugs were fixed, and dependencies updated to meet program standards.
+
 Updates / New Features
 ----------------------
 
