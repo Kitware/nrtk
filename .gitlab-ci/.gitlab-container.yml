@@ -1,0 +1,14 @@
+###############################################################################
+# Stage -- Container
+###############################################################################
+# 
+# Overrides:
+# 
+# 1) Uses this repository's Dockerfile(s)
+###############################################################################
+trigger_aukus:
+  extends: .trigger_containers
+  variables:
+    CONTAINER_NAME: "aukus"
+    DOCKERFILE_FILE: "Dockerfile"
+    PIPELINE_CONTEXT: "$CI_PIPELINE_SOURCE"

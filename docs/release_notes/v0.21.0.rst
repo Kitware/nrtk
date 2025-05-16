@@ -1,0 +1,76 @@
+v0.21.0
+=======
+
+This release adds support for Albumentations-based augmentations and improves bounding box handling
+in JATICDetectionAugmentation. New example notebooks and significant documentation updates improve
+usability and coverage. CI/CD and testing workflows were streamlined, including migration to pyright
+and Syrupy. Several bugs were fixed, and dependencies updated to meet program standards.
+
+Updates / New Features
+----------------------
+
+Core Features
+
+* ``JATICDetectionAugmentation`` now uses the configured image perturber to update bounding boxes.
+
+* Added generic ``AlbumentationsPerturber`` to support augmentations from the Albumentations package.
+
+Examples & Notebooks
+
+* Added ``nrtk_sensor_transformation_demo`` notebook (from ``nrtk_jatic``).
+
+* Added example notebook demonstrating the use of ``AlbumentationsPerturber``.
+
+* Added T&E guide showcasing ``RandomSunFlare`` using ``AlbumentationsPerturber``.
+
+* Added example notebook exploring the ``HazePerturber``.
+
+* Added new ``otf_visualization`` notebooks for existing OTF perturbers.
+
+* Improved title and section headers in T&E notebooks.
+
+Documentation
+
+* Updated ``otf_examples.rst`` to render notebooks in documentation.
+
+* Updated ``README.md,`` ``getting_started.rst``, ``index.rst``, and ``installation.rst`` as part of Diátaxis refactor.
+
+* Added ``nrtk-explorer`` description to ``README.md``.
+
+* Replaced JATIC GitLab links with public-facing URLs in ``README.md``.
+
+* Added ``Extras`` section to ``installation.rst`` describing optional extra dependencies.
+
+* Added new documentation ``nrtk_how_to_topics.rst`` and ``glossary.rst``.
+
+* Added new documentation ``ROADMAP.md``, ``containers.rst``, and ``AUKUS.rst``.
+
+* Replaced ``introduction.rst`` with ``nrtk_explanation.rst`` for the Explanation section.
+
+* Clarified that ``poetry<2.0`` is currently required and must be used in a virtual environment
+  (per Poetry documentation).
+
+CI/CD & Tooling
+
+* Added ``pyright`` static checking for example Jupyter notebooks under ``tests/examples``.
+
+* Removed dependency on ``maite`` for static type checking.
+
+* Removed ``mypy`` check and dependency.
+
+* Updated Read the Docs (RTD) build environment to match GitLab Pages.
+
+Testing
+
+* Updated ``test_blur``, ``test_enhance``, and ``test_random_noise`` to use Syrupy for image comparison.
+
+Fixes
+----------------------
+
+* Fixed error in ``translation_perturber`` when ``max_translation_limit`` is ``(0, 0)``.
+
+* Fixed minimum dependency versions to follow program standards.
+
+* Fixed documentation link to ``nrtk_tutorial``.
+
+* Fixed missing extras install for notebooks CI.

@@ -12,6 +12,7 @@ from maite.protocols.object_detection import (
     InputBatchType,
     TargetBatchType,
 )
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -59,24 +60,39 @@ class JATICDetectionAugmentation(Augmentation):
         aug_dets = list()  # list of individual object detection targets
         aug_metadata = list()  # list of individual image-level metadata
 
-        for img, ann, md in zip(imgs, anns, metadata):
+        for img, img_anns, md in zip(imgs, anns, metadata):
             # Perform augmentation
             aug_img = copy.deepcopy(img)
             aug_img = np.transpose(aug_img, (1, 2, 0))
-            height, width = aug_img.shape[0:2]  # type: ignore
-            aug_img, _ = self.augment(np.asarray(aug_img), additional_params=dict(md))
-            aug_height, aug_width = aug_img.shape[0:2]
+
+            # format annotations for passing to perturber
+            img_bboxes = [AxisAlignedBoundingBox(bbox[0:2], bbox[2:4]) for bbox in np.array(img_anns.boxes)]
+            img_labels = [{label: score} for label, score in zip(np.array(img_anns.labels), np.array(img_anns.scores))]
+
+            aug_img, aug_img_anns = self.augment(
+                np.asarray(aug_img),
+                zip(img_bboxes, img_labels),
+                additional_params=dict(md),
+            )
             aug_imgs.append(np.transpose(aug_img, (2, 0, 1)))
 
-            # Resize bounding boxes
-            y_aug_boxes = copy.deepcopy(np.asarray(ann.boxes))
-            y_aug_labels = copy.deepcopy(np.asarray(ann.labels))
-            y_aug_scores = copy.deepcopy(np.asarray(ann.scores))
-            y_aug_boxes[:, 0] *= aug_width / width
-            y_aug_boxes[:, 1] *= aug_height / height
-            y_aug_boxes[:, 2] *= aug_width / width
-            y_aug_boxes[:, 3] *= aug_height / height
-            aug_dets.append(JATICDetectionTarget(y_aug_boxes, y_aug_labels, y_aug_scores))
+            # re-format annotations to JATICDetectionTarget for returning
+            aug_img_bboxes, aug_img_score_dicts = zip(*aug_img_anns)
+            aug_img_bboxes_arr = np.vstack([np.hstack((bbox.min_vertex, bbox.max_vertex)) for bbox in aug_img_bboxes])
+            aug_img_labels, aug_img_scores = zip(
+                *[
+                    # get (label, score) pair for highest score
+                    max(score_dict.items(), key=lambda x: x[1])
+                    for score_dict in aug_img_score_dicts
+                ],
+            )
+            aug_dets.append(
+                JATICDetectionTarget(
+                    aug_img_bboxes_arr,
+                    np.array(aug_img_labels),
+                    np.array(aug_img_scores),
+                ),
+            )
 
             perturber_configs = list()
             if "nrtk_perturber_config" in md:

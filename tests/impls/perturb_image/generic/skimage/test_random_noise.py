@@ -9,8 +9,10 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.skimage.random_noise import (
     GaussianNoisePerturber,
@@ -22,8 +24,11 @@ from nrtk.impls.perturb_image.generic.skimage.random_noise import (
 )
 from nrtk.utils._exceptions import ScikitImageImportError
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 test_rng = np.random.default_rng()
+
+INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
 def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
@@ -58,22 +63,18 @@ def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
 
 @pytest.mark.skipif(not SaltNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSaltNoisePerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.zeros((3, 3), dtype=np.uint8)
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
         amount = 0.5
 
-        # Test perturb interface directly
-        inst = SaltNoisePerturber(amount=amount, rng=rng)
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SALT)
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=SaltNoisePerturber(amount=amount, rng=rng),
             image=image,
-            expected=EXPECTED_SALT,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -174,26 +175,18 @@ class TestSaltNoisePerturber:
 
 @pytest.mark.skipif(not PepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestPepperNoisePerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.ones((3, 3), dtype=np.uint8) * 255
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
         amount = 0.5
 
-        # Test perturb interface directly
-        inst = PepperNoisePerturber(amount=amount, rng=rng)
-        perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=EXPECTED_PEPPER,
-        )
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=PepperNoisePerturber(amount=amount, rng=rng),
             image=image,
-            expected=EXPECTED_PEPPER,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -294,31 +287,23 @@ class TestPepperNoisePerturber:
 
 @pytest.mark.skipif(not SaltAndPepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSaltAndPepperNoisePerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.zeros((3, 3), dtype=np.uint8)
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
         amount = 0.5
         salt_vs_pepper = 0.5
 
-        # Test perturb interface directly
-        inst = SaltAndPepperNoisePerturber(
-            amount=amount,
-            salt_vs_pepper=salt_vs_pepper,
-            rng=rng,
-        )
-        perturber_assertions(perturb=inst.perturb, image=image, expected=EXPECTED_SP)
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=SaltAndPepperNoisePerturber(
                 amount=amount,
                 salt_vs_pepper=salt_vs_pepper,
                 rng=rng,
             ),
             image=image,
-            expected=EXPECTED_SP,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -448,27 +433,19 @@ class TestSaltAndPepperNoisePerturber:
 
 @pytest.mark.skipif(not GaussianNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestGaussianNoisePerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
         image = np.zeros((3, 3), dtype=np.uint8)
         rng = 42
         mean = 0
         var = 0.05
 
-        # Test perturb interface directly
-        inst = GaussianNoisePerturber(mean=mean, var=var, rng=rng)
-        perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=EXPECTED_GAUSSIAN,
-        )
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=GaussianNoisePerturber(mean=mean, var=var, rng=rng),
             image=image,
-            expected=EXPECTED_GAUSSIAN,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -566,27 +543,19 @@ class TestGaussianNoisePerturber:
 
 @pytest.mark.skipif(not SpeckleNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSpeckleNoisePerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.ones((3, 3), dtype=np.uint8) * 255
+    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
         mean = 0
         var = 0.05
 
-        # Test perturb interface directly
-        inst = SpeckleNoisePerturber(mean=mean, var=var, rng=rng)
-        perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=EXPECTED_SPECKLE,
-        )
-
         # Test callable
-        perturber_assertions(
+        out_img = perturber_assertions(
             perturb=SpeckleNoisePerturber(mean=mean, var=var, rng=rng),
             image=image,
-            expected=EXPECTED_SPECKLE,
         )
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -725,16 +694,3 @@ def test_missing_deps_speckle_noise_perturber(mock_is_usable: MagicMock) -> None
     assert not SpeckleNoisePerturber.is_usable()
     with pytest.raises(ScikitImageImportError):
         SpeckleNoisePerturber()
-
-
-EXPECTED_SALT = np.array([[0, 255, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
-EXPECTED_PEPPER = np.array(
-    [[255, 0, 255], [255, 0, 255], [255, 255, 0]],
-    dtype=np.uint8,
-)
-EXPECTED_SP = np.array([[0, 255, 0], [0, 0, 0], [0, 0, 255]], dtype=np.uint8)
-EXPECTED_GAUSSIAN = np.array([[17, 0, 43], [54, 0, 0], [7, 0, 0]], dtype=np.uint8)
-EXPECTED_SPECKLE = np.array(
-    [[255, 196, 255], [255, 144, 181], [255, 237, 254]],
-    dtype=np.uint8,
-)
