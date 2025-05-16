@@ -1,0 +1,16 @@
+###############################################################################
+# Stage -- Quality
+###############################################################################
+#
+# Overrides:
+#
+# 1) Poetry install for optional dependencies for pyright jobs
+#
+###############################################################################
+pyright-internal:
+  variables:
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
+
+pyright-external:
+  variables:
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
