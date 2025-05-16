@@ -36,3 +36,4 @@ Release Notes
    release_notes/v0.19.1
    release_notes/v0.19.2
    release_notes/v0.20.0
+   release_notes/v0.21.0
