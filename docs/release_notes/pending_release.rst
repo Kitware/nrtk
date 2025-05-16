@@ -3,84 +3,69 @@ Pending Release Notes
 
 Updates / New Features
 ----------------------
-* PyBSM based PerturbImage implementations now scale provided bounding boxes
 
-* JATICDetectionAugmentation now uses configured image perturber to update
-  provided bounding boxes
+Core Features
 
-* Updated test_blur to use Syrupy for image comparison.
+* ``JATICDetectionAugmentation`` now uses the configured image perturber to update bounding boxes.
 
-* Updated test_enhance to use Syrupy for image comparison.
+* Added generic ``AlbumentationsPerturber`` to support augmentations from the Albumentations package.
 
-* Updated test_random_noise to use Syrupy for image comparison.
+Examples & Notebooks
 
-CI/CD
+* Added ``nrtk_sensor_transformation_demo`` notebook (from ``nrtk_jatic``).
 
-* Added pyright static checking for example jupyter notebooks under ``tests/examples``.
+* Added example notebook demonstrating the use of ``AlbumentationsPerturber``.
+
+* Added T&E guide showcasing ``RandomSunFlare`` using ``AlbumentationsPerturber``.
+
+* Added example notebook exploring the ``HazePerturber``.
+
+* Added new ``otf_visualization`` notebooks for existing OTF perturbers.
+
+* Improved title and section headers in T&E notebooks.
+
+Documentation
+
+* Updated ``otf_examples.rst`` to render notebooks in documentation.
+
+* Updated ``README.md,`` ``getting_started.rst``, ``index.rst``, and ``installation.rst`` as part of Diátaxis refactor.
+
+* Added ``nrtk-explorer`` description to ``README.md``.
+
+* Replaced JATIC GitLab links with public-facing URLs in ``README.md``.
+
+* Added ``Extras`` section to ``installation.rst`` describing optional extra dependencies.
+
+* Added new documentation ``nrtk_how_to_topics.rst`` and ``glossary.rst``.
+
+* Added new documentation ``ROADMAP.md``, ``containers.rst``, and ``AUKUS.rst``.
+
+* Replaced ``introduction.rst`` with ``nrtk_explanation.rst`` for the Explanation section.
+
+* Clarified that ``poetry<2.0`` is currently required and must be used in a virtual environment
+  (per Poetry documentation).
+
+CI/CD & Tooling
+
+* Added ``pyright`` static checking for example Jupyter notebooks under ``tests/examples``.
 
 * Removed dependency on ``maite`` for static type checking.
 
 * Removed ``mypy`` check and dependency.
 
-* Updated RTD build environment to match Gitlab Pages environment.
+* Updated Read the Docs (RTD) build environment to match GitLab Pages.
 
-Documentation
+Testing
 
-* Added new ``otf_visualization`` notebooks for existing OTF perturbers
-
-* Updated ``otf_examples.rst`` to render notebooks in docs
-
-* Updated ``README.md``, ``getting_started.rst``, ``index.rst``, and ``installation.rst`` as part of Diataxis refactor.
-
-* Added ``nrtk-explorer`` section to ``README.md``.
-
-* Corrected Google Colab links in example notebooks
-
-* Updated ``index.rst``, ``installation.rst``, and ``README.md``  based on ``devel-jatic``.
-
-* Added ``Extras`` section to ``installation.rst``.
-
-* Replaced ``introduction.rst``  with ``nrtk_explanation.rst`` for Explanation section of docs.
-
-* Replaced JATIC Gitlab links with public-facing links in ``README.md``.
-
-* Added ``nrtk_how_to_topics.rst`` to documentation.
-
-* Added ``glossary.rst`` to documentation.
-
-* Added generic ``AlbumentationsPerturber`` to use perturbers from the Albumentations module
-
-* Added ``ROADMAP.md``.
-
-* Added a ``Containers`` section to documentation
-
-* Added ``AUKUS.rst`` to Containers documentations
-
-* Updated T&E notebook titles.
-
-* Added ``nrtk_lens_flare_demo.ipynb`` to documentation.
-
-* Added warning to use Poetry only in a virtual environment per Poetry documentation.
-
-* Clarified that ``poetry<2.0`` is currently required.
+* Updated ``test_blur``, ``test_enhance``, and ``test_random_noise`` to use Syrupy for image comparison.
 
 Fixes
------
+----------------------
 
-* Fixed incorrect link for ``nrtk_tutorial``.
-
-* Fixed missing extras install for notebooks CI.
-
-* Fixed error with ``translation_perturber`` when ``max_translation_limit`` is ``(0, 0)``.
+* Fixed error in ``translation_perturber`` when ``max_translation_limit`` is ``(0, 0)``.
 
 * Fixed minimum dependency versions to follow program standards.
 
-Examples
---------
-* Added ``nrtk_sensor_transformation_demo`` notebook from ``nrtk_jatic``
+* Fixed documentation link to ``nrtk_tutorial``.
 
-* Added an example notebook exploring the HazePerturber and its use.
-
-* Added an example notebook demonstrating use of the new ``AlbumentationsPerturber``
-
-* Added a guide exploring a lens flare perturber using Albumentations
+* Fixed missing extras install for notebooks CI.
