@@ -10,3 +10,7 @@ CI/CD
 
 Fixes
 -----
+
+Dependencies
+
+- Specify ``maite`` dependency as ``^0.7.1`` instead of ``>=0.7.1``
