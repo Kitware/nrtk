@@ -4,9 +4,11 @@ include:
     file: ".gitlab-ci.yml"
 
   # job overrides specific to this repo
-  - local: .gitlab-ci/.gitlab-docs.yml
-  - local: .gitlab-ci/.gitlab-test.yml
   - local: .gitlab-ci/.gitlab-container.yml
+  - local: .gitlab-ci/.gitlab-docs.yml
+  - local: .gitlab-ci/.gitlab-quality.yml
+  - local: .gitlab-ci/.gitlab-test.yml
+
 
 trigger_compliance:
   extends: .trigger_compliance
