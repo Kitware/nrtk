@@ -1,6 +1,8 @@
 v0.22.0
 =======
 
+Added new peturber: ``WaterDropletPerturber``. Improved T&E guide descriptions.
+
 Updates / New Features
 ----------------------
 Core Features
