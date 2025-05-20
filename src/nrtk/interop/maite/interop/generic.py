@@ -40,7 +40,6 @@ def _forward_md_keys(
             continue
         if key in aug_md:
             raise KeyError(f"'{key}' already present in metadata, erroring out to prevent overwrite")
-        # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
-        aug_md[key] = value  # type: ignore
+        aug_md[key] = value
 
     return aug_md

@@ -104,10 +104,9 @@ def nrtk_perturber_cli(
     perturber_factory = from_config_dict(config["PerturberFactory"], PerturbImageFactory.get_impls())
 
     # Initialize dataset object
-    # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
     input_dataset = COCOJATICObjectDetectionDataset(
         kwcoco_dataset=kwcoco_dataset,
-        image_metadata=metadata,  # type: ignore
+        image_metadata=metadata,
     )
 
     # Augment input dataset
