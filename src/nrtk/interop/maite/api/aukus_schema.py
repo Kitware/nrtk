@@ -1,20 +1,22 @@
 """This module contains schemas for AUKUS API"""
 
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Any
 
 from nrtk.utils._exceptions import PydanticImportError
 
 BaseModel: type = object
 try:
-    # TODO: Remove once mypy is dropped (no redef)  # noqa: FIX002
-    from pydantic import BaseModel  # type: ignore
+    from pydantic import BaseModel
 
     pydantic_available = True
 except ImportError:  # pragma: no cover
     pydantic_available = False
 
 
-class AukusdataCollectionSchema(BaseModel):
+# pyright warns about inheritance from BaseSettings which is ambiguous
+class AukusdataCollectionSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
     """Collection schema for AUKUS API"""
 
     # header params
@@ -31,11 +33,11 @@ class AukusdataCollectionSchema(BaseModel):
     description: str
 
     # Optional Data Collection Params
-    local_region: Optional[str] = None
-    collection_date_time: Optional[str] = None
-    data_entries: Optional[int] = None
-    source: Optional[dict[str, str]] = None
-    data_formats: Optional[list[dict[str, Any]]] = None
+    local_region: str | None = None
+    collection_date_time: str | None = None
+    data_entries: int | None = None
+    source: dict[str, str] | None = None
+    data_formats: list[dict[str, Any]] | None = None
 
     def __init__(self, /, **data: Any) -> None:
         """Raise import error if pydantic isn't available"""
@@ -45,7 +47,8 @@ class AukusdataCollectionSchema(BaseModel):
         super().__init__(**data)
 
 
-class AukusDatasetSchema(BaseModel):
+# pyright warns about inheritance from BaseModel which is ambiguous
+class AukusDatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
     """Dataset schema for AUKUS API"""
 
     # header params
@@ -70,7 +73,7 @@ class AukusDatasetSchema(BaseModel):
     output_dir: str
 
     # Optional Dataset Params
-    tags: Optional[list[str]] = None
+    tags: list[str] | None = None
 
     def __init__(self, /, **data: Any) -> None:
         """Raise import error if pydantic isn't available"""

@@ -21,8 +21,10 @@ Example:
     output_image = nop_perturber.perturb(input_image)
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -45,9 +47,9 @@ class NOPPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return unperturbed image."""
         if additional_params is None:
             additional_params = dict()

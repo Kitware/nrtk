@@ -19,8 +19,10 @@ Example usage:
     perturbed_image = perturber.perturb(image)
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional
+from typing import Any
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
@@ -76,10 +78,10 @@ class JitterOTFPerturber(PerturbImage):
 
     def __init__(
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        s_x: Optional[float] = None,
-        s_y: Optional[float] = None,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
+        s_x: float | None = None,
+        s_y: float | None = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -159,9 +161,9 @@ class JitterOTFPerturber(PerturbImage):
     def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able

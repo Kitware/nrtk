@@ -31,7 +31,7 @@ class TestPybsmScenario:
         ground_range = 0
         name = "test"
         scenario = PybsmScenario(name, ihaze, altitude, ground_range)
-        assert isinstance(scenario(), Scenario)
+        assert isinstance(scenario(), Scenario)  # pyright: ignore [reportPossiblyUnboundVariable]
 
     @pytest.mark.parametrize(
         ("ihaze", "altitude", "ground_range", "name", "expectation"),

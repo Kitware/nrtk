@@ -49,10 +49,10 @@ class PybsmSensor(Configurable):
         f: float,
         p_x: float,
         opt_trans_wavelengths: np.ndarray,
-        optics_transmission: np.ndarray = None,
+        optics_transmission: np.ndarray | None = None,
         eta: float = 0.0,
-        w_x: float = None,
-        w_y: float = None,
+        w_x: float | None = None,
+        w_y: float | None = None,
         int_time: float = 1.0,
         n_tdi: float = 1.0,
         dark_current: float = 0.0,
@@ -64,8 +64,8 @@ class PybsmSensor(Configurable):
         s_y: float = 0.0,
         da_x: float = 0.0,
         da_y: float = 0.0,
-        qe_wavelengths: np.ndarray = None,
-        qe: np.ndarray = None,
+        qe_wavelengths: np.ndarray | None = None,
+        qe: np.ndarray | None = None,
     ) -> None:
         """
         Initializes a PybsmSensor instance with specified configuration parameters.
@@ -249,7 +249,7 @@ class PybsmSensor(Configurable):
 
     def _set_optics_transmission(
         self,
-        optics_transmission: np.ndarray = None,
+        optics_transmission: np.ndarray | None = None,
     ) -> None:
         """
         This method assigns the `optics_transmission` array to the instance. If no array is provided,

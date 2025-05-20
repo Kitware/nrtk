@@ -17,14 +17,14 @@ from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError
 
 try:
-    import kwcoco  # type: ignore
+    from kwcoco import CocoDataset  # type: ignore
 
     is_usable = True
 except ImportError:  # pragma: no cover
     is_usable = False
 
 
-def _load_metadata(dataset_dir: str, kwcoco_dataset: "kwcoco.CocoDataset") -> list[dict[str, Any]]:
+def _load_metadata(dataset_dir: str, kwcoco_dataset: "CocoDataset") -> list[dict[str, Any]]:
     metadata_file = Path(dataset_dir) / "image_metadata.json"
     if not metadata_file.is_file():
         logging.warn(
@@ -94,7 +94,7 @@ def nrtk_perturber_cli(
     logging.info(f"Loading kwcoco annotations from {coco_file}")
     if not is_usable:
         raise KWCocoImportError
-    kwcoco_dataset = kwcoco.CocoDataset(coco_file)
+    kwcoco_dataset = CocoDataset(coco_file)
 
     # Load metadata, if it exists
     metadata = _load_metadata(dataset_dir, kwcoco_dataset)

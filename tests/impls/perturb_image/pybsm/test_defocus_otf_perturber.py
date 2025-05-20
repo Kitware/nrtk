@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, Optional
+from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -305,8 +307,8 @@ class TestDefocusOTFPerturber:
         self,
         snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
-        w_x: Optional[float],
-        w_y: Optional[float],
+        w_x: float | None,
+        w_y: float | None,
         interp: bool,
         is_rgb: bool,
     ) -> None:

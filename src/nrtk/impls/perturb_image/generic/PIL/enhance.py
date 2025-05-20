@@ -41,6 +41,7 @@ from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 import numpy as np
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from PIL import Image, ImageEnhance
     from PIL.Image import Image as PILImage
 
@@ -49,7 +50,7 @@ except ImportError:  # pragma: no cover
     pillow_available = False
 
 
-from smqtk_image_io import AxisAlignedBoundingBox
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
@@ -97,7 +98,7 @@ class _PerturbImage(PerturbImage):
         if np.issubdtype(dtype, np.floating):
             image = (image * 255).astype(np.uint8)
 
-        image_pil = Image.fromarray(image)
+        image_pil = Image.fromarray(image)  # pyright: ignore [reportPossiblyUnboundVariable]
         image_enhanced = enhancement(image_pil).enhance(factor=self.factor)
         image_np = np.array(image_enhanced)
 
@@ -144,7 +145,7 @@ class BrightnessPerturber(_PerturbImage):
         """Return image stimulus with adjusted brightness."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        enhancement = ImageEnhance.Brightness
+        enhancement = ImageEnhance.Brightness  # pyright: ignore [reportPossiblyUnboundVariable]
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
@@ -166,7 +167,7 @@ class ColorPerturber(_PerturbImage):
         """Return image stimulus with adjusted color balance."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        enhancement = ImageEnhance.Color
+        enhancement = ImageEnhance.Color  # pyright: ignore [reportPossiblyUnboundVariable]
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
@@ -188,7 +189,7 @@ class ContrastPerturber(_PerturbImage):
         """Return image stimulus with adjusted contrast."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        enhancement = ImageEnhance.Contrast
+        enhancement = ImageEnhance.Contrast  # pyright: ignore [reportPossiblyUnboundVariable]
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),
@@ -219,7 +220,7 @@ class SharpnessPerturber(_PerturbImage):
         """Return image stimulus with adjusted sharpness."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        enhancement = ImageEnhance.Sharpness
+        enhancement = ImageEnhance.Sharpness  # pyright: ignore [reportPossiblyUnboundVariable]
         if TYPE_CHECKING and not isinstance(
             enhancement,
             type(_Enhancement),

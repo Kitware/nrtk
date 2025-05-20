@@ -12,6 +12,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 
 pybsm_available = True
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from pybsm.simulation.sensor import Sensor
 except ImportError:
     pybsm_available = False
@@ -41,7 +42,7 @@ class TestPybsmSensor:
         opt_trans_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
         name = "test"
         sensor = PybsmSensor(name, D, f, p_x, opt_trans_wavelengths)
-        assert isinstance(sensor(), Sensor)
+        assert isinstance(sensor(), Sensor)  # pyright: ignore [reportPossiblyUnboundVariable]
 
     @pytest.mark.parametrize(
         ("opt_trans_wavelengths", "optics_transmission", "name", "expectation"),

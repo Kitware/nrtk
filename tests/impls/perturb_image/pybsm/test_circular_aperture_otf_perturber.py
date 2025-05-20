@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, Optional
+from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -349,8 +351,8 @@ class TestCircularApertureOTFPerturber:
         self,
         snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
-        mtf_wavelengths: Optional[Sequence[float]],
-        mtf_weights: Optional[Sequence[float]],
+        mtf_wavelengths: Sequence[float] | None,
+        mtf_weights: Sequence[float] | None,
         interp: bool,
         is_rgb: bool,
     ) -> None:

@@ -11,8 +11,10 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -42,9 +44,9 @@ class HazePerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Apply haze to an image based on depth_map and sky_color
 

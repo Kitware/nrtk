@@ -250,8 +250,9 @@ class TestTurbulenceApertureOTFPerturber:
         pos_weights = np.asarray([])
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+            # Multiple type ignores added for pyright's handling of guarded imports
+            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # pyright: ignore [reportPossiblyUnboundVariable]
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # pyright: ignore [reportPossiblyUnboundVariable]
                 atm,
                 sensor.create_sensor(),
                 sensor.int_time,

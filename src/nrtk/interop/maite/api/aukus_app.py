@@ -12,6 +12,7 @@ from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import FastApiImportError, PydanticSettingsImportError
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from fastapi import FastAPI, HTTPException
     from fastapi.encoders import jsonable_encoder
 
@@ -21,15 +22,15 @@ except ImportError:  # pragma: no cover
 
 BaseSettings: type = object
 try:
-    # TODO: Remove once mypy is dropped (no redef) # noqa: FIX002
-    from pydantic_settings import BaseSettings  # type: ignore
+    from pydantic_settings import BaseSettings
 
     pydantic_settings_available = True
 except ImportError:  # pragma: no cover
     pydantic_settings_available = False
 
 
-class Settings(BaseSettings):
+# pyright warns about inheritance from BaseSettings which is ambiguous
+class Settings(BaseSettings):  # pyright: ignore [reportGeneralTypeIssues]
     """Dataclass for NRTK API settings"""
 
     NRTK_IP: str = "http://localhost:8888/"
@@ -61,12 +62,11 @@ def _check_input(data: AukusDatasetSchema) -> None:
     """Check input data and raise HTTPException if needed"""
     if not fastapi_available:
         raise FastApiImportError
-
     if data.data_format != "COCO":
         raise HTTPException(status_code=400, detail="Labels provided in incorrect format.")  # pyright: ignore [reportPossiblyUnboundVariable]
+
     if not settings.NRTK_IP:
         raise HTTPException(status_code=400, detail="Provide NRTK_IP in AUKUS_app.env.")  # pyright: ignore [reportPossiblyUnboundVariable]
-
     # Read NRTK configuration file and add relevant data to internalJSON
     if not os.path.isfile(data.nrtk_config):
         raise HTTPException(status_code=400, detail="Provided NRTK config is not a valid file.")  # pyright: ignore [reportPossiblyUnboundVariable]

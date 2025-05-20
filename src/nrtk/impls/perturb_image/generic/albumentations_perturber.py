@@ -12,12 +12,15 @@ Dependencies:
     - albumentations: For the underlying perturbations
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional
+from typing import Any
 
 from typing_extensions import override
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import albumentations as A  # noqa N812
     from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations
 
@@ -44,9 +47,9 @@ class AlbumentationsPerturber(PerturbImage):
     def __init__(
         self,
         perturber: str,
-        parameters: Optional[dict[str, Any]] = None,
+        parameters: dict[str, Any] | None = None,
         box_alignment_mode: str = "extent",
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> None:
         """
         AlbumentationsPerturber applies a BasicTransform from Albumentations
@@ -104,9 +107,9 @@ class AlbumentationsPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,  # ARG002
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,  # ARG002
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Apply a BasicTransform from Albumentations to an image
 

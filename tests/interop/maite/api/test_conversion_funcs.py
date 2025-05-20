@@ -58,7 +58,7 @@ class TestAPIConversionFunctions:
                             eta=0.4,
                             int_time=0.03,
                             read_noise=25.0,
-                            max_n=96000.0,
+                            max_n=96000,
                             bit_depth=11.9,
                             max_well_fill=0.005,
                             da_x=0.0001,
@@ -177,10 +177,10 @@ class TestAPIConversionFunctions:
     def test_load_COCOJATIC_dataset(self, data: dict[str, Any]) -> None:  # noqa: N802
         """Test if load_COCOJATIC_dataset returns the expected dataset."""
         schema = NrtkPerturbInputSchema.model_validate(data)
-        dataset = load_COCOJATIC_dataset(schema)
+        dataset = load_COCOJATIC_dataset(schema)  # pyright: ignore [reportPossiblyUnboundVariable]
         # Check all images metadata for gsd
         for i in range(len(dataset)):
-            assert dataset[i][2]["gsd"] == data["image_metadata"][i]["gsd"]
+            assert dict(dataset[i][2])["gsd"] == dict(data["image_metadata"][i])["gsd"]
         # Check number of image matches
         assert len(dataset) == len(os.listdir(os.path.join(data["dataset_dir"], "images")))
 
@@ -206,7 +206,7 @@ class TestAPIConversionFunctions:
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(KWCocoImportError):
-            _ = load_COCOJATIC_dataset(schema)
+            _ = load_COCOJATIC_dataset(schema)  # pyright: ignore [reportPossiblyUnboundVariable]
 
     @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
     @pytest.mark.parametrize(
@@ -230,4 +230,4 @@ class TestAPIConversionFunctions:
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(ValueError, match=r"ID not present in image metadata. Is it a DatumMetadataType?"):
-            _ = load_COCOJATIC_dataset(schema)
+            _ = load_COCOJATIC_dataset(schema)  # pyright: ignore [reportPossiblyUnboundVariable]

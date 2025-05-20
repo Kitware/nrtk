@@ -10,7 +10,7 @@ from maite.protocols.object_detection import Dataset
 from PIL import Image  # type: ignore
 
 try:
-    import kwcoco  # type: ignore
+    from kwcoco import CocoDataset  # type: ignore
 
     is_usable = True
 except ImportError:  # pragma: no cover
@@ -22,8 +22,8 @@ def _xywh_bbox_xform(x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int,
     return x1, y1, x2 - x1, y2 - y1
 
 
-def _create_annotations(dataset_categories: list[dict[str, Any]]) -> "kwcoco.CocoDataset":
-    annotations = kwcoco.CocoDataset()
+def _create_annotations(dataset_categories: list[dict[str, Any]]) -> "CocoDataset":
+    annotations = CocoDataset()  # pyright: ignore [reportPossiblyUnboundVariable, reportCallIssue]
     for cat in dataset_categories:
         annotations.add_category(name=cat["name"], supercategory=cat["supercategory"], id=cat["id"])
     return annotations

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Any, Optional
+from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -305,8 +307,8 @@ class TestJitterOTFPerturber:
         self,
         snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
-        s_x: Optional[float],
-        s_y: Optional[float],
+        s_x: float | None,
+        s_y: float | None,
         interp: bool,
         is_rgb: bool,
     ) -> None:
