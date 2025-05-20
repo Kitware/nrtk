@@ -219,6 +219,11 @@ description of the extra.
     **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` perturbers.
 
+    **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `shapely <https://github.com/shapely/shapely>`_.
+    Required for :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and
+    :mod:`~nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils` utility functions. Note: This needs
+    to be installed in conjunction with either the ``graphics`` or ``headless`` extras due to the OpenCV requirement.
+
     **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
 
 .. :auto installation-links:

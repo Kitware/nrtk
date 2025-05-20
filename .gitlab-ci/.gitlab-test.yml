@@ -15,7 +15,7 @@ pytest-core:
 pytest-extras:
   allow_failure: false
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
 
 notebooks:
   extends: .notebooks
