@@ -66,8 +66,7 @@ class JATICClassificationAugmentation(Augmentation):
 
             perturber_configs = list()
             if "nrtk_perturber_config" in md:
-                # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
-                perturber_configs = list(md["nrtk_perturber_config"])  # type: ignore
+                perturber_configs = list(md["nrtk_perturber_config"])
             perturber_configs.append(self.augment.get_config())
             aug_md = NRTKDatumMetadata(
                 id=md["id"],
@@ -144,8 +143,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):
 
             existing_metrics = list()
             if "nrtk_metric" in aug_md:
-                # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
-                existing_metrics = list(aug_md["nrtk_metric"])  # type: ignore
+                existing_metrics = list(aug_md["nrtk_metric"])
             existing_metrics.append((metric_name, metric_value))
             metric_aug_md = NRTKDatumMetadata(
                 id=aug_md["id"],

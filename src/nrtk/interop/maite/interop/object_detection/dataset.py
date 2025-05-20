@@ -164,8 +164,7 @@ class COCOJATICObjectDetectionDataset(Dataset):
                 continue
             if key in image_md and key not in forwarded_keys:
                 raise KeyError(f"'{key}' already present in metadata, erroring out to prevent overwrite")
-            # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
-            image_md[key] = value  # type: ignore
+            image_md[key] = value
 
         image_array = np.asarray(image)
         if image.mode == "L":
