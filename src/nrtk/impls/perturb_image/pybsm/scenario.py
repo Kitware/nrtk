@@ -28,7 +28,7 @@ try:
 except ImportError:  # pragma: no cover
     pybsm_available = False
 
-from smqtk_core import Configurable
+from smqtk_core.configuration import Configurable
 from typing_extensions import override
 
 from nrtk.utils._exceptions import PyBSMImportError
@@ -167,7 +167,8 @@ class PybsmScenario(Configurable):
         Returns:
             Scenario: pybsm.Scenario object populated with instance parameters
         """
-        S = Scenario(  # noqa:N806
+        # Type ignore added for pyright's handling of guarded imports
+        S = Scenario(  # noqa:N806  # pyright: ignore [reportPossiblyUnboundVariable]
             self.name,
             self.ihaze,
             self.altitude,

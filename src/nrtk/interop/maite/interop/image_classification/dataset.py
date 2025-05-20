@@ -1,7 +1,8 @@
 """This module contains wrappers for converting a generic dataset to a MAITE dataset for image classification"""
 
+from __future__ import annotations
+
 from collections.abc import Sequence
-from typing import Optional
 
 import numpy as np
 from maite.protocols import DatasetMetadata
@@ -36,7 +37,7 @@ class JATICImageClassificationDataset(Dataset):
         labels: Sequence[TargetType],
         datum_metadata: Sequence[DatumMetadataType],
         dataset_id: str,
-        index2label: Optional[dict[int, str]] = None,
+        index2label: dict[int, str] | None = None,
     ) -> None:
         """
         Initialize MAITE-compliant dataset
@@ -46,7 +47,7 @@ class JATICImageClassificationDataset(Dataset):
             labels (Sequence[TargetType]): Sequence of labels for the images.
             datum_metadata (Sequence[DatumMetadataType]): Sequence of metadata dictionaries.
             dataset_id (str): Dataset ID.
-            index2label (Optional[dict[int, str]]): Mapping from class index to label.
+            index2label (dict[int, str] | None): Mapping from class index to label.
         """
         self.imgs = imgs
         self.labels = labels

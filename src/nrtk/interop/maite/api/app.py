@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Callable, Union
 
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from fastapi import FastAPI, HTTPException
 
     fastapi_available = True
@@ -47,7 +48,7 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
     :raises: HTTPException upon failure
     """
     if not fastapi_available:
-        raise HTTPException(status_code=400, detail=str(FastApiImportError()))
+        raise HTTPException(status_code=400, detail=str(FastApiImportError()))  # pyright: ignore [reportPossiblyUnboundVariable]
 
     try:
         # Build pybsm factory

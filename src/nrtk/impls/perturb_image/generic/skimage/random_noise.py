@@ -72,23 +72,23 @@ class _SKImageNoisePerturber(PerturbImage):
         # Determine if conversion back to original dtype is possible
         dtype_str = str(image.dtype)
         convert_image = {
-            str(np.dtype(np.bool_)): skimage.util.img_as_bool,
-            str(np.dtype(np.float32)): skimage.util.img_as_float32,
-            str(np.dtype(np.float64)): skimage.util.img_as_float64,
-            str(np.dtype(np.int16)): skimage.util.img_as_int,
-            str(np.dtype(np.uint8)): skimage.util.img_as_ubyte,
-            str(np.dtype(np.uint)): skimage.util.img_as_uint,
+            str(np.dtype(np.bool_)): skimage.util.img_as_bool,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.float32)): skimage.util.img_as_float32,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.float64)): skimage.util.img_as_float64,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.int16)): skimage.util.img_as_int,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.uint8)): skimage.util.img_as_ubyte,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.uint)): skimage.util.img_as_uint,  # pyright: ignore [reportPossiblyUnboundVariable]
         }
         if dtype_str not in convert_image:
             if np.issubdtype(image.dtype, np.floating):
-                convert = skimage.util.img_as_float
+                convert = skimage.util.img_as_float  # pyright: ignore [reportPossiblyUnboundVariable]
             else:
                 raise NotImplementedError(f"Perturb not implemented for {dtype_str}")
         else:
             convert = convert_image[dtype_str]
 
         # Apply perturbation
-        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)
+        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)  # pyright: ignore [reportPossiblyUnboundVariable]
 
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)

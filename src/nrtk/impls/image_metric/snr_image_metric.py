@@ -49,8 +49,8 @@ class SNRImageMetric(ImageMetric):
     def compute(  # noqa: C901
         self,
         img_1: np.ndarray,
-        img_2: np.ndarray = None,
-        additional_params: dict[str, Any] = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given one image, compute the Signal to Noise ratio.
 
@@ -128,7 +128,7 @@ class SNRImageMetric(ImageMetric):
 
 def _signal_to_noise(
     img: np.ndarray,
-    axis: int | tuple[int, ...] = None,
+    axis: int | tuple[int, ...] | None = None,
     ddof: int = 0,
 ) -> float:
     """Computes the signal to noise ratio of an input image.

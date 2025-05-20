@@ -14,8 +14,10 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any, Optional, Union
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -35,8 +37,8 @@ class RandomTranslationPerturber(PerturbImage):
     def __init__(
         self,
         box_alignment_mode: str = "extent",
-        seed: Optional[Union[int, np.random.Generator]] = 1,
-        color_fill: Optional[Sequence[int]] = [0, 0, 0],
+        seed: int | np.random.Generator | None = 1,
+        color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
         """
         RandomTranslationPerturber applies a random translation perturbation to an input image.
@@ -54,9 +56,9 @@ class RandomTranslationPerturber(PerturbImage):
     def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Randomly translates an image and adjusts bounding boxes.
 
@@ -144,9 +146,9 @@ class RandomTranslationPerturber(PerturbImage):
     def __call__(
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Calls `perturb` with the given input image."""
         return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 

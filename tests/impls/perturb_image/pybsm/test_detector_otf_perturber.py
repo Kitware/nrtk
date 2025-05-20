@@ -18,6 +18,7 @@ from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPer
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 
 if DetectorOTFPerturber.is_usable():
+    # Multiple type ignores added for pyright's handling of guarded imports
     from tests.impls.test_pybsm_utils import (
         TIFFImageSnapshotExtension,
         create_sample_sensor_and_scenario,
@@ -34,7 +35,7 @@ class TestDetectorOTFPerturber:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor, scenario = create_sample_sensor_and_scenario()  # pyright: ignore [reportPossiblyUnboundVariable]
         # Test perturb interface directly
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
         inst2 = DetectorOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
@@ -71,7 +72,7 @@ class TestDetectorOTFPerturber:
         sensor = None
         scenario = None
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor, scenario = create_sample_sensor_and_scenario()  # pyright: ignore [reportPossiblyUnboundVariable]
 
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
@@ -101,7 +102,7 @@ class TestDetectorOTFPerturber:
         sensor = None
         scenario = None
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor, scenario = create_sample_sensor_and_scenario()  # pyright: ignore [reportPossiblyUnboundVariable]
         perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
@@ -128,7 +129,7 @@ class TestDetectorOTFPerturber:
         sensor = None
         scenario = None
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor, scenario = create_sample_sensor_and_scenario()  # pyright: ignore [reportPossiblyUnboundVariable]
 
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
         for i in configuration_test_helper(inst):
@@ -227,13 +228,13 @@ class TestDetectorOTFPerturber:
         sensor = None
         scenario = None
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor, scenario = create_sample_sensor_and_scenario()  # pyright: ignore [reportPossiblyUnboundVariable]
 
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
 
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)  # pyright: ignore [reportPossiblyUnboundVariable]
 
     @pytest.mark.parametrize(
         "boxes",

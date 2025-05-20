@@ -23,6 +23,8 @@ Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
 """
 
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
@@ -46,7 +48,6 @@ try:
 except ImportError:  # pragma: no cover
     pybsm_available = False
 
-from typing import Optional
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -88,18 +89,18 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: Optional[PybsmSensor] = None,
-        scenario: Optional[PybsmScenario] = None,
-        mtf_wavelengths: Optional[Sequence[float]] = None,
-        mtf_weights: Optional[Sequence[float]] = None,
-        altitude: Optional[float] = None,
-        slant_range: Optional[float] = None,
-        D: Optional[float] = None,  # noqa: N803
-        ha_wind_speed: Optional[float] = None,
-        cn2_at_1m: Optional[float] = None,
-        int_time: Optional[float] = None,
-        n_tdi: Optional[float] = None,
-        aircraft_speed: Optional[float] = None,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
+        mtf_wavelengths: Sequence[float] | None = None,
+        mtf_weights: Sequence[float] | None = None,
+        altitude: float | None = None,
+        slant_range: float | None = None,
+        D: float | None = None,  # noqa: N803
+        ha_wind_speed: float | None = None,
+        cn2_at_1m: float | None = None,
+        int_time: float | None = None,
+        n_tdi: float | None = None,
+        aircraft_speed: float | None = None,
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
@@ -239,9 +240,9 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
     def perturb(  # noqa: C901
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies turbulence and aperture-based perturbation to the provided image.
 
@@ -342,7 +343,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> "TurbulenceApertureOTFPerturber":
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> TurbulenceApertureOTFPerturber:
         """
         Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
 

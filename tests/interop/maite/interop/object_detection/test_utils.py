@@ -18,6 +18,7 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
 from nrtk.interop.maite.interop.object_detection.utils import is_usable
 
 if is_usable:
+    # Multiple type ignores added for pyright's handling of guarded imports
     import kwcoco  # type: ignore
 
 from nrtk.interop.maite.interop.object_detection.dataset import (
@@ -110,7 +111,7 @@ def test_dataset_to_coco(
 
         # Re-create MAITE dataset from file
         coco_dataset = COCOJATICObjectDetectionDataset(
-            kwcoco_dataset=kwcoco.CocoDataset(label_file),
+            kwcoco_dataset=kwcoco.CocoDataset(label_file),  # pyright: ignore [reportPossiblyUnboundVariable, reportCallIssue]
             image_metadata=metadata,
         )
 
@@ -137,4 +138,4 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     mock_is_usable.return_value = False
     assert not COCOJATICObjectDetectionDataset.is_usable()
     with pytest.raises(KWCocoImportError):
-        COCOJATICObjectDetectionDataset(None, None, None)
+        COCOJATICObjectDetectionDataset(None, list(), False)

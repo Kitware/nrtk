@@ -38,7 +38,7 @@ class TestNRTKPerturberCLI:
         tmpdir: py.path.local,
     ) -> None:
         """Test that entrypoint and dataset_to_coco are called with appropriate arguments."""
-        output_dir = Path(tmpdir.join("out"))
+        output_dir = Path(tmpdir.join(Path("out")))
 
         runner = CliRunner()
         result = runner.invoke(
@@ -120,7 +120,7 @@ class TestNRTKPerturberCLI:
         Check that the entrypoint is able to continue when a metadata file is not present (as long as
         it's not required by the perturber).
         """
-        output_dir = tmpdir.join("out")
+        output_dir = tmpdir.join(Path("out"))
 
         with expectation:
             runner = CliRunner()
@@ -137,7 +137,7 @@ class TestNRTKPerturberCLI:
     @mock.patch("pathlib.Path.is_file", return_value=False)
     def test_missing_annotations(self, tmpdir: py.path.local) -> None:
         """Check that an exception is appropriately raised if the annotations file is missing."""
-        output_dir = tmpdir.join("out")
+        output_dir = tmpdir.join(Path("out"))
 
         with pytest.raises(ValueError, match=r"Could not identify annotations file."):
             CliRunner().invoke(
@@ -148,9 +148,9 @@ class TestNRTKPerturberCLI:
 
     def test_config_gen(self, tmpdir: py.path.local) -> None:
         """Test the generate configuration file option."""
-        output_dir = tmpdir.join("out")
+        output_dir = tmpdir.join(Path("out"))
 
-        output_config = tmpdir.join("gen_conf.json")
+        output_config = tmpdir.join(Path("gen_conf.json"))
 
         runner = CliRunner()
         runner.invoke(
@@ -172,7 +172,7 @@ class TestNRTKPerturberCLI:
     @mock.patch("nrtk.interop.maite.utils.bin.nrtk_perturber_cli.is_usable", False)
     def test_missing_deps(self, tmpdir: py.path.local) -> None:
         """Test that proper warning is displayed when required dependencies are not installed."""
-        output_dir = tmpdir.join("out")
+        output_dir = tmpdir.join(Path("out"))
 
         runner = CliRunner()
 

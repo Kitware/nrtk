@@ -6,15 +6,15 @@ from nrtk.utils._exceptions import PydanticImportError
 
 BaseModel: type = object
 try:
-    # TODO: Remove once mypy is dropped (no redef) # noqa: FIX002
-    from pydantic import BaseModel  # type: ignore
+    from pydantic import BaseModel
 
     pydantic_available = True
 except ImportError:  # pragma: no cover
     pydantic_available = False
 
 
-class NrtkPerturbInputSchema(BaseModel):
+# pyright warns about inheritance from BaseModel which is ambiguous
+class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
     """Input schema for NRTK perturber API"""
 
     # Header
@@ -55,7 +55,7 @@ class NrtkPerturbInputSchema(BaseModel):
         super().__init__(**data)
 
 
-class DatasetSchema(BaseModel):
+class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
     """Dataset schema for NRTK perturber API"""
 
     root_dir: str
@@ -82,7 +82,7 @@ class DatasetSchema(BaseModel):
         super().__init__(**data)
 
 
-class NrtkPerturbOutputSchema(BaseModel):
+class NrtkPerturbOutputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
     """Output schema for NRTK perturber API"""
 
     message: str

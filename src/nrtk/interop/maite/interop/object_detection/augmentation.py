@@ -1,8 +1,10 @@
 """This module contains wrappers for NRTK perturbers for object detection"""
 
+from __future__ import annotations
+
 import copy
 from collections.abc import Sequence
-from typing import Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from maite.protocols import AugmentationMetadata
@@ -74,6 +76,8 @@ class JATICDetectionAugmentation(Augmentation):
                 zip(img_bboxes, img_labels),
                 additional_params=dict(md),
             )
+            if TYPE_CHECKING and not aug_img_anns:
+                break
             aug_imgs.append(np.transpose(aug_img, (2, 0, 1)))
 
             # re-format annotations to JATICDetectionTarget for returning
@@ -96,8 +100,7 @@ class JATICDetectionAugmentation(Augmentation):
 
             perturber_configs = list()
             if "nrtk_perturber_config" in md:
-                # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
-                perturber_configs = list(md["nrtk_perturber_config"])  # type: ignore
+                perturber_configs = list(md["nrtk_perturber_config"])
             perturber_configs.append(self.augment.get_config())
             aug_md = NRTKDatumMetadata(
                 id=md["id"],
@@ -118,7 +121,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):
 
     Parameters
     ----------
-    augmentations : Optional[Sequence[Augmentation]]
+    augmentations : Sequence[Augmentation] | None
         Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
     metric : ImageMetric
         Image metric to be applied for a given image.
@@ -128,7 +131,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):
 
     def __init__(
         self,
-        augmentations: Optional[Sequence[Augmentation]],
+        augmentations: Sequence[Augmentation] | None,
         metric: ImageMetric,
         augment_id: str,
     ) -> None:
@@ -140,7 +143,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):
     def _apply_augmentations(
         self,
         batch: OBJ_DETECTION_BATCH_T,
-    ) -> tuple[Union[InputBatchType, Sequence[None]], TargetBatchType, DatumMetadataBatchType]:
+    ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:
         """Apply augmentations to given batch"""
 
         if self.augmentations:
@@ -174,8 +177,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):
 
             existing_metrics = list()
             if "nrtk_metric" in aug_md:
-                # TODO: Remove ignore after switch to pyright, mypy doesn't have good typed dict support  # noqa: FIX002
-                existing_metrics = list(aug_md["nrtk_metric"])  # type: ignore
+                existing_metrics = list(aug_md["nrtk_metric"])
             existing_metrics.append((metric_name, metric_value))
             metric_aug_md = NRTKDatumMetadata(
                 id=aug_md["id"],

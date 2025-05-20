@@ -21,9 +21,11 @@ Example usage:
     perturbed_image = perturber.perturb(image)
 """
 
+from __future__ import annotations
+
 import copy
 from collections.abc import Hashable, Iterable
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -133,9 +135,9 @@ class PybsmPerturber(PerturbImage):
     def perturb(
         self,
         image: np.ndarray,
-        boxes: Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]] = None,
-        additional_params: Optional[dict[str, Any]] = None,
-    ) -> tuple[np.ndarray, Optional[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]]:
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """:raises: ValueError if 'img_gsd' not present in additional_params"""
         if additional_params is None:  # Cannot have mutable data structure in argument default
             additional_params = dict()
@@ -196,7 +198,7 @@ class PybsmPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> "PybsmPerturber":
+    def from_config(cls, config_dict: dict, merge_default: bool = True) -> PybsmPerturber:
         """
         Instantiates a PybsmPerturber from a configuration dictionary.
 

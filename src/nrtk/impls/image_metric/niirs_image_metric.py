@@ -75,9 +75,9 @@ class NIIRSImageMetric(ImageMetric):
     @override
     def compute(
         self,
-        img_1: np.ndarray = None,
-        img_2: np.ndarray = None,
-        additional_params: dict[str, Any] = None,
+        img_1: np.ndarray | None = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """
         Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
@@ -98,9 +98,9 @@ class NIIRSImageMetric(ImageMetric):
     @override
     def __call__(
         self,
-        img_1: np.ndarray = None,
-        img_2: np.ndarray = None,
-        additional_params: dict[str, Any] = None,
+        img_1: np.ndarray | None = None,
+        img_2: np.ndarray | None = None,
+        additional_params: dict[str, Any] | None = None,
     ) -> float:
         """
         Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
