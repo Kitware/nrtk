@@ -75,3 +75,9 @@ class WaterDropletImportError(ImportError):
             `nrtk[waterdroplet,graphics]` or `nrtk[waterdroplet,headless]`.
             """,
         )
+
+
+class NotebookTestingImportError(ImportError):
+    def __init__(self) -> None:
+        # Call the base class constructor with the parameters it needs
+        super().__init__("jupytext must be installed. Please install via `nrtk[notebook-testing]`.")

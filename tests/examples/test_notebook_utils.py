@@ -17,6 +17,8 @@ from typing import Any, Literal, TypedDict, Union
 
 from typing_extensions import NotRequired
 
+from nrtk.utils._exceptions import NotebookTestingImportError
+
 _found_path = shutil.which("pyright")
 PYRIGHT_PATH = Path(_found_path) if _found_path else None
 del _found_path
@@ -85,9 +87,7 @@ def notebook_to_py_text(path_to_nb: Path) -> str:
     try:
         import jupytext
     except ImportError:
-        raise ImportError(
-            "`jupytext` must be installed in order to run pyright on jupyter notebooks.",
-        ) from ImportError
+        raise NotebookTestingImportError from ImportError
     ntbk = jupytext.read(path_to_nb, fmt="ipynb")
     return jupytext.writes(ntbk, fmt=".py")
 

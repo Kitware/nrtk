@@ -7,11 +7,16 @@ from unittest.mock import MagicMock
 import py  # type: ignore
 import pytest
 from click.testing import CliRunner
-from maite.protocols.object_detection import Dataset
 
+from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.interop.maite.utils.bin.nrtk_perturber_cli import is_usable, nrtk_perturber_cli
-from nrtk.utils._exceptions import KWCocoImportError
+from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from tests.interop.maite import DATASET_FOLDER, NRTK_BLUR_CONFIG, NRTK_PYBSM_CONFIG
+
+Dataset: type = object
+if maite_available:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols.object_detection import Dataset
 
 
 class TestNRTKPerturberCLI:
@@ -21,13 +26,14 @@ class TestNRTKPerturberCLI:
     """
 
     @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
+    @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
     @mock.patch(
         "nrtk.interop.maite.utils.bin.nrtk_perturber_cli.nrtk_perturber",
         return_value=[
-            ("_f-0.012_D-0.001_px-2e-05", MagicMock(spec=Dataset)),
-            ("_f-0.012_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
-            ("_f-0.014_D-0.001_px-2e-05", MagicMock(spec=Dataset)),
-            ("_f-0.014_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
+            ("_f-0.012_D-0.001_px-2e-05", MagicMock(spec=Dataset)),  # pyright: ignore [reportPossiblyUnboundVariable]
+            ("_f-0.012_D-0.003_px-2e-05", MagicMock(spec=Dataset)),  # pyright: ignore [reportPossiblyUnboundVariable]
+            ("_f-0.014_D-0.001_px-2e-05", MagicMock(spec=Dataset)),  # pyright: ignore [reportPossiblyUnboundVariable]
+            ("_f-0.014_D-0.003_px-2e-05", MagicMock(spec=Dataset)),  # pyright: ignore [reportPossiblyUnboundVariable]
         ],
     )
     @mock.patch("nrtk.interop.maite.utils.bin.nrtk_perturber_cli.dataset_to_coco", return_value=None)

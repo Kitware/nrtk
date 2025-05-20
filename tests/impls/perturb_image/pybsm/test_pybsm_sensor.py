@@ -24,7 +24,7 @@ def sensor_instance() -> PybsmSensor:
     return PybsmSensor(name="test_sensor", D=0.3, f=1.1, p_x=0.4, opt_trans_wavelengths=np.array([0.1, 0.4]) * 1.0e-6)
 
 
-@pytest.mark.skipif(not pybsm_available, reason=str(PyBSMImportError))
+@pytest.mark.skipif(not pybsm_available, reason=str(PyBSMImportError()))
 class TestPybsmSensor:
     @pytest.mark.parametrize("name", ["spatial", "spectra", "hyperspectral"])
     def test_sensor_string_rep(self, name: str) -> None:
