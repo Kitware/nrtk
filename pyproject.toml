@@ -201,6 +201,7 @@ addopts = [
     "--cov=./tests",                    # Also cover our tests for dead spots
     "--cov-report=term",                # Coverage report to terminal
     "--cov-report=xml:coverage.xml",    # for external tool reporting
+    "--snapshot-warn-unused"
 ]
 testpaths = [
     "tests",

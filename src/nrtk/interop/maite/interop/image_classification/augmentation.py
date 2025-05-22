@@ -6,22 +6,34 @@ import copy
 from collections.abc import Sequence
 
 import numpy as np
-from maite.protocols import AugmentationMetadata
-from maite.protocols.image_classification import (
-    Augmentation,
-    DatumMetadataBatchType,
-    InputBatchType,
-    TargetBatchType,
-)
 
 from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.interop.generic import NRTKDatumMetadata, _forward_md_keys
+from nrtk.utils._exceptions import MaiteImportError
 
-IMG_CLASSIFICATION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]
+Augmentation: type = object
+InputBatchType: type = object
+TargetBatchType: type = object
+DatumMetadataBatchType: type = object
+try:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols import AugmentationMetadata
+    from maite.protocols.image_classification import (
+        Augmentation,
+        DatumMetadataBatchType,
+        InputBatchType,
+        TargetBatchType,
+    )
+
+    maite_available = True
+except ImportError:  # pragma: no cover
+    maite_available = False
+
+IMG_CLASSIFICATION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]  # pyright:  ignore [reportPossiblyUnboundVariable]
 
 
-class JATICClassificationAugmentation(Augmentation):
+class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
     """Implementation of JATIC Augmentation for NRTK perturbers.
 
     Implementation of JATIC Augmentation for NRTK perturbers operating on a MAITE-protocol
@@ -37,13 +49,15 @@ class JATICClassificationAugmentation(Augmentation):
 
     def __init__(self, augment: PerturbImage, augment_id: str) -> None:
         """Initialize augmentation wrapper"""
+        if not self.is_usable():
+            raise MaiteImportError
         self.augment = augment
-        self.metadata = AugmentationMetadata(id=augment_id)
+        self.metadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
 
     def __call__(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:
+    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
         """Apply augmentations to the given data batch."""
         imgs, anns, metadata = batch
 
@@ -52,7 +66,7 @@ class JATICClassificationAugmentation(Augmentation):
         aug_anns = list()  # list of individual augmented annotations
         aug_metadata = list()  # list of individual augmented image-level metadata
 
-        for img, ann, md in zip(imgs, anns, metadata):
+        for img, ann, md in zip(imgs, anns, metadata):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
             aug_img = np.transpose(np.asarray(copy.deepcopy(img)), (1, 2, 0))  # Convert to channels-last
             aug_img, _ = self.augment(aug_img, additional_params=dict(md))
@@ -78,8 +92,18 @@ class JATICClassificationAugmentation(Augmentation):
         # return batch of augmented inputs, class labels and updated metadata
         return aug_imgs, aug_anns, aug_metadata
 
+    @classmethod
+    def is_usable(cls) -> bool:
+        """
+        Checks if the necessary dependency (MAITE) is available.
 
-class JATICClassificationAugmentationWithMetric(Augmentation):
+        Returns:
+            bool: True MAITE is available; False otherwise.
+        """
+        return maite_available
+
+
+class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
     """Implementation of JATIC augmentation wrapper for NRTK's Image metrics.
 
     Implementation of JATIC augmentation for NRTK metrics operating on a MAITE-protocol
@@ -97,19 +121,19 @@ class JATICClassificationAugmentationWithMetric(Augmentation):
 
     def __init__(
         self,
-        augmentations: Sequence[Augmentation] | None,
+        augmentations: Sequence[Augmentation] | None,  # pyright: ignore [reportInvalidTypeForm]
         metric: ImageMetric,
         augment_id: str,
     ) -> None:
         """Initialize augmentation with metric wrapper"""
         self.augmentations = augmentations
         self.metric = metric
-        self.metadata = AugmentationMetadata(id=augment_id)
+        self.metadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
 
     def _apply_augmentations(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:
+    ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:  # pyright: ignore [reportInvalidTypeForm]
         """Apply augmentations to given batch"""
 
         if self.augmentations:
@@ -118,21 +142,21 @@ class JATICClassificationAugmentationWithMetric(Augmentation):
                 aug_batch = aug(aug_batch)
         else:
             imgs, anns, metadata = batch
-            aug_batch = [None] * len(imgs), anns, metadata
+            aug_batch = [None] * len(imgs), anns, metadata  # pyright: ignore [reportArgumentType]
 
         return aug_batch
 
     def __call__(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:
+    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
         """Compute a specified image metric on the given batch."""
         imgs, _, _ = batch
         metric_aug_metadata = list()  # list of individual image-level metric metadata
 
         aug_imgs, aug_anns, aug_metadata = self._apply_augmentations(batch)
 
-        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata):
+        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata):  # pyright: ignore [reportArgumentType]
             # Convert from channels-first to channels-last
             img_1 = np.transpose(img, (1, 2, 0))
             img_2 = None if aug_img is None else np.transpose(aug_img, (1, 2, 0))

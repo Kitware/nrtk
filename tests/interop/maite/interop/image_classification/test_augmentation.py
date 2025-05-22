@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-from maite.protocols.image_classification import Augmentation, DatumMetadataType, TargetBatchType
 
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.image_metric import ImageMetric
@@ -16,11 +15,19 @@ from nrtk.interop.maite.interop.image_classification.augmentation import (
     JATICClassificationAugmentation,
     JATICClassificationAugmentationWithMetric,
 )
+from nrtk.interop.maite.interop.object_detection.utils import maite_available
+from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
+
+TargetBatchType: type = object
+if maite_available:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols.image_classification import DatumMetadataType, TargetBatchType
 
 random = np.random.default_rng()
 
 
+@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestJATICClassificationAugmentation:
     @pytest.mark.parametrize(
         ("perturber", "targets_in", "expected_targets_out"),
@@ -33,8 +40,8 @@ class TestJATICClassificationAugmentation:
     def test_augmentation_adapter(
         self,
         perturber: PerturbImage,
-        targets_in: TargetBatchType,
-        expected_targets_out: TargetBatchType,
+        targets_in: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
+        expected_targets_out: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
         """Test that the adapter provides the same image perturbation result as the core perturber.
 
@@ -42,7 +49,7 @@ class TestJATICClassificationAugmentation:
         """
         augmentation = JATICClassificationAugmentation(augment=perturber, augment_id="test_augment")
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)  # MAITE is channels-first
-        md_in: list[DatumMetadataType] = [{"id": 1}]
+        md_in: list[DatumMetadataType] = [{"id": 1}]  # pyright: ignore [reportInvalidTypeForm]
 
         # Get copies to check for modification
         img_copy = np.copy(img_in)
@@ -82,11 +89,11 @@ class TestJATICClassificationAugmentation:
     def test_multiple_augmentations(
         self,
         perturbers: Sequence[PerturbImage],
-        targets_in: TargetBatchType,
+        targets_in: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
         """Test that the adapter appends, not overrides nrtk configs when multiple perturbations are applied."""
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)  # MAITE is channels-first
-        md_in: list[DatumMetadataType] = [{"id": 1}]
+        md_in: list[DatumMetadataType] = [{"id": 1}]  # pyright: ignore [reportInvalidTypeForm]
 
         imgs_out = [img_in]
         targets_out = targets_in
@@ -100,9 +107,10 @@ class TestJATICClassificationAugmentation:
         assert md_out[0]["nrtk_perturber_config"] == all_perturber_configs
 
 
+@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestJATICClassificationAugmentationWithMetric:
     img_in = random.integers(0, 255, (256, 256, 3), dtype=np.uint8)
-    md_in: list[DatumMetadataType] = [{"id": 1}]
+    md_in: list["DatumMetadataType"] = [{"id": 1}]
     md_aug_nop_pertuber = [
         {
             "nrtk_perturber_config": [{"box_alignment_mode": "extent"}],
@@ -115,7 +123,7 @@ class TestJATICClassificationAugmentationWithMetric:
         [
             (None, [np.asarray([0])], [np.asarray([0])], None, md_in, does_not_raise()),
             (
-                [JATICClassificationAugmentation(NOPPerturber(), augment_id="no op augment")],
+                [(NOPPerturber(), "no op augment")],
                 [np.asarray([0])],
                 [np.asarray([0])],
                 img_in,
@@ -127,9 +135,9 @@ class TestJATICClassificationAugmentationWithMetric:
     )
     def test_metric_augmentation_adapter(
         self,
-        augmentations: Sequence[Augmentation],
-        targets_in: TargetBatchType,
-        expected_targets_out: TargetBatchType,
+        augmentations: Sequence[tuple[PerturbImage, str]],  # pyright: ignore [reportPossiblyUnboundVariable]
+        targets_in: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
+        expected_targets_out: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
         metric_input_img2: np.ndarray,
         metric_metadata: list[dict[str, Any]],
         expectation: AbstractContextManager,
@@ -143,7 +151,11 @@ class TestJATICClassificationAugmentationWithMetric:
         perturber = NOPPerturber()
         metric_patch = MagicMock(spec=ImageMetric, return_value=1.0)
         metric_augmentation = JATICClassificationAugmentationWithMetric(
-            augmentations=augmentations,
+            augmentations=[
+                JATICClassificationAugmentation(augment=augment, augment_id=idx) for augment, idx in augmentations
+            ]
+            if augmentations is not None
+            else None,
             metric=metric_patch,
             augment_id="test_augment_with_metric",
         )
@@ -187,15 +199,15 @@ class TestJATICClassificationAugmentationWithMetric:
         ("augmentations", "targets_in"),
         [
             (
-                [JATICClassificationAugmentation(NOPPerturber(), augment_id="no op augment")],
+                [(NOPPerturber(), "no op augment")],
                 [np.asarray([0])],
             ),
         ],
     )
     def test_multiple_metrics(
         self,
-        augmentations: Sequence[Augmentation],
-        targets_in: TargetBatchType,
+        augmentations: Sequence[tuple[PerturbImage, str]],  # pyright: ignore [reportPossiblyUnboundVariable]
+        targets_in: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
         """Test that multiple metrics can be added to metadata"""
         imgs_out = [np.transpose(self.img_in, (2, 0, 1))]
@@ -206,7 +218,9 @@ class TestJATICClassificationAugmentationWithMetric:
         metric_patches = [MagicMock(spec=ImageMetric, return_value=idx) for idx in range(num_augments)]
         for idx in range(num_augments):
             metric_augmentation = JATICClassificationAugmentationWithMetric(
-                augmentations=augmentations,
+                augmentations=[
+                    JATICClassificationAugmentation(augment=augment, augment_id=idx) for augment, idx in augmentations
+                ],
                 metric=metric_patches[idx],
                 augment_id=f"test_augment_with_metric{1}",
             )

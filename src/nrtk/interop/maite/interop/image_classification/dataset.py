@@ -5,18 +5,29 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import numpy as np
-from maite.protocols import DatasetMetadata
-from maite.protocols.image_classification import (
-    Dataset,
-    DatumMetadataType,
-    InputType,
-    TargetType,
-)
 
-IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
+InputType: type = object
+TargetType: type = object
+DatumMetadataType: type = object
+Dataset: type = object
+try:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols import DatasetMetadata
+    from maite.protocols.image_classification import (
+        Dataset,
+        DatumMetadataType,
+        InputType,
+        TargetType,
+    )
+
+    maite_available = True
+except ImportError:  # pragma: no cover
+    maite_available = False
+
+IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]  # pyright:  ignore [reportPossiblyUnboundVariable]
 
 
-class JATICImageClassificationDataset(Dataset):
+class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]
     """Implementation of the JATIC Image Classification dataset wrapper for dataset images of varying sizes.
 
     Parameters
@@ -34,8 +45,8 @@ class JATICImageClassificationDataset(Dataset):
     def __init__(
         self,
         imgs: Sequence[np.ndarray],
-        labels: Sequence[TargetType],
-        datum_metadata: Sequence[DatumMetadataType],
+        labels: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
+        datum_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         dataset_id: str,
         index2label: dict[int, str] | None = None,
     ) -> None:

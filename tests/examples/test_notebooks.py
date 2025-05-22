@@ -1,8 +1,17 @@
+from importlib.util import find_spec
+
 import pytest
+
+from nrtk.utils._exceptions import NotebookTestingImportError
 
 from .test_notebook_utils import list_error_messages, pyright_analyze
 
+deps = ["jupytext"]
+specs = [find_spec(dep) for dep in deps]
+is_usable = all(spec is not None for spec in specs)
 
+
+@pytest.mark.skipif(not is_usable, reason=str(NotebookTestingImportError()))
 class TestPyrightNotebook:
     @pytest.mark.filterwarnings("ignore:Jupyter is migrating its paths")
     @pytest.mark.parametrize(

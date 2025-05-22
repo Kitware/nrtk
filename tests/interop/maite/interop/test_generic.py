@@ -3,11 +3,18 @@ from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 
 import pytest
-from maite.protocols import DatumMetadata
 
 from nrtk.interop.maite.interop.generic import NRTKDatumMetadata, _forward_md_keys
+from nrtk.interop.maite.interop.object_detection.utils import maite_available
+from nrtk.utils._exceptions import MaiteImportError
+
+DatumMetadata: type = object
+if maite_available:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols import DatumMetadata
 
 
+@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestGenericInteropUtilities:
     @pytest.mark.parametrize(
         ("md", "aug_md", "forwarded_keys", "expectation"),
@@ -23,13 +30,13 @@ class TestGenericInteropUtilities:
     )
     def test_forward_md_keys(
         self,
-        md: DatumMetadata,
+        md: DatumMetadata,  # pyright: ignore [reportInvalidTypeForm]
         aug_md: NRTKDatumMetadata,
         forwarded_keys: Sequence[str],
         expectation: AbstractContextManager,
     ) -> None:
         with expectation:
-            md_out = _forward_md_keys(md, aug_md, forwarded_keys)
+            md_out = _forward_md_keys(md, aug_md, forwarded_keys)  # pyright: ignore [reportPossiblyUnboundVariable]
 
             for key in md_out:
-                assert key in md or aug_md
+                assert key in md or aug_md  # pyright: ignore [reportPossiblyUnboundVariable]

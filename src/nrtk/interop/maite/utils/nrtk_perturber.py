@@ -9,19 +9,22 @@ from collections.abc import Iterable
 
 import numpy as np
 
-try:
-    from maite.protocols.object_detection import Dataset
-
-    maite_available = True
-except ImportError:  # pragma: no cover
-    maite_available = False
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation
 from nrtk.interop.maite.interop.object_detection.dataset import JATICObjectDetectionDataset
 from nrtk.utils._exceptions import MaiteImportError
 
+Dataset: type = object
+try:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols.object_detection import Dataset
 
-def nrtk_perturber(maite_dataset: "Dataset", perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportPossiblyUnboundVariable]
+    maite_available = True
+except ImportError:  # pragma: no cover
+    maite_available = False
+
+
+def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportInvalidTypeForm]
     """Generate augmented dataset(s) of type maite.protocols.object_detection.Dataset.
 
     Generate augmented dataset(s) of type maite.protocols.object_detection.Dataset
@@ -49,7 +52,7 @@ def nrtk_perturber(maite_dataset: "Dataset", perturber_factory: PerturbImageFact
     # Iterate through the different perturber factory parameter combinations and
     # save the perturbed images to disk
     logging.info("Starting perturber sweep")
-    augmented_datasets: list[Dataset] = []  # pyright: ignore [reportPossiblyUnboundVariable]
+    augmented_datasets: list[Dataset] = []  # pyright: ignore [reportInvalidTypeForm]
     output_perturb_params: list[str] = []
     for i, (perturber_combo, perturber) in enumerate(zip(perturber_combinations, perturber_factory)):
         output_perturb_params.append("".join(f"_{k!s}-{v!s}" for k, v in perturber_combo.items()))

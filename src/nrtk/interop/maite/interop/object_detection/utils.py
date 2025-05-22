@@ -6,16 +6,26 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from maite.protocols.object_detection import Dataset
 from PIL import Image  # type: ignore
 
+from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
+
+Dataset: type = object
 try:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols.object_detection import Dataset
+
+    maite_available = True
+except ImportError:  # pragma: no cover
+    maite_available = False
+
+try:
+    # Multiple type ignores added for pyright's handling of guarded imports
     from kwcoco import CocoDataset  # type: ignore
 
-    is_usable = True
+    kwcoco_available = True
 except ImportError:  # pragma: no cover
-    is_usable = False
-from nrtk.utils._exceptions import KWCocoImportError
+    kwcoco_available = False
 
 
 def _xywh_bbox_xform(x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:
@@ -29,8 +39,8 @@ def _create_annotations(dataset_categories: list[dict[str, Any]]) -> "CocoDatase
     return annotations
 
 
-def dataset_to_coco(
-    dataset: Dataset,
+def dataset_to_coco(  # noqa: C901
+    dataset: Dataset,  # pyright: ignore [reportInvalidTypeForm]
     output_dir: Path,
     img_filenames: list[Path],
     dataset_categories: list[dict[str, Any]],
@@ -43,17 +53,19 @@ def dataset_to_coco(
     :param dataset_categories: A list of the categories related to this dataset.
         Each dictionary should contain the following keys: id, name, supercategory.
     """
-    if not is_usable:
+    if not kwcoco_available:
         raise KWCocoImportError
-    if len(img_filenames) != len(dataset):
-        raise ValueError(f"Image filename and dataset length mismatch ({len(img_filenames)} != {len(dataset)})")
+    if not maite_available:
+        raise MaiteImportError
+    if len(img_filenames) != len(dataset):  # pyright: ignore [reportPossiblyUnboundVariable]
+        raise ValueError(f"Image filename and dataset length mismatch ({len(img_filenames)} != {len(dataset)})")  # pyright: ignore [reportPossiblyUnboundVariable]
 
     mod_metadata = list()
 
     annotations = _create_annotations(dataset_categories)
 
-    for i in range(len(dataset)):
-        image, dets, metadata = dataset[i]
+    for i in range(len(dataset)):  # pyright: ignore [reportPossiblyUnboundVariable]
+        image, dets, metadata = dataset[i]  # pyright: ignore [reportPossiblyUnboundVariable]
         filename = output_dir / img_filenames[i]
         filename.parent.mkdir(parents=True, exist_ok=True)
 
