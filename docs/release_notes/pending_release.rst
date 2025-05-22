@@ -14,3 +14,5 @@ Fixes
 * Fixed ``LinspaceStepPerturber`` to follow default linspace behavior (endpoint=True)
 
 * Fixed errors in T&E Guides and added Colab link.
+
+* Fixed some broken URLs in jupyter notebooks
