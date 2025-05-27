@@ -228,6 +228,78 @@ description of the extra.
 
 .. :auto installation-links:
 
+Perturber Dependencies
+----------------------
+The following table lists the perturbers and the extra/dependencies required to use them.
+
+.. list-table:: Perturber Dependencies
+    :widths: 45 25 30
+    :header-rows: 1
+
+    * - Perturber
+      - Extra(s) Required
+      - Key Dependencies Provided by Extra(s)
+    * - :ref:`AlbumentationsPerturber`
+      - ``albumentations``
+      - ``albumentations``
+    * - :ref:`AverageBlurPerturber`
+      - ``graphics`` or ``headless``
+      - ``OpenCV``
+    * - :ref:`BrightnessPerturber`
+      - ``Pillow``
+      - ``Pillow``
+    * - :ref:`CircularApertureOTFPerturber`
+      - ``pybsm``, and (``graphics`` or ``headless``)
+      - ``pyBSM``, ``OpenCV``
+    * - :ref:`ColorPerturber`
+      - ``Pillow``
+      - ``Pillow``
+    * - :ref:`ContrastPerturber`
+      - ``Pillow``
+      - ``Pillow``
+    * - :ref:`DefocusOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`DetectorOTFPerturber`
+      - ``pybsm``, and (``graphics`` or ``headless``)
+      - ``pyBSM``, ``OpenCV``
+    * - :ref:`GaussianBlurPerturber`
+      - ``graphics`` or ``headless``
+      - ``OpenCV``
+    * - :ref:`GaussianNoisePerturber`
+      - ``scikit-image``
+      - ``scikit-image``
+    * - :ref:`JitterOTFPerturber`
+      - ``pybsm``, and (``graphics`` or ``headless``)
+      - ``pyBSM``, ``OpenCV``
+    * - :ref:`MedianBlurPerturber`
+      - ``graphics`` or ``headless``
+      - ``OpenCV``
+    * - :ref:`PepperNoisePerturber`
+      - ``scikit-image``
+      - ``scikit-image``
+    * - :ref:`PyBSMPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`SaltAndPepperNoisePerturber`
+      - ``scikit-image``
+      - ``scikit-image``
+    * - :ref:`SaltNoisePerturber`
+      - ``scikit-image``
+      - ``scikit-image``
+    * - :ref:`SharpnessPerturber`
+      - ``Pillow``
+      - ``Pillow``
+    * - :ref:`SpeckleNoisePerturber`
+      - ``scikit-image``
+      - ``scikit-image``
+    * - :ref:`TurbulenceApertureOTFPerturber`
+      - ``pybsm``, and (``graphics`` or ``headless``)
+      - ``pyBSM``, ``OpenCV``
+    * - :ref:`WaterDropletPerturber`
+      - ``waterdroplet``, and (``graphics`` or ``headless``)
+      - ``scipy``, ``shapely``, ``OpenCV``
+
 .. _Poetry: https://python-poetry.org
 .. _installation: https://python-poetry.org/docs/#installation
 .. _usage: https://python-poetry.org/docs/basic-usage/
