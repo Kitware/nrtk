@@ -92,6 +92,7 @@ Documentation Contents:
    :caption: Explanation
 
    nrtk_explanation
+   risk_factors
 
 .. toctree::
    :maxdepth: 1
