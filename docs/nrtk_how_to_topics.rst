@@ -26,6 +26,7 @@ Each guide links to a Jupyter notebook in the ``docs/examples/`` directory of th
     examples/maite/nrtk_sensor_transformation_demo.ipynb
     examples/maite/nrtk_translation_perturber_demo.ipynb
     examples/maite/nrtk_turbulence_perturber_demo.ipynb
+    examples/maite/nrtk_water_droplet_perturber_demo.ipynb
 
 
 General NRTK Examples
@@ -105,6 +106,11 @@ Introduce pixel-level translations and observe model sensitivity to spatial shif
 
 Simulate atmospheric distortion effects and assess their impact on image quality and model inference.
 `View notebook <examples/maite/nrtk_turbulence_perturber_demo.html>`__.
+
+- **Demonstrating Rain/Water Droplet Perturbations**
+
+Simulate a rain/water droplet effect and analyze its impact on model inputs and predictions.
+`View notebook <examples/maite/nrtk_water_droplet_perturber_demo.html>`__.
 
 
 Related Resources

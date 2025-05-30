@@ -1,10 +1,13 @@
-"""
 # This file includes code originally posted on Stack Overflow
 # (https://stackoverflow.com/posts/50751932/revisions) and is licensed under the
 # Creative Commons Attribution-ShareAlike 4.0 International License.
 # https://creativecommons.org/licenses/by-sa/4.0/
 #
 # © 2025 Kitware, Inc
+
+"""
+This module defines the `WaterDropletPerturber` class, which implements a physics-based,
+photorealistic water/rain droplet model on input images.
 
 WaterDropletPerturber Implementation based on the work from these source papers:
 (1)

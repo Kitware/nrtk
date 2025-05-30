@@ -17,7 +17,7 @@ notebooks:
   extends: .notebooks
   rules: !reference [.notebooks, rules]
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
@@ -49,6 +49,7 @@ notebooks:
           "nrtk_lens_flare_demo.ipynb",
           "nrtk_translation_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
+          "nrtk_water_droplet_perturber_demo.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/maite/gradio"
         NOTEBOOK_FILE: [
