@@ -8,6 +8,11 @@ Updates / New Features
 
 * Added a documentation page outlining operational risks
 
+Examples
+--------
+
+* Added an example notebook guide to demonstrate the use of the ``WaterDropletPerturber``.
+
 Fixes
 -----
 
