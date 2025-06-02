@@ -27,3 +27,5 @@ Fixes
 * Fixed some broken URLs in jupyter notebooks
 
 * Generalized ``DummyPerturber`` class to be used in tests.
+
+* Use context handlers for file opens in ``tests/impls/score_detections/test_coco_scorer.py``
