@@ -8,6 +8,8 @@ Updates / New Features
 
 * Added a documentation page outlining operational risks
 
+* Improved installation documentation for README.md
+
 Examples
 --------
 
