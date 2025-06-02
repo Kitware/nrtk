@@ -36,7 +36,7 @@ This toolkit is intended to help data scientists, developers, and T&E engineers 
 
 To install the current version via `pip`:
 ```bash
-pip install nrtk[<extra1>,<extra2>,...]
+pip install nrtk
 ```
 
 To install the current version via `conda-forge`:
@@ -44,7 +44,34 @@ To install the current version via `conda-forge`:
 conda install -c conda-forge nrtk
 ```
 
-Certain plugins may require additional runtime dependencies. Details on these requirements can be found
+This installs core functionality, but many specific perturbers require additional dependencies.
+
+### Installation with Optional Features (Extras)
+
+NRTK uses optional "extras" to avoid installing unncessary dependencies. You can install extras with square brackets:
+
+```bash
+# Install with extras (note: no spaces after commas)
+pip install nrtk[<extra1>,<extra2>]
+```
+
+#### Common Installation Patterns
+
+```bash
+# For basic OpenCV image perturbations
+pip install nrtk[graphics]
+# For basic Pillow image perturbations
+pip install nrtk[Pillow]
+# For pybsm's sensor-based perturbations
+pip install nrtk[pybsm,graphics]
+```
+
+**Note**: Choose either `graphics` or `headless` for OpenCV, not both.
+
+More information on extras and related perturbers can be found
+[here](https://nrtk.readthedocs.io/en/latest/installation.html#extras)
+
+Details on the perturbers and their dependencies can be found
 [here](https://nrtk.readthedocs.io/en/latest/implementations.html).
 
 For more detailed installation instructions, visit the
