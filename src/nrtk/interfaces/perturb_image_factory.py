@@ -79,7 +79,7 @@ class PerturbImageFactory(Plugfigurable):
         if self.n < len(self.thetas):
             kwargs = {self.theta_key: self.thetas[self.n]}
             func = self.perturber(**kwargs)
-            self.n += 1
+            self.n: int = self.n + 1
             return func
         raise StopIteration
 
@@ -101,7 +101,7 @@ class PerturbImageFactory(Plugfigurable):
     @classmethod
     def from_config(
         cls,
-        config_dict: dict,
+        config_dict: dict[str, Any],
         merge_default: bool = True,
     ) -> Self:
         """

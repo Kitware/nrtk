@@ -70,7 +70,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
     def __getitem__(
         self,
         idx: int,
-    ) -> tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]:
+    ) -> tuple[np.ndarray[Any, Any], CLASSIFICATION_DICT_T, dict[str, Any]]:
         """Get the ``idx``th image and ground_truth pair."""
 
     def generate(  # noqa C901:

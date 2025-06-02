@@ -26,9 +26,9 @@ try:
         TargetBatchType,
     )
 
-    maite_available = True
+    maite_available: bool = True
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 IMG_CLASSIFICATION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]  # pyright:  ignore [reportPossiblyUnboundVariable]
 
@@ -52,7 +52,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
-        self.metadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
 
     def __call__(
         self,
@@ -128,7 +128,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
         """Initialize augmentation with metric wrapper"""
         self.augmentations = augmentations
         self.metric = metric
-        self.metadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
 
     def _apply_augmentations(
         self,

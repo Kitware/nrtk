@@ -64,7 +64,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         self,
         idx: int,
     ) -> tuple[
-        np.ndarray,
+        np.ndarray[Any, Any],
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:

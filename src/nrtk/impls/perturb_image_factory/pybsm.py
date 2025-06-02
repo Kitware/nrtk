@@ -101,7 +101,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         self._thetas = thetas
 
         top = [len(entry) for entry in self.thetas]
-        self.sets = _PybsmPerturbImageFactory._build_set_list(0, top)
+        self.sets: Sequence[list[int]] = _PybsmPerturbImageFactory._build_set_list(0, top)
 
     @override
     def __len__(self) -> int:
@@ -138,7 +138,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         if self.n < len(self.sets):
             kwargs = {k: self.thetas[i][self.sets[self.n][i]] for i, k in enumerate(self.theta_keys)}
             func = PybsmPerturber(self.sensor, self.scenario, **kwargs)
-            self.n += 1
+            self.n: int = self.n + 1
             return func
         raise StopIteration
 
@@ -207,7 +207,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @classmethod
     def from_config(
         cls,
-        config_dict: dict,
+        config_dict: dict[str, Any],
         merge_default: bool = True,
     ) -> _PybsmPerturbImageFactory:
         """

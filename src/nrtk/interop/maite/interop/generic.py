@@ -13,10 +13,10 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from maite.protocols import DatumMetadata
 
-    maite_available = True
+    maite_available: bool = True
 
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 
 @dataclass

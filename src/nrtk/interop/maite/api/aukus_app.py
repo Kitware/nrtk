@@ -18,17 +18,17 @@ try:
     from fastapi import FastAPI, HTTPException
     from fastapi.encoders import jsonable_encoder
 
-    fastapi_available = True
+    fastapi_available: bool = True
 except ImportError:  # pragma: no cover
-    fastapi_available = False
+    fastapi_available: bool = False
 
 BaseSettings: type = object
 try:
     from pydantic_settings import BaseSettings
 
-    pydantic_settings_available = True
+    pydantic_settings_available: bool = True
 except ImportError:  # pragma: no cover
-    pydantic_settings_available = False
+    pydantic_settings_available: bool = False
 
 
 # pyright warns about inheritance from BaseSettings which is ambiguous
@@ -43,7 +43,7 @@ class Settings(BaseSettings):  # pyright: ignore [reportGeneralTypeIssues]
     print('\t`NRTK_IP="http://<hostname>:<port>/"`\n')
 
 
-settings = Settings()
+settings: Settings = Settings()
 
 
 class _UnusableFastApi:

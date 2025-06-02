@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 
 try:
     from scipy.special import binom
 
-    scipy_available = True
+    scipy_available: bool = True
 except ImportError:
-    scipy_available = False
+    scipy_available: bool = False
 
 
 class Bezier:
@@ -22,8 +24,8 @@ class Bezier:
 
     def __init__(
         self,
-        p1: np.ndarray,
-        p2: np.ndarray,
+        p1: np.ndarray[Any, Any],
+        p2: np.ndarray[Any, Any],
         angle1: float,
         angle2: float,
         r: float = 0.3,
@@ -49,11 +51,11 @@ class Bezier:
         )
         self.p = p
 
-    def get_curve(self) -> np.ndarray:
+    def get_curve(self) -> np.ndarray[Any, Any]:
         """Returns curve information"""
         return self.bezier()
 
-    def bezier(self) -> np.ndarray:
+    def bezier(self) -> np.ndarray[Any, Any]:
         """
         Draw Bézier curve by interpolating segments based on the
         Bernstein basis poynomial function.
@@ -97,7 +99,7 @@ class Bezier:
         return curve
 
 
-def ccw_sort(points: np.ndarray) -> np.ndarray:
+def ccw_sort(points: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
     """Sorts points in counterclockwise order around a center point."""
 
     # Subtract original point from center point (position obtained
@@ -109,7 +111,11 @@ def ccw_sort(points: np.ndarray) -> np.ndarray:
     return points[np.argsort(s), :]
 
 
-def get_bezier_curve(points: np.ndarray, rad: float = 0.2, edgy: float = 0.0) -> tuple[np.ndarray, np.ndarray]:
+def get_bezier_curve(
+    points: np.ndarray[Any, Any],
+    rad: float = 0.2,
+    edgy: float = 0.0,
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """
     Given an array of *points*, create a curve through
     those points.
@@ -160,7 +166,7 @@ def get_random_points_within_min_dist(
     scale: float = 0.8,
     min_dst: float | None = None,
     recursive: int = 0,
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """
     Recursive function to create *n* random points in the unit square,
     which are *min_dst* apart, then scale them.

@@ -37,3 +37,5 @@ Fixes
 * Fixed ruff rules and updated linting.
 
 * Removed ``Union`` and ``Optional`` type hints.
+
+* Improved the completeness score of pyright --verifytypes

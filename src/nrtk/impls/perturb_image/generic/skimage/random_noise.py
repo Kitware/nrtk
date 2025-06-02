@@ -41,9 +41,9 @@ import numpy as np
 try:
     import skimage.util  # type:ignore
 
-    skimage_available = True
+    skimage_available: bool = True
 except ImportError:  # pragma: no cover
-    skimage_available = False
+    skimage_available: bool = False
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
@@ -157,10 +157,10 @@ class SaltNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with salt noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="salt", amount=self.amount), boxes
@@ -172,10 +172,10 @@ class PepperNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with pepper noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="pepper", amount=self.amount), boxes
@@ -210,10 +210,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with S&P noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
@@ -281,10 +281,10 @@ class GaussianNoisePerturber(_GSNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with Gaussian noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean), boxes
@@ -296,10 +296,10 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with multiplicative noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="speckle", var=self.var, mean=self.mean), boxes

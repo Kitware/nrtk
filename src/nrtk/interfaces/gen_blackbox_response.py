@@ -94,10 +94,10 @@ class GenerateBlackboxResponse(Plugfigurable):
         idx: int,
     ) -> (
         tuple[
-            np.ndarray,
+            np.ndarray[Any, Any],
             Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
             dict[str, Any],
         ]
-        | tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]
+        | tuple[np.ndarray[Any, Any], CLASSIFICATION_DICT_T, dict[str, Any]]
     ):
         """Get the ``idx``th image and ground_truth pair."""

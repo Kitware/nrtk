@@ -49,25 +49,25 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 
 try:
     # Guarded import check for utility function usage.
     from shapely.geometry import Point, Polygon
 
-    shapely_available = True
+    shapely_available: bool = True
 except ImportError:  # pragma: no cover
-    shapely_available = False
+    shapely_available: bool = False
 
 try:
     # Guarded import check for utility function usage.
     import scipy  # noqa: F401
 
-    scipy_available = True
+    scipy_available: bool = True
 except ImportError:  # pragma: no cover
-    scipy_available = False
+    scipy_available: bool = False
 
 
 import numpy as np
@@ -170,7 +170,7 @@ class WaterDropletPerturber(PerturbImage):
 
     def _initialize_derived_parameters(self) -> None:
         """Derived Parameters"""
-        self.rng = np.random.default_rng(self.seed)
+        self.rng: np.random.Generator = np.random.default_rng(self.seed)
         # Glass plane at M centimeters ahead of the camera (value range chosen from source paper)
         self.M = self.rng.integers(20, 40)
 
@@ -178,7 +178,7 @@ class WaterDropletPerturber(PerturbImage):
         # and lies beyond the glass plane (value range chosen from source paper)
         self.B = self.rng.integers(800, 1500)
 
-        self.normal = np.array([0.0, -1.0 * np.cos(self.psi), np.sin(self.psi)])
+        self.normal: np.ndarray[Any, Any] = np.array([0.0, -1.0 * np.cos(self.psi), np.sin(self.psi)])
 
         self.g_centers = list()
         self.g_radius = list()
@@ -212,7 +212,7 @@ class WaterDropletPerturber(PerturbImage):
         v = w * (yy - intrinsic[1, 2]) / intrinsic[1, 1]
         return np.dstack((u, v, w)).reshape((x, y, 3))
 
-    def _get_sphere_raindrop(self, width: int, height: int, gls: np.ndarray) -> None:  # noqa: C901
+    def _get_sphere_raindrop(self, width: int, height: int, gls: np.ndarray[Any, Any]) -> None:  # noqa: C901
         """
         Simulate and store information about raindrops on the windshield.
 
@@ -226,10 +226,10 @@ class WaterDropletPerturber(PerturbImage):
             :param height: Input image height.
             :param gls: Glass (3D) coordinate system mapping matrix.
         """
-        self.g_centers = list()
-        self.g_radius = list()
-        self.centers = list()
-        self.radius = list()
+        self.g_centers: list[Any] = list()
+        self.g_radius: list[Any] = list()
+        self.centers: list[Any] = list()
+        self.radius: list[Any] = list()
 
         left_upper = gls[0][0]
         left_bottom = gls[0][height - 1]
@@ -439,7 +439,7 @@ class WaterDropletPerturber(PerturbImage):
         p_i = np.dot(intrinsic, np.transpose(p_e)) / self.B
         return np.round(p_i)
 
-    def render(self, image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:  # noqa: C901
+    def render(self, image: np.ndarray[Any, Any]) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:  # noqa: C901
         """
         Rendering the image with the Water Droplet effect.
 
@@ -507,7 +507,12 @@ class WaterDropletPerturber(PerturbImage):
                     mask[y - 1, x - 1] = 255
         return rain_image, mask
 
-    def blur(self, image: np.ndarray, rain_image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    def blur(
+        self,
+        image: np.ndarray[Any, Any],
+        rain_image: np.ndarray[Any, Any],
+        mask: np.ndarray[Any, Any],
+    ) -> np.ndarray[Any, Any]:
         """
         Blur the area within the boundaries of the droplets
 
@@ -552,10 +557,10 @@ class WaterDropletPerturber(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies the Water Droplet perturbation effect to the provided input image.
 

@@ -52,10 +52,10 @@ class ComposePerturber(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Apply the sequence of perturbers to the input image.
 
@@ -94,7 +94,7 @@ class ComposePerturber(PerturbImage):
     @classmethod
     def from_config(
         cls,
-        config_dict: dict,
+        config_dict: dict[str, Any],
         merge_default: bool = True,
     ) -> Self:
         """

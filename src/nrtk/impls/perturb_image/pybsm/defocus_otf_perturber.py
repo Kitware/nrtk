@@ -26,9 +26,9 @@ try:
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
     from scipy.signal import fftconvolve
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -143,14 +143,14 @@ class DefocusOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.w_x = w_x if w_x is not None else 0.0
-            self.w_y = w_y if w_y is not None else 0.0
+            self.w_x: float = w_x if w_x is not None else 0.0
+            self.w_y: float = w_y if w_y is not None else 0.0
             # Assume visible spectrum of light
-            self.ifov = -1
-            self.slant_range = -1
-            self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+            self.ifov: float = -1
+            self.slant_range: float = -1
+            self.mtf_wavelengths: np.ndarray[np.float64, Any] = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            self.D = 0.003
+            self.D: float = 0.003
 
         self.sensor = sensor
         self.scenario = scenario
@@ -159,10 +159,10 @@ class DefocusOTFPerturber(PerturbImage):
     @override
     def perturb(  # noqa:C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies the defocus aperture-based perturbation to the provided image.
 
@@ -190,8 +190,8 @@ class DefocusOTFPerturber(PerturbImage):
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.defocus_otf = defocus_OTF(uu, vv, self.w_x, self.w_y)  # type: ignore
+        self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+        self.defocus_otf: np.ndarray[Any, Any] = defocus_OTF(uu, vv, self.w_x, self.w_y)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -276,7 +276,7 @@ class DefocusOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
         """
         Instantiates a DefocusOTFPerturber from a configuration dictionary.
 

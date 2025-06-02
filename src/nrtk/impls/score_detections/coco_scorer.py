@@ -59,9 +59,9 @@ class COCOScorer(ScoreDetections):
         self.stat_index = stat_index
 
         with contextlib.redirect_stdout(None):
-            self.coco_gt = COCO(gt_path)
+            self.coco_gt: COCO = COCO(gt_path)
 
-        self.cat_ids = {v["name"]: k for k, v in self.coco_gt.cats.items()}
+        self.cat_ids: dict[str, Any] = {v["name"]: k for k, v in self.coco_gt.cats.items()}
 
     @override
     def score(  # noqa: C901

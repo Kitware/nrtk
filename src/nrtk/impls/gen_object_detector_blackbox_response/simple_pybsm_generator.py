@@ -56,7 +56,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     def __init__(
         self,
-        images: Sequence[np.ndarray],
+        images: Sequence[np.ndarray[Any, Any]],
         img_gsds: Sequence[float],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> None:
@@ -92,7 +92,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         self,
         idx: int,
     ) -> tuple[
-        np.ndarray,
+        np.ndarray[Any, Any],
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:

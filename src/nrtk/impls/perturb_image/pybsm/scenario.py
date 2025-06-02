@@ -24,9 +24,9 @@ from typing import Any
 try:
     from pybsm.simulation.scenario import Scenario
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import Configurable
 from typing_extensions import override
@@ -48,11 +48,11 @@ class PybsmScenario(Configurable):
         ground_range_values (list[float]): Permissible ground range values for the scenario.
     """
 
-    ihaze_values = [1, 2]
-    altitude_values = (
+    ihaze_values: list[int] = [1, 2]
+    altitude_values: list[float] = (
         [2, 32.55, 75, 150, 225, 500] + list(range(1000, 12001, 1000)) + list(range(14000, 20001, 2000)) + [24500]
     )
-    ground_range_values = (
+    ground_range_values: list[int] = (
         [0, 100, 500]
         + list(range(1000, 20001, 1000))
         + list(range(22000, 80001, 2000))

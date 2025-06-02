@@ -35,9 +35,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 
 try:
     import pybsm.radiance as radiance
@@ -49,9 +49,9 @@ try:
     )
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 import numpy as np
 from smqtk_core.configuration import (
@@ -179,11 +179,11 @@ class CircularApertureOTFPerturber(PerturbImage):
                 np.asarray(mtf_weights) if mtf_weights is not None else np.ones(len(self.mtf_wavelengths))
             )
             # Assume visible spectrum of light
-            self.ifov = -1
-            self.slant_range = -1
+            self.ifov: float = -1
+            self.slant_range: float = -1
             # Default value for lens diameter and relative linear obscuration
-            self.D = 0.003
-            self.eta = 0.0
+            self.D: float = 0.003
+            self.eta: float = 0.0
 
         if self.mtf_wavelengths.size == 0:
             raise ValueError("mtf_wavelengths is empty")
@@ -201,10 +201,10 @@ class CircularApertureOTFPerturber(PerturbImage):
     @override
     def perturb(  # noqa: C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies the circular aperture-based perturbation to the provided image.
 
@@ -231,14 +231,15 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
+
         # Sample spacing for the optical transfer function
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+        self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
         # Compute a wavelength weighted composite array based on the circular aperture OTF function.
         def ap_function(wavelengths: float) -> np.ndarray:
             return circular_aperture_OTF(uu, vv, wavelengths, self.D, self.eta)  # type: ignore
 
-        self.ap_OTF = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)  # type: ignore
+        self.ap_OTF: np.ndarray[Any, Any] = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -300,7 +301,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
         """
         Instantiates a CircularApertureOTFPerturber from a configuration dictionary.
 

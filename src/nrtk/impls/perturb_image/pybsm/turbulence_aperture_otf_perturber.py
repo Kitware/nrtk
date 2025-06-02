@@ -34,9 +34,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 import numpy as np
 
 try:
@@ -44,9 +44,9 @@ try:
     from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 
 from smqtk_core.configuration import (
@@ -216,15 +216,15 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             )
 
             # Sensor paramaters
-            self.D = D if D is not None else 40e-3
-            self.int_time = int_time if int_time is not None else 30e-3
-            self.n_tdi = n_tdi if n_tdi is not None else 1.0
+            self.D: float = D if D is not None else 40e-3
+            self.int_time: float = int_time if int_time is not None else 30e-3
+            self.n_tdi: float = n_tdi if n_tdi is not None else 1.0
 
             # Scenario Parameters
-            self.altitude = altitude if altitude is not None else 250
-            self.ha_wind_speed = ha_wind_speed if ha_wind_speed is not None else 0
-            self.cn2_at_1m = cn2_at_1m if cn2_at_1m is not None else 1.7e-14
-            self.aircraft_speed = aircraft_speed if aircraft_speed is not None else 0
+            self.altitude: float = altitude if altitude is not None else 250
+            self.ha_wind_speed: float = ha_wind_speed if ha_wind_speed is not None else 0
+            self.cn2_at_1m: float = cn2_at_1m if cn2_at_1m is not None else 1.7e-14
+            self.aircraft_speed: float = aircraft_speed if aircraft_speed is not None else 0
 
         # Assume visible spectrum of light
         self.slant_range = slant_range if slant_range is not None else self.altitude
@@ -248,10 +248,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
     @override
     def perturb(  # noqa: C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies turbulence and aperture-based perturbation to the provided image.
 
@@ -279,8 +279,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.turbulence_otf, _ = polychromatic_turbulence_OTF(  # type: ignore
+        self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+        turbulence_otf: tuple[np.ndarray[Any, Any], Any] = polychromatic_turbulence_OTF(  # type: ignore
             uu,
             vv,
             self.mtf_wavelengths,
@@ -293,6 +293,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             (self.int_time * self.n_tdi if self.int_time is not None and self.n_tdi is not None else 1.0),
             self.aircraft_speed,
         )
+        self.turbulence_otf: np.ndarray[Any, Any] = turbulence_otf[0]
 
         if additional_params is None:
             additional_params = dict()
@@ -361,7 +362,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
         """
         Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
 

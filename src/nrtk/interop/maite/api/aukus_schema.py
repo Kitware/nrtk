@@ -10,9 +10,9 @@ BaseModel: type = object
 try:
     from pydantic import BaseModel
 
-    pydantic_available = True
+    pydantic_available: bool = True
 except ImportError:  # pragma: no cover
-    pydantic_available = False
+    pydantic_available: bool = False
 
 
 # pyright warns about inheritance from BaseSettings which is ambiguous
