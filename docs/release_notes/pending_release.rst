@@ -25,3 +25,5 @@ Fixes
 * Fixed errors in T&E Guides and added Colab link.
 
 * Fixed some broken URLs in jupyter notebooks
+
+* Generalized ``DummyPerturber`` class to be used in tests.
