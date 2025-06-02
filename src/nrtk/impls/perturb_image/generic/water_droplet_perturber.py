@@ -119,38 +119,40 @@ class WaterDropletPerturber(PerturbImage):
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
-        :param size_range: Range of size multiplier values used for computing
-            the size of the water droplet.
-        :param num_drops: Target number of water droplets.
-        :param blur_strength: Strength of Gaussian blur operation.
-        :param psi: Angle between the line-of-sight and glass plane (radians).
-        :param n_air: Density of air.
-        :param n_water: Density of water.
-        :param f_x: Camera focal length in x direction (cm).
-        :param f_y: Camera focal length in y direction (cm).
-        :param seed: Random seed for reproducibility.
-        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
-            Should be one of the following options:
-                extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                median: median between extent and extant
-            Default value is extent
+        Args:
+            :param size_range: Range of size multiplier values used for computing
+                the size of the water droplet.
+            :param num_drops: Target number of water droplets.
+            :param blur_strength: Strength of Gaussian blur operation.
+            :param psi: Angle between the line-of-sight and glass plane (radians).
+            :param n_air: Density of air.
+            :param n_water: Density of water.
+            :param f_x: Camera focal length in x direction (cm).
+            :param f_y: Camera focal length in y direction (cm).
+            :param seed: Random seed for reproducibility.
+            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
 
-        If any of the parameters are absent, the following values will be set
-        as defaults:
+            If any of the parameters are absent, the following values will be set
+            as defaults:
 
-        size_range = (0.0, 1.0)
-        num_drops = 20
-        blur_strength = 0.25
-        psi = 90.0 / 180.0 * np.pi
-        n_air = 1.0
-        n_water = 1.33
-        f_x = 400
-        f_y = 400
-        seed = None
+            size_range = (0.0, 1.0)
+            num_drops = 20
+            blur_strength = 0.25
+            psi = 90.0 / 180.0 * np.pi
+            n_air = 1.0
+            n_water = 1.33
+            f_x = 400
+            f_y = 400
+            seed = None
 
-        :raises: ImportError if OpenCV, Scipy or Shapely is not found, install via
-        `pip install nrtk[waterdroplet,graphics]` or `pip install nrtk[waterdroplet,headless]`.
+        Raises:
+            :raises ImportError: If OpenCV, Scipy or Shapely is not found, install via
+                `pip install nrtk[waterdroplet,graphics]` or `pip install nrtk[waterdroplet,headless]`.
         """
         if not self.is_usable():
             raise WaterDropletImportError
@@ -195,14 +197,14 @@ class WaterDropletPerturber(PerturbImage):
         Convert 2D pixel coordinates from an image (x, y) into a 3D point in the glass coordinate system.
 
         Args:
-            x (int): X-coordinate value in the image plane.
-            y (int): Y-coordinate value in the image plane.
-            psi (float): Angle between the camera line-of-sight and glass plane (radians).
-            M (int): Glass plane at M centimeters ahead of the camera.
-            intrinsic: Intrinsic (Camera) parameters matrix.
+            :param x: X-coordinate value in the image plane.
+            :param y: Y-coordinate value in the image plane.
+            :param psi: Angle between the camera line-of-sight and glass plane (radians).
+            :param M: Glass plane at M centimeters ahead of the camera.
+            :param intrinsic: Intrinsic (Camera) parameters matrix.
 
         Returns:
-            np.ndarray: Glass plane (3D) coordinate system matrix.
+            :return np.ndarray: Glass plane (3D) coordinate system matrix.
         """
         xx, yy = np.meshgrid(np.arange(x), np.arange(y), indexing="ij")
         w = M * np.tan(psi) / (np.tan(psi) - (yy - intrinsic[1, 2]) / intrinsic[1, 1])
@@ -220,9 +222,9 @@ class WaterDropletPerturber(PerturbImage):
         - Stores this data for later use in the simulation.
 
         Args:
-            width (int): Input image width.
-            height (int): Input image height.
-            gls (np.ndarray): Glass (3D) coordinate system mapping matrix.
+            :param width: Input image width.
+            :param height: Input image height.
+            :param gls: Glass (3D) coordinate system mapping matrix.
         """
         self.g_centers = list()
         self.g_radius = list()
@@ -301,10 +303,10 @@ class WaterDropletPerturber(PerturbImage):
         the windshield. If yes, == index of the raindrop, if no, == -1.
 
         Args:
-            gls (np.ndarray): Glass (3D) coordinate system mapping matrix.
+            :param gls: Glass (3D) coordinate system mapping matrix.
 
         Returns:
-            np.ndarray: Truth mask of valid pixels.
+            :return np.ndarray: Truth mask of valid pixels.
         """
         p = gls
         q = np.ones(p.shape[:2]) * -1
@@ -319,10 +321,8 @@ class WaterDropletPerturber(PerturbImage):
             # Find the center of the droplet in terms of the image pixels
             x_cent = np.where(dist == np.min(dist))[0][0]
             y_cent = np.where(dist == np.min(dist))[1][0]
-
             diff = np.abs(dist - radius)
             rad_loc = np.where(diff == np.min(diff))
-
             x_rad, y_rad = rad_loc
             cent_rad = int(np.sqrt((x_rad - x_cent) ** 2 + (y_rad - y_cent) ** 2))
             cent = [int(x_cent - 1.5 * cent_rad), int(y_cent - 1.5 * cent_rad)]
@@ -375,7 +375,6 @@ class WaterDropletPerturber(PerturbImage):
                 rad=0.6,
                 scale=2 * cent_rad,
             )
-
             for point in all_points:
                 if point[0] >= q.shape[0] or point[1] >= q.shape[1]:
                     continue
@@ -394,14 +393,14 @@ class WaterDropletPerturber(PerturbImage):
         - Maps this point back to the image plane and returns the adjusted pixel coordinates.
 
         Args:
-            x (int): x-value from 2D coordinate system.
-            y (int): x-value from 2D coordinate system.
-            idx (int): Index for idx-th points from a list of points.
-            intrinsic: Intrinsic (Camera) parameters matrix.
-            gls (np.ndarray): Glass (3D) coordinate system mapping matrix.
+            :param x: x-value from 2D coordinate system.
+            :param y: x-value from 2D coordinate system.
+            :param idx: Index for idx-th points from a list of points.
+            :param intrinsic: Intrinsic (Camera) parameters matrix.
+            :param gls: Glass (3D) coordinate system mapping matrix.
 
         Returns:
-            np.ndarray: 3D point coordinates of water droplet (spherical model).
+            :return np.ndarray: 3D point coordinates of water droplet (spherical model).
         """
         p_g = gls[x, y]
 
@@ -427,6 +426,9 @@ class WaterDropletPerturber(PerturbImage):
         p_a = p_a / np.linalg.norm(p_a)
 
         eta = np.arccos(np.dot(normal_w, p_w - p_g) / np.linalg.norm(p_w - p_g))
+
+        # The angle between the normal to the spherical surface at the point of
+        # incidence and the optical axis.
         gamma = np.arcsin(self.n_air / self.n_water)
         if eta >= gamma:
             eta = gamma - 0.2
@@ -442,11 +444,11 @@ class WaterDropletPerturber(PerturbImage):
         Rendering the image with the Water Droplet effect.
 
         Args:
-            image (np.ndarray): Input Image.
+            :param image: Input Image.
 
         Returns:
-            np.ndarray: Image rendered with Water Droplet effect.
-            np.ndarray: Image mask.
+            :return np.ndarray: Image rendered with Water Droplet effect.
+            :return np.ndarray: Image mask.
         """
         h, w = image.shape[:2]
 
@@ -558,15 +560,13 @@ class WaterDropletPerturber(PerturbImage):
         Applies the Water Droplet perturbation effect to the provided input image.
 
         Args:
-            image (np.ndarray): The image to be perturbed.
-            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], optional): Bounding boxes
-                for detections in input image
-            additional_params (dict[str, Any], optional): Additional parameters, if applicable.
+            :param image: The image to be perturbed.
+            :param boxes: Bounding boxes for source detections.
+            :param additional_params: Additional parameters, if applicable.
 
         Returns:
-            np.ndarray: The perturbed image.
-            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: Bounding boxes
-                scaled to perturbed image shape.
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                The perturbed image and bounding boxes scaled to perturbed image shape.
         """
         image, boxes = super().perturb(image=image, boxes=boxes)
 
@@ -592,7 +592,7 @@ class WaterDropletPerturber(PerturbImage):
         Returns the current configuration of the WaterDropletPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         cfg = super().get_config()
 
@@ -614,6 +614,6 @@ class WaterDropletPerturber(PerturbImage):
         Checks if the necessary dependencies (OpenCV, Scipy and Shapely) are available.
 
         Returns:
-            bool: True if OpenCV, Scipy and Shapely are available.
+            :return bool: True if OpenCV, Scipy and Shapely are available.
         """
         return cv2_available and scipy_available and shapely_available

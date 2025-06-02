@@ -28,10 +28,15 @@ from nrtk.interfaces.perturb_image import PerturbImage
 class RandomTranslationPerturber(PerturbImage):
     """
     RandomTranslationPerturber randomly translates an image and adjusts bounding boxes accordingly.
+
+    Attributes:
+        rng (numpy.random.Generator): Random number generator for deterministic behavior.
+        color_fill (numpy.array): Background color fill for RGB image.
+
     Methods:
-    perturb: Applies a random translation to an input image and adjusts bounding boxes.
-    __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the RandomTranslationPerturber instance.
+        perturb: Applies a random translation to an input image and adjusts bounding boxes.
+        __call__: Calls the perturb method with the given input image.
+        get_config: Returns the current configuration of the RandomTranslationPerturber instance.
     """
 
     def __init__(
@@ -45,9 +50,10 @@ class RandomTranslationPerturber(PerturbImage):
         It ensures that bounding boxes are adjusted correctly to reflect the translated
         image coordinates.
 
-        Attributes:
-            rng (numpy.random.Generator): Random number generator for deterministic behavior.
-            color_fill: Background color fill for RGB image.
+        Args:
+            :param rng: Numpy random number generator.
+            :param color_fill: Numpy random number generator.
+
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
         self.rng = np.random.default_rng(seed)
@@ -62,15 +68,16 @@ class RandomTranslationPerturber(PerturbImage):
         """
         Randomly translates an image and adjusts bounding boxes.
 
-        :param image: Input image as a numpy array of shape (H, W, C).
-        :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+        Args:
+            :param image: Input image as a numpy array of shape (H, W, C).
+            :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            :param additional_params: Dictionary containing:
+                - "max_translation_limit" (tuple[int, int]): Max translation magnitude (translate_h, translate_w) lesser
+                  than or equal to the size of the input image.
 
-        :param additional_params: Dictionary containing:
-        - "max_translation_limit" (tuple[int, int]): Max translation magnitude
-          (translate_h, translate_w) lesser than or equal to the size of the input
-          image.
-
-        :return: Translated image as numpy array with the modified bounding boxes
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                Translated image with the modified bounding boxes.
         """
         super().perturb(image=image)
         if additional_params is None:
@@ -112,33 +119,41 @@ class RandomTranslationPerturber(PerturbImage):
         adjusted_bboxes = []
         if boxes is not None:
             for bbox, metadata in boxes:
-                # Shift the bounding box to align with the translated image coordinates
+                # Compute the shifted_min coords for the bounding box to align with
+                # the translated min_vertex coordinates
                 shifted_min_x = bbox.min_vertex[0] + translate_x
                 shifted_min_y = bbox.min_vertex[1] + translate_y
+
+                # Check boundary conditions for the shifted_min bounding box coordinates
                 if shifted_min_x < 0:
                     shifted_min_x = 0
                 elif shifted_min_x > bbox.max_vertex[0]:
                     shifted_min_x = bbox.max_vertex[0]
-
                 if shifted_min_y < 0:
                     shifted_min_y = 0
                 elif shifted_min_y > bbox.max_vertex[1]:
                     shifted_min_y = bbox.max_vertex[1]
 
                 shifted_min = (shifted_min_x, shifted_min_y)
+
+                # Compute the shifted_max coords for the bounding box to align with
+                # the translated max_vertex coordinates
                 shifted_max_x = bbox.max_vertex[0] + translate_x
                 shifted_max_y = bbox.max_vertex[1] + translate_y
 
+                # Assign boundary conditions for the shifted_max bounding box coordinates
                 if shifted_max_x < 0:
                     shifted_max_x = 0
                 elif shifted_max_x > bbox.max_vertex[0]:
                     shifted_max_x = bbox.max_vertex[0]
-
                 if shifted_max_y < 0:
                     shifted_max_y = 0
                 elif shifted_max_y > bbox.max_vertex[1]:
                     shifted_max_y = bbox.max_vertex[1]
+
                 shifted_max = (shifted_max_x, shifted_max_y)
+
+                # Apply the shifted coordinates to the output bounding box
                 adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
                 adjusted_bboxes.append((adjusted_box, metadata))
         return final_image, adjusted_bboxes
@@ -157,7 +172,7 @@ class RandomTranslationPerturber(PerturbImage):
         Returns the current configuration of the RandomTranslationPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         cfg = super().get_config()
         cfg["seed"] = self.rng

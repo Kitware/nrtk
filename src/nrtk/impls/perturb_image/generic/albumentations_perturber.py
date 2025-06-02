@@ -38,10 +38,16 @@ from nrtk.utils._exceptions import AlbumentationsImportError
 class AlbumentationsPerturber(PerturbImage):
     """
     AlbumentationsPerturber applies a BasicTransform from Albumentations
+
+    Attributes:
+        perturber (string): The name of the BasicTransform perturber to apply.
+        parameters (dict): Keyword arguments that should be passed to the given perturber.
+        seed (int): An optional seed for reproducible results.
+
     Methods:
-    perturb: Applies the specified to an input image.
-    __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the AlbumentationsPerturber instance.
+        perturb: Applies the specified to an input image.
+        __call__: Calls the perturb method with the given input image.
+        get_config: Returns the current configuration of the AlbumentationsPerturber instance.
     """
 
     def __init__(
@@ -52,12 +58,22 @@ class AlbumentationsPerturber(PerturbImage):
         seed: int | None = None,
     ) -> None:
         """
-        AlbumentationsPerturber applies a BasicTransform from Albumentations
+        AlbumentationsPerturber applies a BasicTransform from Albumentations.
 
-        Attributes:
-            perturber (string): The name of the BasicTransform perturber to apply
-            parameters (dict): Keyword arguments that should be passed to the given perturber
-            seed (int): An optional seed for reproducible results
+        Args:
+            :param perturber: The name of the BasicTransform perturber to apply.
+            :param parameters: Keyword arguments that should be passed to the given perturber.
+            :param seed: An optional seed for reproducible results.
+            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
+
+        Raises:
+            :raises ValueError: Given perturber is not available in Albumentations.
+            :raises ValueError: Given perturber does not inherit BasicTransform.
         """
         if not self.is_usable():
             raise AlbumentationsImportError
@@ -111,13 +127,16 @@ class AlbumentationsPerturber(PerturbImage):
         additional_params: dict[str, Any] | None = None,  # ARG002
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
-        Apply a BasicTransform from Albumentations to an image
+        Apply a BasicTransform from Albumentations to an image.
 
-        :param image: Input image as a numpy array of shape (H, W, C).
-        :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-        :return: Tuple containing:
-            Image with transform applied as numpy array
-            Bounding boxes with their coordinates adjusted by the transform
+        Args:
+            :param image: Input image as a numpy array of shape (H, W, C).
+            :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            :param additional_params: Additional parameters for perturbation.
+
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                Image with transform applied and bounding boxes with their coordinates adjusted by the transform.
         """
         # Create bboxes and labels in a format usable by Albumentations
         bboxes = list()
@@ -148,7 +167,7 @@ class AlbumentationsPerturber(PerturbImage):
         Returns the current configuration of the AlbumentationsPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         cfg = super().get_config()
         cfg["perturber"] = self.perturber
@@ -163,7 +182,7 @@ class AlbumentationsPerturber(PerturbImage):
         Checks if the required albumentations module is available.
 
         Returns:
-            bool: True if albumentations is installed; False otherwise.
+            :return bool: True if albumentations is installed; False otherwise.
         """
         # Requires opencv to be installed
         return albumentations_available
