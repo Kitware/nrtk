@@ -4,22 +4,20 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
-* Added a new section to the installation guide that lists the key dependencies for each perturber.
-
-* Added a documentation page outlining operational risks
-
-* Improved installation documentation for README.md
-
 Examples
---------
 
 * Added an example notebook guide to demonstrate the use of the ``WaterDropletPerturber``.
 
 Documentation
--------------
 
 * Improved inline documentation and docstring formatting for files under
   ``src/nrtk/perturb_image/impls/generic`` and ``src/nrtk/perturb_image/impls/pybsm``.
+
+* Improved installation documentation for README.md
+
+* Added a new section to the installation guide that lists the key dependencies for each perturber.
+
+* Added a documentation page outlining operational risks
 
 Fixes
 -----
