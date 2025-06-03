@@ -55,7 +55,7 @@ running the notebook.
 
 ### Encountering Issues
 
-For issues relating to NRTK functionality or running an example, 
+For issues relating to NRTK functionality or running an example,
 create an issue on the [repository](https://github.com/Kitware/nrtk/issues).
 
 ---

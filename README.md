@@ -10,7 +10,7 @@
 
 # Natural Robustness Toolkit (NRTK)
 
->The Natural Robustness Toolkit (NRTK) is an open source toolkit for generating operationally realistic perturbations to evaluate the natural robustness of computer vision 
+>The Natural Robustness Toolkit (NRTK) is an open source toolkit for generating operationally realistic perturbations to evaluate the natural robustness of computer vision
  algorithms.
 
 The `nrtk` package evaluates the natural robustness of computer vision algorithms to various perturbations, including sensor-specific changes to camera focal length, aperture
@@ -27,7 +27,7 @@ start with the `nrtk-jatic` module.
 NRTK addresses the critical gap in evaluating computer vision model resilience to real-world operational conditions beyond what traditional image augmentation libraries cover. T&E engineers need precise methods to assess how models respond to sensor-specific variables (focal length, aperture diameter, pixel pitch) and environmental factors without the prohibitive costs of exhaustive data collection. NRTK leverages pyBSM's physics-based models to rigorously simulate how imaging sensors capture and process light, enabling systematic robustness testing across parameter sweeps, identification of performance boundaries, and visualization of model degradation. This capability is particularly valuable for satellite and aerial imaging applications, where engineers can simulate hypothetical sensor configurations to support cost-performance trade-off analysis during system design—ensuring AI models maintain reliability when deployed on actual hardware facing natural perturbations in the field.
 
 ## Target Audience
-This toolkit is intended to help data scientists, developers, and T&E engineers who want to rigorously evaluate and enhance the robustness of their computer vision models. For users of the JATIC product suite, this toolkit is used to assess model robustness against natural perturbations. 
+This toolkit is intended to help data scientists, developers, and T&E engineers who want to rigorously evaluate and enhance the robustness of their computer vision models. For users of the JATIC product suite, this toolkit is used to assess model robustness against natural perturbations.
 
 
 <!-- :auto installation: -->
