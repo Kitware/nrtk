@@ -49,78 +49,16 @@ Closed
 ^^^^^^
 Indicates that the MR is resolved or discarded.
 
-Continuous Integration
-======================
+Continuous Integration (JATIC GitLab)
+=====================================
 The following checks are included in the automated portion of the review
 process, and are triggered whenever a merge-request is made or changes, a tag is
 created, or when the ``main`` branch is updated.
 These are run as part of the CI/CD pipeline driven by GitLab CI pipelines, and
 defined by the :file:`.gitlab-ci.yml` file.
 The success or failure of each may be seen in-line in a submitted MR in the
-"Checks" section of the MR view.
-
-Code Style Consistency (``test-py-lint``)
------------------------------------------
-Runs ``flake8`` to quality check the code style.
-You can run this check manually in your local repository with
-``poetry run flake8``.
-
-Passage of this check is strictly required.
-
-Static Type Analysis (``test-py-typecheck``)
---------------------------------------------
-Performs static type analysis.
-You can run this check manually in your local repository with ``poetry run
-mypy``.
-
-Passage of this check is strictly required.
-
-Documentation Build (``test-docs-build``)
------------------------------------------
-Performs a build of our Sphinx documentation.
-
-Passage of this check is strictly required.
-
-Unit Tests (``test-pytest``)
-----------------------------
-Runs the unittests created under ``tests/`` as well as any doctests found in
-docstrings in the package code proper.
-You can run this check manually  in your local repository with ``poetry run
-pytest``.
-
-Passage of these checks is strictly required.
-
-Regression Tests
-^^^^^^^^^^^^^^^^
-Regression test snapshots are generated using
-`syrupy <https://github.com/syrupy-project/syrupy>`_. To generate new snapshots,
-run ``poetry run pytest --snapshot-update path/to/test_file.py``. Ensure the full
-filepath is included so that irrelevant snapshots are not erroneously updated.
-Once a snapshot is generated, regression test results will be included in the
-``test-pytest`` job.
-
-Code Coverage (``test-coverage-percent``)
------------------------------------------
-This job checks that the lines of code covered by our Unit Tests checks meet or
-exceed certain thresholds.
-
-Passage of this check is not strictly required but highly encouraged.
-
-Release Notes Check (``test-release-notes-check``)
---------------------------------------------------
-Checks that the current branch's release notes has modifications relative to
-the marge target's.
-
-Passage of this check is not strictly required but highly encouraged.
-
-Example Notebooks Execution (``test-notebooks``)
-------------------------------------------------
-This check executes included example notebooks to ensure their proper
-functionality with the package with respect to a merge request.
-Not all notebooks may be run, as some may be set up to use too many resources
-or run for an extended period of time.
-
-Passage of these checks is strictly required.
+"Checks" section of the MR view. For a deeper overview, see the
+`CI/CD Pipeline documentation <https://gitlab.jatic.net/jatic/kitware/nrtk/-/blob/main/cicd-pipeline.md>`_.
 
 Human Review
 ============
@@ -146,10 +84,10 @@ so that the issue will be automatically closed upon merge.
 
 For internal development, the following review procedure shall be used:
 
-1. The author will label the merge request as "status::for review", move the
-   associated issue(s) to the for review column on the issue board, and request
+1. The author will label the merge request as "status::in review", move the
+   associated issue(s) to the in review column on the issue board, and request
    a review from a peer reviewer. Once the review process begins, the issue(s)
-   should remain in the for review column, review status will only be updated
+   should remain in the in review column, review status will only be updated
    on the MR itself, unless the scope of the issue significantly changes.
 
 2. Peer reviewer will provide comments or suggested changes and re-label the
@@ -157,7 +95,7 @@ For internal development, the following review procedure shall be used:
    will instead approve the MR and request a review from a maintainer.
 
 3. Author will address the comments provided by the peer reviewer and then
-   re-label the merge request as "status::for review" and re-request a peer
+   re-label the merge request as "status::in review" and re-request a peer
    review.
 
 4. Peer reviewer will repeat the process starting at step 2, as needed.

@@ -35,9 +35,9 @@ def image_metric_assertions(
     if original_img_2 is not None and img_2 is not None:
         assert np.array_equal(original_img_2, img_2), "img_2 modified, data changed"
 
-    assert (original_additional_params is None) == (
-        additional_params is None
-    ), "additional_params modified, data became None or no longer None"
+    assert (original_additional_params is None) == (additional_params is None), (
+        "additional_params modified, data became None or no longer None"
+    )
 
     if original_additional_params is not None and additional_params is not None:
         assert original_additional_params == additional_params, "additional_params modified, data changed"
