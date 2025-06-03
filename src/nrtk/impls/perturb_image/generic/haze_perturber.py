@@ -24,11 +24,15 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 class HazePerturber(PerturbImage):
     """
-    HazePerturber applies haze using Shree Nayar weathering
+    HazePerturber applies haze using Shree Nayar weathering.
+
+    Attributes:
+        factor (float): Strength of haze applied to an image.
+
     Methods:
-    perturb: Applies haze to an input image.
-    __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the HazePerturber instance.
+        perturb: Applies haze to an input image.
+        __call__: Calls the perturb method with the given input image.
+        get_config: Returns the current configuration of the HazePerturber instance.
     """
 
     def __init__(self, box_alignment_mode: str = "extent", factor: float = 1.0) -> None:
@@ -36,7 +40,7 @@ class HazePerturber(PerturbImage):
         HazePerturber applies haze to an input image.
 
         Attributes:
-            factor (float): Strength of haze applied to an image
+            :param factor: Strength of haze applied to an image.
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
         self.factor = factor
@@ -50,20 +54,24 @@ class HazePerturber(PerturbImage):
         """
         Apply haze to an image based on depth_map and sky_color
 
-        :param image: Input image as a numpy array of shape (H, W, C).
-        :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-        :param additional_params: Dictionary containing:
-            "depth_map" (np.ndarray): Optional depth map for adding haze. If depth_map is not in additional_params,
-            then a depth map the size of the image with all values equal to 1 will be used.
-            "sky_color" (list[float]): Sky color to use for weathering. If sky_color is not in additional_params,
-            then an average pixel value will be calculated and used as the sky color.
+        Args:
+            :param image: Input image as a numpy array of shape (H, W, C).
+            :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            :param additional_params: Dictionary containing:
+                - "depth_map" (np.ndarray): Optional depth map for adding haze. If depth_map is not in
+                  additional_params, then a depth map the size of the image with all values equal to 1 will be used.
+                - "sky_color" (list[float]): Sky color to use for weathering. If sky_color is not in
+                  additional_params, then an average pixel value will be calculated and used as the sky color.
 
-        :return: Image with haze applied as numpy array
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                Image with haze applied and source bounding boxes.
         """
 
         if additional_params is None:
             additional_params = dict()
 
+        # Use either the provided depth map or a map containing all values = 1
         if "depth_map" in additional_params:
             depth_map = additional_params["depth_map"]
             if len(image.shape) != len(depth_map.shape):
@@ -73,12 +81,14 @@ class HazePerturber(PerturbImage):
         else:
             depth_map = np.ones_like(image)
 
+        # Use either the provided sky_color map or a map containing avg. pixel values
         if "sky_color" in additional_params:
             sky_color = additional_params["sky_color"]
             self._check_sky_color(image=image, sky_color=sky_color)
         else:
             sky_color = np.mean(image, axis=(0, 1))
 
+        # Beer's Law of Attenuation based on the haze factor and depth map
         attenuation = np.exp(-self.factor * depth_map)
         output = image * attenuation + sky_color * (1 - attenuation)
 
@@ -95,7 +105,7 @@ class HazePerturber(PerturbImage):
         Returns the current configuration of the HazePerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         cfg = super().get_config()
         cfg["factor"] = self.factor

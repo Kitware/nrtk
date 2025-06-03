@@ -15,6 +15,12 @@ Examples
 
 * Added an example notebook guide to demonstrate the use of the ``WaterDropletPerturber``.
 
+Documentation
+-------------
+
+* Improved inline documentation and docstring formatting for files under
+  ``src/nrtk/perturb_image/impls/generic`` and ``src/nrtk/perturb_image/impls/pybsm``.
+
 Fixes
 -----
 

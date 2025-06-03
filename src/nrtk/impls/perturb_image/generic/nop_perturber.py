@@ -50,7 +50,18 @@ class NOPPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """Return unperturbed image."""
+        """
+        Returns unperturbed image and input bounding boxes.
+
+        Args:
+            :param image: Input image as a numpy array of shape (H, W, C).
+            :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            :param additional_params: Additional parameters for perturbation.
+
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                Returns the source image and bounding boxes.
+        """
         if additional_params is None:
             additional_params = dict()
         return np.copy(image), boxes

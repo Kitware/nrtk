@@ -81,33 +81,55 @@ class DefocusOTFPerturber(PerturbImage):
         Initializes a DefocusOTFPerturber instance with the specified parameters.
 
         Args:
-            sensor (PybsmSensor | None): Sensor configuration for the simulation.
-            scenario (PybsmScenario | None): Scenario configuration (altitude, ground range, etc.).
-            w_x (float | None): the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
-            w_y (float | None): the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
-            interp (bool): Whether to interpolate atmosphere data. Defaults to True.
-            box_alignment_mode (string) Mode for how to handle how bounding boxes change.
+            :param sensor: Sensor configuration for the simulation.
+            :param scenario: Scenario configuration (altitude, ground range, etc.).
+            :param w_x: the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
+            :param w_y: the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
+            :param interp: Whether to interpolate atmosphere data. Defaults to True.
+            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
                     median: median between extent and extant
                 Default value is extent
+
+            If a value is provided for w_x and/or w_y those values will be used in the otf calculation.
+
+            If both sensor and scenario parameters are provided, but not w_x and/or w_y, the
+            value(s) of w_x and/or w_y will come from the sensor and scenario objects.
+
+            If either sensor or scenario parameters are absent, default values will be used for both
+            sensor and scenario parameters (except for w_x/w_y as defined below).
+
+            If any of w_x or w_y are absent and sensor/scenario objects are also absent,
+            the absent value(s) will default to 0.0 for both.
+
+        Raises:
+            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         if not self.is_usable():
             raise PyBSMImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
 
+        # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
                 atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            (
-                _,
-                _,
-                spectral_weights,
-            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)  # type: ignore
+                atm = load_database_atmosphere_no_interp(  # type: ignore
+                    scenario.altitude,
+                    scenario.ground_range,
+                    scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
+            )
 
+            # Use the spectral_weights variable for MTF wavelengths and weights
+            # Note: These values are used only if mtf_wavelengths and mtf_weights
+            # are missing in the input
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
 
@@ -141,7 +163,23 @@ class DefocusOTFPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
+        """
+        Applies the defocus aperture-based perturbation to the provided image.
+
+        Args:
+            :param image: The image to be perturbed.
+            :param boxes: Bounding boxes for detections in input image.
+            :param additional_params: Dictionary containing:
+                - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                  pixels in an image, measured on the ground.
+
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                The perturbed image and bounding boxes scaled to perturbed image shape.
+
+        Raises:
+            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
+        """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
@@ -151,7 +189,7 @@ class DefocusOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-
+        # Sample spacing for the optical transfer function
         self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.defocus_otf = defocus_OTF(uu, vv, self.w_x, self.w_y)  # type: ignore
 
@@ -164,6 +202,7 @@ class DefocusOTFPerturber(PerturbImage):
                                   for this perturber",
                 )
             ref_gsd = additional_params["img_gsd"]
+            # Transform an optical transfer function into a point spread function
             psf = otf_to_psf(self.defocus_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
@@ -174,13 +213,21 @@ class DefocusOTFPerturber(PerturbImage):
                 # the guarded import at the top of this file, but an object of
                 # this class is only instantiable if it has been successfully
                 # imported, so we can igore this
-                blur_img[:, :, 0] = fftconvolve(image[:, :, 0], psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+                blur_img[:, :, 0] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                    image[:, :, 0],
+                    psf,
+                    mode="same",
+                )
                 # resample the image to the camera's ifov
                 resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    blur_img[:, :, channel] = fftconvolve(image[:, :, channel], psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+                    blur_img[:, :, channel] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                        image[:, :, channel],
+                        psf,
+                        mode="same",
+                    )
                     sim_img[:, :, channel] = resample_2D(  # type: ignore
                         blur_img[:, :, channel],
                         ref_gsd / self.slant_range,
@@ -193,7 +240,9 @@ class DefocusOTFPerturber(PerturbImage):
                 sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
         else:
-            # Default is to set dxout param to same value as dxin
+            # Transform an optical transfer function into a point spread function
+            # Note: default is to set dxout param to same value as dxin to maintain the
+            # image size ratio.
             psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))  # type: ignore
             if image.ndim == 2:
                 sim_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
@@ -201,8 +250,12 @@ class DefocusOTFPerturber(PerturbImage):
                 # image.ndim must be 3
                 sim_img = np.zeros_like(image, dtype=float)
                 for c in range(image.shape[2]):
-                    sim_img[..., c] = fftconvolve(image[..., c], psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
-
+                    sim_img[..., c] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                        image[..., c],
+                        psf,
+                        mode="same",
+                    )
+        # Rescale bounding boxes to the shape of the perturbed image
         if boxes:
             scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
             return sim_img.astype(np.uint8), scaled_boxes
@@ -215,7 +268,7 @@ class DefocusOTFPerturber(PerturbImage):
         Provides the default configuration for DefocusOTFPerturber instances.
 
         Returns:
-            dict[str, Any]: A dictionary with the default configuration values.
+            :return dict[str, Any]: A dictionary with the default configuration values.
         """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
@@ -228,11 +281,11 @@ class DefocusOTFPerturber(PerturbImage):
         Instantiates a DefocusOTFPerturber from a configuration dictionary.
 
         Args:
-            config_dict (dict): Configuration dictionary with initialization parameters.
-            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+            :param config_dict: Configuration dictionary with initialization parameters.
+            :param merge_default: Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            C: An instance of DefocusOTFPerturber configured according to `config_dict`.
+            :return DefocusOTFPerturber: An instance of DefocusOTFPerturber.
         """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
@@ -250,7 +303,7 @@ class DefocusOTFPerturber(PerturbImage):
         Returns the current configuration of the DefocusOTFPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         sensor = to_config_dict(self.sensor) if self.sensor else None
         scenario = to_config_dict(self.scenario) if self.scenario else None
@@ -270,6 +323,6 @@ class DefocusOTFPerturber(PerturbImage):
         Checks if the necessary dependencies pyBSM is available.
 
         Returns:
-            bool: True if pyBSM is available; False otherwise.
+            :return bool: True if pyBSM is available; False otherwise.
         """
         return pybsm_available
