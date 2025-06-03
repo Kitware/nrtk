@@ -226,8 +226,6 @@ description of the extra.
 
     **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
 
-.. :auto installation-links:
-
 Perturber Dependencies
 ----------------------
 The following table lists the perturbers and the extra/dependencies required to use them.
@@ -299,6 +297,8 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`WaterDropletPerturber`
       - ``waterdroplet``, and (``graphics`` or ``headless``)
       - ``scipy``, ``shapely``, ``OpenCV``
+
+.. :auto installation-links:
 
 .. _Poetry: https://python-poetry.org
 .. _installation: https://python-poetry.org/docs/#installation
