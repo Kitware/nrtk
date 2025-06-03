@@ -3,6 +3,8 @@ The following functions are an adapted from MAITE. To see the original implement
 see https://gitlab.jatic.net/jatic/cdao/maite/-/blob/main/src/maite/_internals/testing/pyright.py?ref_type=heads
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re
@@ -13,7 +15,7 @@ from collections import Counter
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Literal, TypedDict, Union
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
@@ -107,7 +109,7 @@ def get_docstring_examples(doc: str) -> str:
     return "\n".join(src_lines)
 
 
-def _validate_path_to_pyright(path_to_pyright: Union[Path, None]) -> None:
+def _validate_path_to_pyright(path_to_pyright: Path | None) -> None:
     if path_to_pyright is None:  # pragma: no cover
         raise ModuleNotFoundError(
             "`pyright` was not found. It may need to be installed.",
@@ -153,7 +155,7 @@ def _format_outputs(scan: PyrightOutput) -> PyrightOutput:
 
 def pyright_analyze(
     notebook_path_str: str,
-    path_to_pyright: Union[Path, None] = PYRIGHT_PATH,
+    path_to_pyright: Path | None = PYRIGHT_PATH,
 ) -> PyrightOutput:
     r"""
     Scan a Python notebook with pyright.
