@@ -31,3 +31,5 @@ Fixes
 * Use context handlers for file opens in ``tests/impls/score_detections/test_coco_scorer.py``
 
 * Fixed ruff rules and updated linting.
+
+* Removed ``Union`` and ``Optional`` type hints.

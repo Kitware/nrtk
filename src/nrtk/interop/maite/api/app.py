@@ -1,7 +1,9 @@
 """This module contains handle_post, which is the endpoint for NRTK API requests"""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
@@ -31,7 +33,7 @@ class _UnusableFastApi:
 
 
 if fastapi_available:
-    app: Union[FastAPI, _UnusableFastApi] = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+    app: FastAPI | _UnusableFastApi = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
 else:
     app = _UnusableFastApi()
 

@@ -20,9 +20,11 @@ Example usage:
     perturber_combinations = gen_perturber_combinations(factories)
 """
 
+from __future__ import annotations
+
 import abc
 from collections.abc import Hashable, Sequence
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
@@ -90,12 +92,12 @@ class GenerateBlackboxResponse(Plugfigurable):
     def __getitem__(
         self,
         idx: int,
-    ) -> Union[
+    ) -> (
         tuple[
             np.ndarray,
             Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
             dict[str, Any],
-        ],
-        tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]],
-    ]:
+        ]
+        | tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]
+    ):
         """Get the ``idx``th image and ground_truth pair."""

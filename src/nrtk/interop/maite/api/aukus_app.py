@@ -1,9 +1,11 @@
 """This module contains handle_aukus_post, which is the endpoint for AUKUS API requests"""
 
+from __future__ import annotations
+
 import copy
 import os
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable
 
 import requests
 
@@ -53,7 +55,7 @@ class _UnusableFastApi:
 
 
 if fastapi_available:
-    AUKUS_app: Union[FastAPI, _UnusableFastApi] = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+    AUKUS_app: FastAPI | _UnusableFastApi = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
 else:
     AUKUS_app = _UnusableFastApi()
 
