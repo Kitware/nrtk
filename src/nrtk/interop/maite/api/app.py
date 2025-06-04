@@ -9,9 +9,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from fastapi import FastAPI, HTTPException
 
-    fastapi_available = True
+    fastapi_available: bool = True
 except ImportError:  # pragma: no cover
-    fastapi_available = False
+    fastapi_available: bool = False
 
 from nrtk.interop.maite.api.converters import build_factory, load_COCOJATIC_dataset
 from nrtk.interop.maite.api.schema import (

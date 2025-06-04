@@ -56,15 +56,15 @@ class RandomTranslationPerturber(PerturbImage):
 
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
-        self.rng = np.random.default_rng(seed)
-        self.color_fill = np.array(color_fill)
+        self.rng: np.random.Generator = np.random.default_rng(seed)
+        self.color_fill: np.ndarray[np.int64, Any] = np.array(color_fill)
 
     def perturb(  # noqa: C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Randomly translates an image and adjusts bounding boxes.
 
@@ -160,10 +160,10 @@ class RandomTranslationPerturber(PerturbImage):
 
     def __call__(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Calls `perturb` with the given input image."""
         return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 

@@ -30,9 +30,9 @@ try:
         TargetBatchType,
     )
 
-    maite_available = True
+    maite_available: bool = True
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 OBJ_DETECTION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]  # pyright: ignore [reportPossiblyUnboundVariable]
 
@@ -63,7 +63,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
-        self.metadata = AugmentationMetadata(id=augment_id)  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright: ignore [reportPossiblyUnboundVariable]
 
     def __call__(
         self,
@@ -165,7 +165,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
             raise MaiteImportError
         self.augmentations = augmentations
         self.metric = metric
-        self.metadata = AugmentationMetadata(id=augment_id)  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright: ignore [reportPossiblyUnboundVariable]
 
     def _apply_augmentations(
         self,

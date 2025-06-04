@@ -36,17 +36,17 @@ try:
         TargetType,
     )
 
-    maite_available = True
+    maite_available: bool = True
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import kwcoco  # type: ignore
 
-    kwcoco_available = True
+    kwcoco_available: bool = True
 except ImportError:  # pragma: no cover
-    kwcoco_available = False
+    kwcoco_available: bool = False
 
 OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]  # pyright: ignore [reportPossiblyUnboundVariable]
 
@@ -57,9 +57,9 @@ LOG = logging.getLogger(__name__)
 class JATICDetectionTarget:
     """Dataclass for the datum-level JATIC output detection format."""
 
-    boxes: np.ndarray
-    labels: np.ndarray
-    scores: np.ndarray
+    boxes: np.ndarray[Any, Any]
+    labels: np.ndarray[Any, Any]
+    scores: np.ndarray[Any, Any]
 
 
 class COCOMetadata(DatumMetadata):  # pyright: ignore [reportGeneralTypeIssues]
@@ -152,7 +152,7 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
         if len(self._image_metadata) != len(self._image_ids):
             raise ValueError("Image metadata length mismatch, metadata needed for every image.")
 
-        self.metadata = DatasetMetadata(  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.metadata: DatasetMetadata = DatasetMetadata(  # pyright: ignore [reportPossiblyUnboundVariable]
             id=dataset_id if dataset_id else kwcoco_dataset.fpath,
             index2label={c["id"]: c["name"] for c in kwcoco_dataset.cats.values()},
         )
@@ -233,7 +233,7 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
 
     def __init__(
         self,
-        imgs: Sequence[np.ndarray],
+        imgs: Sequence[np.ndarray[Any, Any]],
         dets: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
         datum_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         dataset_id: str,

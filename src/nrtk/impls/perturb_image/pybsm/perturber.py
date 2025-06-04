@@ -36,9 +36,9 @@ try:
     from pybsm.simulation import simulate_image
     from pybsm.simulation.ref_image import RefImage
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -72,7 +72,7 @@ class PybsmPerturber(PerturbImage):
         self,
         sensor: PybsmSensor,
         scenario: PybsmScenario,
-        reflectance_range: np.ndarray = DEFAULT_REFLECTANCE_RANGE,
+        reflectance_range: np.ndarray[Any, Any] = DEFAULT_REFLECTANCE_RANGE,
         rng_seed: int = 1,
         box_alignment_mode: str = "extent",
         **kwargs: Any,
@@ -98,8 +98,8 @@ class PybsmPerturber(PerturbImage):
             raise PyBSMImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
         self._rng_seed = rng_seed
-        self.sensor = copy.deepcopy(sensor)
-        self.scenario = copy.deepcopy(scenario)
+        self.sensor: PybsmSensor = copy.deepcopy(sensor)
+        self.scenario: PybsmScenario = copy.deepcopy(scenario)
 
         for k in kwargs:
             if hasattr(self.sensor, k):
@@ -111,13 +111,13 @@ class PybsmPerturber(PerturbImage):
             raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
         if reflectance_range[0] >= reflectance_range[1]:
             raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
-        self.reflectance_range = reflectance_range
+        self.reflectance_range: np.ndarray[Any, Any] = reflectance_range
 
         # this is key:value record of the thetas use for perturbing
-        self.thetas = copy.deepcopy(kwargs)
+        self.thetas: dict[str, Any] = copy.deepcopy(kwargs)
 
     @property
-    def params(self) -> dict:
+    def params(self) -> dict[str, Any]:
         """
         Retrieves the theta parameters related to the perturbation configuration.
 
@@ -134,10 +134,10 @@ class PybsmPerturber(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies pyBSM-based perturbations to the provided image.
 
@@ -218,7 +218,7 @@ class PybsmPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> PybsmPerturber:
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> PybsmPerturber:
         """
         Instantiates a PybsmPerturber from a configuration dictionary.
 

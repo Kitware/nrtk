@@ -19,9 +19,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from maite.protocols.object_detection import Dataset
 
-    maite_available = True
+    maite_available: bool = True
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 
 def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportInvalidTypeForm]

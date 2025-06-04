@@ -28,9 +28,9 @@ import numpy as np
 try:
     from pybsm.metrics import niirs5
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import to_config_dict
 from typing_extensions import override
@@ -69,14 +69,14 @@ class NIIRSImageMetric(ImageMetric):
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
-        self.sensor = copy.deepcopy(sensor)
-        self.scenario = copy.deepcopy(scenario)
+        self.sensor: PybsmSensor = copy.deepcopy(sensor)
+        self.scenario: PybsmScenario = copy.deepcopy(scenario)
 
     @override
     def compute(
         self,
-        img_1: np.ndarray | None = None,
-        img_2: np.ndarray | None = None,
+        img_1: np.ndarray[Any, Any] | None = None,
+        img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
         """
@@ -98,8 +98,8 @@ class NIIRSImageMetric(ImageMetric):
     @override
     def __call__(
         self,
-        img_1: np.ndarray | None = None,
-        img_2: np.ndarray | None = None,
+        img_1: np.ndarray[Any, Any] | None = None,
+        img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
         """

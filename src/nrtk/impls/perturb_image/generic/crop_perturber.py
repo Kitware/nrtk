@@ -51,14 +51,14 @@ class RandomCropPerturber(PerturbImage):
                 Default value is extent
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
-        self.rng = np.random.default_rng(seed)
+        self.rng: np.random.Generator = np.random.default_rng(seed)
 
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Randomly crops an image and adjusts bounding boxes.
 

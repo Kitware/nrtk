@@ -26,9 +26,9 @@ from nrtk.utils._exceptions import PyBSMImportError
 try:
     from pybsm.simulation.sensor import Sensor
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import Configurable
 
@@ -48,8 +48,8 @@ class PybsmSensor(Configurable):
         D: float,  # noqa:N803
         f: float,
         p_x: float,
-        opt_trans_wavelengths: np.ndarray,
-        optics_transmission: np.ndarray | None = None,
+        opt_trans_wavelengths: np.ndarray[np.float64, Any],
+        optics_transmission: np.ndarray[np.float64, Any] | None = None,
         eta: float = 0.0,
         w_x: float | None = None,
         w_y: float | None = None,
@@ -64,8 +64,8 @@ class PybsmSensor(Configurable):
         s_y: float = 0.0,
         da_x: float = 0.0,
         da_y: float = 0.0,
-        qe_wavelengths: np.ndarray | None = None,
-        qe: np.ndarray | None = None,
+        qe_wavelengths: np.ndarray[np.float64, Any] | None = None,
+        qe: np.ndarray[np.float64, Any] | None = None,
     ) -> None:
         """
         Initializes a PybsmSensor instance with specified configuration parameters.
@@ -181,8 +181,8 @@ class PybsmSensor(Configurable):
         self._set_optics_transmission(optics_transmission=optics_transmission)
         self.eta = eta
         self.p_y = p_x
-        self.w_x = p_x if w_x is None else w_x
-        self.w_y = p_x if w_y is None else w_y
+        self.w_x: float = p_x if w_x is None else w_x
+        self.w_y: float = p_x if w_y is None else w_y
         self.int_time = int_time
         self.n_tdi = n_tdi
         self.dark_current = dark_current
@@ -193,31 +193,31 @@ class PybsmSensor(Configurable):
         if qe_wavelengths is None:
             self.qe_wavelengths = opt_trans_wavelengths
         else:
-            self.qe_wavelengths = qe_wavelengths
+            self.qe_wavelengths: np.ndarray[np.float64, Any] = qe_wavelengths
         if qe is None:
             self.qe = np.ones(opt_trans_wavelengths.shape[0])
         else:
-            self.qe = qe
+            self.qe: np.ndarray[np.float64, Any] = qe
 
         # not yet added to constructor
-        self.other_irradiance = 0.0
-        self.cold_shield_temperature = 70.0
-        self.optics_temperature = 270.0
-        self.optics_emissivity = 0.0
-        self.cold_filter_transmission = 1.0
-        self.cold_filter_temperature = 70.0
-        self.cold_filter_emissivity = 0.0
+        self.other_irradiance: float = 0.0
+        self.cold_shield_temperature: float = 70.0
+        self.optics_temperature: float = 270.0
+        self.optics_emissivity: float = 0.0
+        self.cold_filter_transmission: float = 1.0
+        self.cold_filter_temperature: float = 70.0
+        self.cold_filter_emissivity: float = 0.0
         self.s_x = s_x
         self.s_y = s_y
         self.da_x = da_x
         self.da_y = da_y
-        self.pv = 0.0
-        self.pv_wavelength = 0.633e-6  # typical value
+        self.pv: float = 0.0
+        self.pv_wavelength: float = 0.633e-6  # typical value
         self.L_x = D
         self.L_y = D
-        self.other_noise = np.array([0])
-        self.filter_kernel = np.array([1])
-        self.frame_stacks = 1
+        self.other_noise: np.ndarray[np.float64, Any] = np.array([0])
+        self.filter_kernel: np.ndarray[np.float64, Any] = np.array([1])
+        self.frame_stacks: int = 1
 
     def _check_opt_trans_wavelengths(self, opt_trans_wavelengths: np.ndarray) -> None:
         """
@@ -243,7 +243,7 @@ class PybsmSensor(Configurable):
 
     def _set_optics_transmission(
         self,
-        optics_transmission: np.ndarray | None = None,
+        optics_transmission: np.ndarray[np.float64, Any] | None = None,
     ) -> None:
         """
         This method assigns the `optics_transmission` array to the instance. If no array is provided,
@@ -260,7 +260,7 @@ class PybsmSensor(Configurable):
                 `opt_trans_wavelengths`.
         """
         if optics_transmission is None:
-            self.optics_transmission = np.ones(self.opt_trans_wavelengths.shape[0])
+            self.optics_transmission: np.ndarray[np.float64, Any] = np.ones(self.opt_trans_wavelengths.shape[0])
         else:
             if optics_transmission.shape[0] != self.opt_trans_wavelengths.shape[0]:
                 raise ValueError("optics_transmission and opt_trans_wavelengths must have the same length")
@@ -320,7 +320,7 @@ class PybsmSensor(Configurable):
         return self.create_sensor()
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
         """
         Rehydrates an object instance from a serializable config dictionary.
 

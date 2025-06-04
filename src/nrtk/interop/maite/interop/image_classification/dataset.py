@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 
@@ -20,9 +21,9 @@ try:
         TargetType,
     )
 
-    maite_available = True
+    maite_available: bool = True
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]  # pyright:  ignore [reportPossiblyUnboundVariable]
 
@@ -44,7 +45,7 @@ class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGenera
 
     def __init__(
         self,
-        imgs: Sequence[np.ndarray],
+        imgs: Sequence[np.ndarray[Any, Any]],
         labels: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
         datum_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         dataset_id: str,

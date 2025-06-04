@@ -30,9 +30,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 import numpy as np
 
 try:
@@ -40,9 +40,9 @@ try:
     from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -153,14 +153,14 @@ class JitterOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.s_x = s_x if s_x is not None else 0.0
-            self.s_y = s_y if s_y is not None else 0.0
+            self.s_x: float = s_x if s_x is not None else 0.0
+            self.s_y: float = s_y if s_y is not None else 0.0
             # Assume visible spectrum of light
-            self.ifov = -1
-            self.slant_range = -1
-            self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+            self.ifov: float = -1
+            self.slant_range: float = -1
+            self.mtf_wavelengths: np.ndarray[np.float64, Any] = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            self.D = 0.003
+            self.D: float = 0.003
 
         self.sensor = sensor
         self.scenario = scenario
@@ -169,10 +169,10 @@ class JitterOTFPerturber(PerturbImage):
     @override
     def perturb(  # noqa: C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Applies the jitter OTF-based perturbation to the provided image.
 
@@ -200,8 +200,8 @@ class JitterOTFPerturber(PerturbImage):
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.jit_OTF = jitter_OTF(uu, vv, self.s_x, self.s_y)  # type: ignore
+        self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+        self.jit_OTF: np.ndarray[Any, Any] = jitter_OTF(uu, vv, self.s_x, self.s_y)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -262,7 +262,7 @@ class JitterOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
         """
         Instantiates a JitterOTFPerturber from a configuration dictionary.
 

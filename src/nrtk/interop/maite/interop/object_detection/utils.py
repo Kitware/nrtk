@@ -15,17 +15,17 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from maite.protocols.object_detection import Dataset
 
-    maite_available = True
+    maite_available: bool = True
 except ImportError:  # pragma: no cover
-    maite_available = False
+    maite_available: bool = False
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from kwcoco import CocoDataset  # type: ignore
 
-    kwcoco_available = True
+    kwcoco_available: bool = True
 except ImportError:  # pragma: no cover
-    kwcoco_available = False
+    kwcoco_available: bool = False
 
 
 def _xywh_bbox_xform(x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:

@@ -8,9 +8,9 @@ BaseModel: type = object
 try:
     from pydantic import BaseModel
 
-    pydantic_available = True
+    pydantic_available: bool = True
 except ImportError:  # pragma: no cover
-    pydantic_available = False
+    pydantic_available: bool = False
 
 
 # pyright warns about inheritance from BaseModel which is ambiguous
@@ -31,8 +31,8 @@ class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIs
     config_file: str
 
     class Config:  # noqa: D106
-        arbitrary_types_allowed = True
-        schema_extra = {
+        arbitrary_types_allowed: bool = True
+        schema_extra: dict[str, Any] = {
             "examples": [
                 {
                     "id": "0",
@@ -63,8 +63,8 @@ class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
     metadata_file: str
 
     class Config:  # noqa: D106
-        arbitrary_types_allowed = True
-        schema_extra = {
+        arbitrary_types_allowed: bool = True
+        schema_extra: dict[str, Any] = {
             "examples": [
                 {
                     "root_dir": "path/to/root/dir",
@@ -89,8 +89,8 @@ class NrtkPerturbOutputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeI
     datasets: list[DatasetSchema]
 
     class Config:  # noqa: D106
-        arbitrary_types_allowed = True
-        schema_extra = {
+        arbitrary_types_allowed: bool = True
+        schema_extra: dict[str, Any] = {
             "examples": [
                 {
                     "message": "response message",

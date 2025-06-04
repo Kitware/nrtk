@@ -39,7 +39,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
     def __init__(
         self,
-        images: Sequence[np.ndarray],
+        images: Sequence[np.ndarray[Any, Any]],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> None:
         """Generate response curve for given images and ground_truth.
@@ -66,7 +66,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
         self,
         idx: int,
     ) -> tuple[
-        np.ndarray,
+        np.ndarray[Any, Any],
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:

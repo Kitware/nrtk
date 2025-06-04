@@ -24,9 +24,9 @@ try:
     import albumentations as A  # noqa N812
     from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations
 
-    albumentations_available = True
+    albumentations_available: bool = True
 except ImportError:  # pragma: no cover
-    albumentations_available = False
+    albumentations_available: bool = False
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -90,7 +90,7 @@ class AlbumentationsPerturber(PerturbImage):
         if not issubclass(transformer, A.BasicTransform):  # pyright: ignore [reportPossiblyUnboundVariable]
             raise ValueError(f'Given perturber "{self.perturber}" does not inherit "BasicTransform"')
 
-        self.transform = A.Compose(  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.transform: A.Compose = A.Compose(  # pyright: ignore [reportPossiblyUnboundVariable]
             [transformer(**self.parameters) if self.parameters else transformer()],
         )
 
@@ -99,7 +99,7 @@ class AlbumentationsPerturber(PerturbImage):
             self.transform.set_random_seed(seed)
 
     @staticmethod
-    def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray) -> list[int]:
+    def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
         """Convert AxisAlignedBoundingBox to albumentations format bbox"""
         flat = np.array([[box.min_vertex[0], box.min_vertex[1], box.max_vertex[0], box.max_vertex[1]]])
         return convert_bboxes_to_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
@@ -109,7 +109,7 @@ class AlbumentationsPerturber(PerturbImage):
         )[0]
 
     @staticmethod
-    def _bbox_to_aabb(box: list[int], image: np.ndarray) -> AxisAlignedBoundingBox:
+    def _bbox_to_aabb(box: list[int], image: np.ndarray[Any, Any]) -> AxisAlignedBoundingBox:
         """Convert albumentations format bbox to AxisAlignedBoundingBox"""
         flat = np.array([[box[0], box[1], box[2], box[3]]])
         as_aabb = convert_bboxes_from_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
@@ -122,10 +122,10 @@ class AlbumentationsPerturber(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,  # ARG002
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """
         Apply a BasicTransform from Albumentations to an image.
 

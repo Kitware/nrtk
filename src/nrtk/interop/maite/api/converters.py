@@ -14,9 +14,9 @@ from nrtk.utils._exceptions import KWCocoImportError
 try:
     from kwcoco import CocoDataset  # type: ignore
 
-    is_usable = True
+    is_usable: bool = True
 except ImportError:  # pragma: no cover
-    is_usable = False
+    is_usable: bool = False
 
 LOG = logging.getLogger(__name__)
 
