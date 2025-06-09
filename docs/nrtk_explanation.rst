@@ -32,9 +32,18 @@ This allows AI practitioners to:
     * Evaluate AI model performance under conditions that are difficult to replicate with standard data collection.
     * Optimize sensor design for AI-based detection and classification tasks.
 
+Figure 1 illustrates how NRTK integrates into a typical model evaluation workflow. It highlights where NRTK’s
+physics-based test data augmentation is positioned within the broader pipeline — between training and robustness
+assessment — providing a way to generate expanded datasets that reflect realistic imaging conditions. These expanded
+datasets enable more meaningful and interpretable robustness evaluation by simulating variations in sensor parameters
+and environmental conditions that are complex or expensive to capture in real-world data.
+
 .. figure:: figures/intro-fig-01.png
 
    Figure 1: Extending Robustness Testing with NRTK.
+
+The following sections explain the types of sensor-specific perturbations that NRTK can simulate and how
+these are applied and evaluated within an AI pipeline.
 
 
 Understanding Sensor-Specific Perturbations in AI Robustness
@@ -109,11 +118,9 @@ The NRTK algorithms can be organized according to their respective tasks:
 References
 ----------
 
-1. Hendrycks, Dan, and Thomas Dietterich. "Benchmarking Neural Network Robustness to Common
-Corruptions and Perturbations." International Conference on Learning Representations. 2018.
-
-2. Recht, Benjamin, et al. "Do imagenet classifiers generalize to imagenet?." International
-Conference on machine learning. PMLR, 2019.
-
-3. LeMaster, Daniel A., and Michael T. Eismann. 2017. "pyBSM: A Python package for modeling imaging
-systems." Proceedings of the SPIE 10204.
+#. Hendrycks, Dan, and Thomas Dietterich. "Benchmarking Neural Network Robustness to Common
+   Corruptions and Perturbations." International Conference on Learning Representations. 2018.
+#. Recht, Benjamin, et al. "Do imagenet classifiers generalize to imagenet?." International
+   Conference on machine learning. PMLR, 2019.
+#. LeMaster, Daniel A., and Michael T. Eismann. 2017. "pyBSM: A Python package for modeling imaging
+   systems." Proceedings of the SPIE 10204.
