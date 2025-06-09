@@ -1,8 +1,4 @@
-"""
-This module provides the `TurbulenceApertureOTFPerturber` class, which applies image perturbations
-based on Optical Transfer Function (OTF) calculations considering turbulence and aperture effects.
-The class supports configurations with specific sensor and scenario parameters, leveraging pyBSM
-and OpenCV for realistic image simulations.
+"""Provides TurbulenceApertureOTFPerturber for turbulence aperture-based OTF image perturbations using pyBSM and OpenCV.
 
 Classes:
     TurbulenceApertureOTFPerturber: Applies OTF-based perturbations with turbulence and aperture
@@ -63,8 +59,7 @@ from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class TurbulenceApertureOTFPerturber(PerturbImage):
-    """
-    Implements OTF-based image perturbation with turbulence and aperture effects.
+    """Implements OTF-based image perturbation with turbulence and aperture effects.
 
     The `TurbulenceApertureOTFPerturber` class simulates image degradation due to atmospheric
     turbulence and optical aperture effects, using pyBSM sensor and scenario configurations.
@@ -72,19 +67,32 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
     realistic perturbations.
 
     Attributes:
-        sensor (PybsmSensor | None): Sensor configuration for the perturbation.
-        scenario (PybsmScenario | None): Scenario settings applied during perturbation.
-        mtf_wavelengths (Sequence[float]): Wavelengths used in MTF calculations.
-        mtf_weights (Sequence[float]): Weights associated with each wavelength.
-        altitude (float): Altitude of the imaging platform.
-        slant_range (float): Line-of-sight distance between platform and target.
-        D (float): Effective aperture diameter.
-        ha_wind_speed (float): High-altitude wind speed affecting turbulence profile.
-        cn2_at_1m (float): Refractive index structure parameter at ground level.
-        int_time (float): Integration time for imaging.
-        n_tdi (float): Number of time-delay integration stages.
-        aircraft_speed (float): Apparent atmospheric velocity.
-        interp (bool): Indicates whether to use interpolated atmospheric data.
+        sensor (PybsmSensor | None):
+            Sensor configuration for the perturbation.
+        scenario (PybsmScenario | None):
+            Scenario settings applied during perturbation.
+        mtf_wavelengths (Sequence[float]):
+            Wavelengths used in MTF calculations.
+        mtf_weights (Sequence[float]):
+            Weights associated with each wavelength.
+        altitude (float):
+            Altitude of the imaging platform.
+        slant_range (float):
+            Line-of-sight distance between platform and target.
+        D (float):
+            Effective aperture diameter.
+        ha_wind_speed (float):
+            High-altitude wind speed affecting turbulence profile.
+        cn2_at_1m (float):
+            Refractive index structure parameter at ground level.
+        int_time (float):
+            Integration time for imaging.
+        n_tdi (float):
+            Number of time-delay integration stages.
+        aircraft_speed (float):
+            Apparent atmospheric velocity.
+        interp (bool):
+            Indicates whether to use interpolated atmospheric data.
     """
 
     def __init__(  # noqa: C901
@@ -105,27 +113,41 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         box_alignment_mode: str = "extent",
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
+
         Args:
-            :param sensor: pyBSM sensor object
-            :param scenario: pyBSM scenario object
-            :param mtf_wavelengths: a sequence of wavelengths (m)
-            :param mtf_weights: a sequence of weights for each wavelength contribution (arb)
-            :param altitude: height of the aircraft above the ground (m)
-            :param slant_range: line-of-sight range between the aircraft and target (target is assumed
+            sensor:
+                pyBSM sensor object
+            scenario:
+                pyBSM scenario object
+            mtf_wavelengths:
+                a sequence of wavelengths (m)
+            mtf_weights:
+                a sequence of weights for each wavelength contribution (arb)
+            altitude:
+                height of the aircraft above the ground (m)
+            slant_range:
+                line-of-sight range between the aircraft and target (target is assumed
                 to be on the ground) (m)
-            :param D: effective aperture diameter (m)
-            :param ha_wind_speed: the high altitude windspeed (m/s); used to calculate the turbulence
-                profile
-            :param cn2_at_1m: the refractive index structure parameter "near the ground" (e.g. at
+            D:
+                effective aperture diameter (m)
+            ha_wind_speed:
+                the high altitude windspeed (m/s); used to calculate the turbulence profile
+            cn2_at_1m:
+                the refractive index structure parameter "near the ground" (e.g. at
                 h = 1 m); used to calculate the turbulence profile
-            :param int_time: dwell (i.e. integration) time (seconds)
-            :param n_tdi: the number of time-delay integration stages (relevant only when TDI cameras
+            int_time:
+                dwell (i.e. integration) time (seconds)
+            n_tdi:
+                the number of time-delay integration stages (relevant only when TDI cameras
                 are used. For CMOS cameras, the value can be assumed to be 1.0)
-            :param aircraft_speed: apparent atmospheric velocity (m/s); this can just be the windspeed
+            aircraft_speed:
+                apparent atmospheric velocity (m/s); this can just be the windspeed
                 at the sensor position if the sensor is stationary
-            :param interp: a boolean determining whether load_database_atmosphere is used with or without
+            interp:
+                a boolean determining whether load_database_atmosphere is used with or without
                 interpolation
-            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
@@ -252,15 +274,17 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Applies turbulence and aperture-based perturbation to the provided image.
+        """Applies turbulence and aperture-based perturbation to the provided image.
 
         Args:
-            :param image: The image to be perturbed.
-            :param boxes: Bounding boxes for detections in input image.
-            :param additional_params: Dictionary containing:
-                - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                  pixels in an image, measured on the ground.
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                        pixels in an image, measured on the ground.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
@@ -350,8 +374,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for TurbulenceApertureOTFPerturber instances.
+        """Provides the default configuration for TurbulenceApertureOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.
@@ -363,12 +386,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
-        """
-        Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
+        """Instantiates a TurbulenceApertureOTFPerturber from a configuration dictionary.
 
         Args:
-            :param config_dict: Configuration dictionary with initialization parameters.
-            :param merge_default: Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
             :return TurbulenceApertureOTFPerturber: An instance of TurbulenceApertureOTFPerturber.
@@ -384,8 +408,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         return super().from_config(config_dict, merge_default=merge_default)
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the TurbulenceApertureOTFPerturber instance.
+        """Returns the current configuration of the TurbulenceApertureOTFPerturber instance.
 
         Returns:
             :return dict[str, Any]: Configuration dictionary with current settings.
@@ -410,8 +433,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
 
         Returns:
             :return bool: True if both pyBSM and OpenCV are available; False otherwise.

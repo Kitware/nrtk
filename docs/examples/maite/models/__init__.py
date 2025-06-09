@@ -1,1 +1,1 @@
-"""Module for example-related models"""
+"""Module for example-related models."""

@@ -1,1 +1,1 @@
-"""Module for cv2 based implementations of PerturbImage"""
+"""Module for cv2 based implementations of PerturbImage."""

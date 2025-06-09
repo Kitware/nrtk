@@ -1,7 +1,4 @@
-"""
-This module provides the `PerturbImageFactory` class, an abstract base factory for generating
-instances of `PerturbImage` with specified configurations. This factory pattern allows users
-to produce various image perturbations by adjusting key parameters in a flexible, reusable way.
+"""Provides PerturbImageFactory, an abstract factory for creating configurable PerturbImage instances flexibly.
 
 Classes:
     PerturbImageFactory: An abstract factory for creating `PerturbImage` instances with specific
@@ -63,18 +60,19 @@ class PerturbImageFactory(Plugfigurable):
         return self._theta_key
 
     def __len__(self) -> int:
-        """:return: Number of perturber instances this factory will generate."""
+        """Number of perturber instances this factory will generate."""
         return len(self.thetas)
 
     def __iter__(self) -> Iterator[PerturbImage]:
-        """:return: Iterator for this factory."""
+        """Iterator for this factory."""
         self.n = 0
         return self
 
     def __next__(self) -> PerturbImage:
         """:raises StopIteration: Iterator exhausted.
 
-        :return: Next perturber instance.
+        Returns:
+            Next perturber instance.
         """
         if self.n < len(self.thetas):
             kwargs = {self.theta_key: self.thetas[self.n]}
@@ -90,7 +88,8 @@ class PerturbImageFactory(Plugfigurable):
 
         :raises IndexError: The given index does not exist.
 
-        :return: Perturber corresponding to the given index.
+        Returns:
+            Perturber corresponding to the given index.
         """
         if idx < 0 or idx >= len(self.thetas):
             raise IndexError
@@ -104,11 +103,11 @@ class PerturbImageFactory(Plugfigurable):
         config_dict: dict[str, Any],
         merge_default: bool = True,
     ) -> Self:
-        """
-        Instantiates a PerturbImageFactory from a configuration dictionary.
+        """Instantiates a PerturbImageFactory from a configuration dictionary.
 
         Args:
             config_dict (dict[str, Any]): Configuration dictionary with parameters for instantiation.
+            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
 
         Returns:
             An instance of the PerturbImageFactory class.
@@ -132,8 +131,7 @@ class PerturbImageFactory(Plugfigurable):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Returns the default configuration for the PerturbImageFactory.
+        """Returns the default configuration for the PerturbImageFactory.
 
         This method provides a default configuration dictionary, specifying default
         values for key parameters in the factory. It can be used to create an instance
@@ -148,8 +146,7 @@ class PerturbImageFactory(Plugfigurable):
         return cfg
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the configuration of the factory instance.
+        """Returns the configuration of the factory instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary containing the perturber type and theta_key.

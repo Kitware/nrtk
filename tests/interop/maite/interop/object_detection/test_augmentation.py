@@ -290,7 +290,7 @@ class TestJATICDetectionAugmentationWithMetric:
         augmentations: Sequence[tuple[PerturbImage, str]],  # pyright: ignore [reportPossiblyUnboundVariable]
         targets_in: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
-        """Test that multiple metrics can be added to metadata"""
+        """Test that multiple metrics can be added to metadata."""
         imgs_out = [np.transpose(self.img_in, (2, 0, 1))]
         targets_out = targets_in
         md_out = self.md_in

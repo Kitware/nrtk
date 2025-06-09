@@ -1,8 +1,4 @@
-"""
-This module provides the `JitterOTFPerturber` class, which applies jitter and Optical Transfer Function (OTF)
-perturbations to images for use in remote sensing and other image processing applications. The class leverages
-sensor and scenario configurations provided by `PybsmSensor` and `PybsmScenario`, using pyBSM functionalities
-to implement realistic perturbations.
+"""Provides JitterOTFPerturber which applies jitter perturbations using pyBSM with sensor and scenario configs.
 
 Classes:
     JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM and OpenCV.
@@ -58,22 +54,27 @@ from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class JitterOTFPerturber(PerturbImage):
-    """
-    Implements image perturbation using jitter and Optical Transfer Function (OTF).
+    """Implements image perturbation using jitter and Optical Transfer Function (OTF).
 
     This class applies realistic perturbations to images based on sensor and scenario configurations,
     leveraging Optical Transfer Function (OTF) modeling through the pyBSM library. Perturbations include
     jitter effects that simulate real-world distortions in optical imaging systems.
 
     Attributes:
-        sensor (PybsmSensor | None): The sensor configuration used to define perturbation parameters.
-        scenario (PybsmScenario | None): Scenario configuration providing environmental context for perturbations.
-        additional_params (dict): Additional configuration options for customizing perturbations.
+        sensor (PybsmSensor | None):
+            The sensor configuration used to define perturbation parameters.
+        scenario (PybsmScenario | None):
+            Scenario configuration providing environmental context for perturbations.
+        additional_params (dict):
+            Additional configuration options for customizing perturbations.
 
     Methods:
-        perturb(image): Applies the jitter-based OTF perturbation to the provided image.
-        get_config(): Returns the configuration for the current instance.
-        from_config(config_dict): Instantiates from a configuration dictionary.
+        perturb(image):
+            Applies the jitter-based OTF perturbation to the provided image.
+        get_config():
+            Returns the configuration for the current instance.
+        from_config(config_dict):
+            Instantiates from a configuration dictionary.
     """
 
     def __init__(
@@ -88,13 +89,18 @@ class JitterOTFPerturber(PerturbImage):
         """Initializes the JitterOTFPerturber.
 
         Args:
-            :param sensor: pyBSM sensor object.
-            :param scenario: pyBSM scenario object
-            :param s_x: root-mean-squared jitter amplitudes in the x direction (rad).
-            :param s_y: root-mean-squared jitter amplitudes in the y direction (rad).
-            :param interp: a boolean determining whether load_database_atmosphere is used with or without
-                interpolation.
-            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            sensor:
+                pyBSM sensor object.
+            scenario:
+                pyBSM scenario object
+            s_x:
+                root-mean-squared jitter amplitudes in the x direction (rad).
+            s_y:
+                root-mean-squared jitter amplitudes in the y direction (rad).
+            interp:
+                a boolean determining whether load_database_atmosphere is used with or without interpolation.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
@@ -112,6 +118,7 @@ class JitterOTFPerturber(PerturbImage):
 
             If s_x and s_y are ever provided by the user, those values will be used
             in the otf calculation.
+
         Raises:
             :raises ImportError: If OpenCV or pyBSM is not found, install via
                 `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
@@ -173,15 +180,17 @@ class JitterOTFPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Applies the jitter OTF-based perturbation to the provided image.
+        """Applies the jitter OTF-based perturbation to the provided image.
 
         Args:
-            :param image: The image to be perturbed.
-            :param boxes: Bounding boxes for detections in input image.
-            :param additional_params: Dictionary containing:
-                - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                  pixels in an image, measured on the ground.
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                        pixels in an image, measured on the ground.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
@@ -250,8 +259,7 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for JitterOTFPerturber instances.
+        """Provides the default configuration for JitterOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.
@@ -263,12 +271,13 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
-        """
-        Instantiates a JitterOTFPerturber from a configuration dictionary.
+        """Instantiates a JitterOTFPerturber from a configuration dictionary.
 
         Args:
-            :param config_dict: Configuration dictionary with initialization parameters.
-            :param merge_default: Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
             :return JitterOTFPerturber: An instance of JitterOTFPerturber.
@@ -285,8 +294,7 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
 
         Returns:
             :return bool: True if both pyBSM and OpenCV are available; False otherwise.
@@ -295,13 +303,11 @@ class JitterOTFPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the JitterOTFPerturber instance.
+        """Returns the current configuration of the JitterOTFPerturber instance.
 
         Returns:
             :return dict[str, Any]: Configuration dictionary with current settings.
         """
-
         cfg = super().get_config()
 
         cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None

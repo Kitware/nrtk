@@ -1,7 +1,4 @@
-"""
-This module implements the `DefocusOTFPerturber` class, which simulates optical defocus
-using the Optical Transfer Function (OTF) in imaging systems. The class leverages the pybsm library
-and OpenCV to apply perturbations to input images based on sensor and scenario configurations.
+"""Implements DefocusOTFPerturber for optical defocus simulation via OTF using pybsm and OpenCV.
 
 Classes:
     DefocusOTFPerturber: Simulates defocus effects in images using OTF and PSF calculations.
@@ -44,28 +41,43 @@ from nrtk.utils._exceptions import PyBSMImportError
 
 
 class DefocusOTFPerturber(PerturbImage):
-    """
+    """Implements image perturbation using defocus and Optical Transfer Function (OTF).
+
     DefocusOTFPerturber applies optical defocus perturbations to input images based on
     specified sensor and scenario configurations. The perturbation uses the Optical
     Transfer Function (OTF) and Point Spread Function (PSF) for simulation.
 
     Attributes:
-        sensor (PybsmSensor | None): The sensor configuration for the simulation.
-        scenario (PybsmScenario | None): The scenario configuration, such as altitude and ground range.
-        w_x (float | None): Defocus parameter in the x-direction.
-        w_y (float | None): Defocus parameter in the y-direction.
-        interp (bool): Whether to interpolate atmosphere data.
-        mtf_wavelengths (np.ndarray): Array of wavelengths used for Modulation Transfer Function (MTF).
-        D (float): Lens diameter in meters.
-        slant_range (float): Slant range in meters, calculated from altitude and ground range.
-        ifov (float): Instantaneous Field of View (IFOV).
+        sensor (PybsmSensor | None):
+            The sensor configuration for the simulation.
+        scenario (PybsmScenario | None):
+            The scenario configuration, such as altitude and ground range.
+        w_x (float | None):
+            Defocus parameter in the x-direction.
+        w_y (float | None):
+            Defocus parameter in the y-direction.
+        interp (bool):
+            Whether to interpolate atmosphere data.
+        mtf_wavelengths (np.ndarray):
+            Array of wavelengths used for Modulation Transfer Function (MTF).
+        D (float):
+            Lens diameter in meters.
+        slant_range (float):
+            Slant range in meters, calculated from altitude and ground range.
+        ifov (float):
+            Instantaneous Field of View (IFOV).
 
     Methods:
-        perturb: Applies the defocus effect to the input image.
-        __call__: Alias for the perturb method.
-        get_default_config: Provides the default configuration for the perturber.
-        from_config: Instantiates the perturber from a configuration dictionary.
-        get_config: Retrieves the current configuration of the perturber instance.
+        perturb:
+            Applies the defocus effect to the input image.
+        __call__:
+            Alias for the perturb method.
+        get_default_config:
+            Provides the default configuration for the perturber.
+        from_config:
+            Instantiates the perturber from a configuration dictionary.
+        get_config:
+            Retrieves the current configuration of the perturber instance.
     """
 
     def __init__(
@@ -77,16 +89,21 @@ class DefocusOTFPerturber(PerturbImage):
         interp: bool = True,
         box_alignment_mode: str = "extent",
     ) -> None:
-        """
-        Initializes a DefocusOTFPerturber instance with the specified parameters.
+        """Initializes a DefocusOTFPerturber instance with the specified parameters.
 
         Args:
-            :param sensor: Sensor configuration for the simulation.
-            :param scenario: Scenario configuration (altitude, ground range, etc.).
-            :param w_x: the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
-            :param w_y: the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
-            :param interp: Whether to interpolate atmosphere data. Defaults to True.
-            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            sensor:
+                Sensor configuration for the simulation.
+            scenario:
+                Scenario configuration (altitude, ground range, etc.).
+            w_x:
+                the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
+            w_y:
+                the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
+            interp:
+                Whether to interpolate atmosphere data. Defaults to True.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
@@ -163,15 +180,17 @@ class DefocusOTFPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Applies the defocus aperture-based perturbation to the provided image.
+        """Applies the defocus aperture-based perturbation to the provided image.
 
         Args:
-            :param image: The image to be perturbed.
-            :param boxes: Bounding boxes for detections in input image.
-            :param additional_params: Dictionary containing:
-                - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                  pixels in an image, measured on the ground.
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                        pixels in an image, measured on the ground.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
@@ -264,8 +283,7 @@ class DefocusOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for DefocusOTFPerturber instances.
+        """Provides the default configuration for DefocusOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.
@@ -277,12 +295,13 @@ class DefocusOTFPerturber(PerturbImage):
 
     @classmethod
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
-        """
-        Instantiates a DefocusOTFPerturber from a configuration dictionary.
+        """Instantiates a DefocusOTFPerturber from a configuration dictionary.
 
         Args:
-            :param config_dict: Configuration dictionary with initialization parameters.
-            :param merge_default: Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
             :return DefocusOTFPerturber: An instance of DefocusOTFPerturber.
@@ -299,8 +318,7 @@ class DefocusOTFPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the DefocusOTFPerturber instance.
+        """Returns the current configuration of the DefocusOTFPerturber instance.
 
         Returns:
             :return dict[str, Any]: Configuration dictionary with current settings.
@@ -319,8 +337,7 @@ class DefocusOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies pyBSM is available.
+        """Checks if the necessary dependencies pyBSM is available.
 
         Returns:
             :return bool: True if pyBSM is available; False otherwise.

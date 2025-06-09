@@ -1,7 +1,4 @@
-"""
-This module contains nrtk_perturber, which generates augemented MAITE dataset(s)
-based on a pertrber factory configuration
-"""
+"""nrtk_perturber generates augemented MAITE dataset(s)based on a pertrber factory configuration."""
 
 import itertools
 import logging

@@ -1,6 +1,4 @@
-"""
-This module contains wrappers for converting a COCO dataset or
-a generic dataset to a MAITE dataset for object detection
+"""This module contains wrappers for converting a COCO dataset or a generic dataset to a MAITE dataset.
 
 All instances of # pyright: ignore [reportPossiblyUnboundVariable]
 are result of guard imports on maite imports
@@ -63,7 +61,7 @@ class JATICDetectionTarget:
 
 
 class COCOMetadata(DatumMetadata):  # pyright: ignore [reportGeneralTypeIssues]
-    """TypedDict for COCO-detection datum-level metdata"""
+    """TypedDict for COCO-detection datum-level metdata."""
 
     # pyright fails when failing to import maite.protocols
     ann_ids: ReadOnly[Sequence[int]]  # pyright: ignore [reportInvalidTypeForm]
@@ -86,14 +84,14 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
         skip_no_anns: bool = False,
         dataset_id: str | None = None,
     ) -> None:
-        """
-        Initialize MAITE-compliant dataset from a COCO dataset.
+        """Initialize MAITE-compliant dataset from a COCO dataset.
 
         Args:
             kwcoco_dataset (kwcoco.CocoDataset): The COCO dataset object.
             image_metadata (Sequence[DatumMetadataType]): Metadata for each image.
             skip_no_anns (bool): Whether to skip images without annotations. Defaults to False.
             dataset_id (str): Dataset ID, defaults to filepath.
+
         Raises:
             ImportError: If required dependencies are not installed.
             ValueError: If metadata is missing for any image in the dataset.
@@ -205,8 +203,7 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required kwcoco and MAITE modules are available.
+        """Checks if the required kwcoco and MAITE modules are available.
 
         Returns:
             bool: True if kwcoco and MAITE are installed; False otherwise.
@@ -239,8 +236,7 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
         dataset_id: str,
         index2label: dict[int, str] | None = None,
     ) -> None:
-        """
-        Initialize MAITE-compliant dataset
+        """Initialize MAITE-compliant dataset.
 
         Args:
             imgs (Sequence[np.ndarray]): Sequence of images in the dataset.
@@ -274,8 +270,7 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required MAITE module is available.
+        """Checks if the required MAITE module is available.
 
         Returns:
             bool: True if MAITE is installed; False otherwise.

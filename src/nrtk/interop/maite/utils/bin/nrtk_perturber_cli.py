@@ -1,4 +1,4 @@
-"""This module contains nrtk_perturber_cli, which is a CLI script for running nrtk_perturber"""
+"""This module contains nrtk_perturber_cli, which is a CLI script for running nrtk_perturber."""
 
 import json
 import logging

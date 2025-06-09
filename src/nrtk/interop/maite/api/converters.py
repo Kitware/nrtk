@@ -1,4 +1,4 @@
-"""This module contains functions to convert input schema to NRTK objects"""
+"""This module contains functions to convert input schema to NRTK objects."""
 
 import json
 import logging

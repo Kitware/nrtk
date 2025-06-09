@@ -1,8 +1,4 @@
-"""
-This module provides the `GenerateObjectDetectorBlackboxResponse` class, an interface
-for generating item-response curves and scores for object detection models. The module
-also includes functions to handle image perturbations and scoring within a blackbox setting,
-using various factories, detectors, and scoring mechanisms.
+"""Provides GenerateObjectDetectorBlackboxResponse for response curves and scoring in blackbox object detection setups.
 
 Classes:
     GenerateObjectDetectorBlackboxResponse: An interface that defines methods to generate
@@ -86,8 +82,8 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         :param img_batch_size: The number of images to predict and score upon at once.
         :param verbose: Increases the verbosity of progress updates.
 
-        :return: Item-response curve
-        :return: Scores for each input stimuli
+        Returns:
+            Item-response curve and scores for each input stimuli
         """
         curve: list[tuple[dict[str, Any], float]] = list()
         full: list[Sequence[float]] = list()

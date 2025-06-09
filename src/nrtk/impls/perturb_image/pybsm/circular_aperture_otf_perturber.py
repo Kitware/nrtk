@@ -1,8 +1,4 @@
-"""
-This module provides the `CircularApertureOTFPerturber` class, which applies Optical Transfer
-Function (OTF) perturbations to images based on a circular aperture model. This class allows for
-customizable sensor and scenario configurations, supporting realistic image perturbations with
-wavelength and weight considerations.
+"""Provides CircularApertureOTFPerturber for circular aperture OTF perturbations with sensor and scenario configs.
 
 Classes:
     CircularApertureOTFPerturber: Implements OTF-based perturbations using a circular aperture
@@ -68,24 +64,31 @@ from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class CircularApertureOTFPerturber(PerturbImage):
-    """
-    Applies OTF-based image perturbation using a circular aperture model with sensor and
-    scenario configurations.
+    """Applies OTF-based image perturbation using a circular aperture model with sensor and scenario configurations.
 
     The `CircularApertureOTFPerturber` class uses a circular aperture model to simulate
     image perturbations, allowing for wavelength-specific and sensor-specific modifications
     based on the sensor and scenario configurations.
 
     Attributes:
-        sensor (PybsmSensor | None): The sensor configuration for the perturbation.
-        scenario (PybsmScenario | None): The scenario configuration used for perturbation.
-        mtf_wavelengths (Sequence[float]): Sequence of wavelengths used in MTF calculations.
-        mtf_weights (Sequence[float]): Sequence of weights associated with each wavelength.
-        D (float): Effective aperture diameter.
-        eta (float): Relative linear obscuration.
-        slant_range (float): Line-of-sight distance between platform and target.
-        ifov (float): Instantaneous field of view of the sensor.
-        interp (bool): Specifies whether to use interpolated atmospheric data.
+        sensor (PybsmSensor | None):
+            The sensor configuration for the perturbation.
+        scenario (PybsmScenario | None):
+            The scenario configuration used for perturbation.
+        mtf_wavelengths (Sequence[float]):
+            Sequence of wavelengths used in MTF calculations.
+        mtf_weights (Sequence[float]):
+            Sequence of weights associated with each wavelength.
+        D (float):
+            Effective aperture diameter.
+        eta (float):
+            Relative linear obscuration.
+        slant_range (float):
+            Line-of-sight distance between platform and target.
+        ifov (float):
+            Instantaneous field of view of the sensor.
+        interp (bool):
+            Specifies whether to use interpolated atmospheric data.
     """
 
     def __init__(  # noqa: C901
@@ -100,13 +103,19 @@ class CircularApertureOTFPerturber(PerturbImage):
         """Initializes the CircularApertureOTFPerturber.
 
         Args:
-            :param sensor: pyBSM sensor object
-            :param scenario: pyBSM scenario object
-            :param mtf_wavelengths: a numpy array of wavelengths (m)
-            :param mtf_weights: a numpy array of weights for each wavelength contribution (arb)
-            :param interp: a boolean determining whether load_database_atmosphere is used with or without
+            sensor:
+                pyBSM sensor object
+            scenario:
+                pyBSM scenario object
+            mtf_wavelengths:
+                a numpy array of wavelengths (m)
+            mtf_weights:
+                a numpy array of weights for each wavelength contribution (arb)
+            interp:
+                a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
-            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
@@ -205,15 +214,17 @@ class CircularApertureOTFPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Applies the circular aperture-based perturbation to the provided image.
+        """Applies the circular aperture-based perturbation to the provided image.
 
         Args:
-            :param image: The image to be perturbed.
-            :param boxes: Bounding boxes for detections in input image.
-            :param additional_params: Dictionary containing:
-                - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                  pixels in an image, measured on the ground.
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                    pixels in an image, measured on the ground.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
@@ -289,8 +300,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for CircularApertureOTFPerturber instances.
+        """Provides the default configuration for CircularApertureOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.
@@ -302,12 +312,13 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
-        """
-        Instantiates a CircularApertureOTFPerturber from a configuration dictionary.
+        """Instantiates a CircularApertureOTFPerturber from a configuration dictionary.
 
         Args:
-            :param config_dict: Configuration dictionary with initialization parameters.
-            :param merge_default: Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
             :return CircularApertureOTFPerturber: An instance of CircularApertureOTFPerturber.
@@ -324,13 +335,11 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the CircularApertureOTFPerturber instance.
+        """Returns the current configuration of the CircularApertureOTFPerturber instance.
 
         Returns:
             :return dict[str, Any]: Configuration dictionary with current settings.
         """
-
         cfg = super().get_config()
 
         cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
@@ -343,8 +352,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
 
         Returns:
             :return bool: True if both pyBSM and OpenCV are available; False otherwise.

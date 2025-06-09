@@ -1,8 +1,4 @@
-"""
-This module provides the `COCOScorer` class, an implementation of the `ScoreDetections`
-interface that calculates object detection scores conforming to the COCO (Common Objects in
-Context) dataset format and evaluation metrics. This class is specifically tailored to use COCO
-evaluation metrics by formatting ground truth and predicted data accordingly.
+"""Provides COCOScorer, a ScoreDetections implementation that scores detections using COCO dataset metrics and formats.
 
 Classes:
     COCOScorer: Scores object detection results based on COCO evaluation metrics, allowing
@@ -48,8 +44,7 @@ class COCOScorer(ScoreDetections):
     """
 
     def __init__(self, gt_path: str, stat_index: int = 0) -> None:
-        """
-        Initializes the `COCOScorer` with a path to the ground truth data and a statistic index.
+        """Initializes the `COCOScorer` with a path to the ground truth data and a statistic index.
 
         Args:
             gt_path (str): Path to the COCO-formatted ground truth JSON file.
@@ -153,8 +148,7 @@ class COCOScorer(ScoreDetections):
         return final_scores
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the configuration dictionary for the `COCOScorer` instance.
+        """Returns the configuration dictionary for the `COCOScorer` instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary containing the ground truth path and statistic index.

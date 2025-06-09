@@ -1,7 +1,4 @@
-"""
-This module defines the `PerturbImage` interface, which provides an abstract base for
-implementing image perturbation algorithms. The primary purpose of this interface is to
-generate perturbed versions of input images, represented as `numpy.ndarray` arrays.
+"""Defines PerturbImage, an interface for implementing algorithms that generate perturbed numpy.ndarray images.
 
 Classes:
     PerturbImage: An abstract base class that specifies the structure for image perturbation
@@ -69,7 +66,7 @@ class PerturbImage(Plugfigurable):
             image output from DetectImageObjects.detect_objects
         :param additional_params: A dictionary containing perturber implementation-specific input param-values pairs.
 
-        :return:
+        Returns:
             Perturbed image as numpy array, including matching dtype. Implementations should impart no side
                 effects upon the input image.
             Iterable of tuples containing the bounding boxes for detections in the image. If an implementation
@@ -85,9 +82,7 @@ class PerturbImage(Plugfigurable):
         orig_shape: ArrayLike,
         new_shape: ArrayLike,
     ) -> Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]:
-        """
-        Utility function to rescale set of bounding boxes based on provided old
-        and new image sizes.
+        """Utility function to rescale set of bounding boxes based on provided old and new image sizes.
 
         :param boxes: Bounding boxes as input to the ``perturb()`` method.
         :param orig_shape: Original shape of the image that the provided bounding boxes belong to. It is assumed that
@@ -95,7 +90,8 @@ class PerturbImage(Plugfigurable):
         :param new_shape: New image shape to scale boxes to. It is assumed that first two members of this represent the
             height and width respectively.
 
-        :returns: Rescaled bounding boxes in the same format as input.
+        Returns:
+            Rescaled bounding boxes in the same format as input.
         """
         y_factor, x_factor = np.array(new_shape)[0:2] / np.array(orig_shape)[0:2]
         if x_factor == y_factor == 1:
@@ -127,17 +123,16 @@ class PerturbImage(Plugfigurable):
 
     @classmethod
     def get_type_string(cls) -> str:
-        """
-        Returns the fully qualified type string of the `PerturbImage` class or its subclass.
+        """Returns the fully qualified type string of the `PerturbImage` class or its subclass.
 
-        :return: A string representing the fully qualified type, in the format `<module>.<class_name>`.
-                 For example, "my_module.CustomPerturbImage".
+        Returns:
+            A string representing the fully qualified type, in the format `<module>.<class_name>`.
+            For example, "my_module.CustomPerturbImage".
         """
         return f"{cls.__module__}.{cls.__name__}"
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the PerturbImage instance.
+        """Returns the current configuration of the PerturbImage instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.

@@ -1,8 +1,4 @@
-"""
-This module provides classes for applying different types of blurring to an image,
-implementing the `PerturbImage` interface. Blurring methods include average, Gaussian,
-and median blurring, each with customizable kernel sizes for controlling the level of
-blur effect.
+"""Provides PerturbImage blurs: average, Gaussian, and median, with customizable kernel sizes.
 
 Classes:
     AverageBlurPerturber: Applies average blurring to an image.
@@ -81,8 +77,7 @@ class _PerturbImage(PerturbImage):
         return _image, _boxes
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the MedianBlurPerturber instance.
+        """Returns the current configuration of the MedianBlurPerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -93,8 +88,7 @@ class _PerturbImage(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required cv2 module is available.
+        """Checks if the required cv2 module is available.
 
         Returns:
             bool: True if opencv is installed; False otherwise.

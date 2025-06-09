@@ -1,1 +1,1 @@
-"""Module for generic implementations of PerturbImageFactory"""
+"""Module for generic implementations of PerturbImageFactory."""

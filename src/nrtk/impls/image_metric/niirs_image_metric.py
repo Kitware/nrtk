@@ -1,7 +1,4 @@
-"""
-This module provides an implementation of the `ImageMetric` interface, specifically for
-calculating the NIIRS (National Imagery Interpretability Rating Scale) metric using pyBSM
-sensor and scenario configurations.
+"""Provides an ImageMetric implementation to calculate NIIRS using pyBSM sensor and scenario configs.
 
 Classes:
     NIIRSImageMetric: Computes the NIIRS metric using the provided sensor and scenario.
@@ -42,8 +39,7 @@ from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class NIIRSImageMetric(ImageMetric):
-    """
-    Implementation of the `ImageMetric` interface to calculate the NIIRS metric.
+    """Implementation of the `ImageMetric` interface to calculate the NIIRS metric.
 
     The NIIRS metric, or National Imagery Interpretability Rating Scale, is used to rate
     the quality of images based on interpretability. This class requires a `PybsmSensor`
@@ -56,8 +52,7 @@ class NIIRSImageMetric(ImageMetric):
     """
 
     def __init__(self, sensor: PybsmSensor, scenario: PybsmScenario) -> None:
-        """
-        Initializes the NIIRSImageMetric.
+        """Initializes the NIIRSImageMetric.
 
         Args:
             sensor (PybsmSensor): A pyBSM sensor object representing sensor characteristics.
@@ -79,8 +74,7 @@ class NIIRSImageMetric(ImageMetric):
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
-        """
-        Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
+        """Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
 
         While this implementation of compute() takes the expected input paramerters, none
         of the values are used during calculation. pyBSM's NIIRS calculation only uses
@@ -89,7 +83,8 @@ class NIIRSImageMetric(ImageMetric):
         In order to inherit and function as an ImageMetric implementation, the arguements
         for compute stay consistent with other implementaiotns and are not used.
 
-        :return: Returns the NIIRS metric for the given pyBSMSensor and pyBSMScenario.
+        Returns:
+            The NIIRS metric for the given pyBSMSensor and pyBSMScenario.
         """
         # type ignore for pyright's handling of guarded import
         metrics = niirs5(self.sensor(), self.scenario())  # type: ignore
@@ -102,8 +97,7 @@ class NIIRSImageMetric(ImageMetric):
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
-        """
-        Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
+        """Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
 
         While this implementation of compute() takes the expected input paramerters, none
         of the values are used during calculation. pyBSM's NIIRS calculation only uses
@@ -112,14 +106,14 @@ class NIIRSImageMetric(ImageMetric):
         In order to inherit and function as an ImageMetric implementation, the arguements
         for compute stay consistent with other implementaiotns and are not used.
 
-        :return: Returns the NIIRS metric for the given pyBSMSensor and pyBSMScenario.
+        Returns:
+            The NIIRS metric for the given pyBSMSensor and pyBSMScenario.
         """
         return self.compute()
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Generates a configuration dictionary for the NIIRSImageMetric instance.
+        """Generates a configuration dictionary for the NIIRSImageMetric instance.
 
         Returns:
             dict[str, Any]: Configuration data representing the sensor and scenario.
@@ -131,8 +125,7 @@ class NIIRSImageMetric(ImageMetric):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required pybsm module is available.
+        """Checks if the required pybsm module is available.
 
         Returns:
             bool: True if pybsm is installed; False otherwise.

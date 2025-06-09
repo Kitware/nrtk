@@ -1,8 +1,4 @@
-"""
-This module defines the `ImageMetric` abstract base class, an interface for computing
-metrics between one or two images. Implementations of `ImageMetric` should define the
-specific metric computation in the `compute` method, which can be called directly or
-via the `__call__` method.
+"""Defines ImageMetric, an abstract class for computing metrics between images via a compute or __call__ method.
 
 Classes:
     ImageMetric: An interface outlining the computation of a given metric for image comparison or analysis.
@@ -46,8 +42,9 @@ class ImageMetric(Plugfigurable):
         :param img_2: An optional input image in the shape (height, width, channels)
         :param additional_params: A dictionary containing implementation-specific input param-values pairs.
 
-        :return: Returns a single scalar value representing an implementation's computed metric. Implementations
-                 should impart no side effects upon either input image or the additional parameters.
+        Returns:
+            Returns a single scalar value representing an implementation's computed metric. Implementations
+            should impart no side effects upon either input image or the additional parameters.
         """
 
     def __call__(
@@ -62,15 +59,15 @@ class ImageMetric(Plugfigurable):
         :param img_2: An optional input image in the shape (height, width, channels)
         :param additional_params: A dictionary containing implementation-specific input param-values pairs.
 
-        :return: Returns a single scalar value representing an implementation's computed metric. Implementations
-                 should impart no side effects upon either input image or the additional parameters.
+        Returns:
+            A single scalar value representing an implementation's computed metric. Implementations
+            should impart no side effects upon either input image or the additional parameters.
         """
         return self.compute(img_1, img_2, additional_params)
 
     @property
     def name(self) -> str:
-        """
-        Returns the name of the ImageMetric instance.
+        """Returns the name of the ImageMetric instance.
 
         This property provides a convenient way to retrieve the name of the
         class instance, which can be useful for logging, debugging, or display purposes.

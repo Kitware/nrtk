@@ -152,7 +152,7 @@ class TestRandomTranslationPerturber:
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         expectation: AbstractContextManager,
     ) -> None:
-        """Ensure the max translation limit image output is consistent"""
+        """Ensure the max translation limit image output is consistent."""
         inst = RandomTranslationPerturber()
         with expectation:
             _, _ = bbox_perturber_assertions(

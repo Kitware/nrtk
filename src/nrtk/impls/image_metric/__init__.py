@@ -1,1 +1,1 @@
-"""Module for implementations of ImageMetric interface"""
+"""Module for implementations of ImageMetric interface."""

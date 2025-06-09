@@ -1,7 +1,4 @@
-"""
-This module provides the `OneStepPerturbImageFactory` class, a simple implementation of the
-`StepPerturbImageFactory`. This factory creates a single `PerturbImage` instance with specific
-parameters for one-step perturbation, suitable for controlled image transformations.
+"""Provides OneStepPerturbImageFactory, creating a single PerturbImage with fixed parameters for one-step perturbations.
 
 Classes:
     OneStepPerturbImageFactory: A factory that generates one `PerturbImage` instance
@@ -51,8 +48,7 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         self.theta_value = theta_value
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Generates a configuration dictionary for the OneStepPerturbImageFactory instance.
+        """Generates a configuration dictionary for the OneStepPerturbImageFactory instance.
 
         Returns:
             dict[str, Any]: Configuration data representing the sensor and scenario.

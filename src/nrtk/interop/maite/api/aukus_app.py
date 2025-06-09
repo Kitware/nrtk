@@ -1,4 +1,4 @@
-"""This module contains handle_aukus_post, which is the endpoint for AUKUS API requests"""
+"""This module contains handle_aukus_post, which is the endpoint for AUKUS API requests."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ except ImportError:  # pragma: no cover
 
 # pyright warns about inheritance from BaseSettings which is ambiguous
 class Settings(BaseSettings):  # pyright: ignore [reportGeneralTypeIssues]
-    """Dataclass for NRTK API settings"""
+    """Dataclass for NRTK API settings."""
 
     NRTK_IP: str = "http://localhost:8888/"
 
@@ -61,7 +61,7 @@ else:
 
 
 def _check_input(data: AukusDatasetSchema) -> None:
-    """Check input data and raise HTTPException if needed"""
+    """Check input data and raise HTTPException if needed."""
     if not fastapi_available:
         raise FastApiImportError
     if data.data_format != "COCO":
@@ -76,7 +76,7 @@ def _check_input(data: AukusDatasetSchema) -> None:
 
 @AUKUS_app.post("/")
 def handle_aukus_post(data: AukusDatasetSchema) -> list[AukusDatasetSchema]:
-    """Format AUKUS request data to NRTK API format and return NRTK API data in AUKUS format"""
+    """Format AUKUS request data to NRTK API format and return NRTK API data in AUKUS format."""
     if not fastapi_available:
         raise FastApiImportError
 
