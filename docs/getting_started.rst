@@ -6,24 +6,32 @@ Overview
 
 NRTK consists of three main parts:
 
-- :ref:`Image Perturbation`: The core of NRTK is based on image perturbation. NRTK offers a wide variety of ways to
-  perturb images and transform bounding boxes.
-  `scikit-image <https://scikit-image.org/>`_, `Pillow <https://pillow.readthedocs.io/en/stable/>`_,
-  `openCV <https://pypi.org/project/opencv-python/#documentation-for-opencv-python>`_, and
-  `pyBSM  <https://github.com/kitware/pybsm/>`_ are used for various types of perturbation. The perturbation classes
-  take an image and perform a transformation based on input parameters.
+- Image Perturbation:
 
-- :ref:`Perturbation Factories`: Building upon image perturbation, perturbation factories are able to take a range of
+  The core of NRTK is based on image perturbation. NRTK offers a wide variety of ways to perturb images and transform
+  bounding boxes. The perturbation classes take an image and perform a transformation based on input parameters.
+  `Perturbers <implementations.html#image-perturbation>`_
+  implement the `PerturbImage <interfaces.html#interface-perturbimage>`_ interface.
+
+- Perturbation Factories:
+
+  Building upon image perturbation, perturbation factories are able to take a range of
   values for parameter(s) and perform multiple perturbations on the same image. This allows for quick and simple
-  generation of multiple perturbations. The ``scikit-image``, ``Pillow``, and ``openCV`` perturbers use the
-  :ref:`StepPerturbImageFactory <StepPerturbImageFactory>`,
-  :ref:`LinSpacePerturbImageFactory <LinSpacePerturbImageFactory>`, or
-  :ref:`OneStepPerturbImageFactory <OneStepPerturbImageFactory>`. The ``pyBSM`` perturber uses the
-  :ref:`CustomPybsmPerturbImageFactory <CustomPybsmPerturbImageFactory>`.
+  generation of multiple perturbations.  `Perturbation Factories <implementations.html#perturbation-factory>`_
+  implement the `PerturbImageFactory <interfaces.html#interface-perturbimagefactory>`_ interface.
 
-- :ref:`Model Evaluation`: NRTK provides functionality for evaluating models in the image classification and object
+- Model Evaluation:
+
+  NRTK provides functionality for evaluating models in the image classification and object
   detection tasks. The package also provides test orchestration functionality for performing evaluations over a sweep
-  of parameters in order to test model response to varying severity of image degradation.
+  of parameters in order to test model response to varying severity of image degradation. While NRTK perturbations can
+  be used with any evaluation harness, built-in
+  `NRTK Generators <implementations.html#end-to-end-generation-and-scoring>`_ implement the
+  `GenerateObjectDetectorBlackboxResponse <interfaces.html#interface-generateobjectdetectorblackboxresponse>`_
+  interface.
+
+In this example, we'll generate your first perturbation. Afterwards, `the NRTK tutorial <examples/nrtk_tutorial.html>`_
+provides a deeper look at perturbation and the other main components of NRTK.
 
 Example: A First Look at NRTK Perturbations
 -------------------------------------------
@@ -81,5 +89,8 @@ blur introduced due to simulated sensor jitter.
 Next Steps
 ----------
 
-To learn more about NRTK read the :doc:`Overview <./introduction>` or dive right into a
-:doc:`Tutorial <./nrtk_tutorial>`.
+For broader context or foundational theory, see:
+
+- `NRTK Tutorial <examples/nrtk_tutorial.html>`__ – Step-by-step tutorial to get started
+- :doc:`nrtk_explanation` – Conceptual guide to NRTK’s architecture and approach
+- :doc:`risk_factors` – Conceptual guide to understand how NRTK's perturbations map to real-world risk factors

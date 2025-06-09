@@ -130,3 +130,4 @@ For broader context or foundational theory, see:
 
 - `NRTK Tutorial <examples/nrtk_tutorial.html>`__ – Step-by-step tutorial to get started
 - :doc:`nrtk_explanation` – Conceptual guide to NRTK’s architecture and approach
+- :doc:`risk_factors` – Conceptual guide to understand how NRTK's perturbations map to real-world risk factors
