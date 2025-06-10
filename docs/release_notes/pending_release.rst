@@ -19,6 +19,8 @@ Documentation
 
 * Added a documentation page outlining operational risks
 
+* Ensure intra-documentation links are consistent
+
 Fixes
 -----
 

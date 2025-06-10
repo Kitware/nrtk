@@ -168,7 +168,7 @@ sensor jitter.
 ## Documentation
 
 Documentation for both release snapshots and the latest main branch is available
-on [ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
+on [ReadTheDocs](https://nrtk.readthedocs.io).
 
 To build the Sphinx-based documentation locally for the latest reference:
 
@@ -196,8 +196,9 @@ The following points help ensure contributions follow development practices.
 - Follow the
   [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
 - Adopt the Git Flow branching strategy.
-- Detailed release information is available in
-  [docs/release_process.rst](./docs/release_process.rst).
+- See the
+  [release process documentation](https://nrtk.readthedocs.io/en/latest/release_process.html)
+  for detailed release information.
 - Additional contribution guidelines and issue reporting steps can be found in
   [CONTRIBUTING.md](./CONTRIBUTING.md).
 
