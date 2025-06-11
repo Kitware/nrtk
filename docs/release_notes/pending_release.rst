@@ -21,6 +21,12 @@ Documentation
 
 * Ensure intra-documentation links are consistent
 
+* Added explanatory context to figure 1 in ``nrtk_explanation.rst``.
+
+* Added missing T&E notebooks to ``nrtk_jatic/testing_and_eval_guides.rst``.
+
+* Added ``WaterDropletPerturber`` to Risk Factors Table in ``risk_factors.rst``.
+
 Fixes
 -----
 
