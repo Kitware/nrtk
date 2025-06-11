@@ -1,4 +1,4 @@
-"""Provides a wrapper for pybsm.sensor with PybsmSensor, extending Sensor for customizable sensors in SMQTK.
+"""Defines a wrapper for pybsm.sensor with PybsmSensor, extending Sensor for customizable sensors in SMQTK.
 
 Typical usage example:
 

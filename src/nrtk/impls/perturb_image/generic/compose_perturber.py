@@ -1,4 +1,4 @@
-"""Provides ComposePerturber to apply multiple PerturbImage instances sequentially for combined image perturbations."""
+"""Defines ComposePerturber to apply multiple PerturbImage instances sequentially for combined image perturbations."""
 
 from __future__ import annotations
 

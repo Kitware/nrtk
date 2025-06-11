@@ -43,7 +43,7 @@ class TestJATICClassificationAugmentation:
         targets_in: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
         expected_targets_out: TargetBatchType,  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
-        """Test that the adapter provides the same image perturbation result as the core perturber.
+        """Test that the adapter generates the same image perturbation result as the core perturber.
 
         Also tests that labels and metadata are appropriately updated.
         """

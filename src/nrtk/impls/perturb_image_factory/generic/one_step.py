@@ -1,4 +1,4 @@
-"""Provides OneStepPerturbImageFactory, creating a single PerturbImage with fixed parameters for one-step perturbations.
+"""Defines OneStepPerturbImageFactory, creating a single PerturbImage with fixed parameters for one-step perturbations.
 
 Classes:
     OneStepPerturbImageFactory: A factory that generates one `PerturbImage` instance

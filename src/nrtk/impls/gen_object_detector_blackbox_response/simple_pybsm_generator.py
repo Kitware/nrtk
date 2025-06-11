@@ -1,6 +1,6 @@
 """pyBSM implementation of GenerateObjectDetectorBlackboxResponse.
 
-This module provides an example implementation of the GenerateObjectDetectorBlackboxResponse interface
+This module defines an example implementation of the GenerateObjectDetectorBlackboxResponse interface
 using a `SimplePybsmGenerator` class. It generates object detection responses for a series of input images
 based on ground truth bounding boxes and scoring methods.
 

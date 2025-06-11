@@ -1,4 +1,4 @@
-"""Provides PerturbImage blurs: average, Gaussian, and median, with customizable kernel sizes.
+"""Implements PerturbImage blurs: average, Gaussian, and median, with customizable kernel sizes.
 
 Classes:
     AverageBlurPerturber: Applies average blurring to an image.

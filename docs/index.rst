@@ -83,12 +83,6 @@ Documentation Contents:
 
 .. toctree::
    :maxdepth: 1
-   :caption: Tutorial
-
-   examples/nrtk_tutorial.ipynb
-
-.. toctree::
-   :maxdepth: 1
    :caption: Explanation
 
    nrtk_explanation
@@ -96,12 +90,18 @@ Documentation Contents:
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorials
+
+   examples/nrtk_tutorial.ipynb
+
+.. toctree::
+   :maxdepth: 1
    :caption: How-To
 
    nrtk_how_to_topics
-   review_process
-   releasing
-   creating_public_release_request
+   contributing
+   release_process
+   miscellaneous/creating_public_release_request
 
 .. toctree::
    :maxdepth: 1
@@ -113,7 +113,7 @@ Documentation Contents:
    glossary
    containers
    release_notes
-   style_sheet
+   miscellaneous/style_sheet
 
 
 

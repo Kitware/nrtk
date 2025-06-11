@@ -1,4 +1,4 @@
-"""Provides ClassAgnosticPixelwiseIoUScorer for class-agnostic pixelwise IoU scoring of object detections.
+"""Defines ClassAgnosticPixelwiseIoUScorer for class-agnostic pixelwise IoU scoring of object detections.
 
 Classes:
     ClassAgnosticPixelwiseIoUScorer: Computes pixelwise IoU scores for bounding boxes in a

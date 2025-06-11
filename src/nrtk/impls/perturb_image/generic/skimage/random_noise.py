@@ -1,4 +1,4 @@
-"""Provides noise perturbers implementing PerturbImage, including salt, pepper, Gaussian, and speckle noise types.
+"""Defines noise perturbers implementing PerturbImage, including salt, pepper, Gaussian, and speckle noise types.
 
 Classes:
     _SKImageNoisePerturber: Base class for noise perturbation, using `skimage.util.random_noise`.

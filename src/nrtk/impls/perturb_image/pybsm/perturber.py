@@ -1,4 +1,4 @@
-"""Provides PybsmPerturber for image perturbations using pyBSM with sensor and scenario configs.
+"""Implements PybsmPerturber for image perturbations using pyBSM with sensor and scenario configs.
 
 Classes:
     PybsmPerturber: Applies image perturbations using pyBSM based on specified sensor and
@@ -127,7 +127,7 @@ class PybsmPerturber(PerturbImage):
     def params(self) -> dict[str, Any]:
         """Retrieves the theta parameters related to the perturbation configuration.
 
-        This method provides extra configuration details for the `PybsmPerturber` instance,
+        This method retrieves extra configuration details for the `PybsmPerturber` instance,
         which may include specific parameters related to the sensor, scenario, or any
         additional customizations applied during initialization.
 
@@ -209,7 +209,7 @@ class PybsmPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Provides the default configuration for PybsmPerturber instances.
+        """Retrieves the default configuration for PybsmPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.

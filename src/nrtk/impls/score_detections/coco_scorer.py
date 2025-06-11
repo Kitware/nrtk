@@ -1,4 +1,4 @@
-"""Provides COCOScorer, a ScoreDetections implementation that scores detections using COCO dataset metrics and formats.
+"""Defines COCOScorer, a ScoreDetections implementation that scores detections using COCO dataset metrics and formats.
 
 Classes:
     COCOScorer: Scores object detection results based on COCO evaluation metrics, allowing

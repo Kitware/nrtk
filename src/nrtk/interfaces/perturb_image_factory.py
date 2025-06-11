@@ -1,4 +1,4 @@
-"""Provides PerturbImageFactory, an abstract factory for creating configurable PerturbImage instances flexibly.
+"""Defines PerturbImageFactory, an abstract factory for creating configurable PerturbImage instances flexibly.
 
 Classes:
     PerturbImageFactory: An abstract factory for creating `PerturbImage` instances with specific
@@ -133,7 +133,7 @@ class PerturbImageFactory(Plugfigurable):
     def get_default_config(cls) -> dict[str, Any]:
         """Returns the default configuration for the PerturbImageFactory.
 
-        This method provides a default configuration dictionary, specifying default
+        This method retrieves a default configuration dictionary, specifying default
         values for key parameters in the factory. It can be used to create an instance
         of the factory with preset configurations.
 

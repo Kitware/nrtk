@@ -1,4 +1,4 @@
-"""Provides JitterOTFPerturber which applies jitter perturbations using pyBSM with sensor and scenario configs.
+"""Implements JitterOTFPerturber which applies jitter perturbations using pyBSM with sensor and scenario configs.
 
 Classes:
     JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM and OpenCV.
@@ -259,7 +259,7 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Provides the default configuration for JitterOTFPerturber instances.
+        """Retrieves the default configuration for JitterOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.

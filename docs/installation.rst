@@ -12,9 +12,6 @@ nrtk installation has been tested on Unix and Linux systems.
 
 .. :auto introduction:
 
-.. note::
-    To install with OpenCV, see instructions `below <#installing-with-opencv>`_.
-
 .. :auto install-commands:
 
 .. _pip:
@@ -46,9 +43,15 @@ The following assumes `Poetry`_ (`installation`_ and `usage`_) is already instal
 .. note::
   nrtk currently requires ``poetry<2.0``
 
-`Poetry`_ is used for development of nrtk. Unlike the previous options,
-`Poetry`_ will not only allows developers to install any extras they need,
-but also install developmental dependencies like ``pytest`` and nrtk's linting tools.
+`Poetry`_ acts as a comprehensive tool for dependency management, virtual environment handling,
+and package building. It streamlines development by automating tasks like dependency resolution,
+ensuring consistent environments across different machines, and simplifying the packaging and
+publishing of Python projects. Unlike the previous options, `Poetry`_ will not only allow developers
+to install any extras they need, but also install multi-dependency groups like nrtk's
+`docs <https://github.com/Kitware/nrtk/blob/main/pyproject.toml#L132>`_,
+`tests <https://github.com/Kitware/nrtk/blob/main/pyproject.toml#L147>`_, and
+`linting <https://github.com/Kitware/nrtk/blob/7014707c0a531fa63fa6d08d7d6aeba9868f09b4/pyproject.toml#L118>`_ tools.
+
 
 Please heed the following warning from Poetry's own documentation:
 
@@ -147,40 +150,6 @@ preview of the rendered documentation.
 
 .. :auto live-preview:
 
-Installing with OpenCV
-----------------------
-One of the optional packages for nrtk is OpenCV. OpenCV is required for
-:py:mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers and
-:ref:`Optical Transfer Functions <Optical Transfer Function Examples>`. To give users the option
-to use either ``opencv-python`` or ``opencv-python-headless``,
-nrtk has the ``graphics`` and ``headless`` extras for ``opencv-python`` and
-``opencv-python-headless`` respectively. The following commands will install
-the ``opencv-python`` version.
-
-For :command:`pip`:
-
-.. prompt:: bash
-
-    pip install nrtk[graphics]
-
-For :command:`conda-forge`:
-
-.. prompt:: bash
-
-    conda install -c conda-forge nrtk-graphics
-
-For `Poetry`_:
-
-.. prompt:: bash
-
-    poetry install --sync --extras graphics
-
-
-To install the ``opencv-python-headless`` version, replace ``graphics``
-with ``headless`` in the above commands.
-
-
-
 Extras
 ------
 
@@ -225,6 +194,41 @@ description of the extra.
     to be installed in conjunction with either the ``graphics`` or ``headless`` extras due to the OpenCV requirement.
 
     **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
+
+Installing with OpenCV
+^^^^^^^^^^^^^^^^^^^^^^
+One of the optional packages for nrtk is OpenCV. OpenCV is required for
+:py:mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers and
+:ref:`Optical Transfer Functions <Optical Transfer Function Examples>`. To give users the option
+to use either ``opencv-python`` or ``opencv-python-headless``, nrtk has the ``graphics`` and ``headless``
+extras for ``opencv-python`` and ``opencv-python-headless``, respectively.
+
+``opencv-python-headless`` is a minimal package version of ``opencv-python`` which contains the core
+capabilities of OpenCV, without including any of the GUI-related functionalities.
+
+The following commands will install the ``opencv-python`` version.
+
+For :command:`pip`:
+
+.. prompt:: bash
+
+    pip install nrtk[graphics]
+
+For :command:`conda-forge`:
+
+.. prompt:: bash
+
+    conda install -c conda-forge nrtk-graphics
+
+For `Poetry`_:
+
+.. prompt:: bash
+
+    poetry install --sync --extras graphics
+
+
+To install the ``opencv-python-headless`` version, replace ``graphics`` with ``headless`` in the above
+commands.
 
 Perturber Dependencies
 ----------------------

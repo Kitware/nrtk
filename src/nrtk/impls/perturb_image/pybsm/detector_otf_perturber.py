@@ -1,4 +1,4 @@
-"""Provides DetectorOTFPerturber which applies detector perturbations using sensor and scenario settings.
+"""Implements DetectorOTFPerturber which applies detector perturbations using sensor and scenario settings.
 
 Classes:
     DetectorOTFPerturber: Applies OTF-based perturbations to images using specified
@@ -266,7 +266,7 @@ class DetectorOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Provides the default configuration for DetectorOTFPerturber instances.
+        """Retrieves the default configuration for DetectorOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.

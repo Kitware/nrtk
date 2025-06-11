@@ -1,6 +1,6 @@
 """Wrapper for pybsm.scenario.
 
-This module provides a convenient wrapper for setting up and managing scenarios using
+This module defines a convenient wrapper for setting up and managing scenarios using
 the pybsm framework. The primary class, `PybsmScenario`, facilitates configuring scenarios
 with parameters such as atmospheric haze, altitude, and ground range.
 
@@ -36,7 +36,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 class PybsmScenario(Configurable):
     """Wrapper for pybsm.scenario.
 
-    This class provides a streamlined interface for creating and configuring a scenario
+    This class defines a streamlined interface for creating and configuring a scenario
     within the pybsm framework, enabling the user to specify parameters such as atmospheric
     haze level, altitude, and ground range.
 
@@ -167,7 +167,7 @@ class PybsmScenario(Configurable):
         return self.name
 
     def create_scenario(self) -> "Scenario":
-        """Creates and returns a pybsm.Scenario object based on the provided parameters.
+        """Creates and returns a pybsm.Scenario object based on the defined parameters.
 
         Returns:
             :return Scenario: pybsm.Scenario object populated with instance parameters.

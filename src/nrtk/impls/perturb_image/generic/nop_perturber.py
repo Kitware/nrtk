@@ -1,4 +1,4 @@
-"""Provides NOPPerturber, a PerturbImage implementation that returns the input image unchanged for testing or baselines.
+"""Defines NOPPerturber, a PerturbImage implementation that returns the input image unchanged for testing or baselines.
 
 Classes:
     NOPPerturber: An implementation of the `PerturbImage` interface that returns an unmodified

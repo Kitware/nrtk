@@ -27,6 +27,8 @@ Documentation
 
 * Added ``WaterDropletPerturber`` to Risk Factors Table in ``risk_factors.rst``.
 
+* Improved documentation based on Phase-1 documentation feedback.
+
 Fixes
 -----
 

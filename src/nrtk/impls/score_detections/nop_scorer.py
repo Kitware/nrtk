@@ -1,4 +1,4 @@
-"""Provides NOPScorer, a ScoreDetections implementation that scores all detections as zero for testing or baselines.
+"""Defines NOPScorer, a ScoreDetections implementation that scores all detections as zero for testing or baselines.
 
 Classes:
     NOPScorer: An example implementation of `ScoreDetections` that outputs zero scores

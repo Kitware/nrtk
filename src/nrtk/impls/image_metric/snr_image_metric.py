@@ -1,4 +1,4 @@
-"""Provides SNRImageMetric, an ImageMetric implementation that computes signal-to-noise ratio for a single image.
+"""Defines SNRImageMetric, an ImageMetric implementation that computes signal-to-noise ratio for a single image.
 
 Classes:
     SNRImageMetric: Calculates the Signal-to-Noise Ratio (SNR) of an image using specified

@@ -8,29 +8,20 @@ specifically integrated with Modular AI Trustworthy Engineering (MAITE) workflow
 
 Each guide links to a Jupyter notebook in the ``docs/examples/`` directory of the repository.
 
-.. toctree::
-   :hidden:
-
-    examples/nrtk_tutorial.ipynb
-    examples/otf_visualization.ipynb
-    examples/perturbers.ipynb
-    examples/coco_scorer.ipynb
-    examples/simple_generic_generator.ipynb
-    examples/simple_pybsm_generator.ipynb
-    examples/maite/augmentations.ipynb
-    examples/maite/compute_image_metric.ipynb
-    examples/maite/jatic-perturbations-saliency.ipynb
-    examples/maite/nrtk_brightness_perturber_demo.ipynb
-    examples/maite/nrtk_focus_perturber_demo.ipynb
-    examples/maite/nrtk_haze_perturber_demo.ipynb
-    examples/maite/nrtk_sensor_transformation_demo.ipynb
-    examples/maite/nrtk_translation_perturber_demo.ipynb
-    examples/maite/nrtk_turbulence_perturber_demo.ipynb
-    examples/maite/nrtk_water_droplet_perturber_demo.ipynb
-
-
 General NRTK Examples
 ---------------------
+
+.. toctree::
+    :hidden:
+
+    examples/otf_visualization.ipynb
+    examples/perturbers.ipynb
+    examples/albumentations_perturber.ipynb
+    examples/coco_scorer.ipynb
+    .. examples/maite/augmentations.ipynb
+    .. examples/maite/compute_image_metric.ipynb
+    .. examples/simple_generic_generator.ipynb
+    .. examples/simple_pybsm_generator.ipynb
 
 - **Visualizing Optical Transfer Functions**
 
@@ -63,6 +54,19 @@ Use COCO scoring to assess object detection model performance across perturbed i
 
 Testing & Evaluation Guides with MAITE
 --------------------------------------
+
+.. toctree::
+    :hidden:
+
+    examples/maite/jatic-perturbations-saliency.ipynb
+    examples/maite/nrtk_brightness_perturber_demo.ipynb
+    examples/maite/nrtk_focus_perturber_demo.ipynb
+    examples/maite/nrtk_haze_perturber_demo.ipynb
+    examples/maite/nrtk_lens_flare_demo.ipynb
+    examples/maite/nrtk_sensor_transformation_demo.ipynb
+    examples/maite/nrtk_translation_perturber_demo.ipynb
+    examples/maite/nrtk_turbulence_perturber_demo.ipynb
+    examples/maite/nrtk_water_droplet_perturber_demo.ipynb
 
 The following notebooks showcase how NRTK perturbations can be applied to simulate key operational risks within a T&E
 workflow. Each notebook illustrates potential impact on model performance, utilizing MAITE as an evaluation harness.
@@ -115,6 +119,12 @@ Simulate a rain/water droplet effect and analyze its impact on model inputs and 
 
 Related Resources
 -----------------
+
+.. toctree::
+    :hidden:
+
+    examples/nrtk_tutorial.ipynb
+    :doc:`nrtk_explanation`
 
 For broader context or foundational theory, see:
 

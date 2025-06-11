@@ -1,7 +1,7 @@
-"""Provides an ImageMetric implementation to calculate NIIRS using pyBSM sensor and scenario configs.
+"""Defines an ImageMetric implementation to calculate NIIRS using pyBSM sensor and scenario configs.
 
 Classes:
-    NIIRSImageMetric: Computes the NIIRS metric using the provided sensor and scenario.
+    NIIRSImageMetric: Computes the NIIRS metric using the defined sensor and scenario.
 
 Dependencies:
     - pybsm.metrics.niirs5

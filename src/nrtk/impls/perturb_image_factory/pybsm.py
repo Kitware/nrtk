@@ -1,4 +1,4 @@
-"""Provides factories to create PybsmPerturber instances for flexible image perturbations.
+"""Defines factories to create PybsmPerturber instances for flexible image perturbations.
 
 Classes:
     _PybsmPerturbImageFactory: A base factory class that generates multiple `PybsmPerturber` instances
@@ -156,7 +156,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @property
     @override
     def thetas(self) -> Sequence[Sequence[Any]]:
-        """Provides the current values for each parameter to be varied.
+        """Retrieves the current values for each parameter to be varied.
 
         Returns:
             Sequence[Sequence[Any]]: A sequence of parameter values for perturbation.
@@ -176,7 +176,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Provides the default configuration for `_PybsmPerturbImageFactory`.
+        """Retrieves the default configuration for `_PybsmPerturbImageFactory`.
 
         Returns:
             dict[str, Any]: A dictionary with the default configuration values.

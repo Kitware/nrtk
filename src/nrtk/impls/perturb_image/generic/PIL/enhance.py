@@ -1,4 +1,4 @@
-"""Provides PerturbImage enhancers using PIL to adjust brightness, color, contrast, and sharpness of images.
+"""Implements PerturbImage enhancers using PIL to adjust brightness, color, contrast, and sharpness of images.
 
 Classes:
     BrightnessPerturber: Adjusts the brightness of an image.

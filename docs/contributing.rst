@@ -1,15 +1,14 @@
-Review Process
-**************
+Contributing
+************
 
 The process for reviewing and integrating branches into nrtk is described
 below.
 
 For guidelines on contributing, see ``CONTRIBUTING.md``.
 
-For guidelines on the release process, see `Release Process and
-Notes`_.
+For guidelines on the release process, see `Release Process`_.
 
-.. _`Release Process and Notes`: release_process.html
+.. _`Release Process`: release_process.html
 
 .. contents:: The review process consists of the following parts:
    :local:

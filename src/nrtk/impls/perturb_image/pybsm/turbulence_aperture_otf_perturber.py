@@ -1,4 +1,4 @@
-"""Provides TurbulenceApertureOTFPerturber for turbulence aperture-based OTF image perturbations using pyBSM and OpenCV.
+"""Implements TurbulenceApertureOTFPerturber for turbulence aperture-based OTF image perturbations using pyBSM & OpenCV.
 
 Classes:
     TurbulenceApertureOTFPerturber: Applies OTF-based perturbations with turbulence and aperture
@@ -374,7 +374,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Provides the default configuration for TurbulenceApertureOTFPerturber instances.
+        """Retrieves the default configuration for TurbulenceApertureOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.

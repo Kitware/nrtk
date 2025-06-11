@@ -69,8 +69,8 @@ class ImageMetric(Plugfigurable):
     def name(self) -> str:
         """Returns the name of the ImageMetric instance.
 
-        This property provides a convenient way to retrieve the name of the
-        class instance, which can be useful for logging, debugging, or display purposes.
+        This property retrieves the name of the class instance, which can
+        be useful for logging, debugging, or display purposes.
 
         Returns:
             str: The name of the ImageMetric instance.

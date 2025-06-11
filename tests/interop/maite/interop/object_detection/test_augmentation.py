@@ -78,7 +78,7 @@ class TestJATICDetectionAugmentation:
     ) -> None:
         """Test that the augmentation adapter functions appropriately.
 
-        Tests that the adapter provides the same image perturbation result
+        Tests that the adapter generates the same image perturbation result
         as the core perturber and that bboxes and metadata are appropriately
         updated.
         """

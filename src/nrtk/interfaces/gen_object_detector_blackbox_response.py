@@ -1,4 +1,4 @@
-"""Provides GenerateObjectDetectorBlackboxResponse for response curves and scoring in blackbox object detection setups.
+"""Defines GenerateObjectDetectorBlackboxResponse for response curves and scoring in blackbox object detection setups.
 
 Classes:
     GenerateObjectDetectorBlackboxResponse: An interface that defines methods to generate

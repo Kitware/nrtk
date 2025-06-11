@@ -1,4 +1,4 @@
-"""Provides CircularApertureOTFPerturber for circular aperture OTF perturbations with sensor and scenario configs.
+"""Implements CircularApertureOTFPerturber for circular aperture OTF perturbations with sensor and scenario configs.
 
 Classes:
     CircularApertureOTFPerturber: Implements OTF-based perturbations using a circular aperture
@@ -300,7 +300,7 @@ class CircularApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Provides the default configuration for CircularApertureOTFPerturber instances.
+        """Retrieves the default configuration for CircularApertureOTFPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.
