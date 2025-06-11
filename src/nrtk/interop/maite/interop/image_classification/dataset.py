@@ -1,4 +1,4 @@
-"""This module contains wrappers for converting a generic dataset to a MAITE dataset for image classification"""
+"""This module contains wrappers for converting a generic dataset to a MAITE dataset for image classification."""
 
 from __future__ import annotations
 
@@ -51,8 +51,7 @@ class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGenera
         dataset_id: str,
         index2label: dict[int, str] | None = None,
     ) -> None:
-        """
-        Initialize MAITE-compliant dataset
+        """Initialize MAITE-compliant dataset.
 
         Args:
             imgs (Sequence[np.ndarray]): Sequence of images in the dataset.

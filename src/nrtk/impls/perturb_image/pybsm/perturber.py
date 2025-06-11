@@ -1,8 +1,4 @@
-"""
-This module provides the `PybsmPerturber` class, which applies image perturbations using
-the pyBSM library. The perturbations are based on a sensor configuration and a scenario,
-allowing for realistic image simulations in remote sensing or other image-processing
-applications.
+"""Provides PybsmPerturber for image perturbations using pyBSM with sensor and scenario configs.
 
 Classes:
     PybsmPerturber: Applies image perturbations using pyBSM based on specified sensor and
@@ -55,17 +51,19 @@ DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call
 
 
 class PybsmPerturber(PerturbImage):
-    """
-    Implements image perturbation using pyBSM sensor and scenario configurations.
+    """Implements image perturbation using pyBSM sensor and scenario configurations.
 
     The `PybsmPerturber` class applies realistic perturbations to images by leveraging
     pyBSM's simulation functionalities. It takes in a sensor and scenario, along with
     other optional parameters, to simulate environmental effects on the image.
 
     Attributes:
-        sensor (PybsmSensor): The sensor configuration for the perturbation.
-        scenario (PybsmScenario): Scenario settings to apply during the perturbation.
-        reflectance_range (np.ndarray): Default reflectance range for image simulation.
+        sensor (PybsmSensor):
+            The sensor configuration for the perturbation.
+        scenario (PybsmScenario):
+            Scenario settings to apply during the perturbation.
+        reflectance_range (np.ndarray):
+            Default reflectance range for image simulation.
     """
 
     def __init__(  # noqa: C901
@@ -78,17 +76,26 @@ class PybsmPerturber(PerturbImage):
         **kwargs: Any,
     ) -> None:
         """Initializes the PybsmPerturber.
+
         Args:
-            :param sensor: pyBSM sensor object.
-            :param scenario: pyBSM scenario object.
-            :param reflectance_range: Array of reflectances that correspond to pixel values.
-            :param rng_seed: integer seed value that will be used for the random number generator.
-            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            sensor:
+                pyBSM sensor object.
+            scenario:
+                pyBSM scenario object.
+            reflectance_range:
+                Array of reflectances that correspond to pixel values.
+            rng_seed:
+                integer seed value that will be used for the random number generator.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
                     median: median between extent and extant
                 Default value is extent
+            kwargs:
+                sensor and/or scenario values to modify.
+
         Raises:
             :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
             :raises ValueError: If reflectance_range length != 2
@@ -118,8 +125,7 @@ class PybsmPerturber(PerturbImage):
 
     @property
     def params(self) -> dict[str, Any]:
-        """
-        Retrieves the theta parameters related to the perturbation configuration.
+        """Retrieves the theta parameters related to the perturbation configuration.
 
         This method provides extra configuration details for the `PybsmPerturber` instance,
         which may include specific parameters related to the sensor, scenario, or any
@@ -128,7 +134,6 @@ class PybsmPerturber(PerturbImage):
         Returns:
             :return dict[str, Any]: A dictionary containing additional perturbation parameters.
         """
-
         return self.thetas
 
     @override
@@ -138,19 +143,20 @@ class PybsmPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Applies pyBSM-based perturbations to the provided image.
+        """Applies pyBSM-based perturbations to the provided image.
 
         Args:
-            :param image: The image to be perturbed.
-            :param boxes: Bounding boxes for detections in input image.
-            :param additional_params: Dictionary containing:
-                - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                  pixels in an image, measured on the ground.
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                        pixels in an image, measured on the ground.
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                The perturbed image and bounding boxes scaled to perturbed image shape.
+            The perturbed image and bounding boxes scaled to perturbed image shape.
 
         Raises:
             :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
@@ -186,8 +192,7 @@ class PybsmPerturber(PerturbImage):
         return perturbed.astype(np.uint8), boxes
 
     def __str__(self) -> str:
-        """
-        Returns a string representation combining sensor and scenario names.
+        """Returns a string representation combining sensor and scenario names.
 
         Returns:
             :return str: Concatenated sensor and scenario names.
@@ -195,8 +200,7 @@ class PybsmPerturber(PerturbImage):
         return self.sensor.name + " " + self.scenario.name
 
     def __repr__(self) -> str:
-        """
-        Returns a representation of the perturber including sensor and scenario names.
+        """Returns a representation of the perturber including sensor and scenario names.
 
         Returns:
             :return str: Representation showing sensor and scenario names.
@@ -205,8 +209,7 @@ class PybsmPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for PybsmPerturber instances.
+        """Provides the default configuration for PybsmPerturber instances.
 
         Returns:
             :return dict[str, Any]: A dictionary with the default configuration values.
@@ -219,12 +222,13 @@ class PybsmPerturber(PerturbImage):
 
     @classmethod
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> PybsmPerturber:
-        """
-        Instantiates a PybsmPerturber from a configuration dictionary.
+        """Instantiates a PybsmPerturber from a configuration dictionary.
 
         Args:
-            :param config_dict: Configuration dictionary with initialization parameters.
-            :param merge_default: Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
             :return PybsmPerturber: An instance of PybsmPerturber.
@@ -240,8 +244,7 @@ class PybsmPerturber(PerturbImage):
         return super().from_config(config_dict, merge_default=merge_default)
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the PybsmPerturber instance.
+        """Returns the current configuration of the PybsmPerturber instance.
 
         Returns:
             :return dict[str, Any]: Configuration dictionary with current settings.
@@ -257,8 +260,7 @@ class PybsmPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependency (pyBSM) is available.
+        """Checks if the necessary dependency (pyBSM) is available.
 
         Returns:
             :return bool: True pyBSM is available; False otherwise.

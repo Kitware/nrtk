@@ -1,7 +1,4 @@
-"""
-This module provides a set of classes for adding different types of noise to images, implementing
-the `PerturbImage` interface. The perturbation types include salt, pepper, salt-and-pepper,
-Gaussian, and speckle noise, allowing for a wide range of image noise simulations.
+"""Provides noise perturbers implementing PerturbImage, including salt, pepper, Gaussian, and speckle noise types.
 
 Classes:
     _SKImageNoisePerturber: Base class for noise perturbation, using `skimage.util.random_noise`.
@@ -67,7 +64,8 @@ class _SKImageNoisePerturber(PerturbImage):
         :param kwargs: Keyword arguments for random_noise call. ``rng`` will be
             specified separately.
 
-        :return: Peturbed image as numpy array, including matching shape and dtype.
+        Returns:
+            Peturbed image as numpy array, including matching shape and dtype.
         """
         # Determine if conversion back to original dtype is possible
         dtype_str = str(image.dtype)
@@ -95,8 +93,7 @@ class _SKImageNoisePerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _SKImageNoisePerturber instance.
+        """Returns the current configuration of the _SKImageNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -107,8 +104,7 @@ class _SKImageNoisePerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required skimage module is available.
+        """Checks if the required skimage module is available.
 
         Returns:
             bool: True if scikit-image is installed; False otherwise.
@@ -140,8 +136,7 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _SPNoisePerturber instance.
+        """Returns the current configuration of the _SPNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -226,8 +221,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the SaltAndPepperNoisePerturber instance.
+        """Returns the current configuration of the SaltAndPepperNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -263,8 +257,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _GSNoisePerturber instance.
+        """Returns the current configuration of the _GSNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.

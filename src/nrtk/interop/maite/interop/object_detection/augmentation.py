@@ -1,4 +1,4 @@
-"""This module contains wrappers for NRTK perturbers for object detection"""
+"""This module contains wrappers for NRTK perturbers for object detection."""
 
 from __future__ import annotations
 
@@ -59,7 +59,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
     """
 
     def __init__(self, augment: PerturbImage, augment_id: str) -> None:
-        """Initialize augmentation wrapper"""
+        """Initialize augmentation wrapper."""
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
@@ -129,8 +129,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependency (MAITE) is available.
+        """Checks if the necessary dependency (MAITE) is available.
 
         Returns:
             bool: True MAITE is available; False otherwise.
@@ -160,7 +159,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
         metric: ImageMetric,
         augment_id: str,
     ) -> None:
-        """Initialize augmentation with metric wrapper"""
+        """Initialize augmentation with metric wrapper."""
         if not self.is_usable():
             raise MaiteImportError
         self.augmentations = augmentations
@@ -171,8 +170,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
         self,
         batch: OBJ_DETECTION_BATCH_T,
     ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:  # pyright: ignore [reportInvalidTypeForm]
-        """Apply augmentations to given batch"""
-
+        """Apply augmentations to given batch."""
         if self.augmentations:
             aug_batch = batch
             for aug in self.augmentations:
@@ -224,8 +222,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependency (MAITE) is available.
+        """Checks if the necessary dependency (MAITE) is available.
 
         Returns:
             bool: True MAITE is available; False otherwise.

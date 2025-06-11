@@ -1,4 +1,4 @@
-"""This module contains schemas for NRTK perturber API"""
+"""This module contains schemas for NRTK perturber API."""
 
 from typing import Any
 
@@ -15,7 +15,7 @@ except ImportError:  # pragma: no cover
 
 # pyright warns about inheritance from BaseModel which is ambiguous
 class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Input schema for NRTK perturber API"""
+    """Input schema for NRTK perturber API."""
 
     # Header
     id: str
@@ -48,7 +48,7 @@ class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIs
         }
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 
@@ -56,7 +56,7 @@ class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIs
 
 
 class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Dataset schema for NRTK perturber API"""
+    """Dataset schema for NRTK perturber API."""
 
     root_dir: str
     label_file: str
@@ -75,7 +75,7 @@ class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
         }
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 
@@ -83,7 +83,7 @@ class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
 
 
 class NrtkPerturbOutputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Output schema for NRTK perturber API"""
+    """Output schema for NRTK perturber API."""
 
     message: str
     datasets: list[DatasetSchema]
@@ -106,7 +106,7 @@ class NrtkPerturbOutputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeI
         }
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 

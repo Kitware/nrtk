@@ -1,9 +1,4 @@
-"""
-This module defines the `StepPerturbImageFactory` class, which is an implementation
-of the `PerturbImageFactory` interface. The `StepPerturbImageFactory` class is designed
-to generate a series of `PerturbImage` instances with a parameter (`theta_key`) that
-steps through a specified range of values, enabling controlled variation in the
-perturbation process.
+"""Defines StepPerturbImageFactory, which creates PerturbImage instances varying a parameter over a range in steps.
 
 Classes:
     StepPerturbImageFactory: Factory for producing `PerturbImage` instances with a specific

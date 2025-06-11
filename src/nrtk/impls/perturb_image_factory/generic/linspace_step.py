@@ -1,7 +1,4 @@
-"""
-This module defines the `LinSpacePerturbImageFactory` class, an implementation
-of the `PerturbImageFactory` interface that generates `PerturbImage` instances
-with a parameter (`theta_key`) varying over a specified range, using linearly spaced values.
+"""Defines LinSpacePerturbImageFactory to create PerturbImage instances with parameters linearly spaced over a range.
 
 Classes:
     LinSpacePerturbImageFactory: A factory class for creating `PerturbImage` instances

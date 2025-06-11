@@ -1,6 +1,4 @@
-"""
-This module defines the `GenerateBlackboxResponse` interface and a utility function
-for generating perturber combinations across multiple factories.
+"""Defines GenerateBlackboxResponse interface and a utility for generating perturber combos across factories.
 
 Classes:
     GenerateBlackboxResponse: An interface for generating item-response curves and scores
@@ -41,8 +39,9 @@ def gen_perturber_combinations(  # noqa: C901
 
     :param factories: Sequence of factories from which to generate combinations.
 
-    :return: list of perturber combinations. For each combination, the value, ``x``,
-            at index ``y`` corresponds to the ``x``th perturber of the ``y``th factory.
+    Returns:
+        list of perturber combinations. For each combination, the value, ``x``,
+        at index ``y`` corresponds to the ``x``th perturber of the ``y``th factory.
     """
     # make sure at least one factory is passed in
     if len(factories) == 0:
@@ -59,7 +58,8 @@ def gen_perturber_combinations(  # noqa: C901
         :param factory_id: Index of the factory to add to the combinations.
         :param factory_sizes: list of the number of perturbers per factory.
 
-        :return: list of combinations.
+        Returns:
+            a list of combinations.
         """
         # list with every perturber index for this factory as its own list
         if factory_id == len(factory_sizes) - 1:

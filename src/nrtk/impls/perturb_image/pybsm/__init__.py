@@ -1,1 +1,1 @@
-"""Module for PyBSM based implementations of PerturbImage"""
+"""Module for PyBSM based implementations of PerturbImage."""

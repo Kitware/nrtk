@@ -1,1 +1,1 @@
-"""Define the nrtk.interop.maite package"""
+"""Define the nrtk.interop.maite package."""

@@ -1,6 +1,4 @@
-"""
-This module defines the `AlbumentationsPerturber` class, which runs any BasicTransform
-from the Albumentations module on input images.
+"""Defines AlbumentationsPerturber to apply Albumentations BasicTransforms to input images.
 
 Classes:
     AlbumentationsPerturber: A perturbation class for applying perturbations from Albumentations
@@ -36,18 +34,23 @@ from nrtk.utils._exceptions import AlbumentationsImportError
 
 
 class AlbumentationsPerturber(PerturbImage):
-    """
-    AlbumentationsPerturber applies a BasicTransform from Albumentations
+    """AlbumentationsPerturber applies a BasicTransform from Albumentations.
 
     Attributes:
-        perturber (string): The name of the BasicTransform perturber to apply.
-        parameters (dict): Keyword arguments that should be passed to the given perturber.
-        seed (int): An optional seed for reproducible results.
+        perturber (string):
+            The name of the BasicTransform perturber to apply.
+        parameters (dict):
+            Keyword arguments that should be passed to the given perturber.
+        seed (int):
+            An optional seed for reproducible results.
 
     Methods:
-        perturb: Applies the specified to an input image.
-        __call__: Calls the perturb method with the given input image.
-        get_config: Returns the current configuration of the AlbumentationsPerturber instance.
+        perturb:
+            Applies the specified to an input image.
+        __call__:
+            Calls the perturb method with the given input image.
+        get_config:
+            Returns the current configuration of the AlbumentationsPerturber instance.
     """
 
     def __init__(
@@ -57,14 +60,17 @@ class AlbumentationsPerturber(PerturbImage):
         box_alignment_mode: str = "extent",
         seed: int | None = None,
     ) -> None:
-        """
-        AlbumentationsPerturber applies a BasicTransform from Albumentations.
+        """AlbumentationsPerturber applies a BasicTransform from Albumentations.
 
         Args:
-            :param perturber: The name of the BasicTransform perturber to apply.
-            :param parameters: Keyword arguments that should be passed to the given perturber.
-            :param seed: An optional seed for reproducible results.
-            :param box_alignment_mode: Mode for how to handle how bounding boxes change.
+            perturber:
+                The name of the BasicTransform perturber to apply.
+            parameters:
+                Keyword arguments that should be passed to the given perturber.
+            seed (int):
+                An optional seed for reproducible results.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
                 Should be one of the following options:
                     extent: a new axis-aligned bounding box that encases the transformed misaligned box
                     extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
@@ -100,7 +106,7 @@ class AlbumentationsPerturber(PerturbImage):
 
     @staticmethod
     def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
-        """Convert AxisAlignedBoundingBox to albumentations format bbox"""
+        """Convert AxisAlignedBoundingBox to albumentations format bbox."""
         flat = np.array([[box.min_vertex[0], box.min_vertex[1], box.max_vertex[0], box.max_vertex[1]]])
         return convert_bboxes_to_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
             flat,
@@ -110,7 +116,7 @@ class AlbumentationsPerturber(PerturbImage):
 
     @staticmethod
     def _bbox_to_aabb(box: list[int], image: np.ndarray[Any, Any]) -> AxisAlignedBoundingBox:
-        """Convert albumentations format bbox to AxisAlignedBoundingBox"""
+        """Convert albumentations format bbox to AxisAlignedBoundingBox."""
         flat = np.array([[box[0], box[1], box[2], box[3]]])
         as_aabb = convert_bboxes_from_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
             flat,
@@ -126,13 +132,15 @@ class AlbumentationsPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,  # ARG002
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Apply a BasicTransform from Albumentations to an image.
+        """Apply a BasicTransform from Albumentations to an image.
 
         Args:
-            :param image: Input image as a numpy array of shape (H, W, C).
-            :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-            :param additional_params: Additional parameters for perturbation.
+            image:
+                Input image as a numpy array of shape (H, W, C).
+            boxes:
+                List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            additional_params:
+                Additional parameters for perturbation.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
@@ -163,8 +171,7 @@ class AlbumentationsPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the AlbumentationsPerturber instance.
+        """Returns the current configuration of the AlbumentationsPerturber instance.
 
         Returns:
             :return dict[str, Any]: Configuration dictionary with current settings.
@@ -178,8 +185,7 @@ class AlbumentationsPerturber(PerturbImage):
     @classmethod
     @override
     def is_usable(cls) -> bool:
-        """
-        Checks if the required albumentations module is available.
+        """Checks if the required albumentations module is available.
 
         Returns:
             :return bool: True if albumentations is installed; False otherwise.

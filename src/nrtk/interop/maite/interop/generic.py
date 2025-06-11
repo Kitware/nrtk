@@ -1,4 +1,4 @@
-"""This module contains definitions for non-task specific MAITE-compliant metadata"""
+"""This module contains definitions for non-task specific MAITE-compliant metadata."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover
 
 @dataclass
 class NRTKDatumMetadata(DatumMetadata):  # pyright:  ignore [reportGeneralTypeIssues]
-    """Dataclass for NRTK-perturbed datum-level metdata"""
+    """Dataclass for NRTK-perturbed datum-level metdata."""
 
     # pyright fails when failing to import maite.protocols
     nrtk_perturber_config: NotRequired[ReadOnly[Sequence[dict[str, Any]]]]  # pyright: ignore [reportInvalidTypeForm]
@@ -33,7 +33,7 @@ def _forward_md_keys(
     aug_md: NRTKDatumMetadata,
     forwarded_keys: Sequence[str],
 ) -> NRTKDatumMetadata:
-    """Forward input metadata, checking for clobbering"""
+    """Forward input metadata, checking for clobbering."""
     for key, value in md.items():
         if key in forwarded_keys:
             continue

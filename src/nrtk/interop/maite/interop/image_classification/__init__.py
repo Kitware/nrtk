@@ -1,1 +1,1 @@
-"""Image Classification"""
+"""Image Classification."""

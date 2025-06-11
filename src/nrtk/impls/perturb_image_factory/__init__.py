@@ -1,1 +1,1 @@
-"""Module for all implementations of PerturbImageFactory"""
+"""Module for all implementations of PerturbImageFactory."""

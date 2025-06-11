@@ -1,1 +1,1 @@
-"""Module for the scoring implementations"""
+"""Module for the scoring implementations."""

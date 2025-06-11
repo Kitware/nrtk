@@ -1,4 +1,4 @@
-"""This module contains dataset_to_coco, which converts a MAITE dataset to a COCO dataset"""
+"""This module contains dataset_to_coco, which converts a MAITE dataset to a COCO dataset."""
 
 import json
 import logging

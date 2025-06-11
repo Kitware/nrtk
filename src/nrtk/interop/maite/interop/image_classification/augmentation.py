@@ -1,4 +1,4 @@
-"""This module contains wrappers for NRTK perturbers for image classification"""
+"""This module contains wrappers for NRTK perturbers for image classification."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
     """
 
     def __init__(self, augment: PerturbImage, augment_id: str) -> None:
-        """Initialize augmentation wrapper"""
+        """Initialize augmentation wrapper."""
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
@@ -94,8 +94,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependency (MAITE) is available.
+        """Checks if the necessary dependency (MAITE) is available.
 
         Returns:
             bool: True MAITE is available; False otherwise.
@@ -125,7 +124,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
         metric: ImageMetric,
         augment_id: str,
     ) -> None:
-        """Initialize augmentation with metric wrapper"""
+        """Initialize augmentation with metric wrapper."""
         self.augmentations = augmentations
         self.metric = metric
         self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
@@ -134,8 +133,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
     ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:  # pyright: ignore [reportInvalidTypeForm]
-        """Apply augmentations to given batch"""
-
+        """Apply augmentations to given batch."""
         if self.augmentations:
             aug_batch = batch
             for aug in self.augmentations:

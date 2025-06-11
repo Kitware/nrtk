@@ -1,4 +1,4 @@
-"""This module contains handle_post, which is the endpoint for NRTK API requests"""
+"""This module contains handle_post, which is the endpoint for NRTK API requests."""
 
 from __future__ import annotations
 

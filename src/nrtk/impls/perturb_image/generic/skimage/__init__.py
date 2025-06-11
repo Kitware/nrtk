@@ -1,1 +1,1 @@
-"""Module for skimage based implementations of PerturbImage"""
+"""Module for skimage based implementations of PerturbImage."""

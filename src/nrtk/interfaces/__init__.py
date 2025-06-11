@@ -1,1 +1,1 @@
-"""package housing the interfaces of nrtk"""
+"""package housing the interfaces of nrtk."""

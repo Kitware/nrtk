@@ -1,8 +1,4 @@
-"""
-This module provides the `NOPPerturber` class, an implementation of the `PerturbImage` interface
-that performs no alteration on the input image. It serves as a pass-through or "no operation"
-(NOP) perturber, returning an exact copy of the input image. This class is useful in testing or
-as a baseline when no perturbation is desired.
+"""Provides NOPPerturber, a PerturbImage implementation that returns the input image unchanged for testing or baselines.
 
 Classes:
     NOPPerturber: An implementation of the `PerturbImage` interface that returns an unmodified
@@ -50,13 +46,15 @@ class NOPPerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Returns unperturbed image and input bounding boxes.
+        """Returns unperturbed image and input bounding boxes.
 
         Args:
-            :param image: Input image as a numpy array of shape (H, W, C).
-            :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-            :param additional_params: Additional parameters for perturbation.
+            image:
+                Input image as a numpy array of shape (H, W, C).
+            boxes:
+                List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            additional_params:
+                Additional parameters for perturbation.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
