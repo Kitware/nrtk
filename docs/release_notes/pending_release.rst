@@ -29,6 +29,8 @@ Documentation
 
 * Improved documentation based on Phase-1 documentation feedback.
 
+* Added link to getting started within tutorial to ensure readers are familiar with core concepts.
+
 Fixes
 -----
 
