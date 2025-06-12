@@ -53,3 +53,5 @@ Fixes
 * Improved the completeness score of pyright --verifytypes
 
 * Enabled ``D`` flag for ruff and fixed associated errors.
+
+* Switched generated tables in ``jatic-perturbations`` notebook to plain text for RTD
