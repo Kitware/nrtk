@@ -31,6 +31,8 @@ Documentation
 
 * Added link to getting started within tutorial to ensure readers are familiar with core concepts.
 
+* Added a note to the review process documentation on use of MRs instead of PRs.
+
 Fixes
 -----
 
