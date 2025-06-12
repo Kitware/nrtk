@@ -15,6 +15,12 @@ For guidelines on the release process, see `Release Process`_.
 
 Merge Request (MR)
 ==================
+.. note::
+   While GitHub uses the term "Pull Request (PR)", GitLab uses "Merge Request (MR)".
+   Because NRTK's primary repository is hosted on JATIC's GitLab instance, we use
+   "MR" throughout our documentation. Although NRTK is mirrored on GitHub, all
+   development and reviews occur on GitLab.
+
 An MR is initiated by a user intending to integrate a branch from their forked
 repository.
 Before the branch is integrated into the nrtk master branch, it must
