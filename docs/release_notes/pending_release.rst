@@ -55,3 +55,6 @@ Fixes
 * Improved the completeness score of pyright --verifytypes
 
 * Enabled ``D`` flag for ruff and fixed associated errors.
+
+* Update RTD config to convert SVGs and use a different LaTeX engine with support for
+  unicode characters.
