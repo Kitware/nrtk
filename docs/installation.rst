@@ -53,7 +53,7 @@ to install any extras they need, but also install multi-dependency groups like n
 `linting <https://github.com/Kitware/nrtk/blob/7014707c0a531fa63fa6d08d7d6aeba9868f09b4/pyproject.toml#L118>`_ tools.
 
 
-Please heed the following warning from Poetry's own documentation:
+Be sure to note the following warning from Poetry's own documentation:
 
 .. warning::
   Poetry should always be installed in a dedicated virtual environment to isolate it from the rest of your system.
@@ -61,7 +61,7 @@ Please heed the following warning from Poetry's own documentation:
   that Poetry's own dependencies will not be accidentally upgraded or uninstalled. In addition, the isolated virtual
   environment in which poetry is installed should not be activated for running poetry commands.
 
-If unfamiliar with Poetry, please take a moment to familiarize yourself using the above links, to ensure the smoothest
+If unfamiliar with Poetry, take a moment to familiarize yourself using the above links, to ensure the smoothest
 introduction possible.
 
 .. note::
@@ -197,13 +197,22 @@ description of the extra.
 
 Installing with OpenCV
 ^^^^^^^^^^^^^^^^^^^^^^
-One of the optional packages for nrtk is OpenCV. OpenCV is required for
+One of the optional packages for nrtk is OpenCV, which is required for
 :py:mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers and
-:ref:`Optical Transfer Functions <Optical Transfer Function Examples>`. To give users the option
+:ref:`Optical Transfer Functions <Optical Transfer Function Examples>`.
+
+OpenCV receives dedicated installation guidance due to its unique dual-installation options.
+Unlike other optional dependencies that have single-path installations,
+OpenCV requires users to choose between ``opencv-python`` (full GUI capabilities) and
+``opencv-python-headless`` (minimal, no GUI) versions depending on their deployment environment
+and requirements.
+
+To give users the option
 to use either ``opencv-python`` or ``opencv-python-headless``, nrtk has the ``graphics`` and ``headless``
 extras for ``opencv-python`` and ``opencv-python-headless``, respectively.
 
-``opencv-python-headless`` is a minimal package version of ``opencv-python`` which contains the core
+``opencv-python-headless`` is a
+minimal package version of ``opencv-python`` that contains the core
 capabilities of OpenCV, without including any of the GUI-related functionalities.
 
 The following commands will install the ``opencv-python`` version.
