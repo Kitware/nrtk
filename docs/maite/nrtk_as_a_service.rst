@@ -1,12 +1,11 @@
-===
-API
-===
-
+===========================
+NRTK-as-a-Service (NRTKaaS)
+===========================
 
 Dependencies
 ============
 
-In addition to the dependencies in Poetry, the user will need to install the uvicorn package.
+In addition to `NRTK installation <../installation.html>`_, the ``uvicorn`` package is required.
 
 Usage
 =====
@@ -27,6 +26,8 @@ To invoke the service with ``curl``, use the following command::
 This command sends a POST request with JSON data ``{"key": "value"}`` to the REST server. Replace
 ``http://127.0.0.1:8000`` with the appropriate URL if you have specified a different host or port. If successful, you
 should receive a response containing a message indicating the success of the operation and the JSON stub.
+
+The expected `JSON schema is detailed here <schema.html>`_.
 
 AUKUS Requirements
 ==================
