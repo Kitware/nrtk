@@ -33,6 +33,9 @@ Documentation
 
 * Added a note to the review process documentation on use of MRs instead of PRs.
 
+* Improved documentation for ``nrtk_tutorial.ipynb`` to enable better tutorial
+  transitions.
+
 Fixes
 -----
 
