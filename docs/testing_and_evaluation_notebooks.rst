@@ -1,8 +1,16 @@
 Testing & Evaluation Guides with MAITE
 --------------------------------------
 
-The following notebooks showcase how NRTK perturbations can be applied to simulate key operational risks within a T&E
-workflow. Each notebook illustrates potential impact on model performance, utilizing MAITE as an evaluation harness.
+Many robustness testing workflows benefit from using NRTK alongside other tools such as the
+`JATIC <https://cdao.pages.jatic.net/public/>`_ program's
+`Modular AI Trustworthy Engineering (MAITE) <https://github.com/mit-ll-ai-technology/maite>`_ toolbox. While NRTK
+focuses on realistic image perturbations, MAITE provides a standardized interface for evaluating model performance
+across a set of test conditions. Using these tools together enables modular, reproducible assessments of AI robustness
+under simulated operational risks.
+
+The following notebooks showcase how NRTK perturbations can be applied to simulate key operational risks within a
+testing and evaluation (T&E) workflow. Each notebook illustrates potential impact on model performance, utilizing MAITE
+as an evaluation harness.
 
 Demonstrating Extreme Illumination Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

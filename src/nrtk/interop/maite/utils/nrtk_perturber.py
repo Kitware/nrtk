@@ -1,4 +1,4 @@
-"""nrtk_perturber generates augemented MAITE dataset(s)based on a pertrber factory configuration."""
+"""nrtk_perturber generates augmented MAITE dataset(s) based on a perturber factory configuration."""
 
 import itertools
 import logging

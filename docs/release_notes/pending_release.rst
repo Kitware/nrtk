@@ -38,6 +38,8 @@ Documentation
 
 * Moved T&E guides and COCO scoring notebooks to ``Tutorials``.
 
+* Improved Interoperability clarity and organization.
+
 Fixes
 -----
 
