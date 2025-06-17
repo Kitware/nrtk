@@ -60,6 +60,8 @@ class JitterOTFPerturber(PerturbImage):
     leveraging Optical Transfer Function (OTF) modeling through the pyBSM library. Perturbations include
     jitter effects that simulate real-world distortions in optical imaging systems.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         sensor (PybsmSensor | None):
             The sensor configuration used to define perturbation parameters.

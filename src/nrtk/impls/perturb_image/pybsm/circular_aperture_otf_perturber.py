@@ -70,6 +70,8 @@ class CircularApertureOTFPerturber(PerturbImage):
     image perturbations, allowing for wavelength-specific and sensor-specific modifications
     based on the sensor and scenario configurations.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         sensor (PybsmSensor | None):
             The sensor configuration for the perturbation.

@@ -47,6 +47,8 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
     of specified perturbation parameters (`theta_keys` and `thetas`). These instances allow for flexible
     image perturbation.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         sensor (PybsmSensor): The sensor configuration for perturbation.
         scenario (PybsmScenario): The scenario configuration for perturbation.
@@ -254,6 +256,8 @@ class CustomPybsmPerturbImageFactory(_PybsmPerturbImageFactory):
         thetas: Sequence[Any],
     ) -> None:
         """Initializes the `CustomPybsmPerturbImageFactory` with sensor, scenario, and parameters.
+
+        See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
         Args:
             sensor (PybsmSensor): A pyBSM sensor object.

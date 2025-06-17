@@ -44,6 +44,8 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
     This class generates detection response data for a sequence of images, using ground truth bounding
     boxes and configurable scoring and perturbation methods.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         images (Sequence[np.ndarray]): Sequence of images to process.
         img_gsds (Sequence[float]): Ground sample distances for each image.

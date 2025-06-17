@@ -64,6 +64,8 @@ class DetectorOTFPerturber(PerturbImage):
     perturbations to images. This includes adjusting for detector width, focal length, and atmospheric
     conditions using OpenCV and pyBSM functionalities.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         sensor (PybsmSensor | None):
             The sensor configuration used to define perturbation parameters.

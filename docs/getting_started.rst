@@ -70,11 +70,12 @@ Below is some example code that applies a Jitter OTF transformation:
     otf = JitterOTFPerturber(s_x=8e-6, s_y=8e-6)
     out_image = otf.perturb(image)
 
-This code uses default values and provides a sample input image. However, you can adjust
-the parameters and use your own image to visualize the perturbation. The ``s_x`` and ``s_y`` parameters
-(the root-mean-squared jitter amplitudes in radians, in the x and y directions) are
-the primary way to customize a jitter perturber. Larger jitter amplitude generate a
-larger Gaussian blur kernel.
+This code uses default values and provides a sample input image. However, you can adjust the parameters and use your
+own image to visualize the perturbation. The ``s_x`` and ``s_y`` parameters (the root-mean-squared jitter amplitudes in
+radians, in the x and y directions) are the primary way to customize a jitter perturber. Larger jitter amplitudes
+generate a larger Gaussian blur kernel. The
+`how-to guide on OTF perturbations <examples/otf_visualization.html#jitter-otf>`_ will provide more detail on selecting
+specific values for these parameters.
 
 Resulting Image
 ^^^^^^^^^^^^^^^
@@ -91,6 +92,6 @@ Next Steps
 
 For broader context or foundational theory, see:
 
-- `NRTK Tutorial <examples/nrtk_tutorial.html>`__ – Step-by-step tutorial to get started
-- :doc:`nrtk_explanation` – Conceptual guide to NRTK’s architecture and approach
-- :doc:`risk_factors` – Conceptual guide to understand how NRTK's perturbations map to real-world risk factors
+- `NRTK Tutorial <examples/nrtk_tutorial.html>`__ - Step-by-step tutorial to get started
+- :doc:`nrtk_explanation` - Conceptual guide to NRTK's architecture and approach
+- :doc:`risk_factors` - Conceptual guide to understand how NRTK's perturbations map to real-world risk factors
