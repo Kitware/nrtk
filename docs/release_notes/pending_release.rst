@@ -36,6 +36,8 @@ Documentation
 * Improved documentation for ``nrtk_tutorial.ipynb`` to enable better tutorial
   transitions.
 
+* Moved T&E guides and COCO scoring notebooks to ``Tutorials``.
+
 Fixes
 -----
 

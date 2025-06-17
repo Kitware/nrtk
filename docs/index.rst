@@ -93,6 +93,8 @@ Documentation Contents:
    :caption: Tutorials
 
    examples/nrtk_tutorial.ipynb
+   examples/coco_scorer.ipynb
+   testing_and_evaluation_notebooks
 
 .. toctree::
    :maxdepth: 1
