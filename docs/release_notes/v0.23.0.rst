@@ -1,72 +1,82 @@
-v0.23.0
-=======
+# v0.23.0
 
-Updates / New Features
-----------------------
+Expanded documentation and tutorial coverage, including new guides for the
+WaterDropletPerturber, operational risks, and interoperability. Improved
+installation instructions, docstring formatting, and cross-referencing. Fixed
+perturber behavior, notebook errors, CI test issues, and linting violations.
+Strengthened type checking and test utility consistency.
+
+## Updates / New Features
 
 Examples
 
-* Added an example notebook guide to demonstrate the use of the ``WaterDropletPerturber``.
+- Added an example notebook guide to demonstrate the use of the
+  ``WaterDropletPerturber``.
 
 Documentation
 
-* Improved inline documentation and docstring formatting for files under
-  ``src/nrtk/perturb_image/impls/generic`` and ``src/nrtk/perturb_image/impls/pybsm``.
+- Improved inline documentation and docstring formatting for files under
+  ``src/nrtk/perturb_image/impls/generic`` and
+  ``src/nrtk/perturb_image/impls/pybsm``.
 
-* Improved installation documentation for README.md
+- Improved installation documentation for README.md
 
-* Added a new section to the installation guide that lists the key dependencies for each perturber.
+- Added a new section to the installation guide that lists the key dependencies
+  for each perturber.
 
-* Added a documentation page outlining operational risks
+- Added a documentation page outlining operational risks
 
-* Ensure intra-documentation links are consistent
+- Ensure intra-documentation links are consistent
 
-* Added explanatory context to figure 1 in ``nrtk_explanation.rst``.
+- Added explanatory context to figure 1 in ``nrtk_explanation.rst``.
 
-* Added missing T&E notebooks to ``nrtk_jatic/testing_and_eval_guides.rst``.
+- Added missing T&E notebooks to ``nrtk_jatic/testing_and_eval_guides.rst``.
 
-* Added ``WaterDropletPerturber`` to Risk Factors Table in ``risk_factors.rst``.
+- Added ``WaterDropletPerturber`` to Risk Factors Table in ``risk_factors.rst``.
 
-* Improved documentation based on Phase-1 documentation feedback.
+- Improved documentation based on Phase-1 documentation feedback.
 
-* Added link to getting started within tutorial to ensure readers are familiar with core concepts.
+- Added link to getting started within tutorial to ensure readers are familiar
+  with core concepts.
 
-* Added a note to the review process documentation on use of MRs instead of PRs.
+- Added a note to the review process documentation on use of MRs instead of PRs.
 
-* Improved documentation for ``nrtk_tutorial.ipynb`` to enable better tutorial
+- Improved documentation for ``nrtk_tutorial.ipynb`` to enable better tutorial
   transitions.
 
-* Moved T&E guides and COCO scoring notebooks to ``Tutorials``.
+- Moved T&E guides and COCO scoring notebooks to ``Tutorials``.
 
-* Improved Interoperability clarity and organization.
+- Improved Interoperability clarity and organization.
 
-* Added links to pyBSM documentation for image formation concepts.
+- Added links to pyBSM documentation for image formation concepts.
 
-* Improved documentation for ``otf_visualization.ipynb`` to provide additional information
-  regarding pyBSM's OTF parameters.
+- Improved documentation for ``otf_visualization.ipynb`` to provide additional
+  information regarding pyBSM's OTF parameters.
 
-Fixes
------
+## Fixes
 
-* Fixed pytest-core CI job with import guards for MAITE and notebook releated tests.
+- Fixed pytest-core CI job with import guards for MAITE and notebook releated
+  tests.
 
-* Fixed ``LinspaceStepPerturber`` to follow default linspace behavior (endpoint=True)
+- Fixed ``LinspaceStepPerturber`` to follow default linspace behavior
+  (endpoint=True)
 
-* Fixed errors in T&E Guides and added Colab link.
+- Fixed errors in T&E Guides and added Colab link.
 
-* Fixed some broken URLs in jupyter notebooks
+- Fixed some broken URLs in jupyter notebooks
 
-* Generalized ``DummyPerturber`` class to be used in tests.
+- Generalized ``DummyPerturber`` class to be used in tests.
 
-* Use context handlers for file opens in ``tests/impls/score_detections/test_coco_scorer.py``
+- Use context handlers for file opens in
+  ``tests/impls/score_detections/test_coco_scorer.py``
 
-* Fixed ruff rules and updated linting.
+- Fixed ruff rules and updated linting.
 
-* Removed ``Union`` and ``Optional`` type hints.
+- Removed ``Union`` and ``Optional`` type hints.
 
-* Improved the completeness score of pyright --verifytypes
+- Improved the completeness score of pyright --verifytypes
 
-* Enabled ``D`` flag for ruff and fixed associated errors.
+- Enabled ``D`` flag for ruff and fixed associated errors.
 
-* Update RTD config to convert SVGs and use a different LaTeX engine with support for
-  unicode characters.
+- Update RTD config to convert SVGs and use a different LaTeX engine with
+  support for unicode characters.
