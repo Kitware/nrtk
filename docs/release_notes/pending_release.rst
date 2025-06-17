@@ -42,6 +42,9 @@ Documentation
 
 * Added links to pyBSM documentation for image formation concepts.
 
+* Improved documentation for ``otf_visualization.ipynb`` to provide additional information
+  regarding pyBSM's OTF parameters.
+
 Fixes
 -----
 
