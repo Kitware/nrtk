@@ -66,6 +66,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
     It supports adjustable wavelengths, weights, and other environmental parameters for
     realistic perturbations.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         sensor (PybsmSensor | None):
             Sensor configuration for the perturbation.

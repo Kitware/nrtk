@@ -57,6 +57,8 @@ class PybsmPerturber(PerturbImage):
     pyBSM's simulation functionalities. It takes in a sensor and scenario, along with
     other optional parameters, to simulate environmental effects on the image.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         sensor (PybsmSensor):
             The sensor configuration for the perturbation.

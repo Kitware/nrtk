@@ -40,6 +40,8 @@ class PybsmScenario(Configurable):
     within the pybsm framework, enabling the user to specify parameters such as atmospheric
     haze level, altitude, and ground range.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
         ihaze_values (list[int]):
             Permissible values for the atmospheric haze parameter.

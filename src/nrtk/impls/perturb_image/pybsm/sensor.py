@@ -36,6 +36,7 @@ class PybsmSensor(Configurable):
     This class allows for creating a sensor instance with specified parameters, managing
     sensor configurations, and enabling flexible integration into larger simulation frameworks.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
     """
 
     def __init__(

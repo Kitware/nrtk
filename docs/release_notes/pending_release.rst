@@ -40,6 +40,8 @@ Documentation
 
 * Improved Interoperability clarity and organization.
 
+* Added links to pyBSM documentation for image formation concepts.
+
 Fixes
 -----
 
