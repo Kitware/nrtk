@@ -86,17 +86,18 @@ class TestCOCOScorer:
         expectation: AbstractContextManager,
     ) -> None:
         """Test basic scorer assertions and exceptions using the helper function from the utils file."""
-        tmp_file = tempfile.NamedTemporaryFile(mode="w+", suffix=".json")
-        json.dump(annotation_data, tmp_file)
-        tmp_file.flush()
-        json_filename = tmp_file.name
-        scorer = COCOScorer(gt_path=json_filename, stat_index=0)
+        with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as tmp_file:
+            json.dump(annotation_data, tmp_file)
+            tmp_file.flush()
+            json_filename = tmp_file.name
 
-        with expectation:
-            # Test scorer interface directly
-            scorer_assertions(scorer=scorer.score, actual=actual, predicted=predicted)
-            # Test callable
-            scorer_assertions(scorer=scorer, actual=actual, predicted=predicted)
+            scorer = COCOScorer(gt_path=json_filename, stat_index=0)
+
+            with expectation:
+                # Test scorer interface directly
+                scorer_assertions(scorer=scorer.score, actual=actual, predicted=predicted)
+                # Test callable
+                scorer_assertions(scorer=scorer, actual=actual, predicted=predicted)
 
     @pytest.mark.parametrize(
         ("actual", "predicted", "annotation_data", "stat_index", "expectation"),
@@ -124,54 +125,55 @@ class TestCOCOScorer:
         expectation: AbstractContextManager,
     ) -> None:
         """Test validity of the ground truth and predictions."""
-        tmp_file = tempfile.NamedTemporaryFile(mode="w+", suffix=".json")
-        json.dump(annotation_data, tmp_file)
-        tmp_file.flush()
-        json_filename = tmp_file.name
+        with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as tmp_file:
+            json.dump(annotation_data, tmp_file)
+            tmp_file.flush()
+            json_filename = tmp_file.name
 
-        with open(json_filename, encoding="utf-8") as file:
-            ann_data = file.read()
+            with open(json_filename, encoding="utf-8") as file:
+                ann_data = file.read()
 
-        ann_json = json.loads(ann_data)
+            ann_json = json.loads(ann_data)
 
-        with expectation:
-            # Load annotation data from json and check if the values match the input GT
-            act = actual[0][0]
-            bbox, cls_info = act
-            assert cls_info["image_id"] == ann_json["annotations"][0]["image_id"]
-            assert cls_info["category_id"] == ann_json["annotations"][0]["category_id"]
-            assert np.array_equal(
-                np.concatenate([bbox.min_vertex, bbox.max_vertex]),
-                np.array(ann_json["annotations"][0]["bbox"]),
-            )
+            with expectation:
+                # Load annotation data from json and check if the values match the input GT
+                act = actual[0][0]
+                bbox, cls_info = act
+                assert cls_info["image_id"] == ann_json["annotations"][0]["image_id"]
+                assert cls_info["category_id"] == ann_json["annotations"][0]["category_id"]
+                assert np.array_equal(
+                    np.concatenate([bbox.min_vertex, bbox.max_vertex]),
+                    np.array(ann_json["annotations"][0]["bbox"]),
+                )
 
-            # Check if GT loaded by COCOScorer obj is non-empty
-            scorer = COCOScorer(gt_path=json_filename, stat_index=stat_index)
-            assert scorer.coco_gt
+                # Check if GT loaded by COCOScorer obj is non-empty
+                scorer = COCOScorer(gt_path=json_filename, stat_index=stat_index)
+                assert scorer.coco_gt
 
-            # Check if predictions are valid
-            pred = predicted[0][0]
-            pred_bbox, scores = pred
-            idx = max(scores, key=scores.get)  # type: ignore
+                # Check if predictions are valid
+                pred = predicted[0][0]
+                pred_bbox, scores = pred
+                idx = max(scores, key=scores.get)  # type: ignore
 
-            cats = ann_json["categories"]
+                cats = ann_json["categories"]
 
-            assert any(scorer.cat_ids[idx] == c["id"] for c in cats)
-            assert all(
-                np.concatenate([pred_bbox.min_vertex, pred_bbox.max_vertex]) >= np.array([0.0, 0.0, 0.0, 0.0]),
-            )
+                assert any(scorer.cat_ids[idx] == c["id"] for c in cats)
+                assert all(
+                    np.concatenate([pred_bbox.min_vertex, pred_bbox.max_vertex]) >= np.array([0.0, 0.0, 0.0, 0.0]),
+                )
 
-            scorer.score(actual=actual, predicted=predicted)
+                scorer.score(actual=actual, predicted=predicted)
 
     @pytest.mark.parametrize("annotation_data", [annotation_data])
     def test_config(self, annotation_data: dict) -> None:
         """Test configuration stability."""
-        tmp_file = tempfile.NamedTemporaryFile(mode="w+", suffix=".json")
-        json.dump(annotation_data, tmp_file)
-        tmp_file.flush()
-        json_filename = tmp_file.name
-        stat_index = 0
-        scorer = COCOScorer(gt_path=json_filename, stat_index=stat_index)
-        for i in configuration_test_helper(scorer):
-            assert i.gt_path == json_filename
-            assert i.stat_index == stat_index
+        with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as tmp_file:
+            json.dump(annotation_data, tmp_file)
+            tmp_file.flush()
+            json_filename = tmp_file.name
+
+            stat_index = 0
+            scorer = COCOScorer(gt_path=json_filename, stat_index=stat_index)
+            for i in configuration_test_helper(scorer):
+                assert i.gt_path == json_filename
+                assert i.stat_index == stat_index

@@ -1,8 +1,4 @@
-"""
-This module defines the `RandomScorer` class, which implements the `ScoreDetections` interface
-to generate random scores for object detection tasks. The `RandomScorer` class serves as a
-test tool to verify reproducibility by returning random float scores based on a given seed
-value. This can be useful in testing scenarios where deterministic random values are needed.
+"""Defines RandomScorer, a ScoreDetections tool that returns seed-based random scores for reproducible testing.
 
 Classes:
     RandomScorer: An implementation of `ScoreDetections` that generates random scores
@@ -46,8 +42,7 @@ class RandomScorer(ScoreDetections):
     """
 
     def __init__(self, seed: int | None = None) -> None:
-        """
-        Initializes the `RandomScorer` with an optional random seed.
+        """Initializes the `RandomScorer` with an optional random seed.
 
         Args:
             seed (int | None, optional): An optional seed to ensure reproducibility of random
@@ -75,8 +70,7 @@ class RandomScorer(ScoreDetections):
         return [self._rng.random() for actual_det in actual]
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the RandomScorer instance.
+        """Returns the current configuration of the RandomScorer instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.

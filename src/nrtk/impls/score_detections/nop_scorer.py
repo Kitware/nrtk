@@ -1,7 +1,4 @@
-"""
-This module provides the `NOPScorer` class, an implementation of the `ScoreDetections`
-interface that serves as a "no operation" (NOP) scorer. The `NOPScorer` class is useful
-in testing or baseline scenarios where all input detections receive a score of zero.
+"""Defines NOPScorer, a ScoreDetections implementation that scores all detections as zero for testing or baselines.
 
 Classes:
     NOPScorer: An example implementation of `ScoreDetections` that outputs zero scores
@@ -60,8 +57,7 @@ class NOPScorer(ScoreDetections):
         return [0 for actual_det in actual]
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the NOPScorer instance.
+        """Returns the current configuration of the NOPScorer instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.

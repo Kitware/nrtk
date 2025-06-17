@@ -1,20 +1,17 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import pytest
 from smqtk_core.configuration import (
     configuration_test_helper,
     from_config_dict,
     to_config_dict,
 )
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generic.skimage.random_noise import SaltNoisePerturber
 from nrtk.impls.perturb_image_factory.generic.linspace_step import (
@@ -22,37 +19,18 @@ from nrtk.impls.perturb_image_factory.generic.linspace_step import (
 )
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.test_utils import DummyPerturber
 
 DATA_DIR = Path(__file__).parents[3] / "data"
-
-
-class DummyFloatPerturber(PerturbImage):
-    def __init__(self, param1: float = 1, param2: float = 2) -> None:
-        self.param1 = param1
-        self.param2 = param2
-
-    def perturb(
-        self,
-        image: np.ndarray,
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,  # noqa:ARG002
-        additional_params: dict[str, Any] | None = None,  # noqa:ARG002
-    ) -> tuple[
-        np.ndarray,
-        Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
-    ]:  # pragma: no cover
-        return np.copy(image), list()
-
-    def get_config(self) -> dict[str, Any]:
-        return {"param1": self.param1, "param2": self.param2}
 
 
 class TestFloatStepPertubImageFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step", "expected"),
         [
-            (DummyFloatPerturber, "param1", 1, 3, 4, (1, 1.5, 2, 2.5)),
-            (DummyFloatPerturber, "param2", 3, 9, 2, (3, 6)),
-            (DummyFloatPerturber, "param1", 4, 4, 1, ()),
+            (DummyPerturber, "param1", 1, 3, 5, (1, 1.5, 2.0, 2.5, 3)),
+            (DummyPerturber, "param2", 3, 9, 2, (3, 9)),
+            (DummyPerturber, "param1", 4, 4, 1, (4,)),
         ],
     )
     def test_iteration(
@@ -89,11 +67,11 @@ class TestFloatStepPertubImageFactory:
             "expectation",
         ),
         [
-            (DummyFloatPerturber, "param1", 1, 6, 10, 0, 1, does_not_raise()),
-            (DummyFloatPerturber, "param1", 1, 6, 10, 3, 2.5, does_not_raise()),
-            (DummyFloatPerturber, "param1", 1, 6, 2, 3, -1, pytest.raises(IndexError)),
-            (DummyFloatPerturber, "param1", 1, 6, 2, -1, -1, pytest.raises(IndexError)),
-            (DummyFloatPerturber, "param1", 4, 4, 1, 0, -1, pytest.raises(IndexError)),
+            (DummyPerturber, "param1", 1, 6, 10, 0, 1, does_not_raise()),
+            (DummyPerturber, "param1", 1, 6, 10, 3, 2.666666666666667, does_not_raise()),
+            (DummyPerturber, "param1", 1, 6, 2, 3, -1, pytest.raises(IndexError)),
+            (DummyPerturber, "param1", 1, 6, 2, -1, -1, pytest.raises(IndexError)),
+            (DummyPerturber, "param1", 4, 3, 1, 0, 4, does_not_raise()),
         ],
         ids=["first idx", "last idx", "idx == len", "neg idx", "empty iter"],
     )
@@ -121,10 +99,38 @@ class TestFloatStepPertubImageFactory:
             assert factory[idx].get_config()[theta_key] == expected_val
 
     @pytest.mark.parametrize(
+        ("start", "stop", "step", "endpoint", "expected"),
+        [
+            (0.0, 1.0, 2, True, [0.0, 1.0]),
+            (0.0, 1.0, 2, False, [0.0, 0.5]),
+            (2.0, 1.0, 1, False, [2.0]),
+            (1.0, 1.0, 3, False, [1.0, 1.0, 1.0]),
+        ],
+    )
+    def test_thetas(
+        self,
+        start: float,
+        stop: float,
+        step: int,
+        endpoint: bool,
+        expected: list[float],
+    ) -> None:
+        """Test the generated theta values."""
+        factory = LinSpacePerturbImageFactory(
+            perturber=DummyPerturber,
+            theta_key="param1",
+            start=start,
+            stop=stop,
+            step=step,
+            endpoint=endpoint,
+        )
+        assert factory.thetas == expected
+
+    @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step"),
         [
-            (DummyFloatPerturber, "param1", 1.0, 5.0, 2),
-            (DummyFloatPerturber, "param2", 3.0, 9.0, 3),
+            (DummyPerturber, "param1", 1.0, 5.0, 2),
+            (DummyPerturber, "param2", 3.0, 9.0, 3),
         ],
     )
     def test_configuration(
@@ -134,6 +140,7 @@ class TestFloatStepPertubImageFactory:
         start: float,
         stop: float,
         step: int,
+        endpoint: bool = True,
     ) -> None:
         """Test configuration stability."""
         inst = LinSpacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
@@ -144,14 +151,14 @@ class TestFloatStepPertubImageFactory:
             assert i.stop == stop
             assert i.step == step
             assert start in i.thetas
-            assert stop not in i.thetas
+            assert stop not in i.thetas if not endpoint else stop in i.thetas
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),
         [
             (
                 {
-                    "perturber": DummyFloatPerturber,
+                    "perturber": DummyPerturber,
                     "theta_key": "param1",
                     "start": 1,
                     "stop": 2,
@@ -160,7 +167,7 @@ class TestFloatStepPertubImageFactory:
             ),
             (
                 {
-                    "perturber": DummyFloatPerturber(1, 2),
+                    "perturber": DummyPerturber(1, 2),
                     "theta_key": "param2",
                     "start": 1,
                     "stop": 2,
@@ -177,8 +184,8 @@ class TestFloatStepPertubImageFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step"),
         [
-            (DummyFloatPerturber, "param1", 1.0, 5.0, 2),
-            (DummyFloatPerturber, "param2", 3.0, 9.0, 3),
+            (DummyPerturber, "param1", 1.0, 5.0, 2),
+            (DummyPerturber, "param2", 3.0, 9.0, 3),
         ],
     )
     def test_hydration(

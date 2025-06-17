@@ -3,14 +3,19 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from maite.protocols.object_detection import DatumMetadataType
+
+from nrtk.interop.maite.interop.object_detection.utils import maite_available
+
+if maite_available:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols.object_detection import DatumMetadataType
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectDetectionDataset
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
-from nrtk.utils._exceptions import KWCocoImportError
+from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from tests.interop.maite import DATASET_FOLDER
 
 kwcoco_available = True
@@ -29,9 +34,9 @@ def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObj
     if load_metadata:
         metadata_file = Path(dataset_path) / "image_metadata.json"
         with open(metadata_file) as f:
-            metadata: list[DatumMetadataType] = json.load(f)
+            metadata: list[DatumMetadataType] = json.load(f)  # pyright: ignore [reportInvalidTypeForm]
     else:
-        metadata: list[DatumMetadataType] = [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]
+        metadata: list[DatumMetadataType] = [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]  # pyright: ignore [reportInvalidTypeForm]
 
     # Initialize dataset object
     return COCOJATICObjectDetectionDataset(
@@ -48,6 +53,7 @@ def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObj
 @pytest.mark.skipif(not PybsmSensor.is_usable(), reason="PybsmSensor not usable")
 @pytest.mark.skipif(not PybsmScenario.is_usable(), reason="PybsmScenario not usable")
 @pytest.mark.skipif(not kwcoco_available, reason=str(KWCocoImportError()))
+@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestNRTKPerturberPyBSM:
     """These tests make use of the `tmpdir` fixture from `pytest`.
 

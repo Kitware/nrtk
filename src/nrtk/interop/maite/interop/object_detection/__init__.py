@@ -1,1 +1,1 @@
-"""Object Detection"""
+"""Object Detection."""

@@ -1,4 +1,4 @@
-"""This module contains nrtk_perturber_cli, which is a CLI script for running nrtk_perturber"""
+"""This module contains nrtk_perturber_cli, which is a CLI script for running nrtk_perturber."""
 
 import json
 import logging
@@ -19,9 +19,9 @@ from nrtk.utils._exceptions import KWCocoImportError
 try:
     from kwcoco import CocoDataset  # type: ignore
 
-    is_usable = True
+    is_usable: bool = True
 except ImportError:  # pragma: no cover
-    is_usable = False
+    is_usable: bool = False
 
 
 def _load_metadata(dataset_dir: str, kwcoco_dataset: "CocoDataset") -> list[dict[str, Any]]:
@@ -61,13 +61,7 @@ def nrtk_perturber_cli(
 ) -> None:
     """Generate NRTK perturbed images and detections from a given set of source images and COCO-format annotations.
 
-    Generate NRTK perturbed images and detections from a given set of source images and COCO-format annotations
-    and write them to an output folder in disk. The perturbed images are stored in subfolders named after the
-    chosen perturbation parameter keys and values.
-
-    DATASET_DIR - Root directory of dataset.
-    OUTPUT_DIR - Directory to write the perturbed images to.
-    CONFIG_FILE - Configuration file specifying the PerturbImageFactory configuration.
+    The perturbed images are stored in subfolders named after the chosen perturbation parameter keys and values.
 
     :param dataset_dir: Root directory of dataset.
     :param output_dir: Directory to write the perturbed images to.

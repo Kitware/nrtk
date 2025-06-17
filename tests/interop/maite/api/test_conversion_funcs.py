@@ -202,7 +202,7 @@ class TestAPIConversionFunctions:
         ],
     )
     def test_load_COCOJATIC_dataset_not_usable(self, data: dict[str, Any]) -> None:  # noqa: N802
-        """Test that ImportError appropriately raised when imports missing"""
+        """Test that ImportError appropriately raised when imports missing."""
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(KWCocoImportError):
@@ -226,7 +226,7 @@ class TestAPIConversionFunctions:
         ],
     )
     def test_load_COCOJATIC_dataset_bad_metadata(self, data: dict[str, Any]) -> None:  # noqa: N802
-        """Test that ValueError appropriately raised when bad metadata is provided"""
+        """Test that ValueError appropriately raised when bad metadata is provided."""
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(ValueError, match=r"ID not present in image metadata. Is it a DatumMetadataType?"):

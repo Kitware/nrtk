@@ -1,7 +1,4 @@
-"""
-This module provides the ComposePerturber class, which allows for composing multiple
-image perturbations by sequentially applying a list of PerturbImage instances.
-"""
+"""Defines ComposePerturber to apply multiple PerturbImage instances sequentially for combined image perturbations."""
 
 from __future__ import annotations
 
@@ -20,9 +17,11 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class ComposePerturber(PerturbImage):
-    """
-    A class that composes multiple image perturbations by applying a list of perturbers
-    sequentially to an input image.
+    """Composes multiple image perturbations by applying a list of perturbers sequentially to an input image.
+
+    Attributes:
+        perturbers (list[PerturbImage]):
+            List of perturbers to apply.
 
     Note:
         This class has not been tested with perturber factories and is not expected
@@ -32,9 +31,18 @@ class ComposePerturber(PerturbImage):
     def __init__(self, perturbers: list[PerturbImage], box_alignment_mode: str = "extent") -> None:
         """Initializes the ComposePerturber.
 
-        This has not been tested with perturber factories and is not expected to work wit perturber factories.
+        This has not been tested with perturber factories and is not expected to work with perturber factories.
 
-        :param perturbers: list of perturbers to apply
+        Args:
+            perturbers:
+                List of perturbers to apply.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
         self.perturbers = perturbers
@@ -42,38 +50,41 @@ class ComposePerturber(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Apply the sequence of perturbers to the input image.
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        """Apply the sequence of perturbers to the input image.
 
         Args:
-            image (np.ndarray): The input image to perturb.
-            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]] | None): The bounding boxes for
-                the input image. This is the single image output from DetectImageObjects.detect_objects
-            additional_params (dict[str, Any] | None): Additional parameters for perturbation.
+            image:
+                The input image to perturb.
+            boxes:
+                The bounding boxes for the input image. This is the single image
+                output from DetectImageObjects.detect_objects.
+            additional_params:
+                Additional parameters for perturbation.
 
         Returns:
-            np.ndarray: The perturbed image.
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                The perturbed image and the source bounding boxes.
         """
         out_img = image
 
         if additional_params is None:
             additional_params = dict()
 
+        # Applies series of perturbations to a the given input image
         for perturber in self.perturbers:
             out_img, _ = perturber(image=out_img, boxes=boxes, additional_params=additional_params)
 
         return out_img, boxes
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Get the configuration dictionary of the ComposePerturber instance.
+        """Get the configuration dictionary of the ComposePerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary containing perturber configurations.
+            :return dict[str, Any]: Configuration dictionary containing perturber configurations.
         """
         cfg = super().get_config()
         cfg["perturbers"] = [to_config_dict(perturber) for perturber in self.perturbers]
@@ -82,18 +93,19 @@ class ComposePerturber(PerturbImage):
     @classmethod
     def from_config(
         cls,
-        config_dict: dict,
+        config_dict: dict[str, Any],
         merge_default: bool = True,
     ) -> Self:
-        """
-        Create a ComposePerturber instance from a configuration dictionary.
+        """Create a ComposePerturber instance from a configuration dictionary.
 
         Args:
-            config_dict (dict): Configuration dictionary with perturber details.
-            merge_default (bool): Whether to merge with the default configuration.
+            config_dict:
+                Configuration dictionary with perturber details.
+            merge_default:
+                Whether to merge with the default configuration.
 
         Returns:
-            ComposePerturber: An instance of ComposePerturber.
+            :return ComposePerturber: An instance of ComposePerturber.
         """
         config_dict = dict(config_dict)
 

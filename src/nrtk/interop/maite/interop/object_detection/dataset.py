@@ -1,6 +1,7 @@
-"""
-This module contains wrappers for converting a COCO dataset or
-a generic dataset to a MAITE dataset for object detection
+"""This module contains wrappers for converting a COCO dataset or a generic dataset to a MAITE dataset.
+
+All instances of # pyright: ignore [reportPossiblyUnboundVariable]
+are result of guard imports on maite imports
 """
 
 from __future__ import annotations
@@ -13,26 +14,39 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from maite.protocols import DatasetMetadata, DatumMetadata
-from maite.protocols.object_detection import (
-    Dataset,
-    DatumMetadataType,
-    InputType,
-    TargetType,
-)
 from PIL import Image  # type: ignore
 from typing_extensions import ReadOnly
+
+from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
+
+InputType: type = object
+TargetType: type = object
+DatumMetadataType: type = object
+Dataset: type = object
+DatumMetadata: type = object
+try:
+    # Multiple type ignores added for pyright's handling of guarded imports
+    from maite.protocols import DatasetMetadata, DatumMetadata
+    from maite.protocols.object_detection import (
+        Dataset,
+        DatumMetadataType,
+        InputType,
+        TargetType,
+    )
+
+    maite_available: bool = True
+except ImportError:  # pragma: no cover
+    maite_available: bool = False
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import kwcoco  # type: ignore
 
-    is_usable = True
+    kwcoco_available: bool = True
 except ImportError:  # pragma: no cover
-    is_usable = False
-from nrtk.utils._exceptions import KWCocoImportError
+    kwcoco_available: bool = False
 
-OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
+OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]  # pyright: ignore [reportPossiblyUnboundVariable]
 
 LOG = logging.getLogger(__name__)
 
@@ -41,20 +55,20 @@ LOG = logging.getLogger(__name__)
 class JATICDetectionTarget:
     """Dataclass for the datum-level JATIC output detection format."""
 
-    boxes: np.ndarray
-    labels: np.ndarray
-    scores: np.ndarray
+    boxes: np.ndarray[Any, Any]
+    labels: np.ndarray[Any, Any]
+    scores: np.ndarray[Any, Any]
 
 
-class COCOMetadata(DatumMetadata):
-    """TypedDict for COCO-detection datum-level metdata"""
+class COCOMetadata(DatumMetadata):  # pyright: ignore [reportGeneralTypeIssues]
+    """TypedDict for COCO-detection datum-level metdata."""
 
     # pyright fails when failing to import maite.protocols
     ann_ids: ReadOnly[Sequence[int]]  # pyright: ignore [reportInvalidTypeForm]
     image_info: ReadOnly[dict[str, Any]]  # pyright: ignore [reportInvalidTypeForm]
 
 
-class COCOJATICObjectDetectionDataset(Dataset):
+class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]
     """Dataset class to convert a COCO dataset to a dataset compliant with JATIC's Object Detection protocol.
 
     Parameters
@@ -66,24 +80,27 @@ class COCOJATICObjectDetectionDataset(Dataset):
     def __init__(  # noqa: C901
         self,
         kwcoco_dataset: kwcoco.CocoDataset,  # pyright: ignore [reportGeneralTypeIssues]
-        image_metadata: Sequence[DatumMetadataType],
+        image_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         skip_no_anns: bool = False,
         dataset_id: str | None = None,
     ) -> None:
-        """
-        Initialize MAITE-compliant dataset from a COCO dataset.
+        """Initialize MAITE-compliant dataset from a COCO dataset.
 
         Args:
             kwcoco_dataset (kwcoco.CocoDataset): The COCO dataset object.
             image_metadata (Sequence[DatumMetadataType]): Metadata for each image.
             skip_no_anns (bool): Whether to skip images without annotations. Defaults to False.
             dataset_id (str): Dataset ID, defaults to filepath.
+
         Raises:
             ImportError: If required dependencies are not installed.
             ValueError: If metadata is missing for any image in the dataset.
         """
-        if not self.is_usable():
+        if not kwcoco_available:
             raise KWCocoImportError
+
+        if not maite_available:
+            raise MaiteImportError
 
         self._kwcoco_dataset = kwcoco_dataset
 
@@ -133,7 +150,7 @@ class COCOJATICObjectDetectionDataset(Dataset):
         if len(self._image_metadata) != len(self._image_ids):
             raise ValueError("Image metadata length mismatch, metadata needed for every image.")
 
-        self.metadata = DatasetMetadata(
+        self.metadata: DatasetMetadata = DatasetMetadata(  # pyright: ignore [reportPossiblyUnboundVariable]
             id=dataset_id if dataset_id else kwcoco_dataset.fpath,
             index2label={c["id"]: c["name"] for c in kwcoco_dataset.cats.values()},
         )
@@ -142,7 +159,7 @@ class COCOJATICObjectDetectionDataset(Dataset):
         """Returns the number of images in the dataset."""
         return len(self._image_ids)
 
-    def __getitem__(self, index: int) -> tuple[InputType, TargetType, COCOMetadata]:
+    def __getitem__(self, index: int) -> tuple[InputType, TargetType, COCOMetadata]:  # pyright: ignore [reportInvalidTypeForm]
         """Returns the dataset object at the given index."""
         image_id = self._image_ids[index]
         img_file_path = Path(self._kwcoco_dataset.get_image_fpath(image_id))
@@ -151,7 +168,7 @@ class COCOJATICObjectDetectionDataset(Dataset):
 
         gid_to_aids = self._kwcoco_dataset.gid_to_aids
 
-        image_md: COCOMetadata = {
+        image_md: COCOMetadata = {  # pyright: ignore [reportAssignmentType]
             "id": image_id,
             "ann_ids": (list(gid_to_aids[image_id]) if image_id in gid_to_aids else list()),
             "image_info": dict(width=width, height=height, file_name=str(img_file_path)),
@@ -186,17 +203,15 @@ class COCOJATICObjectDetectionDataset(Dataset):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required kwcoco module is available.
+        """Checks if the required kwcoco and MAITE modules are available.
 
         Returns:
-            bool: True if kwcoco is installed; False otherwise.
+            bool: True if kwcoco and MAITE are installed; False otherwise.
         """
-        # Requires opencv to be installed
-        return is_usable
+        return kwcoco_available and maite_available
 
 
-class JATICObjectDetectionDataset(Dataset):
+class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]
     """Implementation of the JATIC Object Detection dataset wrapper for dataset images of varying sizes.
 
     Parameters
@@ -215,14 +230,13 @@ class JATICObjectDetectionDataset(Dataset):
 
     def __init__(
         self,
-        imgs: Sequence[np.ndarray],
-        dets: Sequence[TargetType],
-        datum_metadata: Sequence[DatumMetadataType],
+        imgs: Sequence[np.ndarray[Any, Any]],
+        dets: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
+        datum_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         dataset_id: str,
         index2label: dict[int, str] | None = None,
     ) -> None:
-        """
-        Initialize MAITE-compliant dataset
+        """Initialize MAITE-compliant dataset.
 
         Args:
             imgs (Sequence[np.ndarray]): Sequence of images in the dataset.
@@ -231,6 +245,8 @@ class JATICObjectDetectionDataset(Dataset):
             dataset_id (str): Dataset ID.
             index2label (dict[int, str] | None): Mapping from class index to label.
         """
+        if not self.is_usable():
+            raise MaiteImportError
         self.imgs = imgs
         self.dets = dets
         self.datum_metadata = datum_metadata
@@ -251,3 +267,12 @@ class JATICObjectDetectionDataset(Dataset):
     def __getitem__(self, index: int) -> OBJ_DETECTION_DATUM_T:
         """Returns the dataset object at the given index."""
         return self.imgs[index], self.dets[index], self.datum_metadata[index]
+
+    @classmethod
+    def is_usable(cls) -> bool:
+        """Checks if the required MAITE module is available.
+
+        Returns:
+            bool: True if MAITE is installed; False otherwise.
+        """
+        return maite_available

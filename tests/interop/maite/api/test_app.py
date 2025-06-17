@@ -27,29 +27,33 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
 from nrtk.utils._exceptions import FastApiImportError
 from tests.interop.maite import BAD_NRTK_CONFIG, DATASET_FOLDER, LABEL_FILE, NRTK_PYBSM_CONFIG
 
-deps = ["kwcoco"]
+deps = ["kwcoco", "maite"]
 specs = [find_spec(dep) for dep in deps]
 is_usable = all(spec is not None for spec in specs)
 random = np.random.default_rng()
 
-TEST_RETURN_VALUE = [  # repeated test return value for 3 tests, saved to var to save space
-    (
-        "perturb1",
-        JATICObjectDetectionDataset(
-            imgs=[random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 11,
-            dets=[
-                JATICDetectionTarget(
-                    boxes=random.random((2, 4)),
-                    labels=random.random(2),
-                    scores=random.random(2),
-                ),
-            ]
-            * 11,
-            datum_metadata=[{"id": idx} for idx in range(11)],
-            dataset_id="dummy dataset",
+if is_usable:
+    # MAITE is required for JATICObjectDetectionDataset
+    TEST_RETURN_VALUE = [  # repeated test return value for 3 tests, saved to var to save space
+        (
+            "perturb1",
+            JATICObjectDetectionDataset(
+                imgs=[random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 11,
+                dets=[
+                    JATICDetectionTarget(
+                        boxes=random.random((2, 4)),
+                        labels=random.random(2),
+                        scores=random.random(2),
+                    ),
+                ]
+                * 11,
+                datum_metadata=[{"id": idx} for idx in range(11)],
+                dataset_id="dummy dataset",
+            ),
         ),
-    ),
-]
+    ]
+else:
+    TEST_RETURN_VALUE = []
 
 
 @pytest.fixture

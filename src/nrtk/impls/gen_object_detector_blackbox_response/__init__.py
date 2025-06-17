@@ -1,1 +1,1 @@
-"""Module for implementations of GenerateObjectDetectorBlackboxResponse interface"""
+"""Module for implementations of GenerateObjectDetectorBlackboxResponse interface."""

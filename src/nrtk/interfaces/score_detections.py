@@ -1,8 +1,4 @@
-"""
-This module defines the `ScoreDetections` interface, which abstracts the process of scoring
-object detection outputs based on specified metrics. Implementations of this interface are
-expected to compute scores by comparing actual and predicted bounding box detections, with
-corresponding class labels and confidence scores.
+"""Defines ScoreDetections for scoring object detections by comparing predicted vs actual boxes, labels, and scores.
 
 Classes:
     ScoreDetections: Interface for scoring detection outputs against ground truth data.
@@ -60,7 +56,7 @@ class ScoreDetections(Plugfigurable):
             Output detections from a detector with bbox and
             class-wise confidence scores.
 
-        :return:
+        Returns:
             Metric score values as a float-type sequence with the length matching
             the number of samples in the ground truth input.
         """

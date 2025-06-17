@@ -1,8 +1,4 @@
-"""
-This module provides the `ClassAgnosticPixelwiseIoUScorer` class, which calculates pixelwise
-Intersection over Union (IoU) scores in a class-agnostic manner. It is intended for evaluating
-object detection results based on IoU between predicted and actual bounding boxes, without
-differentiating between object classes.
+"""Defines ClassAgnosticPixelwiseIoUScorer for class-agnostic pixelwise IoU scoring of object detections.
 
 Classes:
     ClassAgnosticPixelwiseIoUScorer: Computes pixelwise IoU scores for bounding boxes in a
@@ -95,8 +91,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
         return ious
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Generates a serializable config that can be used to rehydrate object
+        """Generates a serializable config that can be used to rehydrate object.
 
         Returns:
             dict[str, Any]: serializable config containing all instance parameters

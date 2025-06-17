@@ -1,5 +1,6 @@
-"""
-This module provides an example implementation of the GenerateObjectDetectorBlackboxResponse interface
+"""pyBSM implementation of GenerateObjectDetectorBlackboxResponse.
+
+This module defines an example implementation of the GenerateObjectDetectorBlackboxResponse interface
 using a `SimplePybsmGenerator` class. It generates object detection responses for a series of input images
 based on ground truth bounding boxes and scoring methods.
 
@@ -38,11 +39,12 @@ from nrtk.utils._exceptions import PyBSMImportError
 
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
-    """
-    Example implementation of the `GenerateObjectDetectorBlackboxResponse` interface.
+    """Example implementation of the `GenerateObjectDetectorBlackboxResponse` interface.
 
     This class generates detection response data for a sequence of images, using ground truth bounding
     boxes and configurable scoring and perturbation methods.
+
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
     Attributes:
         images (Sequence[np.ndarray]): Sequence of images to process.
@@ -56,12 +58,11 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     def __init__(
         self,
-        images: Sequence[np.ndarray],
+        images: Sequence[np.ndarray[Any, Any]],
         img_gsds: Sequence[float],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> None:
-        """
-        Initializes the SimplePybsmGenerator with input images, ground sample distances, and ground truth.
+        """Initializes the SimplePybsmGenerator with input images, ground sample distances, and ground truth.
 
         Args:
             images (Sequence[np.ndarray]): Sequence of images for detection.
@@ -85,19 +86,18 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @override
     def __len__(self) -> int:
-        """:return: Number of image/ground_truth pairs this generator holds."""
+        """Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
     def __getitem__(
         self,
         idx: int,
     ) -> tuple[
-        np.ndarray,
+        np.ndarray[Any, Any],
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:
-        """
-        Get the image and ground truth pair for a specific index.
+        """Get the image and ground truth pair for a specific index.
 
         Args:
             idx (int): Index of the desired data pair.
@@ -113,8 +113,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         return self.images[idx], self.ground_truth[idx], {"img_gsd": self.img_gsds[idx]}
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Generates a serializable configuration for the instance.
+        """Generates a serializable configuration for the instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary containing instance parameters.
@@ -163,8 +162,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required pybsm module is available.
+        """Checks if the required pybsm module is available.
 
         Returns:
             bool: True if pybsm is installed; False otherwise.

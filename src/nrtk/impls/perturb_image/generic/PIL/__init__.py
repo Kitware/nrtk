@@ -1,1 +1,1 @@
-"""Module for PIL based implementations of PerturbImage"""
+"""Module for PIL based implementations of PerturbImage."""

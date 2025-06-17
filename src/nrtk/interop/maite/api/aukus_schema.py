@@ -1,4 +1,4 @@
-"""This module contains schemas for AUKUS API"""
+"""This module contains schemas for AUKUS API."""
 
 from __future__ import annotations
 
@@ -10,14 +10,14 @@ BaseModel: type = object
 try:
     from pydantic import BaseModel
 
-    pydantic_available = True
+    pydantic_available: bool = True
 except ImportError:  # pragma: no cover
-    pydantic_available = False
+    pydantic_available: bool = False
 
 
 # pyright warns about inheritance from BaseSettings which is ambiguous
 class AukusdataCollectionSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Collection schema for AUKUS API"""
+    """Collection schema for AUKUS API."""
 
     # header params
     doc_type: str
@@ -40,7 +40,7 @@ class AukusdataCollectionSchema(BaseModel):  # pyright: ignore [reportGeneralTyp
     data_formats: list[dict[str, Any]] | None = None
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 
@@ -49,7 +49,7 @@ class AukusdataCollectionSchema(BaseModel):  # pyright: ignore [reportGeneralTyp
 
 # pyright warns about inheritance from BaseModel which is ambiguous
 class AukusDatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Dataset schema for AUKUS API"""
+    """Dataset schema for AUKUS API."""
 
     # header params
     doc_type: str
@@ -76,7 +76,7 @@ class AukusDatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues
     tags: list[str] | None = None
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 

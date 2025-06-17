@@ -1,8 +1,4 @@
-"""
-This module provides classes for enhancing image properties, such as brightness, color,
-contrast, and sharpness, by implementing the `PerturbImage` interface. These classes use
-the PIL library to adjust the enhancement level for a given image, allowing for customized
-image modifications.
+"""Implements PerturbImage enhancers using PIL to adjust brightness, color, contrast, and sharpness of images.
 
 Classes:
     BrightnessPerturber: Adjusts the brightness of an image.
@@ -90,7 +86,8 @@ class _PerturbImage(PerturbImage):
         :param enhancement: Ehancement to apply.
         :param image: Input image as a numpy array.
 
-        :return: Peturbed image as numpy array, including matching shape and dtype.
+        Returns:
+            Peturbed image as numpy array, including matching shape and dtype.
         """
         dtype = image.dtype
         # PIL does not support RGB floating point images so we must do an
@@ -110,8 +107,7 @@ class _PerturbImage(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _PerturbImage instance.
+        """Returns the current configuration of the _PerturbImage instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -122,8 +118,7 @@ class _PerturbImage(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required PIL module is available.
+        """Checks if the required PIL module is available.
 
         Returns:
             bool: True if pillow is installed; False otherwise.

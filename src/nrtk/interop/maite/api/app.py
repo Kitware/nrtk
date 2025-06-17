@@ -1,15 +1,17 @@
-"""This module contains handle_post, which is the endpoint for NRTK API requests"""
+"""This module contains handle_post, which is the endpoint for NRTK API requests."""
+
+from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from fastapi import FastAPI, HTTPException
 
-    fastapi_available = True
+    fastapi_available: bool = True
 except ImportError:  # pragma: no cover
-    fastapi_available = False
+    fastapi_available: bool = False
 
 from nrtk.interop.maite.api.converters import build_factory, load_COCOJATIC_dataset
 from nrtk.interop.maite.api.schema import (
@@ -31,7 +33,7 @@ class _UnusableFastApi:
 
 
 if fastapi_available:
-    app: Union[FastAPI, _UnusableFastApi] = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+    app: FastAPI | _UnusableFastApi = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
 else:
     app = _UnusableFastApi()
 

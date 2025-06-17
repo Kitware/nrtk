@@ -1,20 +1,22 @@
-"Utility functions for the Water Droplet Perturber"
+"""Utility functions for the Water Droplet Perturber."""
 
 from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 
 try:
     from scipy.special import binom
 
-    scipy_available = True
+    scipy_available: bool = True
 except ImportError:
-    scipy_available = False
+    scipy_available: bool = False
 
 
 class Bezier:
-    """
-    Class that computes the Bezier curve based on the segment information.
+    """Class that computes the Bezier curve based on the segment information.
+
     Each curve is made of a series of segments that are initialized by the
     input points, angles, target radius and number of points needed for the
     Bezier interpolation.
@@ -22,8 +24,8 @@ class Bezier:
 
     def __init__(
         self,
-        p1: np.ndarray,
-        p2: np.ndarray,
+        p1: np.ndarray[Any, Any],
+        p2: np.ndarray[Any, Any],
         angle1: float,
         angle2: float,
         r: float = 0.3,
@@ -49,24 +51,21 @@ class Bezier:
         )
         self.p = p
 
-    def get_curve(self) -> np.ndarray:
-        """Returns curve information"""
+    def get_curve(self) -> np.ndarray[Any, Any]:
+        """Returns curve information."""
         return self.bezier()
 
-    def bezier(self) -> np.ndarray:
-        """
-        Draw Bézier curve by interpolating segments based on the
-        Bernstein basis poynomial function.
+    def bezier(self) -> np.ndarray[Any, Any]:
+        """Draw Bézier curve by interpolating segments based on the Bernstein basis poynomial function.
 
         The Bezier curve equation is derived by combining the Bernstein basis polynomials with the control points:
             B(t) =  ∑(i=0 to n) B(i, n)(t) * P(i)
         """
 
         def _bernstein(n: int, k: int, t: np.ndarray) -> np.ndarray:
-            """
-            Bernstein basis polynomial function which is defined as:
+            """Bernstein basis polynomial function.
 
-            B(k, n)(t) = (n! / (k! * (n-k)!)) * t^k * (1 - t)^(n - k)
+            Defined as: B(k, n)(t) = (n! / (k! * (n-k)!)) * t^k * (1 - t)^(n - k)
 
             n is the degree of the curve
             k is the index of the control point
@@ -97,9 +96,8 @@ class Bezier:
         return curve
 
 
-def ccw_sort(points: np.ndarray) -> np.ndarray:
+def ccw_sort(points: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
     """Sorts points in counterclockwise order around a center point."""
-
     # Subtract original point from center point (position obtained
     # by calculating the mean)
     d = points - np.mean(points, axis=0)
@@ -109,10 +107,13 @@ def ccw_sort(points: np.ndarray) -> np.ndarray:
     return points[np.argsort(s), :]
 
 
-def get_bezier_curve(points: np.ndarray, rad: float = 0.2, edgy: float = 0.0) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Given an array of *points*, create a curve through
-    those points.
+def get_bezier_curve(
+    points: np.ndarray[Any, Any],
+    rad: float = 0.2,
+    edgy: float = 0.0,
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
+    """Given an array of *points*, create a curve through those points.
+
     *rad* is a number between 0 and 1 to steer the distance of
           control points.
     *edgy* is a parameter which controls how "edgy" the curve is,
@@ -160,11 +161,8 @@ def get_random_points_within_min_dist(
     scale: float = 0.8,
     min_dst: float | None = None,
     recursive: int = 0,
-) -> np.ndarray:
-    """
-    Recursive function to create *n* random points in the unit square,
-    which are *min_dst* apart, then scale them.
-    """
+) -> np.ndarray[Any, Any]:
+    """Recursive function to create *n* random points in the unit square, which are *min_dst* apart, then scale them."""
     min_dst = min_dst or 0.7 / n
     points = rng.random((n, 2))
     d = np.sqrt(np.sum(np.diff(ccw_sort(points), axis=0), axis=1) ** 2)

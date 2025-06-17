@@ -83,24 +83,27 @@ Documentation Contents:
 
 .. toctree::
    :maxdepth: 1
-   :caption: Tutorial
-
-   examples/nrtk_tutorial.ipynb
-
-.. toctree::
-   :maxdepth: 1
    :caption: Explanation
 
    nrtk_explanation
+   risk_factors
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   examples/nrtk_tutorial.ipynb
+   testing_and_evaluation_notebooks
+   examples/coco_scorer.ipynb
 
 .. toctree::
    :maxdepth: 1
    :caption: How-To
 
-   nrtk_how_to_topics
-   review_process
-   releasing
-   creating_public_release_request
+   examples/perturbers.ipynb
+   examples/otf_visualization.ipynb
+   examples/albumentations_perturber.ipynb
+   generating_perturbed_datasets
 
 .. toctree::
    :maxdepth: 1
@@ -108,11 +111,11 @@ Documentation Contents:
 
    interfaces
    implementations
-   interoperability
+   maite/jatic_interoperability
    glossary
    containers
    release_notes
-   style_sheet
+   for_nrtk_developers
 
 
 

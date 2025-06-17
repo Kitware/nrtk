@@ -1,9 +1,11 @@
-"""This module contains handle_aukus_post, which is the endpoint for AUKUS API requests"""
+"""This module contains handle_aukus_post, which is the endpoint for AUKUS API requests."""
+
+from __future__ import annotations
 
 import copy
 import os
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable
 
 import requests
 
@@ -16,22 +18,22 @@ try:
     from fastapi import FastAPI, HTTPException
     from fastapi.encoders import jsonable_encoder
 
-    fastapi_available = True
+    fastapi_available: bool = True
 except ImportError:  # pragma: no cover
-    fastapi_available = False
+    fastapi_available: bool = False
 
 BaseSettings: type = object
 try:
     from pydantic_settings import BaseSettings
 
-    pydantic_settings_available = True
+    pydantic_settings_available: bool = True
 except ImportError:  # pragma: no cover
-    pydantic_settings_available = False
+    pydantic_settings_available: bool = False
 
 
 # pyright warns about inheritance from BaseSettings which is ambiguous
 class Settings(BaseSettings):  # pyright: ignore [reportGeneralTypeIssues]
-    """Dataclass for NRTK API settings"""
+    """Dataclass for NRTK API settings."""
 
     NRTK_IP: str = "http://localhost:8888/"
 
@@ -41,7 +43,7 @@ class Settings(BaseSettings):  # pyright: ignore [reportGeneralTypeIssues]
     print('\t`NRTK_IP="http://<hostname>:<port>/"`\n')
 
 
-settings = Settings()
+settings: Settings = Settings()
 
 
 class _UnusableFastApi:
@@ -53,13 +55,13 @@ class _UnusableFastApi:
 
 
 if fastapi_available:
-    AUKUS_app: Union[FastAPI, _UnusableFastApi] = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+    AUKUS_app: FastAPI | _UnusableFastApi = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
 else:
     AUKUS_app = _UnusableFastApi()
 
 
 def _check_input(data: AukusDatasetSchema) -> None:
-    """Check input data and raise HTTPException if needed"""
+    """Check input data and raise HTTPException if needed."""
     if not fastapi_available:
         raise FastApiImportError
     if data.data_format != "COCO":
@@ -74,7 +76,7 @@ def _check_input(data: AukusDatasetSchema) -> None:
 
 @AUKUS_app.post("/")
 def handle_aukus_post(data: AukusDatasetSchema) -> list[AukusDatasetSchema]:
-    """Format AUKUS request data to NRTK API format and return NRTK API data in AUKUS format"""
+    """Format AUKUS request data to NRTK API format and return NRTK API data in AUKUS format."""
     if not fastapi_available:
         raise FastApiImportError
 

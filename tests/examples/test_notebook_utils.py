@@ -1,7 +1,6 @@
-"""
-The following functions are an adapted from MAITE. To see the original implementation,
-see https://gitlab.jatic.net/jatic/cdao/maite/-/blob/main/src/maite/_internals/testing/pyright.py?ref_type=heads
-"""
+"""The following functions are an adapted from MAITE. To see the original implementation, see https://gitlab.jatic.net/jatic/cdao/maite/-/blob/main/src/maite/_internals/testing/pyright.py?ref_type=heads."""
+
+from __future__ import annotations
 
 import json
 import os
@@ -13,9 +12,11 @@ from collections import Counter
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Literal, TypedDict, Union
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
+
+from nrtk.utils._exceptions import NotebookTestingImportError
 
 _found_path = shutil.which("pyright")
 PYRIGHT_PATH = Path(_found_path) if _found_path else None
@@ -72,7 +73,7 @@ class Diagnostic(TypedDict):
 
 
 class PyrightOutput(TypedDict):
-    """The schema for the JSON output of a pyright scan"""
+    """The schema for the JSON output of a pyright scan."""
 
     # # doc-ignore: NOQA
     version: str
@@ -85,9 +86,7 @@ def notebook_to_py_text(path_to_nb: Path) -> str:
     try:
         import jupytext
     except ImportError:
-        raise ImportError(
-            "`jupytext` must be installed in order to run pyright on jupyter notebooks.",
-        ) from ImportError
+        raise NotebookTestingImportError from ImportError
     ntbk = jupytext.read(path_to_nb, fmt="ipynb")
     return jupytext.writes(ntbk, fmt=".py")
 
@@ -107,7 +106,7 @@ def get_docstring_examples(doc: str) -> str:
     return "\n".join(src_lines)
 
 
-def _validate_path_to_pyright(path_to_pyright: Union[Path, None]) -> None:
+def _validate_path_to_pyright(path_to_pyright: Path | None) -> None:
     if path_to_pyright is None:  # pragma: no cover
         raise ModuleNotFoundError(
             "`pyright` was not found. It may need to be installed.",
@@ -153,10 +152,9 @@ def _format_outputs(scan: PyrightOutput) -> PyrightOutput:
 
 def pyright_analyze(
     notebook_path_str: str,
-    path_to_pyright: Union[Path, None] = PYRIGHT_PATH,
+    path_to_pyright: Path | None = PYRIGHT_PATH,
 ) -> PyrightOutput:
-    r"""
-    Scan a Python notebook with pyright.
+    r"""Scan a Python notebook with pyright.
 
     Some common pyright configuration options are exposed via this function for
     convenience; a full pyright JSON config can be specified to completely control
@@ -174,7 +172,7 @@ def pyright_analyze(
         Path to the pyright executable (see installation instructions: [4]_).
         Defaults to `shutil.where('pyright')` if the executable can be found.
 
-    Returns
+    Returns:
     -------
     list[dict[str, Any]]  (In one-to-one correspondence with `code_objs_and_or_paths`)
         The JSON-decoded results of the scan [3]_.
@@ -185,7 +183,7 @@ def pyright_analyze(
 
         See Notes for more details.
 
-    Notes
+    Notes:
     -----
     `SummaryDict` consists of:
         - filesAnalyzed: int
@@ -201,7 +199,7 @@ def pyright_analyze(
         - range: _Range
         - rule: NotRequired[str]
 
-    References
+    References:
     ----------
     .. [1] https://github.com/microsoft/pyright/blob/aad650ec373a9894c6f13490c2950398095829c6/README.md#command-line
     .. [2] https://github.com/microsoft/pyright/blob/main/docs/configuration.md
@@ -253,7 +251,7 @@ def list_error_messages(results: PyrightOutput) -> list[str]:
     results : PyrightOutput
         The results of pyright_analyze.
 
-    Returns
+    Returns:
     -------
     list[str]
         A list of error messages.

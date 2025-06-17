@@ -1,4 +1,4 @@
-"""This module contains schemas for NRTK perturber API"""
+"""This module contains schemas for NRTK perturber API."""
 
 from typing import Any
 
@@ -8,14 +8,14 @@ BaseModel: type = object
 try:
     from pydantic import BaseModel
 
-    pydantic_available = True
+    pydantic_available: bool = True
 except ImportError:  # pragma: no cover
-    pydantic_available = False
+    pydantic_available: bool = False
 
 
 # pyright warns about inheritance from BaseModel which is ambiguous
 class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Input schema for NRTK perturber API"""
+    """Input schema for NRTK perturber API."""
 
     # Header
     id: str
@@ -31,8 +31,8 @@ class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIs
     config_file: str
 
     class Config:  # noqa: D106
-        arbitrary_types_allowed = True
-        schema_extra = {
+        arbitrary_types_allowed: bool = True
+        schema_extra: dict[str, Any] = {
             "examples": [
                 {
                     "id": "0",
@@ -48,7 +48,7 @@ class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIs
         }
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 
@@ -56,15 +56,15 @@ class NrtkPerturbInputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIs
 
 
 class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Dataset schema for NRTK perturber API"""
+    """Dataset schema for NRTK perturber API."""
 
     root_dir: str
     label_file: str
     metadata_file: str
 
     class Config:  # noqa: D106
-        arbitrary_types_allowed = True
-        schema_extra = {
+        arbitrary_types_allowed: bool = True
+        schema_extra: dict[str, Any] = {
             "examples": [
                 {
                     "root_dir": "path/to/root/dir",
@@ -75,7 +75,7 @@ class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
         }
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 
@@ -83,14 +83,14 @@ class DatasetSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
 
 
 class NrtkPerturbOutputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeIssues]
-    """Output schema for NRTK perturber API"""
+    """Output schema for NRTK perturber API."""
 
     message: str
     datasets: list[DatasetSchema]
 
     class Config:  # noqa: D106
-        arbitrary_types_allowed = True
-        schema_extra = {
+        arbitrary_types_allowed: bool = True
+        schema_extra: dict[str, Any] = {
             "examples": [
                 {
                     "message": "response message",
@@ -106,7 +106,7 @@ class NrtkPerturbOutputSchema(BaseModel):  # pyright: ignore [reportGeneralTypeI
         }
 
     def __init__(self, /, **data: Any) -> None:
-        """Raise import error if pydantic isn't available"""
+        """Raise import error if pydantic isn't available."""
         if not pydantic_available:
             raise PydanticImportError
 

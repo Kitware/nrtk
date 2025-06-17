@@ -1,8 +1,4 @@
-"""
-This module provides the `JitterOTFPerturber` class, which applies jitter and Optical Transfer Function (OTF)
-perturbations to images for use in remote sensing and other image processing applications. The class leverages
-sensor and scenario configurations provided by `PybsmSensor` and `PybsmScenario`, using pyBSM functionalities
-to implement realistic perturbations.
+"""Implements JitterOTFPerturber which applies jitter perturbations using pyBSM with sensor and scenario configs.
 
 Classes:
     JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM and OpenCV.
@@ -30,9 +26,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 import numpy as np
 
 try:
@@ -40,9 +36,9 @@ try:
     from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -58,22 +54,29 @@ from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class JitterOTFPerturber(PerturbImage):
-    """
-    Implements image perturbation using jitter and Optical Transfer Function (OTF).
+    """Implements image perturbation using jitter and Optical Transfer Function (OTF).
 
     This class applies realistic perturbations to images based on sensor and scenario configurations,
     leveraging Optical Transfer Function (OTF) modeling through the pyBSM library. Perturbations include
     jitter effects that simulate real-world distortions in optical imaging systems.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
-        sensor (PybsmSensor | None): The sensor configuration used to define perturbation parameters.
-        scenario (PybsmScenario | None): Scenario configuration providing environmental context for perturbations.
-        additional_params (dict): Additional configuration options for customizing perturbations.
+        sensor (PybsmSensor | None):
+            The sensor configuration used to define perturbation parameters.
+        scenario (PybsmScenario | None):
+            Scenario configuration providing environmental context for perturbations.
+        additional_params (dict):
+            Additional configuration options for customizing perturbations.
 
     Methods:
-        perturb(image): Applies the jitter-based OTF perturbation to the provided image.
-        get_config(): Returns the configuration for the current instance.
-        from_config(config_dict): Instantiates from a configuration dictionary.
+        perturb(image):
+            Applies the jitter-based OTF perturbation to the provided image.
+        get_config():
+            Returns the configuration for the current instance.
+        from_config(config_dict):
+            Instantiates from a configuration dictionary.
     """
 
     def __init__(
@@ -87,50 +90,65 @@ class JitterOTFPerturber(PerturbImage):
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
-        :param sensor: pyBSM sensor object.
-        :param scenario: pyBSM scenario object
-        :param s_x: root-mean-squared jitter amplitudes in the x direction (rad).
-        :param s_y: root-mean-squared jitter amplitudes in the y direction (rad).
-        :param interp: a boolean determining whether load_database_atmosphere is used with or without
-                       interpolation
-        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
-            Should be one of the following options:
-                extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                median: median between extent and extant
-            Default value is extent
+        Args:
+            sensor:
+                pyBSM sensor object.
+            scenario:
+                pyBSM scenario object
+            s_x:
+                root-mean-squared jitter amplitudes in the x direction (rad).
+            s_y:
+                root-mean-squared jitter amplitudes in the y direction (rad).
+            interp:
+                a boolean determining whether load_database_atmosphere is used with or without interpolation.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
 
-        If both sensor and scenario parameters are not present, then default values
-        will be used for their parameters
+            If both sensor and scenario parameters are not present, then default values
+            will be used for their parameters
 
-        If neither s_x, s_y, sensor or scenario parameters are provided, the values
-        of s_x and s_y will be the default of 0.0 as that results in a nadir view.
+            If neither s_x, s_y, sensor or scenario parameters are provided, the values
+            of s_x and s_y will be the default of 0.0 as that results in a nadir view.
 
-        If sensor and scenario parameters are provided, but not s_x and s_y, the
-        values of s_x and s_y will come from the sensor and scenario objects.
+            If sensor and scenario parameters are provided, but not s_x and s_y, the
+            values of s_x and s_y will come from the sensor and scenario objects.
 
-        If s_x and s_y are ever provided by the user, those values will be used
-        in the otf caluclattion
+            If s_x and s_y are ever provided by the user, those values will be used
+            in the otf calculation.
 
-        :raises: ImportError if OpenCV or pyBSM is not found,
-        install via `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
+        Raises:
+            :raises ImportError: If OpenCV or pyBSM is not found, install via
+                `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
 
         super().__init__(box_alignment_mode=box_alignment_mode)
 
+        # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
                 atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            (
-                _,
-                _,
-                spectral_weights,
-            ) = radiance.reflectance_to_photoelectrons(atm, sensor.create_sensor(), sensor.int_time)  # type: ignore
+                atm = load_database_atmosphere_no_interp(  # type: ignore
+                    scenario.altitude,
+                    scenario.ground_range,
+                    scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
+                atm,
+                sensor.create_sensor(),
+                sensor.int_time,
+            )
 
+            # Use the spectral_weights variable for MTF wavelengths and weights
+            # Note: These values are used only if mtf_wavelengths and mtf_weights
+            # are missing in the input
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
 
@@ -144,14 +162,14 @@ class JitterOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.s_x = s_x if s_x is not None else 0.0
-            self.s_y = s_y if s_y is not None else 0.0
+            self.s_x: float = s_x if s_x is not None else 0.0
+            self.s_y: float = s_y if s_y is not None else 0.0
             # Assume visible spectrum of light
-            self.ifov = -1
-            self.slant_range = -1
-            self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+            self.ifov: float = -1
+            self.slant_range: float = -1
+            self.mtf_wavelengths: np.ndarray[np.float64, Any] = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            self.D = 0.003
+            self.D: float = 0.003
 
         self.sensor = sensor
         self.scenario = scenario
@@ -160,11 +178,29 @@ class JitterOTFPerturber(PerturbImage):
     @override
     def perturb(  # noqa: C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """:raises: ValueError if 'img_gsd' not present in additional_params"""
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        """Applies the jitter OTF-based perturbation to the provided image.
+
+        Args:
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                        pixels in an image, measured on the ground.
+
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                The perturbed image and bounding boxes scaled to perturbed image shape.
+
+        Raises:
+            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
+        """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
         # to resolve is (1/rad).
@@ -174,9 +210,9 @@ class JitterOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.jit_OTF = jitter_OTF(uu, vv, self.s_x, self.s_y)  # type: ignore
+        # Sample spacing for the optical transfer function
+        self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+        self.jit_OTF: np.ndarray[Any, Any] = jitter_OTF(uu, vv, self.s_x, self.s_y)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -187,6 +223,8 @@ class JitterOTFPerturber(PerturbImage):
                                   for this perturber",
                 )
             ref_gsd = additional_params["img_gsd"]
+
+            # Transform an optical transfer function into a point spread function
             psf = otf_to_psf(self.jit_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
@@ -207,11 +245,14 @@ class JitterOTFPerturber(PerturbImage):
                 sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
         else:
-            # Default is to set dxout param to same value as dxin
+            # Transform an optical transfer function into a point spread function
+            # Note: default is to set dxout param to same value as dxin to maintain the
+            # image size ratio.
             psf = otf_to_psf(self.jit_OTF, self.df, 1 / (self.jit_OTF.shape[0] * self.df))  # type: ignore
 
             sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
+        # Rescale bounding boxes to the shape of the perturbed image
         if boxes:
             scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
             return sim_img.astype(np.uint8), scaled_boxes
@@ -220,11 +261,10 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for JitterOTFPerturber instances.
+        """Retrieves the default configuration for JitterOTFPerturber instances.
 
         Returns:
-            dict[str, Any]: A dictionary with the default configuration values.
+            :return dict[str, Any]: A dictionary with the default configuration values.
         """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
@@ -232,16 +272,17 @@ class JitterOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
-        """
-        Instantiates a JitterOTFPerturber from a configuration dictionary.
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
+        """Instantiates a JitterOTFPerturber from a configuration dictionary.
 
         Args:
-            config_dict (dict): Configuration dictionary with initialization parameters.
-            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            C: An instance of JitterOTFPerturber configured according to `config_dict`.
+            :return JitterOTFPerturber: An instance of JitterOTFPerturber.
         """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
@@ -255,23 +296,20 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
 
         Returns:
-            bool: True if both pyBSM and OpenCV are available; False otherwise.
+            :return bool: True if both pyBSM and OpenCV are available; False otherwise.
         """
         return cv2_available and pybsm_available
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the JitterOTFPerturber instance.
+        """Returns the current configuration of the JitterOTFPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
-
         cfg = super().get_config()
 
         cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None

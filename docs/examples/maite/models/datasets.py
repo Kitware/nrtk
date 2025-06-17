@@ -1,4 +1,4 @@
-"""This module contains VisDroneDataset, which is a MAITE wrapper for VisDrone dataset"""
+"""This module contains VisDroneDataset, which is a MAITE wrapper for VisDrone dataset."""
 
 from __future__ import annotations
 
@@ -20,19 +20,19 @@ from torchvision.transforms.functional import pil_to_tensor
 
 @dataclass
 class ObjectDetectionData:
-    """Dataclass for object detection"""
+    """Dataclass for object detection."""
 
     boxes: pr.ArrayLike
     labels: pr.ArrayLike
     scores: pr.ArrayLike
 
     def __iter__(self) -> Iterator[ObjectDetectionData]:
-        """Return an iterator for object detection data"""
+        """Return an iterator for object detection data."""
         self.n = 0
         return iter(self)
 
     def __next__(self) -> tuple[NDArray[Any] | Tensor, NDArray[Any] | Tensor, NDArray[Any] | Tensor]:
-        """Get next object detection data"""
+        """Get next object detection data."""
         # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
         if self.n < len(self.boxes):  # pyright: ignore [reportArgumentType]
             self.n += 1
@@ -43,7 +43,7 @@ class ObjectDetectionData:
 
 @dataclass
 class VisdroneDatumMetadata:
-    """Dataclass for Visdrone metadata"""
+    """Dataclass for Visdrone metadata."""
 
     id: str
     image_info: dict  # user defined datum metadata
@@ -109,7 +109,7 @@ class VisDroneDataset:
     )
 
     def __init__(self, root: Path | str, subset_ids: Sequence[str] | None = None) -> None:
-        """Load and initialize VisDroneDataset"""
+        """Load and initialize VisDroneDataset."""
         self._root: Path = Path(root)
 
         # populate self._images and self._annotations
@@ -157,7 +157,7 @@ class VisDroneDataset:
 
     @staticmethod
     def _check_dirs(image_dir: Path, annotation_dir: Path) -> None:
-        """Validate existence of image_dir and annotation_dir"""
+        """Validate existence of image_dir and annotation_dir."""
         if not image_dir.is_dir():
             raise IndexError("Subdirectory `image` doesn't exist")
         if not annotation_dir.is_dir():
@@ -165,7 +165,7 @@ class VisDroneDataset:
 
     @staticmethod
     def _check_ids(keep_ids: set, all_image_ids: set, all_annotation_ids: set) -> None:
-        """Verify that all ids have image and annotation files"""
+        """Verify that all ids have image and annotation files."""
         for image_id in keep_ids:
             if image_id not in all_image_ids:
                 raise IndexError(f"No image file for id: {image_id}")
@@ -173,7 +173,7 @@ class VisDroneDataset:
                 raise IndexError(f"No annotation file for id: {image_id}")
 
     def __len__(self) -> int:
-        """Returns the number of images in the dataset"""
+        """Returns the number of images in the dataset."""
         return len(self._images)
 
     def set_augmentation(
@@ -197,7 +197,7 @@ class VisDroneDataset:
 
     # TODO: Remove pyright ignore when compute_image_metric notebook is updated  # noqa: FIX002
     def __getitem__(self, index: int | slice) -> VisDroneDataset | pr.SupportsObjectDetection:  # pyright: ignore [reportAttributeAccessIssue]
-        """Returns the dataset object at the given index or subset of dataset at the given slice"""
+        """Returns the dataset object at the given index or subset of dataset at the given slice."""
         if isinstance(index, int):
             image_path = self._images[index]
             image = Image.open(image_path)

@@ -1,7 +1,4 @@
-"""
-This module defines the `RandomCropPerturber` class, which implements a random cropping perturbation
-on input images. The class supports adjusting bounding boxes to match the cropped region,
-making it suitable for tasks involving labeled datasets.
+"""Defines RandomCropPerturber for random image crops with bounding box adjustment for labeled datasets.
 
 Classes:
     RandomCropPerturber: A perturbation class for randomly cropping images and modifying bounding boxes.
@@ -24,41 +21,61 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class RandomCropPerturber(PerturbImage):
-    """
-    RandomCropPerturber randomly crops an image and adjusts bounding boxes accordingly.
+    """RandomCropPerturber randomly crops an image and adjusts bounding boxes accordingly.
+
+    Attributes:
+        rng (numpy.random.Generator): Random number generator for deterministic behavior.
+
     Methods:
-    perturb: Applies a random crop to an input image and adjusts bounding boxes.
-    __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the RandomCropPerturber instance.
+        perturb:
+            Applies a random crop to an input image and adjusts bounding boxes.
+        __call__:
+            Calls the perturb method with the given input image.
+        get_config:
+            Returns the current configuration of the RandomCropPerturber instance.
     """
 
     def __init__(self, box_alignment_mode: str = "extent", seed: int | np.random.Generator | None = 1) -> None:
-        """
-        RandomCropPerturber applies a random cropping perturbation to an input image.
+        """RandomCropPerturber applies a random cropping perturbation to an input image.
+
         It ensures that bounding boxes are adjusted correctly to reflect the new cropped region.
 
-        Attributes:
-            rng (numpy.random.Generator): Random number generator for deterministic behavior.
+        Args:
+            rng:
+                Random number generator for deterministic behavior.
+            seed:
+                Seed for rng.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
-        self.rng = np.random.default_rng(seed)
+        self.rng: np.random.Generator = np.random.default_rng(seed)
 
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Randomly crops an image and adjusts bounding boxes.
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        """Randomly crops an image and adjusts bounding boxes.
 
-        :param image: Input image as a numpy array of shape (H, W, C).
-        :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+        Args:
+            image:
+                Input image as a numpy array of shape (H, W, C).
+            boxes:
+                List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            additional_params:
+                Dictionary containing:
+                    - "crop_size" (tuple[int, int]): Crop size as (crop_height, crop_width).
 
-        :param additional_params: Dictionary containing:
-            - "crop_size" (Tuple[int, int]): Crop size as (crop_height, crop_width).
-
-        :return: Cropped image as numpy array with the modified bounding boxes
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                Cropped image with the modified bounding boxes.
         """
         super().perturb(image=image)
 
@@ -103,11 +120,10 @@ class RandomCropPerturber(PerturbImage):
         return cropped_image, adjusted_bboxes
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _SPNoisePerturber instance.
+        """Returns the current configuration of the _SPNoisePerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         cfg = super().get_config()
         cfg["seed"] = self.rng

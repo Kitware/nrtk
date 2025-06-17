@@ -2,7 +2,6 @@ from collections.abc import Sequence
 
 import numpy as np
 import pytest
-from maite.protocols.image_classification import TargetType
 
 from nrtk.interop.maite.interop.image_classification.augmentation import (
     JATICClassificationAugmentation,
@@ -10,11 +9,18 @@ from nrtk.interop.maite.interop.image_classification.augmentation import (
 from nrtk.interop.maite.interop.image_classification.dataset import (
     JATICImageClassificationDataset,
 )
+from nrtk.interop.maite.interop.object_detection.utils import maite_available
+from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
+
+TargetType: type = object
+if maite_available:
+    from maite.protocols.image_classification import TargetType
 
 random = np.random.default_rng()
 
 
+@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestJATICImageClassificationDataset:
     @pytest.mark.parametrize(
         ("dataset", "expected_lbls_out"),
@@ -49,7 +55,7 @@ class TestJATICImageClassificationDataset:
     def test_dataset_adapter(
         self,
         dataset: JATICImageClassificationDataset,
-        expected_lbls_out: Sequence[TargetType],
+        expected_lbls_out: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
         """Test that the dataset adapter functions appropriately.
 
@@ -66,8 +72,8 @@ class TestJATICImageClassificationDataset:
             # Get expected image and metadata from "normal" perturber
             input_image, _ = perturber(np.transpose(np.asarray(img_in), (1, 2, 0)))
             expected_img_out = np.transpose(input_image, (2, 0, 1))
-            expected_md_out = dict(md_in)
-            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]
+            expected_md_out = dict(md_in)  # pyright: ignore [reportArgumentType, reportCallIssue]
+            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]  # pyright: ignore [reportArgumentType]
 
             # Apply augmentation via adapter
             img_out, lbl_out, md_out = augmentation(([img_in], [lbl_in], [md_in]))

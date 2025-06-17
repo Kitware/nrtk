@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED=1 \
     # do not ask for any interaction
     POETRY_NO_INTERACTION=1 \
     # this is where we copy the lock
-    PYSETUP_PATH="/opt/pysetup" 
+    PYSETUP_PATH="/opt/pysetup"
 
 # prepend poetry and venv to path
 ENV PATH="$POETRY_HOME/bin:$PATH"
@@ -55,5 +55,5 @@ CMD ["/root/input/dataset", "/root/output/", \
 # To run this docker container, use the following command:
 # `docker run -v /path/to/input:/root/input/:ro -v /path/to/output:/root/output/ nrtk-perturber`
 # This will mount the inputs to the correct locations the default args are used.
-# See https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume 
+# See https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 # for more info on mounting volumes

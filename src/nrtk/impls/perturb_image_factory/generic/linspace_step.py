@@ -1,7 +1,4 @@
-"""
-This module defines the `LinSpacePerturbImageFactory` class, an implementation
-of the `PerturbImageFactory` interface that generates `PerturbImage` instances
-with a parameter (`theta_key`) varying over a specified range, using linearly spaced values.
+"""Defines LinSpacePerturbImageFactory to create PerturbImage instances with parameters linearly spaced over a range.
 
 Classes:
     LinSpacePerturbImageFactory: A factory class for creating `PerturbImage` instances
@@ -49,6 +46,7 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
         start: float,
         stop: float,
         step: int = 1,
+        endpoint: bool = True,
     ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
@@ -73,13 +71,13 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
         self.start = start
         self.stop = stop
         self.step = step
+        self.endpoint = endpoint
 
     @property
     @override
     def thetas(self) -> Sequence[float]:
-        if self.start == self.stop:
-            return []
-        return np.linspace(self.start, self.stop, self.step, endpoint=False).tolist()
+        """Use linspace to generate the desired range of values."""
+        return np.linspace(self.start, self.stop, self.step, endpoint=self.endpoint).tolist()
 
     @override
     def get_config(self) -> dict[str, Any]:
@@ -87,4 +85,5 @@ class LinSpacePerturbImageFactory(PerturbImageFactory):
         cfg["start"] = self.start
         cfg["stop"] = self.stop
         cfg["step"] = self.step
+        cfg["endpoint"] = self.endpoint
         return cfg

@@ -1,8 +1,4 @@
-"""
-This module defines the `GenerateClassifierBlackboxResponse` interface, which provides
-functionality for generating item-response curves and scores for image classification tasks
-in a blackbox context. The interface allows images to be perturbed and then classified,
-with scores computed based on the classification results.
+"""Defines GenerateClassifierBlackboxResponse for response curves and scores in blackbox image classification tasks.
 
 Classes:
     GenerateClassifierBlackboxResponse: An interface for generating item-response curves
@@ -70,7 +66,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
     def __getitem__(
         self,
         idx: int,
-    ) -> tuple[np.ndarray, CLASSIFICATION_DICT_T, dict[str, Any]]:
+    ) -> tuple[np.ndarray[Any, Any], CLASSIFICATION_DICT_T, dict[str, Any]]:
         """Get the ``idx``th image and ground_truth pair."""
 
     def generate(  # noqa C901:
@@ -89,8 +85,8 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         :param img_batch_size: The number of images to predict and score upon at once.
         :param verbose: Increases the verbosity of progress updates.
 
-        :return: Item-response curve
-        :return: Scores for each input stimuli
+        Returns:
+            Item-response curve and scores for each input stimuli
         """
         curve: list[tuple[dict[str, Any], float]] = list()
         full: list[Sequence[float]] = list()

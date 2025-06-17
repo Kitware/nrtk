@@ -1,8 +1,4 @@
-"""
-This module defines the `DetectorOTFPerturber` class, which applies image perturbations
-based on the Optical Transfer Function (OTF) of a detector, using configurations for
-sensor and scenario. This class can simulate the effects of detector and environmental
-parameters on images.
+"""Implements DetectorOTFPerturber which applies detector perturbations using sensor and scenario settings.
 
 Classes:
     DetectorOTFPerturber: Applies OTF-based perturbations to images using specified
@@ -34,9 +30,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 import numpy as np
 
 try:
@@ -44,9 +40,9 @@ try:
     from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
     from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
 
-    pybsm_available = True
+    pybsm_available: bool = True
 except ImportError:  # pragma: no cover
-    pybsm_available = False
+    pybsm_available: bool = False
 
 from smqtk_core.configuration import (
     from_config_dict,
@@ -62,20 +58,27 @@ from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 
 class DetectorOTFPerturber(PerturbImage):
-    """
-    Implements OTF-based image perturbation using detector specifications and atmospheric conditions.
+    """Implements OTF-based image perturbation using detector specifications and atmospheric conditions.
 
     The `DetectorOTFPerturber` class uses sensor and scenario configurations to apply realistic
     perturbations to images. This includes adjusting for detector width, focal length, and atmospheric
     conditions using OpenCV and pyBSM functionalities.
 
+    See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
+
     Attributes:
-        sensor (PybsmSensor | None): The sensor configuration used to define perturbation parameters.
-        scenario (PybsmScenario | None): Scenario configuration providing environmental context.
-        w_x (float | None): Detector width in the x direction (meters).
-        w_y (float | None): Detector width in the y direction (meters).
-        f (float | None): Focal length of the detector (meters).
-        interp (bool): Indicates whether atmospheric database should use interpolation.
+        sensor (PybsmSensor | None):
+            The sensor configuration used to define perturbation parameters.
+        scenario (PybsmScenario | None):
+            Scenario configuration providing environmental context.
+        w_x (float | None):
+            Detector width in the x direction (meters).
+        w_y (float | None):
+            Detector width in the y direction (meters).
+        f (float | None):
+            Focal length of the detector (meters).
+        interp (bool):
+            Indicates whether atmospheric database should use interpolation.
     """
 
     def __init__(
@@ -90,51 +93,67 @@ class DetectorOTFPerturber(PerturbImage):
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
-        :param sensor: pyBSM sensor object.
-        :param scenario: pyBSM scenario object.
-        :param w_x: Detector width in the x direction (m).
-        :param w_y: Detector width in the y direction (m).
-        :param f: Focal length (m).
-        :param interp: a boolean determining whether load_database_atmosphere is used with or without
-                       interpolation
-        :param box_alignment_mode: Mode for how to handle how bounding boxes change.
-            Should be one of the following options:
-                extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                median: median between extent and extant
-            Default value is extent
+        Args:
+            sensor:
+                pyBSM sensor object.
+            scenario:
+                pyBSM scenario object.
+            w_x:
+                Detector width in the x direction (m).
+            w_y:
+                Detector width in the y direction (m).
+            f:
+                Focal length (m).
+            interp:
+                a boolean determining whether load_database_atmosphere is used with or without interpolation.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
 
-        If a value is provided for w_x, w_y and/or f that value(s) will be used in
-        the otf calculation.
+            If a value is provided for w_x, w_y and/or f that value(s) will be used in
+            the otf calculation.
 
-        If both sensor and scenario parameters are provided, but not w_x, w_y and/or f, the
-        value(s) of w_x, w_y and/or f will come from the sensor and scenario objects.
+            If both sensor and scenario parameters are provided, but not w_x, w_y and/or f, the
+            value(s) of w_x, w_y and/or f will come from the sensor and scenario objects.
 
-        If either sensor or scenario parameters are absent, default values
-        will be used for both sensor and scenario parameters (except for w_x/w_y/f, as defined
-        below).
+            If either sensor or scenario parameters are absent, default values
+            will be used for both sensor and scenario parameters (except for w_x/w_y/f, as defined
+            below).
 
-        If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
-        the absent value(s) will default to 4um for w_x/w_y and 50mm for f
+            If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
+            the absent value(s) will default to 4um for w_x/w_y and 50mm for f.
 
-        :raises: ImportError if OpenCV or pyBSM is not found,
-        install via `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
+        Raises:
+            :raises ImportError: If OpenCV or pyBSM is not found, install via
+                `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
+
+        # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
                 atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
             else:
-                atm = load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-
+                atm = load_database_atmosphere_no_interp(  # type: ignore
+                    scenario.altitude,
+                    scenario.ground_range,
+                    scenario.ihaze,
+                )
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
                 atm,
                 sensor.create_sensor(),
                 sensor.int_time,
             )
 
+            # Use the spectral_weights variable for MTF wavelengths and weights
+            # Note: These values are used only if mtf_wavelengths and mtf_weights
+            # are missing in the input
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
 
@@ -150,16 +169,16 @@ class DetectorOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / self.f
         else:
-            self.w_x = w_x if w_x is not None else 4e-6
-            self.w_y = w_y if w_y is not None else 4e-6
-            self.f = f if f is not None else 50e-3
+            self.w_x: float = w_x if w_x is not None else 4e-6
+            self.w_y: float = w_y if w_y is not None else 4e-6
+            self.f: float = f if f is not None else 50e-3
 
             # Assume visible spectrum of light
-            self.ifov = -1
-            self.slant_range = -1
-            self.mtf_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
+            self.ifov: float = -1
+            self.slant_range: float = -1
+            self.mtf_wavelengths: np.ndarray[np.float64, Any] = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             # Default value for lens diameter
-            self.D = 0.003
+            self.D: float = 0.003
 
         self.sensor = sensor
         self.scenario = scenario
@@ -168,26 +187,28 @@ class DetectorOTFPerturber(PerturbImage):
     @override
     def perturb(  # noqa: C901
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Applies the OTF-based perturbation to the provided image.
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        """Applies the detector OTF-based perturbation to the provided image.
 
         Args:
-            image (np.ndarray): The image to be perturbed.
-            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]], optional): bounding boxes
-                for detections in input image
-            additional_params (dict[str, Any], optional): Additional parameters, including 'img_gsd'.
+            image:
+                The image to be perturbed.
+            boxes:
+                Bounding boxes for detections in input image.
+            additional_params:
+                Dictionary containing:
+                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
+                        pixels in an image, measured on the ground.
 
         Returns:
-            np.ndarray: The perturbed image.
-            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: Bounding boxes scaled to perturbed image
-                shape.
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                The perturbed image and bounding boxes scaled to perturbed image shape.
 
-        :raises:
-            ValueError: If 'img_gsd' is not present in `additional_params`.
+        Raises:
+            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
         """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -198,9 +219,9 @@ class DetectorOTFPerturber(PerturbImage):
 
         # meshgrid of spatial frequencies out to the optics cutoff
         uu, vv = np.meshgrid(u_rng, v_rng)
-
-        self.df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.det_OTF = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)  # type: ignore
+        # Sample spacing for the optical transfer function
+        self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+        self.det_OTF: np.ndarray[Any, Any] = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)  # type: ignore
 
         if additional_params is None:
             additional_params = dict()
@@ -210,6 +231,8 @@ class DetectorOTFPerturber(PerturbImage):
                 raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
             ref_gsd = additional_params["img_gsd"]
+
+            # Transform an optical transfer function into a point spread function
             psf = otf_to_psf(self.det_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
 
             # filter the image
@@ -229,11 +252,14 @@ class DetectorOTFPerturber(PerturbImage):
             else:
                 sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
         else:
-            # Default is to set dxout param to same value as dxin
+            # Transform an optical transfer function into a point spread function
+            # Note: default is to set dxout param to same value as dxin to maintain the
+            # image size ratio.
             psf = otf_to_psf(self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df))  # type: ignore
 
             sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
 
+        # Rescale bounding boxes to the shape of the perturbed image
         if boxes:
             scaled_boxes = self._rescale_boxes(boxes, image.shape, sim_img.shape)
             return sim_img.astype(np.uint8), scaled_boxes
@@ -242,11 +268,10 @@ class DetectorOTFPerturber(PerturbImage):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """
-        Provides the default configuration for DetectorOTFPerturber instances.
+        """Retrieves the default configuration for DetectorOTFPerturber instances.
 
         Returns:
-            dict[str, Any]: A dictionary with the default configuration values.
+            :return dict[str, Any]: A dictionary with the default configuration values.
         """
         cfg = super().get_default_config()
         cfg["sensor"] = make_default_config([PybsmSensor])
@@ -254,16 +279,17 @@ class DetectorOTFPerturber(PerturbImage):
         return cfg
 
     @classmethod
-    def from_config(cls, config_dict: dict, merge_default: bool = True) -> Self:
-        """
-        Instantiates a DetectorOTFPerturber from a configuration dictionary.
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
+        """Instantiates a DetectorOTFPerturber from a configuration dictionary.
 
         Args:
-            config_dict (dict): Configuration dictionary with initialization parameters.
-            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+            config_dict:
+                Configuration dictionary with initialization parameters.
+            merge_default:
+                Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            C: An instance of DetectorOTFPerturber configured according to `config_dict`.
+            :return DetectorOTFPerturber: An instance of DetectorOTFPerturber.
         """
         config_dict = dict(config_dict)
         sensor = config_dict.get("sensor", None)
@@ -277,13 +303,11 @@ class DetectorOTFPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the DetectorOTFPerturber instance.
+        """Returns the current configuration of the DetectorOTFPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
-
         cfg = super().get_config()
 
         cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
@@ -297,10 +321,9 @@ class DetectorOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
 
         Returns:
-            bool: True if both pyBSM and OpenCV are available; False otherwise.
+            :return bool: True if both pyBSM and OpenCV are available; False otherwise.
         """
         return cv2_available and pybsm_available

@@ -1,8 +1,4 @@
-"""
-This module defines the `ScoreClassifications` interface, which provides an abstract
-method for scoring classification outputs based on a chosen metric. This interface is
-intended for implementations that compute metric scores by comparing actual and predicted
-classification results.
+"""Defines ScoreClassifications for scoring predictions by comparing actual vs predicted labels using a chosen metric.
 
 Classes:
     ScoreClassifications: Interface for scoring classification outputs against ground truth
@@ -56,7 +52,7 @@ class ScoreClassifications(Plugfigurable):
             Output classifications from a classifier with class-wise confidence
             scores.
 
-        :return:
+        Returns:
             Metric score values as a float-type sequence with the length matching
             the number of samples in the ground truth input.
         """

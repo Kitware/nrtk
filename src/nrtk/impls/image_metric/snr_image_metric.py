@@ -1,8 +1,4 @@
-"""
-This module provides an implementation of the `ImageMetric` interface for calculating the
-Signal-to-Noise Ratio (SNR) of an image. The main class, `SNRImageMetric`, computes the SNR
-for a single input image, with options to control the axis and degrees of freedom used in the
-calculation.
+"""Defines SNRImageMetric, an ImageMetric implementation that computes signal-to-noise ratio for a single image.
 
 Classes:
     SNRImageMetric: Calculates the Signal-to-Noise Ratio (SNR) of an image using specified
@@ -48,8 +44,8 @@ class SNRImageMetric(ImageMetric):
     @override
     def compute(  # noqa: C901
         self,
-        img_1: np.ndarray,
-        img_2: np.ndarray | None = None,
+        img_1: np.ndarray[Any, Any],
+        img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given one image, compute the Signal to Noise ratio.
@@ -64,7 +60,8 @@ class SNRImageMetric(ImageMetric):
         - ddof: degrees of freedom for the standard deviation calculation. Default is 0. Max value is
         num_elements, the number of elements used in calculation. Must be non-negative.
 
-        :return: Returns the signal to noise ratio for the input image.
+        Returns:
+            The signal to noise ratio for the input image.
         """
         if img_1.ndim != 3:
             raise ValueError("Incorrect number of dimensions on input image! Expected ndim == 3.")

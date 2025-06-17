@@ -27,7 +27,7 @@ class TestWaterDropletPerturberUtils:
         self,
         snapshot: SnapshotAssertion,
     ) -> None:
-        """Regression testing for the `ccw_sort` util function"""
+        """Regression testing for the `ccw_sort` util function."""
         x_in = np.linspace(0, 100, 50)
         x_out, y_out = np.meshgrid(x_in, x_in)
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
@@ -45,7 +45,7 @@ class TestWaterDropletPerturberUtils:
         rad: float,
         edgy: float,
     ) -> None:
-        """Regression testing for the `get_bezier_curve` util function"""
+        """Regression testing for the `get_bezier_curve` util function."""
         x_in = np.linspace(0, 100, 50)
         x_out, y_out = np.meshgrid(x_in, x_in)
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
@@ -72,7 +72,7 @@ class TestWaterDropletPerturberUtils:
         min_dst: float | None,
         recursive: int,
     ) -> None:
-        """Regression testing for the `get_random_points_within_min_dist` util function"""
+        """Regression testing for the `get_random_points_within_min_dist` util function."""
         rand_points = get_random_points_within_min_dist(  # pyright: ignore [reportPossiblyUnboundVariable]
             rng=rng,
             n=n,

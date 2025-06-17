@@ -1,6 +1,4 @@
-"""
-This module defines the `AlbumentationsPerturber` class, which runs any BasicTransform
-from the Albumentations module on input images.
+"""Defines AlbumentationsPerturber to apply Albumentations BasicTransforms to input images.
 
 Classes:
     AlbumentationsPerturber: A perturbation class for applying perturbations from Albumentations
@@ -24,9 +22,9 @@ try:
     import albumentations as A  # noqa N812
     from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations
 
-    albumentations_available = True
+    albumentations_available: bool = True
 except ImportError:  # pragma: no cover
-    albumentations_available = False
+    albumentations_available: bool = False
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -36,12 +34,23 @@ from nrtk.utils._exceptions import AlbumentationsImportError
 
 
 class AlbumentationsPerturber(PerturbImage):
-    """
-    AlbumentationsPerturber applies a BasicTransform from Albumentations
+    """AlbumentationsPerturber applies a BasicTransform from Albumentations.
+
+    Attributes:
+        perturber (string):
+            The name of the BasicTransform perturber to apply.
+        parameters (dict):
+            Keyword arguments that should be passed to the given perturber.
+        seed (int):
+            An optional seed for reproducible results.
+
     Methods:
-    perturb: Applies the specified to an input image.
-    __call__: Calls the perturb method with the given input image.
-    get_config: Returns the current configuration of the AlbumentationsPerturber instance.
+        perturb:
+            Applies the specified to an input image.
+        __call__:
+            Calls the perturb method with the given input image.
+        get_config:
+            Returns the current configuration of the AlbumentationsPerturber instance.
     """
 
     def __init__(
@@ -51,13 +60,26 @@ class AlbumentationsPerturber(PerturbImage):
         box_alignment_mode: str = "extent",
         seed: int | None = None,
     ) -> None:
-        """
-        AlbumentationsPerturber applies a BasicTransform from Albumentations
+        """AlbumentationsPerturber applies a BasicTransform from Albumentations.
 
-        Attributes:
-            perturber (string): The name of the BasicTransform perturber to apply
-            parameters (dict): Keyword arguments that should be passed to the given perturber
-            seed (int): An optional seed for reproducible results
+        Args:
+            perturber:
+                The name of the BasicTransform perturber to apply.
+            parameters:
+                Keyword arguments that should be passed to the given perturber.
+            seed (int):
+                An optional seed for reproducible results.
+            box_alignment_mode:
+                Mode for how to handle how bounding boxes change.
+                Should be one of the following options:
+                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
+                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
+                    median: median between extent and extant
+                Default value is extent
+
+        Raises:
+            :raises ValueError: Given perturber is not available in Albumentations.
+            :raises ValueError: Given perturber does not inherit BasicTransform.
         """
         if not self.is_usable():
             raise AlbumentationsImportError
@@ -74,7 +96,7 @@ class AlbumentationsPerturber(PerturbImage):
         if not issubclass(transformer, A.BasicTransform):  # pyright: ignore [reportPossiblyUnboundVariable]
             raise ValueError(f'Given perturber "{self.perturber}" does not inherit "BasicTransform"')
 
-        self.transform = A.Compose(  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.transform: A.Compose = A.Compose(  # pyright: ignore [reportPossiblyUnboundVariable]
             [transformer(**self.parameters) if self.parameters else transformer()],
         )
 
@@ -83,8 +105,8 @@ class AlbumentationsPerturber(PerturbImage):
             self.transform.set_random_seed(seed)
 
     @staticmethod
-    def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray) -> list[int]:
-        """Convert AxisAlignedBoundingBox to albumentations format bbox"""
+    def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
+        """Convert AxisAlignedBoundingBox to albumentations format bbox."""
         flat = np.array([[box.min_vertex[0], box.min_vertex[1], box.max_vertex[0], box.max_vertex[1]]])
         return convert_bboxes_to_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
             flat,
@@ -93,8 +115,8 @@ class AlbumentationsPerturber(PerturbImage):
         )[0]
 
     @staticmethod
-    def _bbox_to_aabb(box: list[int], image: np.ndarray) -> AxisAlignedBoundingBox:
-        """Convert albumentations format bbox to AxisAlignedBoundingBox"""
+    def _bbox_to_aabb(box: list[int], image: np.ndarray[Any, Any]) -> AxisAlignedBoundingBox:
+        """Convert albumentations format bbox to AxisAlignedBoundingBox."""
         flat = np.array([[box[0], box[1], box[2], box[3]]])
         as_aabb = convert_bboxes_from_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
             flat,
@@ -106,18 +128,23 @@ class AlbumentationsPerturber(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,  # ARG002
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """
-        Apply a BasicTransform from Albumentations to an image
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        """Apply a BasicTransform from Albumentations to an image.
 
-        :param image: Input image as a numpy array of shape (H, W, C).
-        :param boxes: List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-        :return: Tuple containing:
-            Image with transform applied as numpy array
-            Bounding boxes with their coordinates adjusted by the transform
+        Args:
+            image:
+                Input image as a numpy array of shape (H, W, C).
+            boxes:
+                List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            additional_params:
+                Additional parameters for perturbation.
+
+        Returns:
+            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+                Image with transform applied and bounding boxes with their coordinates adjusted by the transform.
         """
         # Create bboxes and labels in a format usable by Albumentations
         bboxes = list()
@@ -144,11 +171,10 @@ class AlbumentationsPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the AlbumentationsPerturber instance.
+        """Returns the current configuration of the AlbumentationsPerturber instance.
 
         Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
+            :return dict[str, Any]: Configuration dictionary with current settings.
         """
         cfg = super().get_config()
         cfg["perturber"] = self.perturber
@@ -159,11 +185,10 @@ class AlbumentationsPerturber(PerturbImage):
     @classmethod
     @override
     def is_usable(cls) -> bool:
-        """
-        Checks if the required albumentations module is available.
+        """Checks if the required albumentations module is available.
 
         Returns:
-            bool: True if albumentations is installed; False otherwise.
+            :return bool: True if albumentations is installed; False otherwise.
         """
         # Requires opencv to be installed
         return albumentations_available

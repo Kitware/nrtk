@@ -1,8 +1,4 @@
-"""
-This module defines the `ImageMetric` abstract base class, an interface for computing
-metrics between one or two images. Implementations of `ImageMetric` should define the
-specific metric computation in the `compute` method, which can be called directly or
-via the `__call__` method.
+"""Defines ImageMetric, an abstract class for computing metrics between images via a compute or __call__ method.
 
 Classes:
     ImageMetric: An interface outlining the computation of a given metric for image comparison or analysis.
@@ -36,8 +32,8 @@ class ImageMetric(Plugfigurable):
     @abc.abstractmethod
     def compute(
         self,
-        img_1: np.ndarray,
-        img_2: np.ndarray | None = None,
+        img_1: np.ndarray[Any, Any],
+        img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given up to two images, and additional parameters, return some given metric about the image(s).
@@ -46,14 +42,15 @@ class ImageMetric(Plugfigurable):
         :param img_2: An optional input image in the shape (height, width, channels)
         :param additional_params: A dictionary containing implementation-specific input param-values pairs.
 
-        :return: Returns a single scalar value representing an implementation's computed metric. Implementations
-                 should impart no side effects upon either input image or the additional parameters.
+        Returns:
+            Returns a single scalar value representing an implementation's computed metric. Implementations
+            should impart no side effects upon either input image or the additional parameters.
         """
 
     def __call__(
         self,
-        img_1: np.ndarray,
-        img_2: np.ndarray | None = None,
+        img_1: np.ndarray[Any, Any],
+        img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Calls compute() with the given input image(s) and additional parameters.
@@ -62,18 +59,18 @@ class ImageMetric(Plugfigurable):
         :param img_2: An optional input image in the shape (height, width, channels)
         :param additional_params: A dictionary containing implementation-specific input param-values pairs.
 
-        :return: Returns a single scalar value representing an implementation's computed metric. Implementations
-                 should impart no side effects upon either input image or the additional parameters.
+        Returns:
+            A single scalar value representing an implementation's computed metric. Implementations
+            should impart no side effects upon either input image or the additional parameters.
         """
         return self.compute(img_1, img_2, additional_params)
 
     @property
     def name(self) -> str:
-        """
-        Returns the name of the ImageMetric instance.
+        """Returns the name of the ImageMetric instance.
 
-        This property provides a convenient way to retrieve the name of the
-        class instance, which can be useful for logging, debugging, or display purposes.
+        This property retrieves the name of the class instance, which can
+        be useful for logging, debugging, or display purposes.
 
         Returns:
             str: The name of the ImageMetric instance.

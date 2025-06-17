@@ -1,8 +1,4 @@
-"""
-This module provides classes for applying different types of blurring to an image,
-implementing the `PerturbImage` interface. Blurring methods include average, Gaussian,
-and median blurring, each with customizable kernel sizes for controlling the level of
-blur effect.
+"""Implements PerturbImage blurs: average, Gaussian, and median, with customizable kernel sizes.
 
 Classes:
     AverageBlurPerturber: Applies average blurring to an image.
@@ -45,9 +41,9 @@ try:
     # Multiple type ignores added for pyright's handling of guarded imports
     import cv2
 
-    cv2_available = True
+    cv2_available: bool = True
 except ImportError:  # pragma: no cover
-    cv2_available = False
+    cv2_available: bool = False
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
@@ -67,10 +63,10 @@ class _PerturbImage(PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying average blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
@@ -81,8 +77,7 @@ class _PerturbImage(PerturbImage):
         return _image, _boxes
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the MedianBlurPerturber instance.
+        """Returns the current configuration of the MedianBlurPerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -93,8 +88,7 @@ class _PerturbImage(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required cv2 module is available.
+        """Checks if the required cv2 module is available.
 
         Returns:
             bool: True if opencv is installed; False otherwise.
@@ -116,10 +110,10 @@ class AverageBlurPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying average blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
@@ -139,10 +133,10 @@ class GaussianBlurPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying Gaussian blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
@@ -162,10 +156,10 @@ class MedianBlurPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying Gaussian blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 

@@ -1,7 +1,4 @@
-"""
-This module defines the `SimpleGenericGenerator` class, an implementation of the
-`GenerateObjectDetectorBlackboxResponse` interface for generating item-response curves
-based on a set of images and ground-truth bounding box annotations.
+"""Defines SimpleGenericGenerator to generate item-response curves from images and ground-truth boxes.
 
 Classes:
     SimpleGenericGenerator: An example implementation that generates object detection
@@ -39,7 +36,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
     def __init__(
         self,
-        images: Sequence[np.ndarray],
+        images: Sequence[np.ndarray[Any, Any]],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> None:
         """Generate response curve for given images and ground_truth.
@@ -58,7 +55,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @override
     def __len__(self) -> int:
-        """:return: Number of image/ground_truth pairs this generator holds."""
+        """Number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
     @override
@@ -66,7 +63,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
         self,
         idx: int,
     ) -> tuple[
-        np.ndarray,
+        np.ndarray[Any, Any],
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:
@@ -76,15 +73,14 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
         :raises IndexError: The given index does not exist.
 
-        :return: Data pair corresponding to the given index.
+        Data pair corresponding to the given index.
         """
         if idx < 0 or idx >= len(self):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {}
 
     def get_config(self) -> dict[str, Any]:
-        """
-        Generates a serializable configuration for the instance.
+        """Generates a serializable configuration for the instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary containing instance parameters.

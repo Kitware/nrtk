@@ -26,7 +26,7 @@ classifiers = [
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
-version = "0.22.0"
+version = "0.23.0"
 description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 
 [tool.poetry.dependencies]
@@ -46,7 +46,7 @@ smqtk-detection = ">=0.22.0"
 smqtk-image-io = ">=0.17.1"
 tqdm = ">=4.64"
 pycocotools = ">=2.0.6"
-setuptools = ">=65.6.1"
+setuptools = ">=78.1.1"
 typing-extensions = ">=4.5.0"
 
 pybsm = {version = ">=0.10.2", optional = true}
@@ -117,7 +117,7 @@ optional = true
 
 [tool.poetry.group.linting.dependencies]
 pre-commit = ">=2.20"
-ruff = "^0.5.6"
+ruff = "^0.11.0"
 types-setuptools = ">=65.6.0.1"
 sphinx-lint = ">=1.0.0"
 pyright = {version=">=1.1.320",extras=["nodejs"]}
@@ -201,6 +201,7 @@ addopts = [
     "--cov=./tests",                    # Also cover our tests for dead spots
     "--cov-report=term",                # Coverage report to terminal
     "--cov-report=xml:coverage.xml",    # for external tool reporting
+    "--snapshot-warn-unused",           # Prevent test failure when skipping tests
 ]
 testpaths = [
     "tests",
@@ -233,20 +234,16 @@ extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = [
-    "F", "E", "W", "C90", "I", "N", "D1", "D200", "D201", "D211", "D403", "D419", "UP",
+    "F", "E", "W", "C90", "I", "N", "D", "UP",
     "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PYI", "PT", "Q",
     "RSE", "RET", "SLF", "SIM", "TID252", "ARG", "FIX", "PD", "FLY", "NPY", "RUF027",
-    "RUF100", "PERF"
+    "RUF100", "PERF", "UP045", "RUF013"
 ]
 preview = true  # needed for RUF027
 explicit-preview-rules = true
 
-ignore = [
-  "ANN101",
-  "ANN102",
-  # -- Ignore these rules, since they contradict our coding standards
-  "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
-]
+# From program suggested config
+ignore = ["ANN101","ANN102","C408","C416"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

@@ -1,7 +1,4 @@
-"""
-This module provides a set of classes for adding different types of noise to images, implementing
-the `PerturbImage` interface. The perturbation types include salt, pepper, salt-and-pepper,
-Gaussian, and speckle noise, allowing for a wide range of image noise simulations.
+"""Defines noise perturbers implementing PerturbImage, including salt, pepper, Gaussian, and speckle noise types.
 
 Classes:
     _SKImageNoisePerturber: Base class for noise perturbation, using `skimage.util.random_noise`.
@@ -41,9 +38,9 @@ import numpy as np
 try:
     import skimage.util  # type:ignore
 
-    skimage_available = True
+    skimage_available: bool = True
 except ImportError:  # pragma: no cover
-    skimage_available = False
+    skimage_available: bool = False
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
@@ -67,7 +64,8 @@ class _SKImageNoisePerturber(PerturbImage):
         :param kwargs: Keyword arguments for random_noise call. ``rng`` will be
             specified separately.
 
-        :return: Peturbed image as numpy array, including matching shape and dtype.
+        Returns:
+            Peturbed image as numpy array, including matching shape and dtype.
         """
         # Determine if conversion back to original dtype is possible
         dtype_str = str(image.dtype)
@@ -95,8 +93,7 @@ class _SKImageNoisePerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _SKImageNoisePerturber instance.
+        """Returns the current configuration of the _SKImageNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -107,8 +104,7 @@ class _SKImageNoisePerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """
-        Checks if the required skimage module is available.
+        """Checks if the required skimage module is available.
 
         Returns:
             bool: True if scikit-image is installed; False otherwise.
@@ -140,8 +136,7 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _SPNoisePerturber instance.
+        """Returns the current configuration of the _SPNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -157,10 +152,10 @@ class SaltNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with salt noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="salt", amount=self.amount), boxes
@@ -172,10 +167,10 @@ class PepperNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with pepper noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="pepper", amount=self.amount), boxes
@@ -210,10 +205,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with S&P noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
@@ -226,8 +221,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the SaltAndPepperNoisePerturber instance.
+        """Returns the current configuration of the SaltAndPepperNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -263,8 +257,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """
-        Returns the current configuration of the _GSNoisePerturber instance.
+        """Returns the current configuration of the _GSNoisePerturber instance.
 
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
@@ -281,10 +274,10 @@ class GaussianNoisePerturber(_GSNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with Gaussian noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean), boxes
@@ -296,10 +289,10 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with multiplicative noise."""
         super().perturb(image=image, boxes=boxes, additional_params=additional_params)
         return self._perturb(image, mode="speckle", var=self.var, mean=self.mean), boxes

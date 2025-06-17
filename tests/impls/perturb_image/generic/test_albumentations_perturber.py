@@ -122,7 +122,7 @@ class TestAlbumentationsPerturber:
         perturber: str,
         parameters: dict[str, Any],
     ) -> None:
-        """Run perturber twice with consistent seed to ensure repeatable results"""
+        """Run perturber twice with consistent seed to ensure repeatable results."""
         image = np.ones((3, 3, 3)).astype(np.uint8)
 
         # Test perturb interface directly
