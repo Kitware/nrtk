@@ -1,5 +1,5 @@
 # Roadmap
 
-_Last updated: 4/18/2025_
+_Last updated: 6/19/2025_
 
 ![roadmap](./docs/figures/nrtk-road-map.png)
