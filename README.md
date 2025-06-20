@@ -26,7 +26,7 @@ workflows, through interoperability with
 other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use
 NRTK to perturb MAITE-wrapped datasets or evaluate MAITE-wrapped models should
 utilize this module. Explore our
-[T&E guides](https://nrtk.readthedocs.io/en/latest/nrtk_jatic/testing_and_eval_guides.html)
+[T&E guides](https://nrtk.readthedocs.io/en/latest/testing_and_evaluation_notebooks.html)
 which demonstrate how `nrtk` perturbations and `maite` can be applied to assess
 operational risks.
 
