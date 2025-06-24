@@ -170,6 +170,7 @@ Pillow = ">=10.3.0" # CVE-2024-28219
 "impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
 "impls.perturb_image.generic.haze_perturber" = "nrtk.impls.perturb_image.generic.haze_perturber"
 "impls.perturb_image.generic.water_droplet_perturber" = "nrtk.impls.perturb_image.generic.water_droplet_perturber"
+"impls.perturb_image.generic.radial_distortion_perturber" = "nrtk.impls.perturb_image.generic.radial_distortion_perturber"
 "impls.perturb_image.generic.PIL.enhance" = "nrtk.impls.perturb_image.generic.PIL.enhance"
 "impls.perturb_image.generic.cv2.blur" = "nrtk.impls.perturb_image.generic.cv2.blur"
 "impls.perturb_image.generic.skimage.random_noise" = "nrtk.impls.perturb_image.generic.skimage.random_noise"
