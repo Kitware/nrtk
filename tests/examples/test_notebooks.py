@@ -28,6 +28,7 @@ class TestPyrightNotebook:
             ("docs/examples/maite/nrtk_translation_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_turbulence_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_water_droplet_perturber_demo.ipynb", 0),
+            ("docs/examples/maite/nrtk_radial_distortion_perturber_demo.ipynb", 0),
             ("docs/examples/pybsm/pybsm_test.ipynb", 0),
             ("docs/examples/coco_scorer.ipynb", 0),
             ("docs/examples/nrtk_tutorial.ipynb", 0),
