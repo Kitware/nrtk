@@ -1,4 +1,5 @@
-"""Configuration file for the Sphinx documentation builder.
+"""
+Configuration file for the Sphinx documentation builder.
 
 For the full list of built-in configuration values, see the documentation:
 https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -35,7 +36,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.autosummary",
-    "sphinx.ext.imgconverter",
     "sphinx-prompt",
     "sphinx_copybutton",
     "sphinx_click",
@@ -61,8 +61,5 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "sphinx_rtd_theme"
 html_static_path: list[str] = list()  # ['_static']
 
-# -- MyST-NB settings---------------------------------------------------------
-nb_execution_mode = "off"
-
-# -- LaTeX engine ------------------------------------------------------------
-latex_engine = "lualatex"
+# ---MyST-NB settings---------------------------------------------------------
+jupyter_execute_notebooks = "off"

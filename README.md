@@ -62,7 +62,7 @@ assess model robustness against natural perturbations.
 To install the current version via `pip`:
 
 ```bash
-pip install nrtk
+pip install nrtk[<extra1>,<extra2>,...]
 ```
 
 To install the current version via `conda-forge`:
@@ -71,37 +71,8 @@ To install the current version via `conda-forge`:
 conda install -c conda-forge nrtk
 ```
 
-This installs core functionality, but many specific perturbers require
-additional dependencies.
-
-### Installation with Optional Features (Extras)
-
-NRTK uses optional "extras" to avoid installing unncessary dependencies. You can
-install extras with square brackets:
-
-```bash
-# Install with extras (note: no spaces after commas)
-pip install nrtk[<extra1>,<extra2>]
-```
-
-#### Common Installation Patterns
-
-```bash
-# For basic OpenCV image perturbations
-pip install nrtk[graphics]
-# For basic Pillow image perturbations
-pip install nrtk[Pillow]
-# For pybsm's sensor-based perturbations
-pip install nrtk[pybsm,graphics]
-```
-
-**Note**: Choose either `graphics` or `headless` for OpenCV, not both.
-
-More information on extras and related perturbers, including a complete list of
-extras, can be found
-[here](https://nrtk.readthedocs.io/en/latest/installation.html#extras).
-
-Details on the perturbers and their dependencies can be found
+Certain plugins may require additional runtime dependencies. Details on these
+requirements can be found
 [here](https://nrtk.readthedocs.io/en/latest/implementations.html).
 
 For more detailed installation instructions, visit the
@@ -113,8 +84,8 @@ For more detailed installation instructions, visit the
 
 ## Getting Started
 
-Explore usage examples of the `nrtk` package in various contexts using the
-Jupyter notebooks provided in the `./docs/examples/` directory.
+Explore usage examples of the `nrtk` package in various contexts using
+the Jupyter notebooks provided in the `./docs/examples/` directory.
 
 <!-- :auto getting-started: -->
 
@@ -168,7 +139,7 @@ sensor jitter.
 ## Documentation
 
 Documentation for both release snapshots and the latest main branch is available
-on [ReadTheDocs](https://nrtk.readthedocs.io).
+on [ReadTheDocs](https://nrtk.readthedocs.io/en/latest/).
 
 To build the Sphinx-based documentation locally for the latest reference:
 
@@ -196,9 +167,8 @@ The following points help ensure contributions follow development practices.
 - Follow the
   [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
 - Adopt the Git Flow branching strategy.
-- See the
-  [release process documentation](https://nrtk.readthedocs.io/en/latest/release_process.html)
-  for detailed release information.
+- Detailed release information is available in
+  [docs/release_process.rst](./docs/release_process.rst).
 - Additional contribution guidelines and issue reporting steps can be found in
   [CONTRIBUTING.md](./CONTRIBUTING.md).
 
