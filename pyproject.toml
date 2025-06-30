@@ -235,7 +235,7 @@ extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = [
-    "F", "E", "W", "C90", "I", "N", "D1", "D200", "D201", "D211", "D403", "D419", "UP",
+    "F", "E", "W", "C90", "I", "N", "D", "UP",
     "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PYI", "PT", "Q",
     "RSE", "RET", "SLF", "SIM", "TID252", "ARG", "FIX", "PD", "FLY", "NPY", "RUF027",
     "RUF100", "PERF", "UP045", "RUF013"

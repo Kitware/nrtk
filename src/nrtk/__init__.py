@@ -1,4 +1,4 @@
-"""Define the nrtk package"""
+"""Define the nrtk package."""
 
 import importlib.metadata
 
