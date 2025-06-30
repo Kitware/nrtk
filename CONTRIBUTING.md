@@ -87,8 +87,16 @@ ______________________________________________________________________
 
 ## Contribution Release Notes
 
-Typically, every contribution requires an associated release note. Add this to
-the `docs/release_notes/pending_release.rst` file, summarizing the changes made.
+Typically, every contribution requires an associated release note. Add an `rst`
+file to `docs/release_notes/pending_release/` directory summarizing the changes
+made.
+
+Each file should contain a list of bullet points. Each bullet point may begin
+with an uppercase keyword followed by a colon to indicate the type of change is
+being made. For example, if a change was made to fix an error in the linting
+process, the bullet point could be:
+
+`* FIX: linting CI job now fails when changes are needed`.
 
 ### Exceptions
 

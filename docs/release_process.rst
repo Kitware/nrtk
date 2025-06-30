@@ -7,7 +7,7 @@ Three types of releases are expected to occur:
 
 See the :file:`CONTRIBUTING.md` file for information on how to contribute features
 and patches.
-See the :file:`docs/contributing.rst` for information about how to, and what
+See the :file:`docs/review_process.rst` for information about how to, and what
 is involved in, reviewing contributions.
 
 The following process should apply when any release that changes the version
