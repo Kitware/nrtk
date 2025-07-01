@@ -89,7 +89,7 @@ class DetectorOTFPerturber(PerturbImage):
         w_y: float | None = None,
         f: float | None = None,
         interp: bool = True,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -107,12 +107,10 @@ class DetectorOTFPerturber(PerturbImage):
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without interpolation.
             box_alignment_mode:
-                Mode for how to handle how bounding boxes change.
-                Should be one of the following options:
-                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                    median: median between extent and extant
-                Default value is extent
+                Deprecated. Misaligned bounding boxes will always be resolved by taking the
+                smallest possible box that encases the transformed misaligned box.
+
+                .. deprecated:: 0.24.0
 
             If a value is provided for w_x, w_y and/or f that value(s) will be used in
             the otf calculation.

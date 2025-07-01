@@ -53,7 +53,7 @@ from nrtk.utils._exceptions import OpenCVImportError
 
 
 class _PerturbImage(PerturbImage):
-    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, ksize: int = 1, box_alignment_mode: str | None = None) -> None:
         if not self.is_usable():
             raise OpenCVImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
@@ -100,7 +100,7 @@ class _PerturbImage(PerturbImage):
 class AverageBlurPerturber(_PerturbImage):
     """Applies average blurring to the image stimulus."""
 
-    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, ksize: int = 1, box_alignment_mode: str | None = None) -> None:
         """:param ksize: Blurring kernel size."""
         super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
         min_k_size = 1
@@ -123,7 +123,7 @@ class AverageBlurPerturber(_PerturbImage):
 class GaussianBlurPerturber(_PerturbImage):
     """Applies Gaussian blurring to the image stimulus."""
 
-    def __init__(self, ksize: int = 1, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, ksize: int = 1, box_alignment_mode: str | None = None) -> None:
         """:param ksize: Blurring kernel size."""
         super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
         min_k_size = 1
@@ -146,7 +146,7 @@ class GaussianBlurPerturber(_PerturbImage):
 class MedianBlurPerturber(_PerturbImage):
     """Applies median blurring to the image stimulus."""
 
-    def __init__(self, ksize: int = 3, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, ksize: int = 3, box_alignment_mode: str | None = None) -> None:
         """:param ksize: Blurring kernel size."""
         super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
         min_k_size = 3

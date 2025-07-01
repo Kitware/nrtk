@@ -41,7 +41,7 @@ class RandomTranslationPerturber(PerturbImage):
 
     def __init__(
         self,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
         seed: int | np.random.Generator | None = 1,
         color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
@@ -52,12 +52,10 @@ class RandomTranslationPerturber(PerturbImage):
 
         Args:
             box_alignment_mode:
-                Mode for how to handle how bounding boxes change.
-                Should be one of the following options:
-                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                    median: median between extent and extant
-                Default value is extent
+                Deprecated. Misaligned bounding boxes will always be resolved by taking the
+                smallest possible box that encases the transformed misaligned box.
+
+                .. deprecated:: 0.24.0
             seed:
                 Numpy random number generator.
             color_fill:
