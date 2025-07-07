@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING, TypedDict
 
 import numpy as np
 
@@ -13,24 +14,24 @@ from nrtk.interop.maite.interop.generic import NRTKDatumMetadata, _forward_md_ke
 from nrtk.utils._exceptions import MaiteImportError
 
 Augmentation: type = object
-InputBatchType: type = object
-TargetBatchType: type = object
-DatumMetadataBatchType: type = object
+InputType: type = object
+TargetType: type = object
+DatumMetadataType: type = TypedDict
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from maite.protocols import AugmentationMetadata
     from maite.protocols.image_classification import (
         Augmentation,
-        DatumMetadataBatchType,
-        InputBatchType,
-        TargetBatchType,
+        DatumMetadataType,
+        InputType,
+        TargetType,
     )
 
     maite_available: bool = True
 except ImportError:  # pragma: no cover
     maite_available: bool = False
 
-IMG_CLASSIFICATION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]  # pyright:  ignore [reportPossiblyUnboundVariable]
+IMG_CLASSIFICATION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]  # pyright:  ignore [reportPossiblyUnboundVariable]
 
 
 class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
@@ -57,7 +58,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
     def __call__(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
+    ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
         """Apply augmentations to the given data batch."""
         imgs, anns, metadata = batch
 
@@ -80,7 +81,10 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
 
             perturber_configs = list()
             if "nrtk_perturber_config" in md:
-                perturber_configs = list(md["nrtk_perturber_config"])
+                md_configs = md["nrtk_perturber_config"]
+                if TYPE_CHECKING and not isinstance(md_configs, Iterable):  # pragma: no cover
+                    raise RuntimeError("Expected iterable perturber config")
+                perturber_configs = list(md_configs)
             perturber_configs.append(self.augment.get_config())
             aug_md = NRTKDatumMetadata(
                 id=md["id"],
@@ -132,7 +136,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
     def _apply_augmentations(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:  # pyright: ignore [reportInvalidTypeForm]
+    ) -> tuple[Sequence[InputType] | Sequence[None], Sequence[TargetType], Sequence[DatumMetadataType]]:  # pyright: ignore [reportInvalidTypeForm]
         """Apply augmentations to given batch."""
         if self.augmentations:
             aug_batch = batch
@@ -147,7 +151,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
     def __call__(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
+    ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
         """Compute a specified image metric on the given batch."""
         imgs, _, _ = batch
         metric_aug_metadata = list()  # list of individual image-level metric metadata
@@ -156,7 +160,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
 
         for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata):  # pyright: ignore [reportArgumentType]
             # Convert from channels-first to channels-last
-            img_1 = np.transpose(img, (1, 2, 0))
+            img_1 = np.transpose(np.asarray(img), (1, 2, 0))
             img_2 = None if aug_img is None else np.transpose(aug_img, (1, 2, 0))
 
             # Compute Image metric values

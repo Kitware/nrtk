@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import TypedDict
 
 import numpy as np
 import pytest
@@ -11,7 +12,7 @@ from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
 
 TargetType: type = object
-DatumMetadataType: type = object
+DatumMetadataType: type = TypedDict
 if maite_available:
     from maite.protocols.object_detection import DatumMetadataType, TargetType
 
@@ -102,8 +103,8 @@ class TestJATICObjectDetectionDataset:
             expected_img_out, _ = perturber(np.transpose(np.asarray(img_in), (1, 2, 0)))
             # Channel last to channel first
             expected_img_out = np.transpose(expected_img_out, (2, 0, 1))
-            expected_md_out = dict(md_in)  # pyright: ignore [reportArgumentType, reportCallIssue]
-            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]  # pyright: ignore [reportArgumentType]
+            expected_md_out = dict(md_in)
+            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]
 
             # Apply augmentation via adapter
             img_out, det_out, md_out = augmentation(([img_in], [det_in], [md_in]))

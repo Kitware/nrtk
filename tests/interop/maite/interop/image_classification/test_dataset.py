@@ -72,8 +72,8 @@ class TestJATICImageClassificationDataset:
             # Get expected image and metadata from "normal" perturber
             input_image, _ = perturber(np.transpose(np.asarray(img_in), (1, 2, 0)))
             expected_img_out = np.transpose(input_image, (2, 0, 1))
-            expected_md_out = dict(md_in)  # pyright: ignore [reportArgumentType, reportCallIssue]
-            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]  # pyright: ignore [reportArgumentType]
+            expected_md_out = dict(md_in)
+            expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]
 
             # Apply augmentation via adapter
             img_out, lbl_out, md_out = augmentation(([img_in], [lbl_in], [md_in]))

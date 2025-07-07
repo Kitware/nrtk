@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy as np
 
 InputType: type = object
 TargetType: type = object
-DatumMetadataType: type = object
+DatumMetadataType: type = TypedDict
 Dataset: type = object
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
