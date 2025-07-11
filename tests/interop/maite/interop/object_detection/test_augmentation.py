@@ -159,7 +159,7 @@ class TestJATICDetectionAugmentation:
 class TestJATICDetectionAugmentationWithMetric:
     img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)
     md_in: list["DatumMetadataType"] = [{"id": 1}]
-    md_aug_nop_pertuber = [{"nrtk_perturber_config": [{"box_alignment_mode": "extent"}], "id": 1}]
+    md_aug_nop_pertuber = [{"nrtk_perturber_config": [{"box_alignment_mode": None}], "id": 1}]
 
     @pytest.mark.parametrize(
         ("augmentations", "targets_in", "expected_targets_out", "metric_input_img2", "metric_metadata", "expectation"),

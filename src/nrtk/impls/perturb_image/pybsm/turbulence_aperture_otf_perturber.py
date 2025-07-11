@@ -112,7 +112,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         n_tdi: float | None = None,
         aircraft_speed: float | None = None,
         interp: bool = True,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the TurbulenceApertureOTFPerturber.
 
@@ -149,12 +149,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation
             box_alignment_mode:
-                Mode for how to handle how bounding boxes change.
-                Should be one of the following options:
-                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                    median: median between extent and extant
-                Default value is extent
+                Deprecated. Misaligned bounding boxes will always be resolved by taking the
+                smallest possible box that encases the transformed misaligned box.
+
+                .. deprecated:: 0.24.0
 
             If both sensor and scenario parameters are absent, then default values will be used for
             their parameters.

@@ -50,7 +50,7 @@ from nrtk.utils._exceptions import ScikitImageImportError
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = None, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, rng: np.random.Generator | int | None = None, box_alignment_mode: str | None = None) -> None:
         """:param rng: Pseudo-random number generator or seed."""
         if not self.is_usable():
             raise ScikitImageImportError
@@ -118,7 +118,7 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
         self,
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the SPNoisePerturber.
 
@@ -184,7 +184,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
@@ -237,7 +237,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         rng: np.random.Generator | int | None = None,
         mean: float = 0.0,
         var: float = 0.05,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the GSNoisePerturber.
 

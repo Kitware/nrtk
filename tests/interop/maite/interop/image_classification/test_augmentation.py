@@ -113,7 +113,7 @@ class TestJATICClassificationAugmentationWithMetric:
     md_in: list["DatumMetadataType"] = [{"id": 1}]
     md_aug_nop_pertuber = [
         {
-            "nrtk_perturber_config": [{"box_alignment_mode": "extent"}],
+            "nrtk_perturber_config": [{"box_alignment_mode": None}],
             "id": 1,
         },
     ]

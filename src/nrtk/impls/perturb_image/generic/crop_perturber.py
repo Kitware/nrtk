@@ -35,7 +35,7 @@ class RandomCropPerturber(PerturbImage):
             Returns the current configuration of the RandomCropPerturber instance.
     """
 
-    def __init__(self, box_alignment_mode: str = "extent", seed: int | np.random.Generator | None = 1) -> None:
+    def __init__(self, box_alignment_mode: str | None = None, seed: int | np.random.Generator | None = 1) -> None:
         """RandomCropPerturber applies a random cropping perturbation to an input image.
 
         It ensures that bounding boxes are adjusted correctly to reflect the new cropped region.
@@ -46,12 +46,7 @@ class RandomCropPerturber(PerturbImage):
             seed:
                 Seed for rng.
             box_alignment_mode:
-                Mode for how to handle how bounding boxes change.
-                Should be one of the following options:
-                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                    median: median between extent and extant
-                Default value is extent
+                Deprecated Mode for how to handle how bounding boxes change.
         """
         super().__init__(box_alignment_mode=box_alignment_mode)
         self.rng: np.random.Generator = np.random.default_rng(seed)

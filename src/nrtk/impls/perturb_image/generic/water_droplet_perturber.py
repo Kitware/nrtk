@@ -120,7 +120,7 @@ class WaterDropletPerturber(PerturbImage):
         f_x: int = 400,
         f_y: int = 400,
         seed: int | None = None,
-        box_alignment_mode: str = "extent",
+        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
@@ -144,12 +144,10 @@ class WaterDropletPerturber(PerturbImage):
             seed:
                 Random seed for reproducibility.
             box_alignment_mode:
-                Mode for how to handle how bounding boxes change.
-                Should be one of the following options:
-                    extent: a new axis-aligned bounding box that encases the transformed misaligned box
-                    extant: a new axis-aligned bounding box that is encased inside the transformed misaligned box
-                    median: median between extent and extant
-                Default value is extent
+                Deprecated. Misaligned bounding boxes will always be resolved by taking the
+                smallest possible box that encases the transformed misaligned box.
+
+                .. deprecated:: 0.24.0
 
             If any of the parameters are absent, the following values will be set
             as defaults:
