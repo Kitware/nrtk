@@ -176,13 +176,7 @@ class RadialDistortionPerturber(PerturbImage):
                 x1, y1 = self._radial_transform(x0, y0, w, h, [-k for k in self.k])
 
                 # New axis-aligned bounding box from distorted corners
-                boxes[i] = (
-                    AxisAlignedBoundingBox(
-                        (np.min(x1), np.min(y1)),
-                        (np.max(x1), np.max(y1)),
-                    ),
-                    label,
-                )
+                boxes[i] = (self._align_box(np.transpose([x1, y1])), label)
 
         return out.astype(np.uint8), boxes
 

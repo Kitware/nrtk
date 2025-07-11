@@ -25,7 +25,7 @@ Example:
 from __future__ import annotations
 
 import abc
-from collections.abc import Hashable, Iterable
+from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
 import numpy as np
@@ -109,6 +109,23 @@ class PerturbImage(Plugfigurable):
             scaled_boxes.append((scaled_box, score_dict))
 
         return scaled_boxes
+
+    def _align_box(
+        self,
+        vertices: np.ndarray[Any, Any] | Sequence[Sequence[int]],
+    ) -> AxisAlignedBoundingBox:
+        """Utility function to align a misaligned bounding box given a set of vertices.
+
+        :param vertices: A sequence of vertices representing a misaligned bounding box.
+
+        Returns:
+            AxisAlignedBoundingBox: Resulting axis-aligned bounding box.
+        """
+        vertices = np.asarray(vertices)
+        return AxisAlignedBoundingBox(
+            tuple(np.min(vertices, axis=0)),
+            tuple(np.max(vertices, axis=0)),
+        )
 
     def __call__(
         self,
