@@ -81,3 +81,14 @@ class NotebookTestingImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs
         super().__init__("jupytext must be installed. Please install via `nrtk[notebook-testing]`.")
+
+
+class NRTKXAITKHelperImportError(ImportError):
+    def __init__(self) -> None:
+        # Call the base class constructor with the parameters it needs
+        super().__init__(
+            """
+            Helper functions for the NRTK-XAITK workflow must be installed.
+            Please install via `nrtk[maite,Pillow,notebook-testing]`.
+            """,
+        )
