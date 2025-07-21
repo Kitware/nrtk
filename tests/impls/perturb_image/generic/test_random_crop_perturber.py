@@ -1,18 +1,20 @@
+from __future__ import annotations
+
 from collections.abc import Hashable, Iterable
 
 import numpy as np
 import pytest
 from PIL import Image
+from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.random_crop_perturber import RandomCropPerturber
+from tests.impls import INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
-
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 class TestRandomCropPerturber:
@@ -40,22 +42,20 @@ class TestRandomCropPerturber:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=np.uint8)
         # Test perturb interface directly
-        inst = RandomCropPerturber()
+        inst = RandomCropPerturber(crop_size=(2, 2))
         out_img_1, out_boxes_1 = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=input_test_box,
             expected=expected,
-            additional_params={"crop_size": (2, 2)},
         )
 
         # Test callable
         out_img_2, out_boxes_2 = bbox_perturber_assertions(
-            perturb=RandomCropPerturber(),
+            perturb=inst,
             image=image,
             boxes=input_test_box,
             expected=expected,
-            additional_params={"crop_size": (2, 2)},
         )
         assert np.array_equal(out_img_1, out_img_2)
 
@@ -75,41 +75,58 @@ class TestRandomCropPerturber:
     def test_reproducibility(self, image: np.ndarray) -> None:
         """Ensure results are reproducible."""
         # Test perturb interface directly
-        inst = RandomCropPerturber()
+        inst = RandomCropPerturber(crop_size=(20, 20))
         out_image, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=None,
-            additional_params={"crop_size": (20, 20)},
         )
-        inst = RandomCropPerturber()  # Create new instances to reset random seed
+        inst = RandomCropPerturber(crop_size=(20, 20))  # Create new instances to reset random seed
         bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=(out_image, []),
-            additional_params={"crop_size": (20, 20)},
         )
-        inst = RandomCropPerturber()
+        inst = RandomCropPerturber(crop_size=(20, 20))
         # Test callable
         bbox_perturber_assertions(
             perturb=inst,
             image=image,
             boxes=None,
             expected=(out_image, []),
-            additional_params={"crop_size": (20, 20)},
         )
 
     def test_regression(self, snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        inst = RandomCropPerturber()
+        inst = RandomCropPerturber(crop_size=(20, 20))
         out_img, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=None,
-            additional_params={"crop_size": (20, 20)},
         )
         assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+
+    @pytest.mark.parametrize(
+        ("crop_size", "seed"),
+        [
+            ((2, 5), 123),
+            ((20, 20), np.random.default_rng(123)),
+        ],
+    )
+    def test_configuration(
+        self,
+        crop_size: tuple[int, int],
+        seed: int | np.random.Generator,
+    ) -> None:
+        """Test configuration stability."""
+        inst = RandomCropPerturber(
+            crop_size=crop_size,
+            seed=seed,
+        )
+        for i in configuration_test_helper(inst):
+            assert i.crop_size == crop_size
+            assert i.seed == seed
