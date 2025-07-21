@@ -6,7 +6,7 @@ from PIL import Image
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.crop_perturber import RandomCropPerturber
+from nrtk.impls.perturb_image.generic.random_crop_perturber import RandomCropPerturber
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 

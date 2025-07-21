@@ -8,7 +8,7 @@ from PIL import Image
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.translation_perturber import RandomTranslationPerturber
+from nrtk.impls.perturb_image.generic.random_translation_perturber import RandomTranslationPerturber
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 

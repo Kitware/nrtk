@@ -17,12 +17,12 @@ Image Perturbation
    nrtk.impls.perturb_image.generic.skimage.random_noise
    nrtk.impls.perturb_image.generic.nop_perturber
    nrtk.impls.perturb_image.generic.compose_perturber
-   nrtk.impls.perturb_image.generic.crop_perturber
-   nrtk.impls.perturb_image.generic.translation_perturber
+   nrtk.impls.perturb_image.generic.random_crop_perturber
+   nrtk.impls.perturb_image.generic.random_translation_perturber
    nrtk.impls.perturb_image.generic.haze_perturber
    nrtk.impls.perturb_image.generic.water_droplet_perturber
    nrtk.impls.perturb_image.generic.radial_distortion_perturber
-   nrtk.impls.perturb_image.pybsm.perturber
+   nrtk.impls.perturb_image.pybsm.pybsm_perturber
    nrtk.impls.perturb_image.pybsm.scenario
    nrtk.impls.perturb_image.pybsm.sensor
    nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber
