@@ -173,6 +173,20 @@ class TestAlbumentationsPerturber:
             assert i.parameters == parameters
             assert i.seed == seed
 
+    def test_default_config(self) -> None:
+        """Test default configuration when created with no parameters."""
+        image = np.ones((3, 3, 3)).astype(np.uint8)
+        inst = AlbumentationsPerturber()
+        out_image = perturber_assertions(perturb=inst.perturb, image=image)
+
+        cfg = dict()
+        cfg["perturber"] = "NoOp"
+        cfg["parameters"] = None
+        cfg["seed"] = None
+        cfg["box_alignment_mode"] = None
+        assert (out_image == image).all()
+        assert inst.get_config() == cfg
+
 
 @mock.patch.object(AlbumentationsPerturber, "is_usable")
 def test_missing_deps(mock_is_usable: MagicMock) -> None:

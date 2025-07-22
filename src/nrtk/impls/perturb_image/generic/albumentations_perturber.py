@@ -50,7 +50,7 @@ class AlbumentationsPerturber(PerturbImage):
 
     def __init__(
         self,
-        perturber: str,
+        perturber: str = "NoOp",
         parameters: dict[str, Any] | None = None,
         box_alignment_mode: str | None = None,
         seed: int | None = None,
@@ -60,6 +60,7 @@ class AlbumentationsPerturber(PerturbImage):
         Args:
             perturber:
                 The name of the BasicTransform perturber to apply.
+                Will apply a NoOp if not provided.
             parameters:
                 Keyword arguments that should be passed to the given perturber.
             seed (int):

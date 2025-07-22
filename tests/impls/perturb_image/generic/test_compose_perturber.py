@@ -145,3 +145,15 @@ class TestComposePerturber:
         # Both approaches must produce identical results
         assert np.array_equal(compose_image, manual_image)
         assert compose_box == manual_box
+
+    def test_default_config(self) -> None:
+        """Test default configuration when created with no parameters."""
+        image = np.ones((3, 3, 3)).astype(np.uint8)
+        inst = ComposePerturber()
+        out_image = perturber_assertions(perturb=inst.perturb, image=image)
+
+        cfg = dict()
+        cfg["perturbers"] = []
+        cfg["box_alignment_mode"] = None
+        assert (out_image == image).all()
+        assert inst.get_config() == cfg

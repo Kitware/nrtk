@@ -65,8 +65,8 @@ class PybsmPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor,
-        scenario: PybsmScenario,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_REFLECTANCE_RANGE,
         rng_seed: int = 1,
         box_alignment_mode: str | None = None,
@@ -100,6 +100,23 @@ class PybsmPerturber(PerturbImage):
             raise PyBSMImportError
         super().__init__(box_alignment_mode=box_alignment_mode)
         self._rng_seed = rng_seed
+
+        if not sensor:
+            sensor = PybsmSensor(
+                name="Sensor",
+                D=275e-3,
+                f=4,
+                p_x=0.008e-3,
+                opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+            )
+        if not scenario:
+            scenario = PybsmScenario(
+                name="Scenario",
+                ihaze=1,
+                altitude=9000,
+                ground_range=0,
+            )
+
         self.sensor: PybsmSensor = copy.deepcopy(sensor)
         self.scenario: PybsmScenario = copy.deepcopy(scenario)
 
@@ -200,7 +217,7 @@ class PybsmPerturber(PerturbImage):
         Returns:
             :return str: Representation showing sensor and scenario names.
         """
-        return self.sensor.name + " " + self.scenario.name
+        return self.__str__()
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
