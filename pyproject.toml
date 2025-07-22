@@ -157,7 +157,7 @@ pyright = {version=">=1.1.320",extras=["nodejs"]}
 #########################################
 # nrtk.interop.maite testing dependencies
 #########################################
-starlette = ">=0.40.0"
+starlette = ">=0.47.2" # CVE-2025-54121
 responses = ">=0.25.0"
 Pillow = ">=10.3.0" # CVE-2024-28219
 
