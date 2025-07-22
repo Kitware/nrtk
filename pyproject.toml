@@ -65,6 +65,7 @@ albumentations = {version=">=2.0.0", optional=true}
 # Optional for Water droplet perturber
 scipy = {version = ">=1.10.0", optional = true}
 shapely = {version = ">=2.0.7", optional = true}
+geopandas = {version = "^0.14", optional = true}
 
 #################################
 # nrtk.interop.maite dependencies
@@ -103,7 +104,7 @@ tools = ["kwcoco", "Pillow"]
 scikit-image = ["scikit-image"]
 Pillow = ["Pillow"]
 albumentations = ["albumentations"]
-waterdroplet = ["scipy", "shapely"]
+waterdroplet = ["scipy", "shapely", "geopandas"]
 notebook-testing = [
     "datasets", "matplotlib", "numba", "tabulate", "torch",
     "torchmetrics", "torchvision", "transformers", "ultralytics",
