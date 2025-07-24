@@ -1,0 +1,39 @@
+v0.24.0
+=======
+
+This release introduces a new ``RadialDistortionPerturber``, renames several
+perturber modules for clarity, and includes a notebook for benchmarking. It
+also addresses multiple issues in crop and compose perturber logic and
+upgrades the MAITE dependency.
+
+Updates / New Features
+----------------------
+
+* Added a new ``RadialDistortionPerturber``.
+
+* Added an example notebook exploring the ``RadialDistortionPerturber``.
+
+* Added ``benchmarking.ipynb`` to benchmark each perturber.
+
+* Upgrade to MAITE v0.8.1.
+
+* Deprecated the unused ``box_alignment_mode`` parameter for ``PerturbImage``.
+
+* Renamed ``perturber.py`` to ``pybsm_perturber.py``.
+
+* Renamed ``crop_perturber.py`` to ``random_crop_perturber.py``.
+
+* Renamed ``translation_perturber.py`` to ``random_translation_perturber.py``.
+
+Fixes
+-----
+
+* Usage of ``crop_size`` parameter in the ``RandomCropPerturber``
+  implementation.
+
+* ``x`` and ``y`` were swapped in the crop step of ``RandomCropPerturber``.
+
+* Bounding boxes correctly updated through composed perturbers in
+  ``ComposePerturber``.
+
+* Rendering of jupyter notebook contents in RTD sidebar.
