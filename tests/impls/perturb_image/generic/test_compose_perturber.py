@@ -17,6 +17,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generic.compose_perturber import ComposePerturber
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
+from nrtk.impls.perturb_image.generic.random_crop_perturber import RandomCropPerturber
 from nrtk.interfaces.perturb_image import PerturbImage
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
@@ -115,3 +116,32 @@ class TestComposePerturber:
         inst = ComposePerturber(perturbers=[NOPPerturber(), NOPPerturber()])
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
+
+    def test_bounding_box_threading(self) -> None:
+        """Test that bounding boxes are properly threaded through sequential perturbers."""
+        image = np.arange(64, dtype=np.uint8).reshape(8, 8, 1)
+
+        # Use one box that covers the entire image to ensure it survives both crops
+        initial_box: list[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = [
+            (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(7, 7)), {"id": 1.0}),
+        ]
+
+        # Method 1: ComposePerturber with two sequential crops
+        compose_perturb = ComposePerturber(
+            perturbers=[
+                RandomCropPerturber(seed=77),
+                RandomCropPerturber(seed=78),
+            ],
+        )
+        compose_image, compose_box = compose_perturb.perturb(image, initial_box)
+
+        # Method 2: Manual sequential application
+        crop1 = RandomCropPerturber(seed=77)
+        crop2 = RandomCropPerturber(seed=78)
+
+        intermediate_image, intermediate_box = crop1.perturb(image, initial_box)
+        manual_image, manual_box = crop2.perturb(intermediate_image, intermediate_box)
+
+        # Both approaches must produce identical results
+        assert np.array_equal(compose_image, manual_image)
+        assert compose_box == manual_box

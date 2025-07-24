@@ -68,15 +68,16 @@ class ComposePerturber(PerturbImage):
                 The perturbed image and the source bounding boxes.
         """
         out_img = image
+        out_boxes = boxes
 
         if additional_params is None:
             additional_params = dict()
 
         # Applies series of perturbations to a the given input image
         for perturber in self.perturbers:
-            out_img, _ = perturber(image=out_img, boxes=boxes, additional_params=additional_params)
+            out_img, out_boxes = perturber(image=out_img, boxes=out_boxes, additional_params=additional_params)
 
-        return out_img, boxes
+        return out_img, out_boxes
 
     def get_config(self) -> dict[str, Any]:
         """Get the configuration dictionary of the ComposePerturber instance.
