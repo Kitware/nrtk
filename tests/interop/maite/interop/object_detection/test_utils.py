@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy as np
 import py  # type: ignore
@@ -24,7 +24,7 @@ if kwcoco_available:
 
 
 TargetType: type = object
-DatumMetadataType: type = object
+DatumMetadataType: type = TypedDict
 if maite_available:
     # Multiple type ignores added for pyright's handling of guarded imports
     from maite.protocols.object_detection import DatumMetadataType, TargetType

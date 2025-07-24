@@ -1,3 +1,4 @@
+# type: ignore  # remove once compute_image_metric notebook is updated
 """This module contains VisDroneDataset, which is a MAITE wrapper for VisDrone dataset."""
 
 from __future__ import annotations

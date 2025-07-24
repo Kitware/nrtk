@@ -11,7 +11,7 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy as np
 from PIL import Image  # type: ignore
@@ -21,7 +21,7 @@ from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 
 InputType: type = object
 TargetType: type = object
-DatumMetadataType: type = object
+DatumMetadataType: type = TypedDict
 Dataset: type = object
 DatumMetadata: type = object
 try:
