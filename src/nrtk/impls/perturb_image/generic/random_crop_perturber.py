@@ -110,12 +110,12 @@ class RandomCropPerturber(PerturbImage):
                 if intersected_box:
                     # Shift the intersected bounding box to align with the cropped image coordinates
                     shifted_min = (
-                        intersected_box.min_vertex[0] - crop_x,
-                        intersected_box.min_vertex[1] - crop_y,
+                        intersected_box.min_vertex[0] - crop_y,
+                        intersected_box.min_vertex[1] - crop_x,
                     )
                     shifted_max = (
-                        intersected_box.max_vertex[0] - crop_x,
-                        intersected_box.max_vertex[1] - crop_y,
+                        intersected_box.max_vertex[0] - crop_y,
+                        intersected_box.max_vertex[1] - crop_x,
                     )
                     adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
                     adjusted_bboxes.append((adjusted_box, metadata))
