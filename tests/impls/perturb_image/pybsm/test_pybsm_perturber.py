@@ -12,7 +12,7 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
+from nrtk.impls.perturb_image.pybsm.pybsm_perturber import PybsmPerturber
 from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario

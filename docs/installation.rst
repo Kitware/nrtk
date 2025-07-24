@@ -265,6 +265,9 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`ColorPerturber`
       - ``Pillow``
       - ``Pillow``
+    * - :ref:`ComposePerturber`
+      - ---
+      - ---
     * - :ref:`ContrastPerturber`
       - ``Pillow``
       - ``Pillow``
@@ -280,18 +283,33 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`GaussianNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
+    * - :ref:`HazePerturber`
+      - ---
+      - ---
     * - :ref:`JitterOTFPerturber`
       - ``pybsm``, and (``graphics`` or ``headless``)
       - ``pyBSM``, ``OpenCV``
     * - :ref:`MedianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
+    * - :ref:`NOPPerturber`
+      - ---
+      - ---
     * - :ref:`PepperNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
     * - :ref:`PyBSMPerturber`
       - ``pybsm``
       - ``pyBSM``
+    * - :ref:`RadialDistortionPerturber`
+      - ---
+      - ---
+    * - :ref:`RandomCropPerturber`
+      - ---
+      - ---
+    * - :ref:`RandomTranslationPerturber`
+      - ---
+      - ---
     * - :ref:`SaltAndPepperNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``

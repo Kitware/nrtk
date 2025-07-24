@@ -60,6 +60,12 @@ Demonstrating Rain/Water Droplet Perturbations
 Simulate a rain/water droplet effect and analyze its impact on model inputs and predictions.
 `View notebook <examples/maite/nrtk_water_droplet_perturber_demo.html>`__.
 
+Demonstrating Radial Distortion Perturbations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Simulate a radial distortion effect and analyze its impact on model inputs and predictions.
+`View notebook <examples/maite/nrtk_radial_distortion_perturber_demo.html>`__.
+
 Combining Perturbations with Saliency Maps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -52,3 +52,30 @@ def test_rescale_boxes(
         # use np.allclose() because of float operations
         assert np.allclose(out_box.min_vertex, expeted_box.min_vertex)
         assert np.allclose(out_box.max_vertex, expeted_box.max_vertex)
+
+
+@pytest.mark.parametrize(
+    ("vertices", "expected_box"),
+    [
+        (
+            ((1, 2), (5, 6), (-1, 4), (0, 9)),
+            AxisAlignedBoundingBox((-1, 2), (5, 9)),
+        ),
+        (
+            ((-1, 0, 3), (1, -1, -3)),
+            AxisAlignedBoundingBox((-1, -1, -3), (1, 0, 3)),
+        ),
+    ],
+)
+def test_align_bboxes(
+    vertices: tuple[tuple[int]],
+    expected_box: AxisAlignedBoundingBox,
+) -> None:
+    perturber = MagicMock(spec=PerturbImage)
+    # map mock object _align_box method to actual one
+    perturber._align_box = MethodType(PerturbImage._align_box, perturber)
+    out_box = perturber._align_box(
+        vertices,
+    )
+    assert np.allclose(out_box.min_vertex, expected_box.min_vertex)
+    assert np.allclose(out_box.max_vertex, expected_box.max_vertex)

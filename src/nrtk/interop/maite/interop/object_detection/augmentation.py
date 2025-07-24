@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from collections.abc import Iterable, Sequence
+from typing import TYPE_CHECKING, TypedDict
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -16,25 +16,25 @@ from nrtk.interop.maite.interop.object_detection.dataset import JATICDetectionTa
 from nrtk.utils._exceptions import MaiteImportError
 
 Augmentation: type = object
-InputBatchType: type = object
-TargetBatchType: type = object
-DatumMetadataBatchType: type = object
+InputType: type = object
+TargetType: type = object
+DatumMetadataType: type = TypedDict
 
 try:
     # Multiple type ignores added for pyright's handling of guarded imports
     from maite.protocols import AugmentationMetadata
     from maite.protocols.object_detection import (
         Augmentation,
-        DatumMetadataBatchType,
-        InputBatchType,
-        TargetBatchType,
+        DatumMetadataType,
+        InputType,
+        TargetType,
     )
 
     maite_available: bool = True
 except ImportError:  # pragma: no cover
     maite_available: bool = False
 
-OBJ_DETECTION_BATCH_T = tuple[InputBatchType, TargetBatchType, DatumMetadataBatchType]  # pyright: ignore [reportPossiblyUnboundVariable]
+OBJ_DETECTION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]  # pyright: ignore [reportPossiblyUnboundVariable]
 
 
 class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGeneralTypeIssues]
@@ -68,7 +68,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
     def __call__(
         self,
         batch: OBJ_DETECTION_BATCH_T,
-    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
+    ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
         """Apply augmentations to the given data batch."""
         imgs, anns, metadata = batch
 
@@ -79,12 +79,12 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
 
         for img, img_anns, md in zip(imgs, anns, metadata):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
-            aug_img = copy.deepcopy(img)
+            aug_img = np.asarray(copy.deepcopy(img))
             aug_img = np.transpose(aug_img, (1, 2, 0))
 
             # format annotations for passing to perturber
-            img_bboxes = [AxisAlignedBoundingBox(bbox[0:2], bbox[2:4]) for bbox in np.array(img_anns.boxes)]
-            img_labels = [{label: score} for label, score in zip(np.array(img_anns.labels), np.array(img_anns.scores))]
+            img_bboxes = [AxisAlignedBoundingBox(bbox[0:2], bbox[2:4]) for bbox in np.array(img_anns.boxes)]  # pyright: ignore [reportAttributeAccessIssue]
+            img_labels = [{label: score} for label, score in zip(np.array(img_anns.labels), np.array(img_anns.scores))]  # pyright: ignore [reportAttributeAccessIssue]
 
             aug_img, aug_img_anns = self.augment(
                 np.asarray(aug_img),
@@ -115,7 +115,10 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
 
             perturber_configs = list()
             if "nrtk_perturber_config" in md:
-                perturber_configs = list(md["nrtk_perturber_config"])
+                md_configs = md["nrtk_perturber_config"]
+                if TYPE_CHECKING and not isinstance(md_configs, Iterable):  # pragma: no cover
+                    raise RuntimeError("Expected iterable perturber config")
+                perturber_configs = list(md_configs)
             perturber_configs.append(self.augment.get_config())
             aug_md = NRTKDatumMetadata(
                 id=md["id"],
@@ -169,7 +172,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
     def _apply_augmentations(
         self,
         batch: OBJ_DETECTION_BATCH_T,
-    ) -> tuple[InputBatchType | Sequence[None], TargetBatchType, DatumMetadataBatchType]:  # pyright: ignore [reportInvalidTypeForm]
+    ) -> tuple[Sequence[InputType] | Sequence[None], Sequence[TargetType], Sequence[DatumMetadataType]]:  # pyright: ignore [reportInvalidTypeForm]
         """Apply augmentations to given batch."""
         if self.augmentations:
             aug_batch = batch
@@ -184,7 +187,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
     def __call__(
         self,
         batch: OBJ_DETECTION_BATCH_T,
-    ) -> tuple[InputBatchType, TargetBatchType, Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
+    ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
         """Compute a specified image metric on the given batch."""
         imgs, _, _ = batch
         metric_aug_metadata = list()  # list of individual image-level metric metadata

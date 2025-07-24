@@ -35,7 +35,7 @@ class HazePerturber(PerturbImage):
             Returns the current configuration of the HazePerturber instance.
     """
 
-    def __init__(self, box_alignment_mode: str = "extent", factor: float = 1.0) -> None:
+    def __init__(self, box_alignment_mode: str | None = None, factor: float = 1.0) -> None:
         """HazePerturber applies haze to an input image.
 
         Attributes:

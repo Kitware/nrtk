@@ -64,7 +64,7 @@ class _Enhancement(Protocol):  # Used for type checking only  # pragma: no cover
 
 
 class _PerturbImage(PerturbImage):
-    def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, factor: float = 1.0, box_alignment_mode: str | None = None) -> None:
         """:param factor: Enhancement factor."""
         if not self.is_usable():
             raise PillowImportError
@@ -196,7 +196,7 @@ class ContrastPerturber(_PerturbImage):
 class SharpnessPerturber(_PerturbImage):
     """Adjusts image stimulus sharpness."""
 
-    def __init__(self, factor: float = 1.0, box_alignment_mode: str = "extent") -> None:
+    def __init__(self, factor: float = 1.0, box_alignment_mode: str | None = None) -> None:
         """:param rng: Enhancement factor."""
         if factor < 0.0 or factor > 2.0:
             raise ValueError(

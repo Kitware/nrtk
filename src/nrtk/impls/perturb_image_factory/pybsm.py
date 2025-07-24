@@ -32,7 +32,7 @@ from smqtk_core.configuration import (
 )
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.pybsm.perturber import PybsmPerturber
+from nrtk.impls.perturb_image.pybsm.pybsm_perturber import PybsmPerturber
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
