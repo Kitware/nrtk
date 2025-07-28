@@ -53,7 +53,8 @@ except ImportError:  # pragma: no cover
 
 try:
     # Guarded import check for utility function usage.
-    from shapely.geometry import Point, Polygon
+    import geopandas
+    from shapely import Polygon
 
     shapely_available: bool = True
 except ImportError:  # pragma: no cover
@@ -374,11 +375,13 @@ class WaterDropletPerturber(PerturbImage):
                     curve_points = np.column_stack((x, y))
                     polygon = Polygon(curve_points)  # pyright: ignore [reportPossiblyUnboundVariable]
                     xmin, ymin, xmax, ymax = polygon.bounds
-                    grid_points = np.mgrid[xmin:xmax:150j, ymin:ymax:150j].reshape(2, -1).T
+                    grid_x, grid_y = np.mgrid[xmin:xmax:150j, ymin:ymax:150j]
+                    grid_x, grid_y = grid_x.flatten(), grid_y.flatten()
+                    points_gs = geopandas.GeoSeries(geopandas.points_from_xy(grid_x, grid_y))  # pyright: ignore [reportPossiblyUnboundVariable]
                     enclosed_points = [
-                        np.array([int(p[0]), int(p[1])])
-                        for p in grid_points
-                        if polygon.contains(Point(p))  # pyright: ignore [reportPossiblyUnboundVariable]
+                        np.asarray([int(grid_x[i]), int(grid_y[i])])
+                        for i, val in enumerate(polygon.contains(points_gs))
+                        if val
                     ]
 
                 return enclosed_points
