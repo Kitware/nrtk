@@ -119,8 +119,6 @@ def pybsm_perturber_assertions(
     :param image: Input image as numpy array.
     :param expected: (Optional) Expected return value of the perturbation.
     """
-    if additional_params is None:
-        additional_params = dict()
     copy = np.copy(image)
 
     out_image, _ = perturb(image, None, additional_params)
