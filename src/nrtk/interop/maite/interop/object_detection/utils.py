@@ -69,7 +69,7 @@ def dataset_to_coco(  # noqa: C901
         labels = np.asarray(dets.labels)
         bboxes = np.asarray(dets.boxes)
         annotations.add_images([{"id": i, "file_name": str(filename)}])
-        for lbl, bbox in zip(labels, bboxes):
+        for lbl, bbox in zip(labels, bboxes, strict=False):
             annotations.add_annotation(
                 image_id=i,
                 category_id=int(lbl),

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 from nrtk.interop.maite.api.converters import build_factory, load_COCOJATIC_dataset
 from nrtk.interop.maite.api.schema import (

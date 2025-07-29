@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Callable
+from collections.abc import Callable
 
 # 3rd party imports
 import numpy as np

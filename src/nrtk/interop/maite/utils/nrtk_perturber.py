@@ -38,7 +38,7 @@ def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactor
         perturb_factory_keys = [perturber_factory.theta_key]
         thetas = [perturber_factory.thetas]
 
-    perturber_combinations = [dict(zip(perturb_factory_keys, v)) for v in itertools.product(*thetas)]
+    perturber_combinations = [dict(zip(perturb_factory_keys, v, strict=False)) for v in itertools.product(*thetas)]
     logging.info(f"Perturber sweep values: {perturber_combinations}")
 
     # Iterate through the different perturber factory parameter combinations and
@@ -46,7 +46,7 @@ def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactor
     logging.info("Starting perturber sweep")
     augmented_datasets: list[Dataset] = []  # pyright: ignore [reportInvalidTypeForm]
     output_perturb_params: list[str] = []
-    for i, (perturber_combo, perturber) in enumerate(zip(perturber_combinations, perturber_factory)):
+    for i, (perturber_combo, perturber) in enumerate(zip(perturber_combinations, perturber_factory, strict=False)):
         output_perturb_params.append("".join(f"_{k!s}-{v!s}" for k, v in perturber_combo.items()))
 
         logging.info(f"Starting perturbation for {output_perturb_params[i]}")
@@ -81,4 +81,4 @@ def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactor
                 dataset_id=output_perturb_params[i],
             ),
         )
-    return zip(output_perturb_params, augmented_datasets)
+    return zip(output_perturb_params, augmented_datasets, strict=False)

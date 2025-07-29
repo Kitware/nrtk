@@ -175,7 +175,6 @@ numpy = ">=1.24.4"
 opencv-python-headless = ">=4.9.0.80"
 simsimd = ">=5.9.2"
 stringzilla = ">=3.10.4"
-typing-extensions = {version = ">=4.9.0", markers = "python_version < \"3.10\""}
 
 [[package]]
 name = "albumentations"
@@ -190,13 +189,11 @@ files = [
 
 [package.dependencies]
 albucore = "0.0.23"
-eval-type-backport = {version = "*", markers = "python_version < \"3.10\""}
 numpy = ">=1.24.4"
 opencv-python-headless = ">=4.9.0.80"
 pydantic = ">=2.9.2"
 PyYAML = "*"
 scipy = ">=1.10.0"
-typing-extensions = {version = ">=4.9.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 hub = ["huggingface-hub"]
@@ -1016,7 +1013,6 @@ networkx = [
 numpy = [
     {version = ">=1.23.2", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.21.6", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.19.3", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=1.26.0", markers = "python_version < \"4.0\" and python_version >= \"3.12\""},
 ]
 ubelt = ">=1.3.6"
@@ -1100,20 +1096,6 @@ files = [
     {file = "entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f"},
     {file = "entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4"},
 ]
-
-[[package]]
-name = "eval-type-backport"
-version = "0.2.2"
-description = "Like `typing._eval_type`, but lets older Python versions use newer typing features."
-optional = true
-python-versions = ">=3.8"
-files = [
-    {file = "eval_type_backport-0.2.2-py3-none-any.whl", hash = "sha256:cb6ad7c393517f476f96d456d0412ea80f0a8cf96f6892834cd9340149111b0a"},
-    {file = "eval_type_backport-0.2.2.tar.gz", hash = "sha256:f0576b4cf01ebb5bd358d02314d31846af5e07678387486e2c798af0e7d849c1"},
-]
-
-[package.extras]
-tests = ["pytest"]
 
 [[package]]
 name = "exceptiongroup"
@@ -1234,7 +1216,6 @@ certifi = "*"
 click = ">=8.0,<9.0"
 click-plugins = ">=1.0"
 cligj = ">=0.5"
-importlib-metadata = {version = "*", markers = "python_version < \"3.10\""}
 
 [package.extras]
 all = ["fiona[calc,s3,test]"]
@@ -1744,28 +1725,6 @@ test = ["flufl.flake8", "importlib-resources (>=1.3)", "jaraco.test (>=5.4)", "p
 type = ["pytest-mypy"]
 
 [[package]]
-name = "importlib-resources"
-version = "6.4.5"
-description = "Read resources from Python packages"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "importlib_resources-6.4.5-py3-none-any.whl", hash = "sha256:ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717"},
-    {file = "importlib_resources-6.4.5.tar.gz", hash = "sha256:980862a1d16c9e147a59603677fa2aa5fd82b87f223b6cb870695bcfce830065"},
-]
-
-[package.dependencies]
-zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
-
-[package.extras]
-check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1)"]
-cover = ["pytest-cov"]
-doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-enabler = ["pytest-enabler (>=2.2)"]
-test = ["jaraco.test (>=5.4)", "pytest (>=6,!=8.1.*)", "zipp (>=3.17)"]
-type = ["pytest-mypy"]
-
-[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -1831,7 +1790,6 @@ prompt-toolkit = ">=3.0.41,<3.1.0"
 pygments = ">=2.4.0"
 stack-data = "*"
 traitlets = ">=5"
-typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
 
 [package.extras]
 all = ["black", "curio", "docrepr", "exceptiongroup", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.22)", "pandas", "pickleshare", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio (<0.22)", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
@@ -2011,7 +1969,6 @@ files = [
 ]
 
 [package.dependencies]
-importlib-metadata = {version = ">=4.8.3", markers = "python_version < \"3.10\""}
 jupyter-core = ">=4.12,<5.0.dev0 || >=5.1.dev0"
 python-dateutil = ">=2.8.2"
 pyzmq = ">=23.0"
@@ -2079,7 +2036,6 @@ files = [
 ]
 
 [package.dependencies]
-importlib-metadata = {version = ">=4.8.3", markers = "python_version < \"3.10\""}
 jupyter-server = ">=1.1.2"
 
 [[package]]
@@ -2151,7 +2107,6 @@ files = [
 [package.dependencies]
 async-lru = ">=1.0.0"
 httpx = ">=0.25.0"
-importlib-metadata = {version = ">=4.8.3", markers = "python_version < \"3.10\""}
 ipykernel = ">=6.5.0"
 jinja2 = ">=3.0.3"
 jupyter-core = "*"
@@ -2196,7 +2151,6 @@ files = [
 
 [package.dependencies]
 babel = ">=2.10"
-importlib-metadata = {version = ">=4.8.3", markers = "python_version < \"3.10\""}
 jinja2 = ">=3.0.3"
 json5 = ">=0.9.0"
 jsonschema = ">=4.18.0"
@@ -2406,7 +2360,6 @@ files = [
 numpy = [
     {version = ">=1.23.2", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.21.6", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.19.3", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=1.26.0", markers = "python_version < \"3.13\" and python_version >= \"3.12\""},
 ]
 packaging = ">=21.3"
@@ -2446,32 +2399,29 @@ networkx = {version = ">=2.8", markers = "python_version < \"4.0\" and python_ve
 numpy = [
     {version = ">=1.23.2", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.21.6", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.19.3", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=1.26.0", markers = "python_version < \"4.0\" and python_version >= \"3.12\""},
 ]
 packaging = ">=21.3"
 pandas = [
     {version = ">=1.5.0", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
-    {version = ">=1.4.2", markers = "python_version < \"3.11\" and python_version >= \"3.9\""},
+    {version = ">=1.4.2", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
     {version = ">=2.1.1", markers = "python_version < \"4.0\" and python_version >= \"3.12\""},
 ]
 parse = ">=1.19.0"
 psutil = [
     {version = ">=5.9.6", markers = "python_version < \"4.0\" and python_version >= \"3.11\""},
     {version = ">=5.9.1", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=5.7.3", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
 ]
 rich = ">=12.3.0"
 safer = ">=4.4.1"
 scikit-learn = [
     {version = ">=1.1.3", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.1.0", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.0.2", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=1.3.1", markers = "python_version < \"4.0\" and python_version >= \"3.12\""},
 ]
 scipy = [
     {version = ">=1.9.2", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
-    {version = ">=1.8.0", markers = "python_version < \"3.11\" and python_version >= \"3.9\""},
+    {version = ">=1.8.0", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
     {version = ">=1.11.2", markers = "python_version < \"4.0\" and python_version >= \"3.12\""},
 ]
 scriptconfig = ">=0.7.10"
@@ -2573,32 +2523,27 @@ networkx = [
 numpy = [
     {version = ">=1.23.2", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.21.6", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.19.3", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=1.26.0", markers = "python_version < \"3.13\" and python_version >= \"3.12\""},
 ]
 parse = ">=1.14.0"
 Pillow = [
     {version = ">=9.2.0", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=9.1.0", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=8.0.0", markers = "python_version < \"3.10\" and python_version >= \"3.6\""},
     {version = ">=10.0.0", markers = "python_version < \"3.13\" and python_version >= \"3.12\""},
 ]
 scikit-image = [
     {version = ">=0.20.0", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=0.19.0", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=0.18.0", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=0.22.0", markers = "python_version < \"3.13\" and python_version >= \"3.12\""},
 ]
 scipy = [
     {version = ">=1.9.2", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.7.2", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.5.4", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=1.11.2", markers = "python_version < \"3.13\" and python_version >= \"3.12\""},
 ]
 shapely = [
     {version = ">=1.8.5", markers = "python_version < \"3.12\" and python_version >= \"3.11\""},
     {version = ">=1.8.2", markers = "python_version < \"3.11\" and python_version >= \"3.10\""},
-    {version = ">=1.7.1", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=2.0.2", markers = "python_version < \"3.13\" and python_version >= \"3.12\""},
 ]
 ubelt = ">=1.3.3"
@@ -2877,7 +2822,6 @@ files = [
 contourpy = ">=1.0.1"
 cycler = ">=0.10"
 fonttools = ">=4.22.0"
-importlib-resources = {version = ">=3.2.0", markers = "python_version < \"3.10\""}
 kiwisolver = ">=1.3.1"
 numpy = ">=1.23"
 packaging = ">=20.0"
@@ -3176,7 +3120,6 @@ files = [
 beautifulsoup4 = "*"
 bleach = "!=5.0.0"
 defusedxml = "*"
-importlib-metadata = {version = ">=3.6", markers = "python_version < \"3.10\""}
 jinja2 = ">=3.0"
 jupyter-core = ">=4.7"
 jupyterlab-pygments = "*"
@@ -3611,8 +3554,6 @@ numpy = [
     {version = ">=1.23.5", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
     {version = ">=1.21.4", markers = "python_version >= \"3.10\" and platform_system == \"Darwin\" and python_version < \"3.11\""},
     {version = ">=1.21.2", markers = "platform_system != \"Darwin\" and python_version >= \"3.10\" and python_version < \"3.11\""},
-    {version = ">=1.21.0", markers = "python_version == \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
-    {version = ">=1.19.3", markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and python_version >= \"3.8\" and python_version < \"3.10\" or python_version > \"3.9\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_system != \"Darwin\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
     {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 
@@ -3637,8 +3578,6 @@ numpy = [
     {version = ">=1.23.5", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
     {version = ">=1.21.4", markers = "python_version >= \"3.10\" and platform_system == \"Darwin\" and python_version < \"3.11\""},
     {version = ">=1.21.2", markers = "platform_system != \"Darwin\" and python_version >= \"3.10\" and python_version < \"3.11\""},
-    {version = ">=1.21.0", markers = "python_version == \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
-    {version = ">=1.19.3", markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and python_version >= \"3.8\" and python_version < \"3.10\" or python_version > \"3.9\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_system != \"Darwin\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
     {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 
@@ -5418,7 +5357,6 @@ files = [
 [package.dependencies]
 PyYAML = [
     {version = ">=6.0", markers = "python_version < \"3.12\" and python_version >= \"3.10\""},
-    {version = ">=5.4.1", markers = "python_version < \"3.10\" and python_version >= \"3.9\""},
     {version = ">=6.0.1", markers = "python_version < \"4.0\" and python_version >= \"3.12\""},
 ]
 ubelt = ">=1.3.6"
@@ -5865,7 +5803,6 @@ babel = ">=2.13"
 colorama = {version = ">=0.4.6", markers = "sys_platform == \"win32\""}
 docutils = ">=0.20,<0.22"
 imagesize = ">=1.3"
-importlib-metadata = {version = ">=6.0", markers = "python_version < \"3.10\""}
 Jinja2 = ">=3.1"
 packaging = ">=23.0"
 Pygments = ">=2.17"
@@ -6441,28 +6378,6 @@ files = [
     {file = "threadpoolctl-3.5.0-py3-none-any.whl", hash = "sha256:56c1e26c150397e58c4926da8eeee87533b1e32bef131bd4bf6a2f45f3185467"},
     {file = "threadpoolctl-3.5.0.tar.gz", hash = "sha256:082433502dd922bf738de0d8bcc4fdcbf0979ff44c42bd40f5af8a282f6fa107"},
 ]
-
-[[package]]
-name = "tifffile"
-version = "2024.8.30"
-description = "Read and write TIFF files"
-optional = true
-python-versions = ">=3.9"
-files = [
-    {file = "tifffile-2024.8.30-py3-none-any.whl", hash = "sha256:8bc59a8f02a2665cd50a910ec64961c5373bee0b8850ec89d3b7b485bf7be7ad"},
-    {file = "tifffile-2024.8.30.tar.gz", hash = "sha256:2c9508fe768962e30f87def61819183fb07692c258cb175b3c114828368485a4"},
-]
-
-[package.dependencies]
-numpy = "*"
-
-[package.extras]
-all = ["defusedxml", "fsspec", "imagecodecs (>=2023.8.12)", "lxml", "matplotlib", "zarr"]
-codecs = ["imagecodecs (>=2023.8.12)"]
-plot = ["matplotlib"]
-test = ["cmapfile", "czifile", "dask", "defusedxml", "fsspec", "imagecodecs", "lfdfiles", "lxml", "ndtiff", "oiffile", "psdtags", "pytest", "roifile", "xarray", "zarr"]
-xml = ["defusedxml", "lxml"]
-zarr = ["fsspec", "zarr"]
 
 [[package]]
 name = "tifffile"
@@ -7158,30 +7073,6 @@ tools = ["kwcoco (>=0.2.18)", "matplotlib (>=3.4.1)"]
 
 [[package]]
 name = "xarray"
-version = "2024.7.0"
-description = "N-D labeled arrays and datasets in Python"
-optional = true
-python-versions = ">=3.9"
-files = [
-    {file = "xarray-2024.7.0-py3-none-any.whl", hash = "sha256:1b0fd51ec408474aa1f4a355d75c00cc1c02bd425d97b2c2e551fd21810e7f64"},
-    {file = "xarray-2024.7.0.tar.gz", hash = "sha256:4cae512d121a8522d41e66d942fb06c526bc1fd32c2c181d5fe62fe65b671638"},
-]
-
-[package.dependencies]
-numpy = ">=1.23"
-packaging = ">=23.1"
-pandas = ">=2.0"
-
-[package.extras]
-accel = ["bottleneck", "flox", "numbagg", "opt-einsum", "scipy"]
-complete = ["xarray[accel,dev,io,parallel,viz]"]
-dev = ["hypothesis", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-env", "pytest-timeout", "pytest-xdist", "ruff", "xarray[complete]"]
-io = ["cftime", "fsspec", "h5netcdf", "netCDF4", "pooch", "pydap", "scipy", "zarr"]
-parallel = ["dask[complete]"]
-viz = ["matplotlib", "nc-time-axis", "seaborn"]
-
-[[package]]
-name = "xarray"
 version = "2024.11.0"
 description = "N-D labeled arrays and datasets in Python"
 optional = true
@@ -7466,5 +7357,5 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.9"
-content-hash = "6f455405d12549b074bc72ad02fb6412ab3ec557c812811f96b3da4107511af0"
+python-versions = "^3.10"
+content-hash = "2c48558593b1c9c36032cda10fa84f71d8d766ff46107d24cc6761bae1a65ca3"

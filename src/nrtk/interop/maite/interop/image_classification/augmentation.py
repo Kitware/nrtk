@@ -64,7 +64,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
         aug_anns = list()  # list of individual augmented annotations
         aug_metadata = list()  # list of individual augmented image-level metadata
 
-        for img, ann, md in zip(imgs, anns, metadata):  # pyright: ignore [reportArgumentType]
+        for img, ann, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
             aug_img = np.transpose(np.asarray(copy.deepcopy(img)), (1, 2, 0))  # Convert to channels-last
             aug_img, _ = self.augment(aug_img, additional_params=dict(md))
@@ -155,7 +155,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
 
         aug_imgs, aug_anns, aug_metadata = self._apply_augmentations(batch)
 
-        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata):  # pyright: ignore [reportArgumentType]
+        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Convert from channels-first to channels-last
             img_1 = np.transpose(np.asarray(img), (1, 2, 0))
             img_2 = None if aug_img is None else np.transpose(aug_img, (1, 2, 0))

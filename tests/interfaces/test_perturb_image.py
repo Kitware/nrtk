@@ -46,7 +46,7 @@ def test_rescale_boxes(
         orig_shape,
         new_shape,
     )
-    for (out_box, out_dict), (expeted_box, expected_dict) in zip(out_bboxes, expected_bboxes):
+    for (out_box, out_dict), (expeted_box, expected_dict) in zip(out_bboxes, expected_bboxes, strict=False):
         # score dicts should be unchanged
         assert out_dict == expected_dict
         # use np.allclose() because of float operations

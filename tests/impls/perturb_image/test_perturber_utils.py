@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Hashable, Iterable
-from typing import Any, Callable
+from collections.abc import Callable, Hashable, Iterable
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -87,7 +87,7 @@ def bbox_perturber_assertions(
     if expected is not None:
         assert np.array_equal(out_image, expected[0])
         assert out_boxes is not None
-        for (expected_box, expected_meta), (out_box, out_meta) in zip(expected[1], out_boxes):
+        for (expected_box, expected_meta), (out_box, out_meta) in zip(expected[1], out_boxes, strict=False):
             assert expected_box != out_box
             assert expected_meta == out_meta
 
