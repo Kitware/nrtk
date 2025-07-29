@@ -90,6 +90,8 @@ torch = {version = ">=2.2.0", optional = true}
 torchmetrics = {version = ">=1.0.0", optional = true}
 torchvision = {version = ">=0.21.0", optional = true}
 transformers = {version = ">=4.52.1", optional = true} # CVE-2025-3777
+diffusers = {version = ">=0.21.0", optional = true}
+accelerate = {version = ">=0.20.0", optional = true}
 ultralytics = {version = ">=8.3.85", optional = true}
 xaitk-jatic = {version = ">=0.7.0", optional = true}
 jupytext = {version = ">=1.16.7", optional = true}
@@ -104,6 +106,7 @@ scikit-image = ["scikit-image"]
 Pillow = ["Pillow"]
 albumentations = ["albumentations"]
 waterdroplet = ["scipy", "shapely", "geopandas"]
+diffusion = ["torch", "diffusers", "accelerate", "Pillow"]
 notebook-testing = [
     "datasets", "matplotlib", "numba", "tabulate", "torch",
     "torchmetrics", "torchvision", "transformers", "ultralytics",
@@ -172,6 +175,7 @@ Pillow = ">=10.3.0" # CVE-2024-28219
 "impls.perturb_image.generic.random_translation_perturber" = "nrtk.impls.perturb_image.generic.random_translation_perturber"
 "impls.perturb_image.generic.haze_perturber" = "nrtk.impls.perturb_image.generic.haze_perturber"
 "impls.perturb_image.generic.water_droplet_perturber" = "nrtk.impls.perturb_image.generic.water_droplet_perturber"
+"impls.perturb_image.generic.diffusion_perturber" = "nrtk.impls.perturb_image.generic.diffusion_perturber"
 "impls.perturb_image.generic.radial_distortion_perturber" = "nrtk.impls.perturb_image.generic.radial_distortion_perturber"
 "impls.perturb_image.generic.PIL.enhance" = "nrtk.impls.perturb_image.generic.PIL.enhance"
 "impls.perturb_image.generic.cv2.blur" = "nrtk.impls.perturb_image.generic.cv2.blur"

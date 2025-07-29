@@ -9,9 +9,9 @@
 ###############################################################################
 pyright-internal:
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
 
 pyright-external:
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
   allow_failure: false

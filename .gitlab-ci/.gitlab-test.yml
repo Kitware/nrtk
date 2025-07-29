@@ -11,13 +11,15 @@
 
 pytest-extras:
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+  tags:
+    - single-gpu
 
 notebooks:
   extends: .notebooks
   rules: !reference [.notebooks, rules]
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
