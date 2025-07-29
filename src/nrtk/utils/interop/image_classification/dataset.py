@@ -5,27 +5,29 @@ from __future__ import annotations
 
 import math
 import random
+from typing import Callable
 
 # 3rd party imports
 import numpy as np
 
 # Local imports
 from nrtk.utils._exceptions import NRTKXAITKHelperImportError
+from nrtk.utils._import_guard import import_guard
 
-# Guarded imports
-Dataset: type = object
-InputType: type = object
-TargetType: type = object
-DatumMetadataType: type = object
-try:
-    from datasets import Dataset as HFDataset
-    from datasets import load_dataset
-    from maite.protocols.image_classification import Dataset, DatumMetadataType, InputType, TargetType
-    from PIL import Image
-
-    nrtk_xaitk_helpers_available: bool = True
-except ImportError:  # pragma: no cover
-    nrtk_xaitk_helpers_available: bool = False
+PIL_available: bool = import_guard("PIL", NRTKXAITKHelperImportError)
+maite_available: bool = import_guard(
+    "maite",
+    NRTKXAITKHelperImportError,
+    ["protocols.image_classification"],
+    ["Dataset", "DatumMetadataType", "InputType", "TargetType"],
+)
+datasets_available: bool = import_guard("datasets", NRTKXAITKHelperImportError)
+nrtk_xaitk_helpers_available: bool = maite_available and PIL_available and datasets_available
+from datasets import Dataset as HFDataset  # noqa: E402
+from datasets import load_dataset  # noqa: E402
+from maite.protocols import ModelMetadata  # noqa: E402
+from maite.protocols.image_classification import Dataset, DatumMetadataType, InputType, TargetType  # noqa: E402
+from PIL import Image  # noqa: E402
 
 
 def create_data_subset(
@@ -108,10 +110,10 @@ class HuggingFaceMaiteDataset(Dataset):  # pyright:  ignore [reportGeneralTypeIs
         self.hf_dataset = hf_dataset
 
         # Extract class labels mapping (assumes dataset has 'label' column)
-        self.index2label = hf_dataset.features["label"].int2str
-        self.num_classes = len(set(hf_dataset["label"]))
+        self.index2label: Callable = hf_dataset.features["label"].int2str
+        self.num_classes: int = len(set(hf_dataset["label"]))
         # Set up required metadata
-        self.metadata = {
+        self.metadata: ModelMetadata = {
             "id": dataset_name,
             "index2label": {i: self.index2label(i) for i in range(self.num_classes)},
         }
@@ -143,7 +145,7 @@ class HuggingFaceMaiteDataset(Dataset):  # pyright:  ignore [reportGeneralTypeIs
 
         # Convert image (assumes dataset stores images as PIL or arrays)
         image = sample["image"]
-        if isinstance(image, Image.Image):  # pyright: ignore [reportPossiblyUnboundVariable]
+        if isinstance(image, Image.Image):
             image = np.array(image)
 
         # Convert to (C, H, W) format (assuming RGB input)

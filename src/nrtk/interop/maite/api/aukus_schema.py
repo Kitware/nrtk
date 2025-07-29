@@ -5,14 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from nrtk.utils._exceptions import PydanticImportError
+from nrtk.utils._import_guard import import_guard
 
-BaseModel: type = object
-try:
-    from pydantic import BaseModel
-
-    pydantic_available: bool = True
-except ImportError:  # pragma: no cover
-    pydantic_available: bool = False
+pydantic_available: bool = import_guard("pydantic", PydanticImportError)
+from pydantic import BaseModel  # noqa: E402
 
 
 # pyright warns about inheritance from BaseSettings which is ambiguous

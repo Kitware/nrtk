@@ -42,6 +42,18 @@ class PyBSMImportError(ImportError):
         super().__init__("pyBSM must be installed. Please install via `nrtk[pybsm]`.")
 
 
+class ScipyImportError(ImportError):
+    def __init__(self) -> None:
+        # Call the base class constructor with the parameters it needs
+        super().__init__("scipy must be installed. Please install via `nrtk[waterdroplet]`.")
+
+
+class TorchImportError(ImportError):
+    def __init__(self) -> None:
+        # Call the base class constructor with the parameters it needs
+        super().__init__("torchvision must be installed. Please install via `nrtk[notebook-testing]`.")
+
+
 class PydanticImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs

@@ -2,30 +2,35 @@
 
 # Python imports
 from collections.abc import Hashable, Sequence
+from typing import Any
 
 # 3rd party imports
 import numpy as np
 
 # Local imports
 from nrtk.utils._exceptions import NRTKXAITKHelperImportError
+from nrtk.utils._import_guard import import_guard
 
-# Guarded imports
-Model: type = object
-InputType: type = object
-TargetType: type = object
-try:
-    import torch
-    from maite.protocols.image_classification import (
-        InputType,
-        Model,
-        TargetType,
-    )
-    from PIL import Image
-    from transformers import AutoModelForImageClassification, AutoProcessor
+maite_available: bool = import_guard(
+    "maite",
+    NRTKXAITKHelperImportError,
+    ["protocols.image_classification"],
+    ["Model", "InputType", "TargetType"],
+)
+torch_available: bool = import_guard("torch", NRTKXAITKHelperImportError, fake_spec=True)
+PIL_available: bool = import_guard("PIL", NRTKXAITKHelperImportError)
+transformers_available: bool = import_guard("transformers", NRTKXAITKHelperImportError)
+import torch  # noqa: E402
+from maite.protocols import ModelMetadata  # noqa: E402
+from maite.protocols.image_classification import (  # noqa: E402
+    InputType,
+    Model,
+    TargetType,
+)
+from PIL import Image  # noqa: E402
+from transformers import AutoModelForImageClassification, AutoProcessor  # noqa: E402
 
-    nrtk_xaitk_helpers_available: bool = True
-except ImportError:  # pragma: no cover
-    nrtk_xaitk_helpers_available: bool = False
+nrtk_xaitk_helpers_available: bool = maite_available and torch_available and PIL_available and transformers_available
 
 
 class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
@@ -47,13 +52,13 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
         if not self.is_usable():
             raise NRTKXAITKHelperImportError
         self.model_name = model_name
-        self.model = AutoModelForImageClassification.from_pretrained(self.model_name)  # pyright: ignore [reportPossiblyUnboundVariable]
-        self.feature_layer = torch.nn.Sequential(*list(self.model.children())[:-1])  # pyright: ignore [reportPossiblyUnboundVariable]
-        self.processor = AutoProcessor.from_pretrained(model_name)  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.model: Any = AutoModelForImageClassification.from_pretrained(self.model_name)
+        self.feature_layer: torch.nn.Sequential = torch.nn.Sequential(*list(self.model.children())[:-1])
+        self.processor: Any = AutoProcessor.from_pretrained(model_name)
         self.model.eval()  # Set model to evaluation mode
 
         # Set up metadata required by MAITE
-        self.metadata = {"id": model_name}
+        self.metadata: ModelMetadata = {"id": model_name}
 
         # Move model to GPU if available
         self.device = device
@@ -129,10 +134,7 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
             Sequence[np.ndarray]: A sequence of arrays containing class probabilities.
         """
         # Convert batch to PIL images (assuming input format is ArrayLike)
-        pil_images = [
-            Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0))  # pyright: ignore [reportPossiblyUnboundVariable]
-            for img in batch
-        ]
+        pil_images = [Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0)) for img in batch]
 
         # Preprocess images
         inputs = self.processor(images=pil_images, return_tensors="pt")
@@ -141,10 +143,10 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         # Get model predictions
-        with torch.no_grad():  # pyright: ignore [reportPossiblyUnboundVariable]
+        with torch.no_grad():
             outputs = self.model(**inputs)
         logits = outputs.logits
-        probabilities = torch.nn.functional.softmax(logits, dim=-1).cpu().numpy()  # pyright: ignore [reportPossiblyUnboundVariable]
+        probabilities = torch.nn.functional.softmax(logits, dim=-1).cpu().numpy()
 
         return self._remap_model_output(
             [probs for probs in probabilities],
@@ -164,17 +166,14 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
             torch.Tensor: Feature vector as a torch tensor
         """
         # Convert batch to PIL images (assuming input format is ArrayLike)
-        pil_images = [
-            Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0))  # pyright: ignore [reportPossiblyUnboundVariable]
-            for img in batch
-        ]
+        pil_images = [Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0)) for img in batch]
         # Preprocess image
         inputs = self.processor(images=pil_images, return_tensors="pt").to(self.device)
 
-        with torch.no_grad():  # pyright: ignore [reportPossiblyUnboundVariable]
+        with torch.no_grad():
             outputs = self.model(**inputs)
         logits = outputs.logits
-        return torch.tensor(  # pyright: ignore [reportPossiblyUnboundVariable]
+        return torch.tensor(
             np.array(
                 self._remap_model_output(
                     [logit for logit in logits.cpu().numpy()],

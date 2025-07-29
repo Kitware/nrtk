@@ -22,7 +22,6 @@ Example usage:
 """
 
 from collections.abc import Hashable, Sequence
-from importlib.util import find_spec
 from typing import Any
 
 import numpy as np
@@ -36,6 +35,7 @@ from nrtk.interfaces.gen_object_detector_blackbox_response import (
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interfaces.score_detections import ScoreDetections
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import is_available
 
 
 class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
@@ -167,4 +167,4 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         Returns:
             bool: True if pybsm is installed; False otherwise.
         """
-        return find_spec("pybsm") is not None
+        return is_available("pybsm")

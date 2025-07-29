@@ -1,14 +1,12 @@
-from importlib.util import find_spec
-
 import pytest
 
 from nrtk.utils._exceptions import NotebookTestingImportError
+from nrtk.utils._import_guard import is_available
 
 from .test_notebook_utils import list_error_messages, pyright_analyze
 
 deps = ["jupytext"]
-specs = [find_spec(dep) for dep in deps]
-is_usable = all(spec is not None for spec in specs)
+is_usable = all(is_available(dep) for dep in deps)
 
 
 @pytest.mark.skipif(not is_usable, reason=str(NotebookTestingImportError()))

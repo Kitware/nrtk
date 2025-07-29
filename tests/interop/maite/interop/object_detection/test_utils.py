@@ -4,11 +4,13 @@ from collections.abc import Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
+import kwcoco  # type: ignore
 import numpy as np
 import py  # type: ignore
 import pytest
+from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 from nrtk.interop.maite.interop.object_detection.dataset import (
     COCOJATICObjectDetectionDataset,
@@ -17,17 +19,6 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
 )
 from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco, kwcoco_available, maite_available
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
-
-if kwcoco_available:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import kwcoco  # type: ignore
-
-
-TargetType: type = object
-DatumMetadataType: type = TypedDict
-if maite_available:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 random = np.random.default_rng()
 
@@ -98,7 +89,7 @@ def test_dataset_to_coco(
 
     with expectation:
         dataset_to_coco(
-            dataset=dataset,  # pyright: ignore [reportPossiblyUnboundVariable]
+            dataset=dataset,
             output_dir=Path(tmpdir),
             img_filenames=img_filenames,
             dataset_categories=categories,
@@ -120,7 +111,7 @@ def test_dataset_to_coco(
 
         # Re-create MAITE dataset from file
         coco_dataset = COCOJATICObjectDetectionDataset(
-            kwcoco_dataset=kwcoco.CocoDataset(label_file),  # pyright: ignore [reportPossiblyUnboundVariable, reportCallIssue]
+            kwcoco_dataset=kwcoco.CocoDataset(label_file),  # pyright: ignore [reportCallIssue]
             image_metadata=metadata,
         )
 

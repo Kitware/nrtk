@@ -8,15 +8,11 @@ from typing import Any
 
 from typing_extensions import NotRequired, ReadOnly
 
-DatumMetadata: type = object
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols import DatumMetadata
+from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
 
-    maite_available: bool = True
-
-except ImportError:  # pragma: no cover
-    maite_available: bool = False
+maite_available: bool = import_guard("maite", MaiteImportError, submodules=["protocols"], objects=["DatumMetadata"])
+from maite.protocols import DatumMetadata  # noqa: E402
 
 
 @dataclass

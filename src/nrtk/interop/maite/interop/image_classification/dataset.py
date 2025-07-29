@@ -3,29 +3,24 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 
-InputType: type = object
-TargetType: type = object
-DatumMetadataType: type = TypedDict
-Dataset: type = object
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols import DatasetMetadata
-    from maite.protocols.image_classification import (
-        Dataset,
-        DatumMetadataType,
-        InputType,
-        TargetType,
-    )
+from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
 
-    maite_available: bool = True
-except ImportError:  # pragma: no cover
-    maite_available: bool = False
+maite_available: bool = import_guard("maite", MaiteImportError, ["protocols.image_classification"], ["Dataset"])
+import_guard("maite.protocols", MaiteImportError)
+from maite.protocols import DatasetMetadata  # noqa: E402
+from maite.protocols.image_classification import (  # noqa: E402
+    Dataset,
+    DatumMetadataType,
+    InputType,
+    TargetType,
+)
 
-IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]  # pyright:  ignore [reportPossiblyUnboundVariable]
+IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 
 
 class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]

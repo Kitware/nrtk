@@ -1,8 +1,4 @@
-"""This module contains wrappers for converting a COCO dataset or a generic dataset to a MAITE dataset.
-
-All instances of # pyright: ignore [reportPossiblyUnboundVariable]
-are result of guard imports on maite imports
-"""
+"""This module contains wrappers for converting a COCO dataset or a generic dataset to a MAITE dataset."""
 
 from __future__ import annotations
 
@@ -11,42 +7,32 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 from PIL import Image  # type: ignore
 from typing_extensions import ReadOnly
 
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
+from nrtk.utils._import_guard import import_guard
 
-InputType: type = object
-TargetType: type = object
-DatumMetadataType: type = TypedDict
-Dataset: type = object
-DatumMetadata: type = object
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols import DatasetMetadata, DatumMetadata
-    from maite.protocols.object_detection import (
-        Dataset,
-        DatumMetadataType,
-        InputType,
-        TargetType,
-    )
+maite_available: bool = import_guard(
+    "maite",
+    MaiteImportError,
+    ["protocols.object_detection"],
+    ["Dataset", "DatumMetadata"],
+)
+kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+from kwcoco import CocoDataset  # type: ignore  # noqa: E402
+from maite.protocols import DatasetMetadata, DatumMetadata  # noqa: E402
+from maite.protocols.object_detection import (  # noqa: E402
+    Dataset,
+    DatumMetadataType,
+    InputType,
+    TargetType,
+)
 
-    maite_available: bool = True
-except ImportError:  # pragma: no cover
-    maite_available: bool = False
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import kwcoco  # type: ignore
-
-    kwcoco_available: bool = True
-except ImportError:  # pragma: no cover
-    kwcoco_available: bool = False
-
-OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]  # pyright: ignore [reportPossiblyUnboundVariable]
+OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 
 LOG = logging.getLogger(__name__)
 
@@ -79,7 +65,7 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
 
     def __init__(  # noqa: C901
         self,
-        kwcoco_dataset: kwcoco.CocoDataset,  # pyright: ignore [reportGeneralTypeIssues]
+        kwcoco_dataset: CocoDataset,  # pyright: ignore [reportGeneralTypeIssues]
         image_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         skip_no_anns: bool = False,
         dataset_id: str | None = None,
@@ -150,7 +136,7 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
         if len(self._image_metadata) != len(self._image_ids):
             raise ValueError("Image metadata length mismatch, metadata needed for every image.")
 
-        self.metadata: DatasetMetadata = DatasetMetadata(  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.metadata: DatasetMetadata = DatasetMetadata(
             id=dataset_id if dataset_id else kwcoco_dataset.fpath,
             index2label={c["id"]: c["name"] for c in kwcoco_dataset.cats.values()},
         )

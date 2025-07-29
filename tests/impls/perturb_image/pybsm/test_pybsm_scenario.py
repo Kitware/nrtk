@@ -6,12 +6,10 @@ from smqtk_core.configuration import configuration_test_helper
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
 
-pybsm_available = True
-try:
-    from pybsm.simulation.scenario import Scenario
-except ImportError:
-    pybsm_available = False
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.scenario"])
+from pybsm.simulation.scenario import Scenario  # noqa: E402
 
 
 @pytest.mark.skipif(not pybsm_available, reason=str(PyBSMImportError()))
@@ -31,7 +29,7 @@ class TestPybsmScenario:
         ground_range = 0
         name = "test"
         scenario = PybsmScenario(name, ihaze, altitude, ground_range)
-        assert isinstance(scenario(), Scenario)  # pyright: ignore [reportPossiblyUnboundVariable]
+        assert isinstance(scenario(), Scenario)
 
     @pytest.mark.parametrize(
         ("ihaze", "altitude", "ground_range", "name", "expectation"),

@@ -6,12 +6,11 @@ from typing import Any
 
 import numpy as np
 
-try:
-    from scipy.special import binom
+from nrtk.utils._exceptions import WaterDropletImportError
+from nrtk.utils._import_guard import import_guard
 
-    scipy_available: bool = True
-except ImportError:
-    scipy_available: bool = False
+scipy_available: bool = import_guard("scipy", WaterDropletImportError, ["special"])
+from scipy.special import binom  # noqa: E402
 
 
 class Bezier:
@@ -83,7 +82,7 @@ class Bezier:
             - B(3, 3)(t) = t^3.
 
             """
-            return binom(n, k) * t**k * (1.0 - t) ** (n - k)  # pyright: ignore [reportPossiblyUnboundVariable]
+            return binom(n, k) * t**k * (1.0 - t) ** (n - k)
 
         n = len(self.p)
         t = np.linspace(0, 1, num=self.num_points)

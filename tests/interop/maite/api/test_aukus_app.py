@@ -9,20 +9,18 @@ from starlette.testclient import TestClient
 from nrtk.interop.maite.api.aukus_app import AUKUS_app, Settings
 from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema
 from nrtk.interop.maite.api.schema import DatasetSchema, NrtkPerturbOutputSchema
+from nrtk.utils._exceptions import FastApiImportError
+from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG
 
-try:
-    from fastapi.encoders import jsonable_encoder
-
-    is_usable = True
-except ImportError:
-    is_usable = False
+is_usable: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
+from fastapi.encoders import jsonable_encoder  # noqa: E402
 
 
 @pytest.fixture
 def test_aukus_client() -> Generator:
     # Create a test client for the FastAPI application
-    with TestClient(AUKUS_app) as client:  # pyright: ignore [reportArgumentType, reportPossiblyUnboundVariable]
+    with TestClient(AUKUS_app) as client:  # pyright: ignore [reportArgumentType]
         yield client
 
 
@@ -63,7 +61,7 @@ class TestAukusApp:
         responses.add(
             method="POST",
             url=Settings().NRTK_IP,
-            json=jsonable_encoder(  # pyright: ignore [reportPossiblyUnboundVariable]
+            json=jsonable_encoder(
                 NrtkPerturbOutputSchema(
                     message="Data received successfully",
                     datasets=[
@@ -77,7 +75,7 @@ class TestAukusApp:
                 ),
             ),
         )
-        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))
 
         # Check if the response status code is 200 OK
         assert response.status_code == 200
@@ -120,7 +118,7 @@ class TestAukusApp:
             tags=["training", "synthetic"],
         )
 
-        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))
 
         assert response.status_code == 400
         assert response.json()["detail"] == "Labels provided in incorrect format."
@@ -156,7 +154,7 @@ class TestAukusApp:
             tags=["training", "synthetic"],
         )
 
-        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_aukus_client.post("/", json=jsonable_encoder(aukus_dataset))
 
         assert response.status_code == 400
         assert response.json()["detail"] == "Provided NRTK config is not a valid file."

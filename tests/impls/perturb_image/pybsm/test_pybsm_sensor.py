@@ -9,13 +9,10 @@ from smqtk_core.configuration import configuration_test_helper
 
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
 
-pybsm_available = True
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from pybsm.simulation.sensor import Sensor
-except ImportError:
-    pybsm_available = False
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.sensor"])
+from pybsm.simulation.sensor import Sensor  # noqa: E402
 
 
 @pytest.fixture()  # noqa:PT001
@@ -42,7 +39,7 @@ class TestPybsmSensor:
         opt_trans_wavelengths = np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
         name = "test"
         sensor = PybsmSensor(name, D, f, p_x, opt_trans_wavelengths)
-        assert isinstance(sensor(), Sensor)  # pyright: ignore [reportPossiblyUnboundVariable]
+        assert isinstance(sensor(), Sensor)
 
     @pytest.mark.parametrize(
         ("opt_trans_wavelengths", "optics_transmission", "name", "expectation"),

@@ -10,15 +10,10 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation
 from nrtk.interop.maite.interop.object_detection.dataset import JATICObjectDetectionDataset
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
 
-Dataset: type = object
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols.object_detection import Dataset
-
-    maite_available: bool = True
-except ImportError:  # pragma: no cover
-    maite_available: bool = False
+maite_available: bool = import_guard("maite", MaiteImportError, ["protocols.object_detection"])
+from maite.protocols.object_detection import Dataset  # noqa: E402
 
 
 def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportInvalidTypeForm]

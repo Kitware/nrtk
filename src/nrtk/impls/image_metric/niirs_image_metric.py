@@ -22,20 +22,16 @@ from typing import Any
 
 import numpy as np
 
-try:
-    from pybsm.metrics import niirs5
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-from smqtk_core.configuration import to_config_dict
-from typing_extensions import override
-
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._import_guard import import_guard
+
+pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError, ["metrics"])
+from pybsm.metrics import niirs5  # noqa: E402
+from smqtk_core.configuration import to_config_dict  # noqa: E402
+from typing_extensions import override  # noqa: E402
 
 
 class NIIRSImageMetric(ImageMetric):

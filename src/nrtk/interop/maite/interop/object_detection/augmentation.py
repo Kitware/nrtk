@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import copy
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -14,27 +14,19 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.interop.generic import NRTKDatumMetadata, _forward_md_keys
 from nrtk.interop.maite.interop.object_detection.dataset import JATICDetectionTarget
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
 
-Augmentation: type = object
-InputType: type = object
-TargetType: type = object
-DatumMetadataType: type = TypedDict
+maite_available: bool = import_guard("maite", MaiteImportError, ["protocols.object_detection"], ["Augmentation"])
 
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols import AugmentationMetadata
-    from maite.protocols.object_detection import (
-        Augmentation,
-        DatumMetadataType,
-        InputType,
-        TargetType,
-    )
+from maite.protocols import AugmentationMetadata  # noqa: E402
+from maite.protocols.object_detection import (  # noqa: E402
+    Augmentation,
+    DatumMetadataType,
+    InputType,
+    TargetType,
+)
 
-    maite_available: bool = True
-except ImportError:  # pragma: no cover
-    maite_available: bool = False
-
-OBJ_DETECTION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]  # pyright: ignore [reportPossiblyUnboundVariable]
+OBJ_DETECTION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]
 
 
 class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGeneralTypeIssues]
@@ -63,7 +55,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
-        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
 
     def __call__(
         self,
@@ -167,7 +159,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
             raise MaiteImportError
         self.augmentations = augmentations
         self.metric = metric
-        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
 
     def _apply_augmentations(
         self,

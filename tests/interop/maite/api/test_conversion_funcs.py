@@ -10,7 +10,8 @@ from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interop.maite.api.converters import build_factory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
-from nrtk.utils._exceptions import KWCocoImportError
+from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
+from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import (
     BAD_NRTK_CONFIG,
     DATASET_FOLDER,
@@ -19,12 +20,10 @@ from tests.interop.maite import (
     NRTK_PYBSM_CONFIG,
 )
 
-try:
-    from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset
-
-    is_usable = True
-except ImportError:
-    is_usable = False
+maite_available: bool = import_guard("maite", MaiteImportError)
+kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+is_usable = maite_available and kwcoco_available
+from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset  # noqa: E402
 
 
 @pytest.mark.skipif(
@@ -177,7 +176,7 @@ class TestAPIConversionFunctions:
     def test_load_COCOJATIC_dataset(self, data: dict[str, Any]) -> None:  # noqa: N802
         """Test if load_COCOJATIC_dataset returns the expected dataset."""
         schema = NrtkPerturbInputSchema.model_validate(data)
-        dataset = load_COCOJATIC_dataset(schema)  # pyright: ignore [reportPossiblyUnboundVariable]
+        dataset = load_COCOJATIC_dataset(schema)
         # Check all images metadata for gsd
         for i in range(len(dataset)):
             assert dict(dataset[i][2])["gsd"] == dict(data["image_metadata"][i])["gsd"]
@@ -206,7 +205,7 @@ class TestAPIConversionFunctions:
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(KWCocoImportError):
-            _ = load_COCOJATIC_dataset(schema)  # pyright: ignore [reportPossiblyUnboundVariable]
+            _ = load_COCOJATIC_dataset(schema)
 
     @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
     @pytest.mark.parametrize(
@@ -230,4 +229,4 @@ class TestAPIConversionFunctions:
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(ValueError, match=r"ID not present in image metadata. Is it a DatumMetadataType?"):
-            _ = load_COCOJATIC_dataset(schema)  # pyright: ignore [reportPossiblyUnboundVariable]
+            _ = load_COCOJATIC_dataset(schema)
