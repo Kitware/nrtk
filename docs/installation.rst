@@ -193,6 +193,10 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils` utility functions. Note: This needs
     to be installed in conjunction with either the ``graphics`` or ``headless`` extras due to the OpenCV requirement.
 
+    **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
+    `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
+    Required for :ref:`DiffusionPerturber`.
+
     **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
 
 Installing with OpenCV
@@ -277,6 +281,9 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`DetectorOTFPerturber`
       - ``pybsm``, and (``graphics`` or ``headless``)
       - ``pyBSM``, ``OpenCV``
+    * - :ref:`DiffusionPerturber`
+      - ``diffusion``
+      - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
     * - :ref:`GaussianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
