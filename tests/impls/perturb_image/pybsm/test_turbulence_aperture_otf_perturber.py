@@ -8,8 +8,10 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
+import pybsm.radiance as radiance
 import pytest
 from PIL import Image
+from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
@@ -17,17 +19,12 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
     TurbulenceApertureOTFPerturber,
 )
+from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import (
     TIFFImageSnapshotExtension,
     create_sample_sensor_and_scenario,
 )
-
-if TurbulenceApertureOTFPerturber.is_usable():
-    import pybsm.radiance as radiance
-    from pybsm.utils import load_database_atmosphere
-
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 
 INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
@@ -251,8 +248,8 @@ class TestTurbulenceApertureOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
             # Multiple type ignores added for pyright's handling of guarded imports
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # pyright: ignore [reportPossiblyUnboundVariable]
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # pyright: ignore [reportPossiblyUnboundVariable]
+            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
                 atm,
                 sensor.create_sensor(),
                 sensor.int_time,

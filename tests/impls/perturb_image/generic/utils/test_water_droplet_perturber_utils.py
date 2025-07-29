@@ -7,16 +7,14 @@ import numpy as np
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
+from nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils import (
+    ccw_sort,
+    get_bezier_curve,
+    get_random_points_within_min_dist,
+)
 from nrtk.impls.perturb_image.generic.water_droplet_perturber import WaterDropletPerturber
 from nrtk.utils._exceptions import WaterDropletImportError
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
-
-if WaterDropletPerturber.is_usable():
-    from nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils import (
-        ccw_sort,
-        get_bezier_curve,
-        get_random_points_within_min_dist,
-    )
 
 rng = np.random.default_rng(2345)
 
@@ -31,7 +29,7 @@ class TestWaterDropletPerturberUtils:
         x_in = np.linspace(0, 100, 50)
         x_out, y_out = np.meshgrid(x_in, x_in)
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
-        points = ccw_sort(points=points)  # pyright: ignore [reportPossiblyUnboundVariable]
+        points = ccw_sort(points=points)
 
         assert TIFFImageSnapshotExtension.ndarray2bytes(points) == snapshot(extension_class=TIFFImageSnapshotExtension)
 
@@ -49,7 +47,7 @@ class TestWaterDropletPerturberUtils:
         x_in = np.linspace(0, 100, 50)
         x_out, y_out = np.meshgrid(x_in, x_in)
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
-        x, y = get_bezier_curve(points=points, rad=rad, edgy=edgy)  # pyright: ignore [reportPossiblyUnboundVariable]
+        x, y = get_bezier_curve(points=points, rad=rad, edgy=edgy)
         curve_points = np.column_stack((x, y))
         assert TIFFImageSnapshotExtension.ndarray2bytes(curve_points) == snapshot(
             extension_class=TIFFImageSnapshotExtension,
@@ -73,7 +71,7 @@ class TestWaterDropletPerturberUtils:
         recursive: int,
     ) -> None:
         """Regression testing for the `get_random_points_within_min_dist` util function."""
-        rand_points = get_random_points_within_min_dist(  # pyright: ignore [reportPossiblyUnboundVariable]
+        rand_points = get_random_points_within_min_dist(
             rng=rng,
             n=n,
             scale=scale,

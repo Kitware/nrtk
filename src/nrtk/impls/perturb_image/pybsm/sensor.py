@@ -16,18 +16,14 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
+from smqtk_core.configuration import Configurable
 from typing_extensions import Self, override
 
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
 
-try:
-    from pybsm.simulation.sensor import Sensor
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-from smqtk_core.configuration import Configurable
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.sensor"])
+from pybsm.simulation.sensor import Sensor  # noqa: E402
 
 
 class PybsmSensor(Configurable):

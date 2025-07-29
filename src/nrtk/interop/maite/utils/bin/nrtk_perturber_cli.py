@@ -15,13 +15,10 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
 from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError
+from nrtk.utils._import_guard import import_guard
 
-try:
-    from kwcoco import CocoDataset  # type: ignore
-
-    is_usable: bool = True
-except ImportError:  # pragma: no cover
-    is_usable: bool = False
+is_usable: bool = import_guard("kwcoco", KWCocoImportError)
+from kwcoco import CocoDataset  # type: ignore  # noqa: E402
 
 
 def _load_metadata(dataset_dir: str, kwcoco_dataset: "CocoDataset") -> list[dict[str, Any]]:

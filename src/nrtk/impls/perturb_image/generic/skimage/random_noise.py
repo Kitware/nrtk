@@ -34,19 +34,15 @@ from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
-
-try:
-    import skimage.util  # type:ignore
-
-    skimage_available: bool = True
-except ImportError:  # pragma: no cover
-    skimage_available: bool = False
-
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import ScikitImageImportError
+from nrtk.utils._import_guard import import_guard
+
+skimage_available: bool = import_guard("skimage", ScikitImageImportError, ["util"])
+import skimage.util  # noqa: E402
 
 
 class _SKImageNoisePerturber(PerturbImage):
@@ -70,23 +66,23 @@ class _SKImageNoisePerturber(PerturbImage):
         # Determine if conversion back to original dtype is possible
         dtype_str = str(image.dtype)
         convert_image = {
-            str(np.dtype(np.bool_)): skimage.util.img_as_bool,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.float32)): skimage.util.img_as_float32,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.float64)): skimage.util.img_as_float64,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.int16)): skimage.util.img_as_int,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.uint8)): skimage.util.img_as_ubyte,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.uint)): skimage.util.img_as_uint,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.bool_)): skimage.util.img_as_bool,
+            str(np.dtype(np.float32)): skimage.util.img_as_float32,
+            str(np.dtype(np.float64)): skimage.util.img_as_float64,
+            str(np.dtype(np.int16)): skimage.util.img_as_int,
+            str(np.dtype(np.uint8)): skimage.util.img_as_ubyte,
+            str(np.dtype(np.uint)): skimage.util.img_as_uint,
         }
         if dtype_str not in convert_image:
             if np.issubdtype(image.dtype, np.floating):
-                convert = skimage.util.img_as_float  # pyright: ignore [reportPossiblyUnboundVariable]
+                convert = skimage.util.img_as_float
             else:
                 raise NotImplementedError(f"Perturb not implemented for {dtype_str}")
         else:
             convert = convert_image[dtype_str]
 
         # Apply perturbation
-        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)  # pyright: ignore [reportPossiblyUnboundVariable]
+        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)
 
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)

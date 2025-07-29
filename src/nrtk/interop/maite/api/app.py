@@ -5,14 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from fastapi import FastAPI, HTTPException
-
-    fastapi_available: bool = True
-except ImportError:  # pragma: no cover
-    fastapi_available: bool = False
-
 from nrtk.interop.maite.api.converters import build_factory, load_COCOJATIC_dataset
 from nrtk.interop.maite.api.schema import (
     DatasetSchema,
@@ -22,6 +14,10 @@ from nrtk.interop.maite.api.schema import (
 from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import FastApiImportError
+from nrtk.utils._import_guard import import_guard
+
+fastapi_available: bool = import_guard("fastapi", FastApiImportError)
+from fastapi import FastAPI, HTTPException  # noqa: E402
 
 
 class _UnusableFastApi:
@@ -33,7 +29,7 @@ class _UnusableFastApi:
 
 
 if fastapi_available:
-    app: FastAPI | _UnusableFastApi = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+    app: FastAPI | _UnusableFastApi = FastAPI()
 else:
     app = _UnusableFastApi()
 
@@ -50,7 +46,7 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
     :raises: HTTPException upon failure
     """
     if not fastapi_available:
-        raise HTTPException(status_code=400, detail=str(FastApiImportError()))  # pyright: ignore [reportPossiblyUnboundVariable]
+        raise HTTPException(status_code=400, detail=str(FastApiImportError()))
 
     try:
         # Build pybsm factory
@@ -86,4 +82,4 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
         )
     except Exception as e:
         # If we made it to this point, we know we do have FastAPI imports
-        raise HTTPException(status_code=400, detail=str(e)) from e  # pyright: ignore [reportPossiblyUnboundVariable]
+        raise HTTPException(status_code=400, detail=str(e)) from e

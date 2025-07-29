@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.image_metric import ImageMetric
@@ -19,11 +20,6 @@ from nrtk.interop.maite.interop.object_detection.dataset import JATICDetectionTa
 from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
-
-TargetType: type = object
-if maite_available:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 random = np.random.default_rng()
 
@@ -137,11 +133,11 @@ class TestJATICDetectionAugmentation:
     def test_multiple_augmentations(
         self,
         perturbers: Sequence[PerturbImage],
-        targets_in: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
+        targets_in: Sequence[TargetType],
     ) -> None:
         """Test that the adapter appends, not overrides nrtk configs when multiple perturbations are applied."""
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)  # MAITE is channels-first
-        md_in: list[DatumMetadataType] = [{"id": 1}]  # pyright: ignore [reportInvalidTypeForm]
+        md_in: list[DatumMetadataType] = [{"id": 1}]
 
         imgs_out = [img_in]
         targets_out = targets_in
@@ -287,8 +283,8 @@ class TestJATICDetectionAugmentationWithMetric:
     )
     def test_multiple_metrics(
         self,
-        augmentations: Sequence[tuple[PerturbImage, str]],  # pyright: ignore [reportPossiblyUnboundVariable]
-        targets_in: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
+        augmentations: Sequence[tuple[PerturbImage, str]],
+        targets_in: Sequence[TargetType],
     ) -> None:
         """Test that multiple metrics can be added to metadata."""
         imgs_out = [np.transpose(self.img_in, (2, 0, 1))]

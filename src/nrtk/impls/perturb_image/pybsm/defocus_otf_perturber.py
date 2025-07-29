@@ -15,29 +15,26 @@ from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import pybsm.radiance as radiance
-    from pybsm.otf.functional import defocus_OTF, otf_to_psf, resample_2D
-    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
-    from scipy.signal import fftconvolve
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-from smqtk_core.configuration import (
-    from_config_dict,
-    make_default_config,
-    to_config_dict,
-)
 from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._exceptions import PyBSMImportError, ScipyImportError
+from nrtk.utils._import_guard import import_guard
+
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["radiance", "otf.functional", "utils"])
+import pybsm.radiance as radiance  # noqa: E402
+from pybsm.otf.functional import defocus_OTF, otf_to_psf, resample_2D  # noqa: E402
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+
+import_guard("scipy", ScipyImportError, ["signal"])
+from scipy.signal import fftconvolve  # noqa: E402
+from smqtk_core.configuration import (  # noqa: E402
+    from_config_dict,
+    make_default_config,
+    to_config_dict,
+)
 
 
 class DefocusOTFPerturber(PerturbImage):
@@ -232,7 +229,7 @@ class DefocusOTFPerturber(PerturbImage):
                 # the guarded import at the top of this file, but an object of
                 # this class is only instantiable if it has been successfully
                 # imported, so we can igore this
-                blur_img[:, :, 0] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                blur_img[:, :, 0] = fftconvolve(
                     image[:, :, 0],
                     psf,
                     mode="same",
@@ -242,7 +239,7 @@ class DefocusOTFPerturber(PerturbImage):
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    blur_img[:, :, channel] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                    blur_img[:, :, channel] = fftconvolve(
                         image[:, :, channel],
                         psf,
                         mode="same",
@@ -254,7 +251,7 @@ class DefocusOTFPerturber(PerturbImage):
                     )
             else:
                 # Perform convolution using scipy.signal.fftconvolve
-                blur_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+                blur_img = fftconvolve(image, psf, mode="same")
                 # resample the image to the camera's ifov
                 sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
 
@@ -264,12 +261,12 @@ class DefocusOTFPerturber(PerturbImage):
             # image size ratio.
             psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))  # type: ignore
             if image.ndim == 2:
-                sim_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+                sim_img = fftconvolve(image, psf, mode="same")
             else:
                 # image.ndim must be 3
                 sim_img = np.zeros_like(image, dtype=float)
                 for c in range(image.shape[2]):
-                    sim_img[..., c] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                    sim_img[..., c] = fftconvolve(
                         image[..., c],
                         psf,
                         mode="same",

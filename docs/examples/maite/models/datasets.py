@@ -9,14 +9,21 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, overload
 
-import maite.protocols as pr
 import numpy as np
-import torch
 from numpy.typing import NDArray
 from PIL import Image
-from torch import Tensor
-from torchvision.ops.boxes import box_convert
-from torchvision.transforms.functional import pil_to_tensor
+
+from nrtk.utils._exceptions import MaiteImportError, TorchImportError
+from nrtk.utils._import_guard import import_guard
+
+import_guard("maite", MaiteImportError, ["protocols"])
+import_guard("torchvision", TorchImportError, ["torchvision.ops.boxes", "torchvision.transforms.functional"])
+import_guard("torch", TorchImportError)
+import maite.protocols as pr  # noqa: E402
+import torch  # noqa: E402
+from torch import Tensor  # noqa: E402
+from torchvision.ops.boxes import box_convert  # noqa: E402
+from torchvision.transforms.functional import pil_to_tensor  # noqa: E402
 
 
 @dataclass

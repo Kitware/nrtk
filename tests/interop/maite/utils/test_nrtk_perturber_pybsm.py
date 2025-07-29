@@ -4,32 +4,25 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from nrtk.interop.maite.interop.object_detection.utils import maite_available
-
-if maite_available:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols.object_detection import DatumMetadataType
-
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectDetectionDataset
+from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
+from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER
 
-kwcoco_available = True
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import kwcoco  # type: ignore
-except ImportError:
-    kwcoco_available = False
+kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+import kwcoco  # type: ignore  # noqa: E402
+from maite.protocols.object_detection import DatumMetadataType  # noqa: E402
 
 
 def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObjectDetectionDataset:
     coco_file = Path(dataset_path) / "annotations.json"
     # Type ignore added for pyright's handling of guarded imports
-    kwcoco_dataset = kwcoco.CocoDataset(coco_file)  # pyright: ignore [reportPossiblyUnboundVariable, reportCallIssue]
+    kwcoco_dataset = kwcoco.CocoDataset(coco_file)  # pyright: ignore [reportCallIssue]
 
     if load_metadata:
         metadata_file = Path(dataset_path) / "image_metadata.json"

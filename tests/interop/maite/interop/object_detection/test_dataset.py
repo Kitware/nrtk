@@ -1,20 +1,15 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TypedDict
 
 import numpy as np
 import pytest
+from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation
 from nrtk.interop.maite.interop.object_detection.dataset import JATICObjectDetectionDataset
 from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
-
-TargetType: type = object
-DatumMetadataType: type = TypedDict
-if maite_available:
-    from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 random = np.random.default_rng()
 

@@ -14,3 +14,4 @@ pyright-internal:
 pyright-external:
   variables:
     EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations notebook-testing"
+  allow_failure: false

@@ -24,38 +24,27 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import cv2
-
-    cv2_available: bool = True
-except ImportError:  # pragma: no cover
-    cv2_available: bool = False
 import numpy as np
-
-try:
-    import pybsm.radiance as radiance
-    from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D
-    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-
-from smqtk_core.configuration import (
-    from_config_dict,
-    make_default_config,
-    to_config_dict,
-)
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._import_guard import import_guard
+
+cv2_available: bool = import_guard("cv2", PyBSMAndOpenCVImportError)
+pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError, ["radiance", "otf.functional", "utils"])
+import cv2  # noqa: E402
+import pybsm.radiance as radiance  # noqa: E402
+from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D  # noqa: E402
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+from smqtk_core.configuration import (  # noqa: E402
+    from_config_dict,
+    make_default_config,
+    to_config_dict,
+)
 
 
 class TurbulenceApertureOTFPerturber(PerturbImage):
