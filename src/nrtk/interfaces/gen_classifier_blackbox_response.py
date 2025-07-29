@@ -136,7 +136,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         pert_combos = gen_perturber_combinations(factories=blackbox_perturber_factories)
         with tqdm(total=len(pert_combos)) if verbose else nullcontext() as progress_bar:  # type: ignore
             for c in pert_combos:
-                perturbers = [factory[p] for factory, p in zip(blackbox_perturber_factories, c)]
+                perturbers = [factory[p] for factory, p in zip(blackbox_perturber_factories, c, strict=False)]
                 process(perturbers)
                 if progress_bar:
                     progress_bar.update(1)

@@ -1,6 +1,6 @@
 import copy
-from collections.abc import Hashable, Sequence
-from typing import Any, Callable
+from collections.abc import Callable, Hashable, Sequence
+from typing import Any
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 

@@ -312,7 +312,7 @@ class WaterDropletPerturber(PerturbImage):
         """
         p = gls
         q = np.ones(p.shape[:2]) * -1
-        for i, (center, radius) in enumerate(zip(self.g_centers, self.g_radius)):
+        for i, (center, radius) in enumerate(zip(self.g_centers, self.g_radius, strict=False)):
             dist = np.linalg.norm(p - center, axis=-1)
             # Give the true/false values of where the points of the image are within sphere
             # These values are in the coordinate system of the original image
@@ -493,7 +493,7 @@ class WaterDropletPerturber(PerturbImage):
         for idx in np.unique(q):
             if idx != -1:
                 idxs = np.where(q == idx)
-                for _, (x, y) in enumerate(zip(idxs[0], idxs[1])):
+                for _, (x, y) in enumerate(zip(idxs[0], idxs[1], strict=False)):
                     # Translate refractive distortions to the "surface" of the droplet
                     p = self._to_sphere_section_env(x, y, int(idx), intrinsic, gls)
                     u = p[0]

@@ -107,7 +107,7 @@ class TestJATICObjectDetectionDataset:
 
             # Check that expectations hold
             assert np.array_equal(img_out[0], expected_img_out)
-            for det, target in zip(det_out, expected_det_out):
+            for det, target in zip(det_out, expected_det_out, strict=False):
                 assert np.array_equal(det.boxes, target.boxes)
                 assert np.array_equal(det.labels, target.labels)
                 assert np.array_equal(det.scores, target.scores)

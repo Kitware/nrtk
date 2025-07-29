@@ -81,7 +81,7 @@ class COCOScorer(ScoreDetections):
                     "Actual bounding boxes must have detections and can't be empty.",
                 )
 
-        for act_dets, pred_dets in zip(actual, predicted):
+        for act_dets, pred_dets in zip(actual, predicted, strict=False):
             image_id = act_dets[0][1]["image_id"]
             batch_ids.append(image_id)
 

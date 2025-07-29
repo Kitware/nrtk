@@ -100,7 +100,7 @@ class TestJATICDetectionAugmentation:
         # Check that expectations hold
         assert np.array_equal(imgs_out[0], expected_img_out)
         assert len(targets_out) == len(expected_targets_out)
-        for expected_tgt, tgt_out in zip(expected_targets_out, targets_out):
+        for expected_tgt, tgt_out in zip(expected_targets_out, targets_out, strict=False):
             assert np.array_equal(expected_tgt.boxes, tgt_out.boxes)
             assert np.array_equal(expected_tgt.labels, tgt_out.labels)
             assert np.array_equal(expected_tgt.scores, tgt_out.scores)
@@ -109,7 +109,7 @@ class TestJATICDetectionAugmentation:
         # Check that input data was not modified
         assert np.array_equal(img_in, img_copy)
         assert len(targets_copy) == len(targets_in)
-        for tgt_copy, tgt_in in zip(targets_copy, targets_in):
+        for tgt_copy, tgt_in in zip(targets_copy, targets_in, strict=False):
             assert np.array_equal(tgt_copy.boxes, tgt_in.boxes)
             assert np.array_equal(tgt_copy.labels, tgt_in.labels)
             assert np.array_equal(tgt_copy.scores, tgt_in.scores)
@@ -251,7 +251,7 @@ class TestJATICDetectionAugmentationWithMetric:
             # Check that expectations hold
             assert np.array_equal(imgs_out[0], expected_img_out)
             assert len(targets_out) == len(expected_targets_out)
-            for expected_tgt, tgt_out in zip(expected_targets_out, targets_out):
+            for expected_tgt, tgt_out in zip(expected_targets_out, targets_out, strict=False):
                 assert np.array_equal(expected_tgt.boxes, tgt_out.boxes)
                 assert np.array_equal(expected_tgt.labels, tgt_out.labels)
                 assert np.array_equal(expected_tgt.scores, tgt_out.scores)
@@ -260,7 +260,7 @@ class TestJATICDetectionAugmentationWithMetric:
             # Check that input data was not modified
             assert np.array_equal(self.img_in, img_copy)
             assert len(targets_copy) == len(targets_in)
-            for tgt_copy, tgt_in in zip(targets_copy, targets_in):
+            for tgt_copy, tgt_in in zip(targets_copy, targets_in, strict=False):
                 assert np.array_equal(tgt_copy.boxes, tgt_in.boxes)
                 assert np.array_equal(tgt_copy.labels, tgt_in.labels)
                 assert np.array_equal(tgt_copy.scores, tgt_in.scores)

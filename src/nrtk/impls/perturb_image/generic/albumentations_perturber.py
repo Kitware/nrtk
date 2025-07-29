@@ -159,7 +159,7 @@ class AlbumentationsPerturber(PerturbImage):
         if boxes:
             output_boxes = [
                 (AlbumentationsPerturber._bbox_to_aabb(bbox, image), label)
-                for bbox, label in zip(output["bboxes"], labels)
+                for bbox, label in zip(output["bboxes"], labels, strict=False)
             ]
         return output["image"].astype(np.uint8), output_boxes
 

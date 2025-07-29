@@ -69,18 +69,21 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
         aug_dets = list()  # list of individual object detection targets
         aug_metadata = list()  # list of individual image-level metadata
 
-        for img, img_anns, md in zip(imgs, anns, metadata):  # pyright: ignore [reportArgumentType]
+        for img, img_anns, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
             aug_img = np.asarray(copy.deepcopy(img))
             aug_img = np.transpose(aug_img, (1, 2, 0))
 
             # format annotations for passing to perturber
             img_bboxes = [AxisAlignedBoundingBox(bbox[0:2], bbox[2:4]) for bbox in np.array(img_anns.boxes)]  # pyright: ignore [reportAttributeAccessIssue]
-            img_labels = [{label: score} for label, score in zip(np.array(img_anns.labels), np.array(img_anns.scores))]  # pyright: ignore [reportAttributeAccessIssue]
+            img_labels = [
+                {label: score}
+                for label, score in zip(np.array(img_anns.labels), np.array(img_anns.scores), strict=False)  # pyright: ignore [reportAttributeAccessIssue]
+            ]
 
             aug_img, aug_img_anns = self.augment(
                 np.asarray(aug_img),
-                zip(img_bboxes, img_labels),
+                zip(img_bboxes, img_labels, strict=False),
                 additional_params=dict(md),
             )
             if TYPE_CHECKING and not aug_img_anns:
@@ -88,7 +91,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
             aug_imgs.append(np.transpose(aug_img, (2, 0, 1)))
 
             # re-format annotations to JATICDetectionTarget for returning
-            aug_img_bboxes, aug_img_score_dicts = zip(*aug_img_anns)
+            aug_img_bboxes, aug_img_score_dicts = zip(*aug_img_anns, strict=False)
             aug_img_bboxes_arr = np.vstack([np.hstack((bbox.min_vertex, bbox.max_vertex)) for bbox in aug_img_bboxes])
             aug_img_labels, aug_img_scores = zip(
                 *[
@@ -96,6 +99,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
                     max(score_dict.items(), key=lambda x: x[1])
                     for score_dict in aug_img_score_dicts
                 ],
+                strict=False,
             )
             aug_dets.append(
                 JATICDetectionTarget(
@@ -186,7 +190,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
 
         aug_imgs, aug_dets, aug_metadata = self._apply_augmentations(batch)
 
-        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata):  # pyright: ignore [reportArgumentType]
+        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Convert from channels-first to channels-last
             img_1 = img
             img_2 = None if aug_img is None else aug_img

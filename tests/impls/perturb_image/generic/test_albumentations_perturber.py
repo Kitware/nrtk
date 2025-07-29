@@ -81,7 +81,7 @@ class TestAlbumentationsPerturber:
         as_aab = AlbumentationsPerturber._bbox_to_aabb(bbox, image)
         as_list = AlbumentationsPerturber._aabb_to_bbox(as_aab, image)
         assert len(bbox) == len(as_list)
-        assert [x == y for x, y in zip(bbox, as_list)]
+        assert [x == y for x, y in zip(bbox, as_list, strict=False)]
 
     def test_bbox_transform(self, snapshot: SnapshotAssertion) -> None:
         label_dict_1: dict[Hashable, float] = {"label": 1.0}
@@ -95,14 +95,14 @@ class TestAlbumentationsPerturber:
         inst = AlbumentationsPerturber(perturber="HorizontalFlip", parameters={"p": 1.0})
         image_out, bboxes_transformed = inst.perturb(
             image=image,
-            boxes=zip(bboxes, labels),
+            boxes=zip(bboxes, labels, strict=False),
         )
         _, bboxes_reverted = inst.perturb(image=image_out, boxes=bboxes_transformed)
 
         if bboxes_reverted:
             bboxes_reverted = list(bboxes_reverted)
             assert len(bboxes_reverted) == len(bboxes)
-            for bbox, label, reverted in zip(bboxes, labels, bboxes_reverted):
+            for bbox, label, reverted in zip(bboxes, labels, bboxes_reverted, strict=False):
                 assert bbox == reverted[0]
                 assert label == reverted[1]
 
