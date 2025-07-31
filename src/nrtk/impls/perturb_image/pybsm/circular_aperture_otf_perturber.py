@@ -136,17 +136,21 @@ class CircularApertureOTFPerturber(PerturbImage):
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            else:
-                atm = load_database_atmosphere_no_interp(  # type: ignore
-                    scenario.altitude,
-                    scenario.ground_range,
-                    scenario.ihaze,
+                atm = load_database_atmosphere(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
                 )
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+            else:
+                atm = load_database_atmosphere_no_interp(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             # Use the spectral_weights variable for MTF wavelengths and weights
@@ -168,14 +172,15 @@ class CircularApertureOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.mtf_wavelengths = (
+            self.mtf_wavelengths: np.ndarray[Any, Any] = (
                 np.asarray(mtf_wavelengths)
                 if mtf_wavelengths is not None
                 else np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             )
-            self.mtf_weights = (
+            self.mtf_weights: np.ndarray[Any, Any] = (
                 np.asarray(mtf_weights) if mtf_weights is not None else np.ones(len(self.mtf_wavelengths))
             )
+
             # Assume visible spectrum of light
             self.ifov: float = -1
             self.slant_range: float = -1
@@ -237,9 +242,13 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         # Compute a wavelength weighted composite array based on the circular aperture OTF function.
         def ap_function(wavelengths: float) -> np.ndarray:
-            return circular_aperture_OTF(uu, vv, wavelengths, self.D, self.eta)  # type: ignore
+            return circular_aperture_OTF(u=uu, v=vv, lambda0=wavelengths, D=self.D, eta=self.eta)
 
-        self.ap_OTF: np.ndarray[Any, Any] = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)  # type: ignore
+        self.ap_OTF: np.ndarray[Any, Any] = weighted_by_wavelength(
+            wavelengths=self.mtf_wavelengths,
+            weights=self.mtf_weights,
+            my_function=ap_function,
+        )
 
         if additional_params is None:
             additional_params = dict()
@@ -253,32 +262,36 @@ class CircularApertureOTFPerturber(PerturbImage):
             ref_gsd = additional_params["img_gsd"]
 
             # Transform an optical transfer function into a point spread function
-            psf = otf_to_psf(self.ap_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
+            psf = otf_to_psf(otf=self.ap_OTF, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            blur_img = cv2.filter2D(image, -1, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
-                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                resampled_img = resample_2D(
+                    img_in=blur_img[:, :, 0],
+                    dx_in=ref_gsd / self.slant_range,
+                    dx_out=self.ifov,
+                )
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    sim_img[:, :, channel] = resample_2D(  # type: ignore
-                        blur_img[:, :, channel],
-                        ref_gsd / self.slant_range,
-                        self.ifov,
+                    sim_img[:, :, channel] = resample_2D(
+                        img_in=blur_img[:, :, channel],
+                        dx_in=ref_gsd / self.slant_range,
+                        dx_out=self.ifov,
                     )
             else:
-                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=self.ifov)
 
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
-            psf = otf_to_psf(self.ap_OTF, self.df, 1 / (self.ap_OTF.shape[0] * self.df))  # type: ignore
+            psf = otf_to_psf(otf=self.ap_OTF, df=self.df, dx_out=1 / (self.ap_OTF.shape[0] * self.df))
 
-            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            sim_img = cv2.filter2D(image, -1, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:

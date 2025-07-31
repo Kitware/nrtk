@@ -179,15 +179,20 @@ class PybsmPerturber(PerturbImage):
             raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
         # Create a `RefImage` object using the given GSD, img_pixel and reflactance values
-        ref_img = RefImage(  # type: ignore
-            image,
-            additional_params["img_gsd"],
-            np.array([image.min(), image.max()]),
-            self.reflectance_range,
+        ref_img = RefImage(
+            img=image,
+            gsd=additional_params["img_gsd"],
+            pix_values=np.array([image.min(), image.max()]),
+            refl_values=self.reflectance_range,
         )
 
         # Generate a perturbed image using the given sensor and scenario parameters
-        perturbed = simulate_image(ref_img, self.sensor(), self.scenario(), self._rng_seed)[-1]  # type: ignore
+        perturbed = simulate_image(
+            ref_img=ref_img,
+            sensor=self.sensor(),
+            scenario=self.scenario(),
+            rng=self._rng_seed,
+        )[-1]
 
         # Min-Max normalization and conversion to uint8 type
         min_perturbed_val = perturbed.min()

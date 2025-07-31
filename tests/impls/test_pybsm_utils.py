@@ -49,8 +49,7 @@ def create_sample_sensor() -> PybsmSensor:
     # dark current density of 1 nA/cm2 guess, guess mid range for a
     # silicon camera
     # dark current density of 1 nA/cm2 guess, guess mid range for a silicon camera
-    # Type ignore added for pyright's handling of guarded imports
-    dark_current = dark_current_from_density(1e-5, w_x, w_y)
+    dark_current = dark_current_from_density(jd=1e-5, w_x=w_x, w_y=w_y)
 
     # rms read noise (rms electrons)
     read_noise = 25.0

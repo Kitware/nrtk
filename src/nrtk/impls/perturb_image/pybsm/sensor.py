@@ -293,8 +293,13 @@ class PybsmSensor(Configurable):
         if not self.is_usable():
             raise PyBSMImportError
 
-        # type ignore for pyright handling of guarded import
-        S = Sensor(self.name, self.D, self.f, self.p_x, self.opt_trans_wavelengths)  # type: ignore # noqa:N806
+        S = Sensor(  # noqa:N806
+            name=self.name,
+            D=self.D,
+            f=self.f,
+            p_x=self.p_x,
+            opt_trans_wavelengths=self.opt_trans_wavelengths,
+        )
         S.optics_transmission = self.optics_transmission
         S.eta = self.eta
         S.p_y = self.p_y

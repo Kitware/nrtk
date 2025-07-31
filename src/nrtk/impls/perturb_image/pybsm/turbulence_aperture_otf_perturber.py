@@ -180,17 +180,21 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            else:
-                atm = load_database_atmosphere_no_interp(  # type: ignore
-                    scenario.altitude,
-                    scenario.ground_range,
-                    scenario.ihaze,
+                atm = load_database_atmosphere(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
                 )
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+            else:
+                atm = load_database_atmosphere_no_interp(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             # Use the spectral_weights variable for MTF wavelengths and weights
@@ -217,12 +221,12 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             self.cn2_at_1m = cn2_at_1m if cn2_at_1m is not None else scenario.cn2_at_1m
             self.aircraft_speed = aircraft_speed if aircraft_speed is not None else scenario.aircraft_speed
         else:
-            self.mtf_wavelengths = (
+            self.mtf_wavelengths: np.ndarray[Any, Any] = (
                 np.asarray(mtf_wavelengths)
                 if mtf_wavelengths is not None
                 else np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             )
-            self.mtf_weights = (
+            self.mtf_weights: np.ndarray[Any, Any] = (
                 np.asarray(mtf_weights) if mtf_weights is not None else np.ones(len(self.mtf_wavelengths))
             )
 
@@ -293,18 +297,18 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
         self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        turbulence_otf: tuple[np.ndarray[Any, Any], Any] = polychromatic_turbulence_OTF(  # type: ignore
-            uu,
-            vv,
-            self.mtf_wavelengths,
-            self.mtf_weights,
-            self.altitude,
-            self.slant_range,
-            self.D,
-            self.ha_wind_speed,
-            self.cn2_at_1m,
-            (self.int_time * self.n_tdi if self.int_time is not None and self.n_tdi is not None else 1.0),
-            self.aircraft_speed,
+        turbulence_otf: tuple[np.ndarray[Any, Any], Any] = polychromatic_turbulence_OTF(
+            u=uu,
+            v=vv,
+            wavelengths=self.mtf_wavelengths,
+            weights=self.mtf_weights,
+            altitude=self.altitude,
+            slant_range=self.slant_range,
+            D=self.D,
+            ha_wind_speed=self.ha_wind_speed,
+            cn2_at_1m=self.cn2_at_1m,
+            int_time=(self.int_time * self.n_tdi if self.int_time is not None and self.n_tdi is not None else 1.0),
+            aircraft_speed=self.aircraft_speed,
         )
         self.turbulence_otf: np.ndarray[Any, Any] = turbulence_otf[0]
 
@@ -316,43 +320,43 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             ref_gsd = additional_params["img_gsd"]
 
             # Transform an optical transfer function into a point spread function
-            psf = otf_to_psf(  # type: ignore
-                self.turbulence_otf,
-                self.df,
-                2 * np.arctan(ref_gsd / 2 / self.slant_range),
+            psf = otf_to_psf(
+                otf=self.turbulence_otf,
+                df=self.df,
+                dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range),
             )
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            blur_img = cv2.filter2D(image, -1, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
-                resampled_img = resample_2D(  # type: ignore
-                    blur_img[:, :, 0],
-                    ref_gsd / self.slant_range,
-                    ref_gsd / self.altitude,
+                resampled_img = resample_2D(
+                    img_in=blur_img[:, :, 0],
+                    dx_in=ref_gsd / self.slant_range,
+                    dx_out=ref_gsd / self.altitude,
                 )
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    sim_img[:, :, channel] = resample_2D(  # type: ignore
-                        blur_img[:, :, channel],
-                        ref_gsd / self.slant_range,
-                        ref_gsd / self.altitude,
+                    sim_img[:, :, channel] = resample_2D(
+                        img_in=blur_img[:, :, channel],
+                        dx_in=ref_gsd / self.slant_range,
+                        dx_out=ref_gsd / self.altitude,
                     )
             else:
-                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, ref_gsd / self.altitude)  # type: ignore
+                sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=ref_gsd / self.altitude)
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
-            psf = otf_to_psf(  # type: ignore
-                self.turbulence_otf,
-                self.df,
-                1 / (self.turbulence_otf.shape[0] * self.df),
+            psf = otf_to_psf(
+                otf=self.turbulence_otf,
+                df=self.df,
+                dx_out=1 / (self.turbulence_otf.shape[0] * self.df),
             )
 
-            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            sim_img = cv2.filter2D(image, -1, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:

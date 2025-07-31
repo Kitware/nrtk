@@ -248,11 +248,15 @@ class TestTurbulenceApertureOTFPerturber:
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
             # Multiple type ignores added for pyright's handling of guarded imports
-            atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+            atm = load_database_atmosphere(
+                altitude=scenario.altitude,
+                ground_range=scenario.ground_range,
+                ihaze=scenario.ihaze,
+            )
             _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             wavelengths = spectral_weights[0]

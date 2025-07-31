@@ -171,12 +171,11 @@ class PybsmScenario(Configurable):
         Returns:
             :return Scenario: pybsm.Scenario object populated with instance parameters.
         """
-        # Type ignore added for pyright's handling of guarded imports
         S = Scenario(  # noqa:N806
-            self.name,
-            self.ihaze,
-            self.altitude,
-            self.ground_range,
+            name=self.name,
+            ihaze=self.ihaze,
+            altitude=self.altitude,
+            ground_range=self.ground_range,
         )
         S.aircraft_speed = self.aircraft_speed
         S.target_reflectance = self.target_reflectance
