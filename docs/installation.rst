@@ -186,7 +186,8 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.PIL.enhance` perturbers.
 
     **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` perturbers.
+    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` and
+    :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `shapely <https://github.com/shapely/shapely>`_.
     Required for :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and
@@ -314,6 +315,9 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`RandomCropPerturber`
       - ---
       - ---
+    * - :ref:`RandomRotationPerturber`
+      - ``albumentations``
+      - ``albumentations``
     * - :ref:`RandomTranslationPerturber`
       - ---
       - ---

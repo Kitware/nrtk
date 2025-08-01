@@ -172,6 +172,7 @@ Pillow = ">=10.3.0" # CVE-2024-28219
 "impls.perturb_image.generic.compose_perturber" = "nrtk.impls.perturb_image.generic.compose_perturber"
 "impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
 "impls.perturb_image.generic.random_crop_perturber" = "nrtk.impls.perturb_image.generic.random_crop_perturber"
+"impls.perturb_image.generic.random_rotation_perturber" = "nrtk.impls.perturb_image.generic.random_rotation_perturber"
 "impls.perturb_image.generic.random_translation_perturber" = "nrtk.impls.perturb_image.generic.random_translation_perturber"
 "impls.perturb_image.generic.haze_perturber" = "nrtk.impls.perturb_image.generic.haze_perturber"
 "impls.perturb_image.generic.water_droplet_perturber" = "nrtk.impls.perturb_image.generic.water_droplet_perturber"
