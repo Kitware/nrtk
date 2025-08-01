@@ -30,7 +30,7 @@ description = "Natural Robustness Toolkit (NRTK) is a platform for generating va
 
 [tool.poetry.dependencies]
 # :auto python-version:
-python = "^3.10"
+python = ">=3.10,<3.13"
 # :auto python-version:
 
 # Python capped to <3.13 because of:
@@ -48,7 +48,7 @@ pycocotools = ">=2.0.6"
 setuptools = ">=78.1.1"
 typing-extensions = ">=4.5.0"
 
-pybsm = {version = ">=0.10.2", optional = true}
+pybsm = {version = ">=0.12.0", optional = true}
 opencv-python = {version = ">=4.6", optional = true}
 opencv-python-headless = {version = ">=4.6", optional = true}
 

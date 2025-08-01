@@ -128,17 +128,21 @@ class DefocusOTFPerturber(PerturbImage):
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            else:
-                atm = load_database_atmosphere_no_interp(  # type: ignore
-                    scenario.altitude,
-                    scenario.ground_range,
-                    scenario.ihaze,
+                atm = load_database_atmosphere(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
                 )
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+            else:
+                atm = load_database_atmosphere_no_interp(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             # Use the spectral_weights variable for MTF wavelengths and weights
@@ -207,7 +211,7 @@ class DefocusOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
         self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.defocus_otf: np.ndarray[Any, Any] = defocus_OTF(uu, vv, self.w_x, self.w_y)  # type: ignore
+        self.defocus_otf: np.ndarray[Any, Any] = defocus_OTF(u=uu, v=vv, w_x=self.w_x, w_y=self.w_y)
 
         if additional_params is None:
             additional_params = dict()
@@ -219,7 +223,7 @@ class DefocusOTFPerturber(PerturbImage):
                 )
             ref_gsd = additional_params["img_gsd"]
             # Transform an optical transfer function into a point spread function
-            psf = otf_to_psf(self.defocus_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
+            psf = otf_to_psf(otf=self.defocus_otf, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
             if image.ndim == 3:
@@ -235,7 +239,11 @@ class DefocusOTFPerturber(PerturbImage):
                     mode="same",
                 )
                 # resample the image to the camera's ifov
-                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                resampled_img = resample_2D(
+                    img_in=blur_img[:, :, 0],
+                    dx_in=ref_gsd / self.slant_range,
+                    dx_out=self.ifov,
+                )
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
@@ -244,22 +252,22 @@ class DefocusOTFPerturber(PerturbImage):
                         psf,
                         mode="same",
                     )
-                    sim_img[:, :, channel] = resample_2D(  # type: ignore
-                        blur_img[:, :, channel],
-                        ref_gsd / self.slant_range,
-                        self.ifov,
+                    sim_img[:, :, channel] = resample_2D(
+                        img_in=blur_img[:, :, channel],
+                        dx_in=ref_gsd / self.slant_range,
+                        dx_out=self.ifov,
                     )
             else:
                 # Perform convolution using scipy.signal.fftconvolve
                 blur_img = fftconvolve(image, psf, mode="same")
                 # resample the image to the camera's ifov
-                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=self.ifov)
 
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
-            psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))  # type: ignore
+            psf = otf_to_psf(otf=self.defocus_otf, df=self.df, dx_out=1 / (self.defocus_otf.shape[0] * self.df))
             if image.ndim == 2:
                 sim_img = fftconvolve(image, psf, mode="same")
             else:
