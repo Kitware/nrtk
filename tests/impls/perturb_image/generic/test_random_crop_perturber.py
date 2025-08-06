@@ -98,6 +98,23 @@ class TestRandomCropPerturber:
             expected=(out_image, []),
         )
 
+    def test_identity_operation(self) -> None:
+        """Test that the identity crop returns the original image."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        inst = RandomCropPerturber()  # Full image size as crop size
+        out_image, _ = bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=None,
+        )
+        bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=[],
+            expected=(out_image, []),
+        )
+
     def test_regression(self, snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))

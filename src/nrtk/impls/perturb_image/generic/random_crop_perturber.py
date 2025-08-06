@@ -48,9 +48,10 @@ class RandomCropPerturber(PerturbImage):
 
         Args:
             crop_size:
-                Target crop size as (crop_height, crop_width).
+                Target crop size as (crop_height, crop_width). If crop_size is None, it defaults
+                to the size of the input image.
             seed:
-                Seed for rng.
+                Seed for rng. Defaults to 1.
             box_alignment_mode:
                 Deprecated Mode for how to handle how bounding boxes change.
         """
@@ -58,6 +59,34 @@ class RandomCropPerturber(PerturbImage):
         self.crop_size = crop_size
         self.seed = seed
         self.rng: np.random.Generator = np.random.default_rng(self.seed)
+
+    @staticmethod
+    def _compute_bboxes(
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
+        crop_x: int,
+        crop_y: int,
+        crop_w: int,
+        crop_h: int,
+    ) -> Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]:
+        """Compute the intersect-shifted bbox coordinates."""
+        adjusted_bboxes = []
+        for bbox, metadata in boxes:
+            crop_box = AxisAlignedBoundingBox((crop_y, crop_x), (crop_y + crop_h, crop_x + crop_w))
+            # Calculate intersection of the bounding box with the crop region
+            intersected_box = bbox.intersection(crop_box)
+            if intersected_box:
+                # Shift the intersected bounding box to align with the cropped image coordinates
+                shifted_min = (
+                    intersected_box.min_vertex[0] - crop_y,
+                    intersected_box.min_vertex[1] - crop_x,
+                )
+                shifted_max = (
+                    intersected_box.max_vertex[0] - crop_y,
+                    intersected_box.max_vertex[1] - crop_x,
+                )
+                adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
+                adjusted_bboxes.append((adjusted_box, metadata))
+        return adjusted_bboxes
 
     def perturb(
         self,
@@ -84,8 +113,11 @@ class RandomCropPerturber(PerturbImage):
         if additional_params is None:
             additional_params = dict()
 
-        # Set crop_size to half of image size if crop_size is None
-        crop_size = self.crop_size if self.crop_size is not None else (image.shape[0] // 2, image.shape[1] // 2)
+        # Set crop_size to image size if crop_size is None
+        crop_size = self.crop_size if self.crop_size is not None else (image.shape[0], image.shape[1])
+
+        if crop_size == image.shape[:2]:
+            return image.copy(), boxes
 
         crop_h, crop_w = crop_size
         orig_h, orig_w = image.shape[:2]
@@ -100,25 +132,18 @@ class RandomCropPerturber(PerturbImage):
 
         # Perform the crop
         cropped_image = image[crop_y : crop_y + crop_h, crop_x : crop_x + crop_w].copy()
+
+        if boxes is None:
+            return cropped_image, []
+
         # Adjust bounding boxes
-        adjusted_bboxes = []
-        if boxes is not None:
-            for bbox, metadata in boxes:
-                # Calculate intersection of the bounding box with the crop region
-                crop_box = AxisAlignedBoundingBox((crop_y, crop_x), (crop_y + crop_h, crop_x + crop_w))
-                intersected_box = bbox.intersection(crop_box)
-                if intersected_box:
-                    # Shift the intersected bounding box to align with the cropped image coordinates
-                    shifted_min = (
-                        intersected_box.min_vertex[0] - crop_y,
-                        intersected_box.min_vertex[1] - crop_x,
-                    )
-                    shifted_max = (
-                        intersected_box.max_vertex[0] - crop_y,
-                        intersected_box.max_vertex[1] - crop_x,
-                    )
-                    adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
-                    adjusted_bboxes.append((adjusted_box, metadata))
+        adjusted_bboxes = RandomCropPerturber._compute_bboxes(
+            boxes=boxes,
+            crop_x=crop_x,
+            crop_y=crop_y,
+            crop_w=crop_w,
+            crop_h=crop_h,
+        )
         return cropped_image, adjusted_bboxes
 
     def get_config(self) -> dict[str, Any]:
