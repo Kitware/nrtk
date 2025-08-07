@@ -18,6 +18,7 @@ Image Perturbation
    nrtk.impls.perturb_image.generic.nop_perturber
    nrtk.impls.perturb_image.generic.compose_perturber
    nrtk.impls.perturb_image.generic.random_crop_perturber
+   nrtk.impls.perturb_image.generic.random_rotation_perturber
    nrtk.impls.perturb_image.generic.random_translation_perturber
    nrtk.impls.perturb_image.generic.haze_perturber
    nrtk.impls.perturb_image.generic.water_droplet_perturber
