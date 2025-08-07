@@ -18,8 +18,9 @@ Below are a list of notebooks with a short description:
   ``NRTK's`` :ref:`AlbumentationsPerturber`.
 * `nrtk_sensor_transformation_demo <../examples/maite/nrtk_sensor_transformation_demo.html>`_ modifies the resolution
   and noise of a sensor using ``NRTK's`` :ref:`PybsmPerturber`.
-* `nrtk_translation_perturber_demo <../examples/maite/nrtk_translation_perturber_demo.html>`_ performs random
-  translations of the image using ``NRTK's`` :ref:`RandomTranslationPerturber`.
+* `nrtk_affine_perturbers_demo <../examples/maite/nrtk_affine_perturbers_demo.html>`_ performs random
+  translations, rotations and cropping of the image using ``NRTK's`` :ref:`RandomTranslationPerturber`,
+  :ref:`RandomRotationPerturber` and :ref:`RandomCropPerturber`, respectively.
 * `nrtk_turbulence_perturber_demo <../examples/maite/nrtk_turbulence_perturber_demo.html>`_ modifies atmospheric
   turbulence using ``NRTK's`` :ref:`TurbulenceApertureOTFPerturber`.
 * `nrtk_water_droplet_perturber_demo <../examples/maite/nrtk_water_droplet_perturber_demo.html>`_ simulates water

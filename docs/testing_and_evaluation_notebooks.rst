@@ -42,11 +42,11 @@ Demonstrating Resolution and Noise Transformations
 Explore how camera-specific transformations affect model inputs and predictions.
 `View notebook <examples/maite/nrtk_sensor_transformation_demo.html>`__.
 
-Demonstrating Random Translation Perturbations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Demonstrating Affine Transformations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Introduce pixel-level translations and observe model sensitivity to spatial shifts.
-`View notebook <examples/maite/nrtk_translation_perturber_demo.html>`__.
+Explore how affine transformations affect model inputs and predictions.
+`View notebook <examples/maite/nrtk_affine_perturbers_demo.html>`__.
 
 Demonstrating Atmospheric Turbulence Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

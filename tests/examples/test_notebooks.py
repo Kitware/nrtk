@@ -23,7 +23,7 @@ class TestPyrightNotebook:
             ("docs/examples/maite/nrtk_focus_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_sensor_transformation_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_lens_flare_demo.ipynb", 0),
-            ("docs/examples/maite/nrtk_translation_perturber_demo.ipynb", 0),
+            ("docs/examples/maite/nrtk_affine_perturbers_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_turbulence_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_water_droplet_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_radial_distortion_perturber_demo.ipynb", 0),
