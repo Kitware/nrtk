@@ -78,7 +78,8 @@ class TestDiffusionPerturber:
         mock_scheduler_class.from_config.return_value = MagicMock()
         mock_torch.cuda.is_available.return_value = True
 
-        perturber = DiffusionPerturber(model_name="test/model", device=device)
+        # Prompt is set to test to prevent a no-op
+        perturber = DiffusionPerturber(model_name="test/model", device=device, prompt="test")
         image = np.ones((256, 256, 3), dtype=np.uint8)
 
         perturbed_image, output_boxes = perturber.perturb(image, boxes=boxes)
@@ -87,7 +88,6 @@ class TestDiffusionPerturber:
 
         mock_pipeline_class.from_pretrained.assert_called_once_with(
             "test/model",
-            torch_dtype=mock_torch.float16,
             safety_checker=None,
         )
         mock_pipeline.to.assert_called_once_with(expected_device)

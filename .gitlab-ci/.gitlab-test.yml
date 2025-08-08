@@ -32,6 +32,7 @@ notebooks:
           "simple_generic_generator.ipynb",
           "simple_pybsm_generator.ipynb",
           "otf_visualization.ipynb",
+          "diffusion_perturber.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/pybsm"
         NOTEBOOK_FILE: [
@@ -52,7 +53,8 @@ notebooks:
           "nrtk_affine_perturbers_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
           "nrtk_water_droplet_perturber_demo.ipynb",
-          "nrtk_radial_distortion_perturber_demo.ipynb"
+          "nrtk_radial_distortion_perturber_demo.ipynb",
+          # "nrtk_diffusion_perturber_demo.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/maite/gradio"
         NOTEBOOK_FILE: [

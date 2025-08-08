@@ -94,7 +94,7 @@ class DiffusionPerturber(PerturbImage):
     def __init__(
         self,
         model_name: str = "timbrooks/instruct-pix2pix",
-        prompt: str = "add subtle atmospheric effects",
+        prompt: str = "do not change the image",
         seed: int = 1,
         num_inference_steps: int = 50,
         text_guidance_scale: float = 8.0,
@@ -107,7 +107,7 @@ class DiffusionPerturber(PerturbImage):
             model_name: Name of the pre-trained diffusion model. Default is "timbrooks/instruct-pix2pix".
             prompt: Text prompt describing the desired perturbation. Examples include
                 "add rain to the image", "make it foggy", "add snow", "darken the scene", etc.
-                Default is "add subtle atmospheric effects".
+                To apply a no-op, use "do not change the image". Default is "do not change the image".
             seed: Random seed for reproducible perturbations. Default is 1.
             num_inference_steps: Number of denoising steps. Default is 50.
             text_guidance_scale: Guidance scale for text prompt. Default is 8.0.
@@ -164,7 +164,6 @@ class DiffusionPerturber(PerturbImage):
             try:
                 self._pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
                     self.model_name,
-                    torch_dtype=torch.float16,
                     safety_checker=None,
                 )
                 # Cast to help type checker understand pipeline is not None
@@ -222,6 +221,9 @@ class DiffusionPerturber(PerturbImage):
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Generate a prompt-guided perturbed image using diffusion models.
 
+        If the prompt is "do not change the image", this method will perform a no-op
+        and return the original image and bounding boxes.
+
         Args:
             image: Input image as a numpy array. PIL will handle format validation.
                 Common supported formats: (H, W) grayscale, (H, W, 3) RGB, (H, W, 4) RGBA.
@@ -239,6 +241,9 @@ class DiffusionPerturber(PerturbImage):
             ValueError: If the input image cannot be converted to PIL format.
             RuntimeError: If the diffusion model fails to load or process the image.
         """
+        if self.prompt == "do not change the image":
+            return image, boxes
+
         if additional_params is None:
             additional_params = {}
 
