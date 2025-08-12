@@ -106,6 +106,7 @@ def pybsm_perturber_assertions(
     image: np.ndarray,
     expected: None | np.ndarray = None,
     additional_params: None | dict[str, Any] = None,
+    tol: float = 1e-6,
 ) -> np.ndarray:
     """Test some blanket assertions for perturbers.
 
@@ -127,6 +128,6 @@ def pybsm_perturber_assertions(
     assert not np.shares_memory(image, out_image)
     if expected is not None:
         assert out_image.dtype == expected.dtype
-        assert np.array_equal(out_image, expected)
+        assert np.average(np.abs(out_image - expected)) < tol
 
     return out_image

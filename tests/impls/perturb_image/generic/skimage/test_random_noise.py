@@ -31,6 +31,11 @@ test_rng = np.random.default_rng()
 INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
     """Test that output is reproducible if a rng or seed is provided.
 
@@ -63,7 +68,7 @@ def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
 
 @pytest.mark.skipif(not SaltNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSaltNoisePerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
@@ -74,7 +79,7 @@ class TestSaltNoisePerturber:
             perturb=SaltNoisePerturber(amount=amount, rng=rng),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -175,7 +180,7 @@ class TestSaltNoisePerturber:
 
 @pytest.mark.skipif(not PepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestPepperNoisePerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
@@ -186,7 +191,7 @@ class TestPepperNoisePerturber:
             perturb=PepperNoisePerturber(amount=amount, rng=rng),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -287,7 +292,7 @@ class TestPepperNoisePerturber:
 
 @pytest.mark.skipif(not SaltAndPepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSaltAndPepperNoisePerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
@@ -303,7 +308,7 @@ class TestSaltAndPepperNoisePerturber:
             ),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -433,7 +438,7 @@ class TestSaltAndPepperNoisePerturber:
 
 @pytest.mark.skipif(not GaussianNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestGaussianNoisePerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches precomputed results."""
         image = np.zeros((3, 3), dtype=np.uint8)
         rng = 42
@@ -445,7 +450,7 @@ class TestGaussianNoisePerturber:
             perturb=GaussianNoisePerturber(mean=mean, var=var, rng=rng),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),
@@ -543,7 +548,7 @@ class TestGaussianNoisePerturber:
 
 @pytest.mark.skipif(not SpeckleNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
 class TestSpeckleNoisePerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         rng = 42
@@ -555,7 +560,7 @@ class TestSpeckleNoisePerturber:
             perturb=SpeckleNoisePerturber(mean=mean, var=var, rng=rng),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "expectation"),

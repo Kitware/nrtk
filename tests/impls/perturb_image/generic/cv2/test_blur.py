@@ -26,9 +26,14 @@ rng = np.random.default_rng()
 INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 @pytest.mark.skipif(not AverageBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestAverageBlurPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         ksize = 3
@@ -38,7 +43,7 @@ class TestAverageBlurPerturber:
             perturb=AverageBlurPerturber(ksize=ksize),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "ksize"),
@@ -119,7 +124,7 @@ class TestAverageBlurPerturber:
 
 @pytest.mark.skipif(not GaussianBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestGaussianBlurPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         ksize = 3
@@ -129,7 +134,7 @@ class TestGaussianBlurPerturber:
             perturb=GaussianBlurPerturber(ksize=ksize),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "ksize"),
@@ -218,7 +223,7 @@ class TestGaussianBlurPerturber:
 
 @pytest.mark.skipif(not MedianBlurPerturber.is_usable(), reason=str(OpenCVImportError()))
 class TestMedianBlurPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         ksize = 3
@@ -228,7 +233,7 @@ class TestMedianBlurPerturber:
             perturb=MedianBlurPerturber(ksize=ksize),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "ksize"),

@@ -29,7 +29,7 @@ DATA_DIR = Path(__file__).parents[3] / "data"
 INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
-@pytest.fixture()  # noqa:PT001
+@pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(CustomFloatSnapshotExtension)
 

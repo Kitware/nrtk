@@ -19,6 +19,11 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 @pytest.mark.skipif(not RandomRotationPerturber.is_usable(), reason=str(AlbumentationsImportError()))
 class TestRandomRotationPerturber:
     @pytest.mark.parametrize(
@@ -148,7 +153,7 @@ class TestRandomRotationPerturber:
             expected=out_image,
         )
 
-    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
         image = Image.new("RGB", grayscale_image.size)
@@ -163,7 +168,7 @@ class TestRandomRotationPerturber:
             perturb=inst.perturb,
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("perturber", "limit", "probability", "fill", "parameters", "seed"),

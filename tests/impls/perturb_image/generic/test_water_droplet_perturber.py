@@ -18,6 +18,11 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 @pytest.mark.skipif(not WaterDropletPerturber.is_usable(), reason=str(WaterDropletImportError()))
 class TestWaterDropletPerturber:
     def test_default_consistency(
@@ -105,7 +110,7 @@ class TestWaterDropletPerturber:
     )
     def test_regression(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
         size_range: Sequence[float],
         num_drops: int,
         blur_strength: float,
@@ -133,7 +138,7 @@ class TestWaterDropletPerturber:
             perturb=inst.perturb,
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         (
