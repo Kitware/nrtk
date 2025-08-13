@@ -46,7 +46,7 @@ import skimage.util  # noqa: E402
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = None, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, rng: np.random.Generator | int | None = 1, box_alignment_mode: str | None = None) -> None:
         """:param rng: Pseudo-random number generator or seed."""
         if not self.is_usable():
             raise ScikitImageImportError
