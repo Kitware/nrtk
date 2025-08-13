@@ -1,9 +1,4 @@
-import io
-from typing import Any
-
 import numpy as np
-from PIL import Image
-from syrupy.extensions.single_file import SingleFileSnapshotExtension
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
@@ -129,29 +124,3 @@ def create_sample_scenario() -> PybsmScenario:
 
 def create_sample_sensor_and_scenario() -> tuple[PybsmSensor, PybsmScenario]:
     return create_sample_sensor(), create_sample_scenario()
-
-
-class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
-    _file_extension = "tiff"
-
-    def __init__(self, *, tol: float = 1e-3, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self.tol = tol
-
-    def serialize(self, data: np.ndarray, **_: Any) -> bytes:
-        im = Image.fromarray(data)
-        byte_arr = io.BytesIO()
-        im.save(byte_arr, format="tiff")
-        return byte_arr.getvalue()
-
-    def deserialize(self, data: bytes) -> np.ndarray:
-        with Image.open(io.BytesIO(data)) as image:
-            # Force load image data to avoid lazy loading
-            image.load()
-            return np.array(image)
-
-    def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
-        expected_array = self.deserialize(snapshot_data)
-        received_array = self.deserialize(serialized_data)
-
-        return bool(np.average(np.abs(expected_array - received_array)) < self.tol)
