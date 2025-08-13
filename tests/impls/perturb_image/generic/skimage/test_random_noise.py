@@ -25,14 +25,8 @@ from nrtk.impls.perturb_image.generic.skimage.random_noise import (
 from nrtk.utils._exceptions import ScikitImageImportError
 from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 test_rng = np.random.default_rng()
-
-
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:

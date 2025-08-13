@@ -18,15 +18,10 @@ from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturb
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
-
-
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 @pytest.mark.skipif(not JitterOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))

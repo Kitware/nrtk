@@ -8,14 +8,8 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.generic.radial_distortion_perturber import RadialDistortionPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
-
-
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 class TestRadialDistortionPerturber:
