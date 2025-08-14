@@ -154,6 +154,5 @@ class TestComposePerturber:
 
         cfg = dict()
         cfg["perturbers"] = []
-        cfg["box_alignment_mode"] = None
         assert (out_image == image).all()
         assert inst.get_config() == cfg

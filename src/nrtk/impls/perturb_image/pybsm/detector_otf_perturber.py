@@ -79,7 +79,6 @@ class DetectorOTFPerturber(PerturbImage):
         w_y: float | None = None,
         f: float | None = None,
         interp: bool = True,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -96,11 +95,6 @@ class DetectorOTFPerturber(PerturbImage):
                 Focal length (m).
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without interpolation.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If a value is provided for w_x, w_y and/or f that value(s) will be used in
             the otf calculation.
@@ -121,7 +115,7 @@ class DetectorOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:

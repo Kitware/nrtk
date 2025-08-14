@@ -29,7 +29,7 @@ class ComposePerturber(PerturbImage):
         to work with perturber factories.
     """
 
-    def __init__(self, perturbers: list[PerturbImage] | None = None, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, perturbers: list[PerturbImage] | None = None) -> None:
         """Initializes the ComposePerturber.
 
         This has not been tested with perturber factories and is not expected to work with perturber factories.
@@ -37,13 +37,8 @@ class ComposePerturber(PerturbImage):
         Args:
             perturbers:
                 List of perturbers to apply.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
         """
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         if perturbers is None:
             perturbers = list()
         self.perturbers = perturbers

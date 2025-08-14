@@ -40,7 +40,6 @@ class RandomCropPerturber(PerturbImage):
         self,
         crop_size: tuple[int, int] | None = None,
         seed: int | np.random.Generator | None = 1,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """RandomCropPerturber applies a random cropping perturbation to an input image.
 
@@ -52,10 +51,8 @@ class RandomCropPerturber(PerturbImage):
                 to the size of the input image.
             seed:
                 Seed for rng. Defaults to 1.
-            box_alignment_mode:
-                Deprecated Mode for how to handle how bounding boxes change.
         """
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.crop_size = crop_size
         self.seed = seed
         self.rng: np.random.Generator = np.random.default_rng(self.seed)

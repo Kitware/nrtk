@@ -41,7 +41,6 @@ class RandomTranslationPerturber(PerturbImage):
 
     def __init__(
         self,
-        box_alignment_mode: str | None = None,
         seed: int | np.random.Generator | None = 1,
         color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
@@ -51,18 +50,13 @@ class RandomTranslationPerturber(PerturbImage):
         image coordinates.
 
         Args:
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
             seed:
                 Numpy random number generator.
             color_fill:
                 Background color fill for RGB image.
 
         """
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.rng: np.random.Generator = np.random.default_rng(seed)
         self.color_fill: np.ndarray[np.int64, Any] = np.array(color_fill)
 

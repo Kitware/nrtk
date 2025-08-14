@@ -69,7 +69,6 @@ class PybsmPerturber(PerturbImage):
         scenario: PybsmScenario | None = None,
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_REFLECTANCE_RANGE,
         rng_seed: int = 1,
-        box_alignment_mode: str | None = None,
         **kwargs: Any,
     ) -> None:
         """Initializes the PybsmPerturber.
@@ -83,11 +82,6 @@ class PybsmPerturber(PerturbImage):
                 Array of reflectances that correspond to pixel values.
             rng_seed:
                 integer seed value that will be used for the random number generator.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
             kwargs:
                 sensor and/or scenario values to modify.
 
@@ -98,7 +92,7 @@ class PybsmPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self._rng_seed = rng_seed
 
         if not sensor:

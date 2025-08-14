@@ -52,7 +52,6 @@ class AlbumentationsPerturber(PerturbImage):
         self,
         perturber: str = "NoOp",
         parameters: dict[str, Any] | None = None,
-        box_alignment_mode: str | None = None,
         seed: int | None = None,
     ) -> None:
         """AlbumentationsPerturber applies a BasicTransform from Albumentations.
@@ -65,11 +64,6 @@ class AlbumentationsPerturber(PerturbImage):
                 Keyword arguments that should be passed to the given perturber.
             seed (int):
                 An optional seed for reproducible results.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
 
         Raises:
@@ -79,7 +73,7 @@ class AlbumentationsPerturber(PerturbImage):
         if not self.is_usable():
             raise AlbumentationsImportError
 
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.perturber = perturber
         self.parameters = parameters
 

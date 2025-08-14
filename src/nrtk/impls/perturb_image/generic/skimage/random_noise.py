@@ -46,11 +46,11 @@ import skimage.util  # noqa: E402
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = 1, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, rng: np.random.Generator | int | None = 1) -> None:
         """:param rng: Pseudo-random number generator or seed."""
         if not self.is_usable():
             raise ScikitImageImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.rng = rng
 
     def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
@@ -114,14 +114,13 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
         self,
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the SPNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         """
-        super().__init__(rng=rng, box_alignment_mode=box_alignment_mode)
+        super().__init__(rng=rng)
 
         if amount < 0.0 or amount > 1.0:
             raise ValueError(
@@ -180,7 +179,6 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
@@ -189,7 +187,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         :param salt_vs_pepper: Proportion of salt vs. pepper noise on range [0, 1].
             Higher values represent more salt.
         """
-        super().__init__(amount=amount, rng=rng, box_alignment_mode=box_alignment_mode)
+        super().__init__(amount=amount, rng=rng)
 
         if salt_vs_pepper < 0.0 or salt_vs_pepper > 1.0:
             raise ValueError(
@@ -233,7 +231,6 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         rng: np.random.Generator | int | None = None,
         mean: float = 0.0,
         var: float = 0.05,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the GSNoisePerturber.
 
@@ -241,7 +238,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         :param mean: Mean of random distribution.
         :param var: Variance of random distribution.
         """
-        super().__init__(rng=rng, box_alignment_mode=box_alignment_mode)
+        super().__init__(rng=rng)
 
         if var < 0:
             raise ValueError(

@@ -86,7 +86,6 @@ class DefocusOTFPerturber(PerturbImage):
         w_x: float | None = None,
         w_y: float | None = None,
         interp: bool = True,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes a DefocusOTFPerturber instance with the specified parameters.
 
@@ -101,11 +100,6 @@ class DefocusOTFPerturber(PerturbImage):
                 the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
             interp:
                 Whether to interpolate atmosphere data. Defaults to True.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If a value is provided for w_x and/or w_y those values will be used in the otf calculation.
 
@@ -123,7 +117,7 @@ class DefocusOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
@@ -337,7 +331,6 @@ class DefocusOTFPerturber(PerturbImage):
             "w_x": self.w_x,
             "w_y": self.w_y,
             "interp": self.interp,
-            "box_alignment_mode": self.box_alignment_mode,
         }
 
     @classmethod
