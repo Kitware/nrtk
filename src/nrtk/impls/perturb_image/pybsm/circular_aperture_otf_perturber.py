@@ -89,7 +89,6 @@ class CircularApertureOTFPerturber(PerturbImage):
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
         interp: bool = True,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 
@@ -105,11 +104,6 @@ class CircularApertureOTFPerturber(PerturbImage):
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If both sensor and scenario parameters are absent, then default values
             will be used for their parameters
@@ -131,7 +125,7 @@ class CircularApertureOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:

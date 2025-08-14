@@ -207,9 +207,8 @@ class TestPyBSMPerturber:
         inst.perturb(image, additional_params={"img_gsd": 3.19 / 160})
         out_cfg = inst.get_config()
 
-        assert out_cfg["box_alignment_mode"] is None
         assert out_cfg["sensor"] is not None
         assert out_cfg["scenario"] is not None
         assert out_cfg["rng_seed"] == 1
         assert (out_cfg["reflectance_range"] == np.array([0.05, 0.5])).all()
-        assert len(out_cfg.keys()) == 5
+        assert len(out_cfg.keys()) == 4

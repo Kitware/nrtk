@@ -53,7 +53,6 @@ class RadialDistortionPerturber(PerturbImage):
 
     def __init__(
         self,
-        box_alignment_mode: str | None = None,
         k: Sequence[float] = [0, 0, 0],
         color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
@@ -62,16 +61,11 @@ class RadialDistortionPerturber(PerturbImage):
         Args:
             k (Sequence[float]): A list of coefficients used to compute the radial distortion.
             color_fill (Sequence[int]): Background color fill for RGB image.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
         Raises:
             ValueError: Errors when k does not have exactly 3 values
         """
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.k = k
         if len(k) != 3:
             raise ValueError("k must have exactly 3 values")

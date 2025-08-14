@@ -103,7 +103,6 @@ class WaterDropletPerturber(PerturbImage):
         f_x: int = 400,
         f_y: int = 400,
         seed: int | None = None,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
@@ -126,11 +125,6 @@ class WaterDropletPerturber(PerturbImage):
                 Camera focal length in y direction (cm).
             seed:
                 Random seed for reproducibility.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If any of the parameters are absent, the following values will be set
             as defaults:
@@ -151,7 +145,7 @@ class WaterDropletPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise WaterDropletImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.size_range = size_range
         self.num_drops = num_drops
         self.blur_strength = blur_strength

@@ -181,7 +181,6 @@ class TestAlbumentationsPerturber:
         cfg["perturber"] = "NoOp"
         cfg["parameters"] = None
         cfg["seed"] = None
-        cfg["box_alignment_mode"] = None
         assert (out_image == image).all()
         assert inst.get_config() == cfg
 
