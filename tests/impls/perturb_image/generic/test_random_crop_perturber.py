@@ -17,6 +17,11 @@ from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 rng = np.random.default_rng()
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 class TestRandomCropPerturber:
     @pytest.mark.parametrize(
         ("input_test_box", "expected"),
@@ -115,7 +120,7 @@ class TestRandomCropPerturber:
             expected=(out_image, []),
         )
 
-    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomCropPerturber(crop_size=(20, 20))
@@ -125,7 +130,7 @@ class TestRandomCropPerturber:
             boxes=None,
             expected=None,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("crop_size", "seed"),

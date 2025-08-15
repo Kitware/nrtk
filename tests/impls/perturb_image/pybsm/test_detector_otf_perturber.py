@@ -25,6 +25,11 @@ from tests.impls.test_pybsm_utils import (
 INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 @pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
 class TestDetectorOTFPerturber:
     def test_interp_consistency(self) -> None:
@@ -207,7 +212,7 @@ class TestDetectorOTFPerturber:
     )
     def test_regression(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         w_x: float | None,
         w_y: float | None,
@@ -229,8 +234,7 @@ class TestDetectorOTFPerturber:
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",

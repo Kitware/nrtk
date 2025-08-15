@@ -19,11 +19,16 @@ from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 rng = np.random.default_rng(2345)
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 @pytest.mark.skipif(not WaterDropletPerturber.is_usable(), reason=str(WaterDropletImportError()))
 class TestWaterDropletPerturberUtils:
     def test_ccw_sort(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
     ) -> None:
         """Regression testing for the `ccw_sort` util function."""
         x_in = np.linspace(0, 100, 50)
@@ -31,7 +36,7 @@ class TestWaterDropletPerturberUtils:
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
         points = ccw_sort(points=points)
 
-        assert TIFFImageSnapshotExtension.ndarray2bytes(points) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(points)
 
     @pytest.mark.parametrize(
         ("rad", "edgy"),
@@ -39,7 +44,7 @@ class TestWaterDropletPerturberUtils:
     )
     def test_regression_get_bezier_curve(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
         rad: float,
         edgy: float,
     ) -> None:
@@ -49,9 +54,7 @@ class TestWaterDropletPerturberUtils:
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
         x, y = get_bezier_curve(points=points, rad=rad, edgy=edgy)
         curve_points = np.column_stack((x, y))
-        assert TIFFImageSnapshotExtension.ndarray2bytes(curve_points) == snapshot(
-            extension_class=TIFFImageSnapshotExtension,
-        )
+        tiff_snapshot.assert_match(curve_points)
 
     @pytest.mark.parametrize(
         ("n", "scale", "min_dst", "recursive"),
@@ -64,7 +67,7 @@ class TestWaterDropletPerturberUtils:
     )
     def test_regression_get_random_points_within_min_dist(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
         n: int,
         scale: float,
         min_dst: float | None,
@@ -78,9 +81,7 @@ class TestWaterDropletPerturberUtils:
             min_dst=min_dst,
             recursive=recursive,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(rand_points) == snapshot(
-            extension_class=TIFFImageSnapshotExtension,
-        )
+        tiff_snapshot.assert_match(rand_points)
 
 
 @mock.patch.object(WaterDropletPerturber, "is_usable")

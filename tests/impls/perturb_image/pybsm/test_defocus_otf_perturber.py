@@ -24,6 +24,11 @@ EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus
 EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_provided_expected_output.tiff"
 
 
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
+
+
 @pytest.mark.skipif(not DefocusOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestDefocusOTFPerturber:
     def test_interp_consistency(self) -> None:
@@ -305,7 +310,7 @@ class TestDefocusOTFPerturber:
     )
     def test_regression(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         w_x: float | None,
         w_y: float | None,
@@ -332,8 +337,7 @@ class TestDefocusOTFPerturber:
         )
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",
