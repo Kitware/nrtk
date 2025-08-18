@@ -266,14 +266,16 @@ to facilitate dataset exploration. This tool uses the
 
 ## Contacts
 
-**Principal Investigator / Product Owner**: Brian Hu (Kitware) @brian.hu
+**Principal Investigator**: Brian Hu (Kitware) @brian.hu
+
+**Project Manager / Product Owner**: Keith Fieldhouse (Kitware)
+@keith.fieldhouse
 
 **Scrum Master / Maintainer**: Brandon RichardWebster (Kitware)
 @b.richardwebster
 
-**Deputy Scrum Master / Maintainer**: Emily Veenhuis (Kitware) @emily.veenhuis
-
-**Project Manager**: Keith Fieldhouse (Kitware) @keith.fieldhouse
+**Deputy Scrum Master / Deputy Maintainer**: Emily Veenhuis (Kitware)
+@emily.veenhuis
 
 **Program Representative**: Austin Whitesell (MITRE) @awhitesell
 
