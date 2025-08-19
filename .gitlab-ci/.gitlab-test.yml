@@ -13,7 +13,8 @@ pytest-extras:
   variables:
     EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
   tags:
-    - single-gpu
+    # - single-gpu
+    - single-gpu-g4dn.xlarge
 
 notebooks:
   extends: .notebooks
