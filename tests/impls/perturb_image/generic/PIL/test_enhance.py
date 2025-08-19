@@ -19,12 +19,11 @@ from nrtk.impls.perturb_image.generic.PIL.enhance import (
     SharpnessPerturber,
 )
 from nrtk.utils._exceptions import PillowImportError
+from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
-
-INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
 @pytest.fixture

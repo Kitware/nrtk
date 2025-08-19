@@ -16,9 +16,6 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.test_utils import DummyPerturber
 
-DATA_DIR = Path(__file__).parents[3] / "data"
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
-
 
 class TestStepPerturbImageFactory:
     @pytest.mark.parametrize(

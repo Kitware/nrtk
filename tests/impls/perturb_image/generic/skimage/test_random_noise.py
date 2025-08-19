@@ -23,12 +23,11 @@ from nrtk.impls.perturb_image.generic.skimage.random_noise import (
     _SKImageNoisePerturber,
 )
 from nrtk.utils._exceptions import ScikitImageImportError
+from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 test_rng = np.random.default_rng()
-
-INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
 
 
 @pytest.fixture

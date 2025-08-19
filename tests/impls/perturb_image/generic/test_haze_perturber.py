@@ -9,12 +9,11 @@ from smqtk_core.configuration import configuration_test_helper
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.haze_perturber import HazePerturber
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
-
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 @pytest.fixture

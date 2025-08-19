@@ -13,7 +13,7 @@ from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.water_droplet_perturber import WaterDropletPerturber
 from nrtk.utils._exceptions import WaterDropletImportError
-from tests.impls import INPUT_IMG_FILE_PATH
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
