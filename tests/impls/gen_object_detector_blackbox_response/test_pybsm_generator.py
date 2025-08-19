@@ -20,10 +20,9 @@ from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.impls.score_detections.random_scorer import RandomScorer
 from nrtk.utils._exceptions import PyBSMImportError
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
 from tests.impls.gen_object_detector_blackbox_response.test_generator_utils import gen_rand_dets, generator_assertions
 from tests.impls.test_pybsm_utils import create_sample_scenario, create_sample_sensor
-
-INPUT_IMG_FILE = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 rng = np.random.default_rng()
 
