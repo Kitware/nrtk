@@ -96,6 +96,11 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
     poetry install --sync --with linting,tests,docs
 
+.. note::
+  Developers should also ensure their enviroment has Git LFS installed
+  before their first commit. See the `Git LFS documentation <https://git-lfs.com/>`_
+  for more details.
+
 .. :auto dev-deps:
 
 .. :auto build-docs:
