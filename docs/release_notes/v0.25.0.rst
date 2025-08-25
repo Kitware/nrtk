@@ -1,42 +1,45 @@
-0.25.0
-======
+v0.18.0
+=======
 
-* Added a new ``RandomRotationPerturber`` implementation with appropriate unit testing.
+This minor release introduces new perturbation implementations, several example
+notebooks, and improvements to testing and developer tooling. It also removes
+deprecated functionality, updates dependency handling, and makes adjustments
+for Python version compatibility.
 
-* Updated method of optional dependency imports to ensure 100% pyright type completeness
+Updates / New Features
+----------------------
 
-* Added a How-To notebook guide for Image Classification Perturbation Saliency,
+- Added new perturbations:
 
-* The deprecated ``box_alignment_mode`` has been removed
+  - ``RandomRotationPerturber`` with full unit test coverage.
+  - ``DiffusionPerturber``, with an accompanying example notebook.
+  - Added default configuration to ``PybsmPerturber`` and ``ComposePerturber``.
 
-* Use ``geopandas`` in ``WaterDropletPerturber`` to improve performance.
+- Example notebooks and guides:
 
-* Added a T&E guide example notebook for Affine perturbations.
+  - How-To guide for **Image Classification Perturbation Saliency** with ``xaitk-saliency``.
+  - T&E guide for **Affine perturbations**.
 
-* Add fuzzy syrupy comparator for TIFF Snapshot Extension
+- Performance improvements:
 
-* MAITE lowerbound changed from v0.8.1 to v0.8.2
+  - ``WaterDropletPerturber`` now uses ``geopandas`` to obtain a ~3x performance boost.
 
-* Added default configuration to ``PybsmPerturber``, ``ComposePerturber`` and
+- Dependency and compatibility updates:
 
-* Added Diffusion Perturber example notebook.
+  - Changed MAITE lower bound to **v0.8.2**.
+  - Dropped support for **Python 3.9** (EOL).
+  - Placed an upper bound on Python versions (``<3.13``) due to an upstream NumPy 2.0 compatibility.
+  - Updated optional dependency imports to achieve full **pyright type completeness**.
 
-* Added a new ``DiffusionPerturber`` implementation.
+- Other additions:
 
-* Dropped Python 3.9 due to EOL. Added testing for Python 3.13
+  - Added fuzzy syrupy comparator for TIFF Snapshot Extension.
+  - Added Git LFS pointers in documentation.
+  - Added an internal debugging utility to print installed extras and their sources.
 
-* Add Git LFS pointers in various docs locations.
+Fixes
+-----
 
-* Added an internal utility script to update the ``_extras.yml`` file from
-
-* Added a pre-commit hook to run the utility script to ensure that the
-
-* Added an internal utility script to print the installed extras and their
-
-* Placed upperbound on Python versioning (<3.13) due to upstream NumPy2.0 compatibility issues
-
-* Updated ``tests/impls/__init__.py`` to have input image filepaths for tests.
-
-* Updated tests to use input image filepaths from ``tests/impls/__init__.py``.
-
-* Updated ``random_noise.py`` to use 1 as the default parameter for ``rng``.
+- Removed deprecated ``box_alignment_mode``.
+- Updated ``tests/impls/__init__.py`` to define and centralize input image filepaths.
+- Updated ``random_noise.py`` to use ``1`` as the default ``rng`` parameter.
