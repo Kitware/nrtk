@@ -1,4 +1,4 @@
-v0.18.0
+v0.25.0
 =======
 
 This minor release introduces new perturbation implementations, several example
