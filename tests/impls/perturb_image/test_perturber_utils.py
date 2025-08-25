@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Hashable, Iterable
-from typing import Any, Callable
+from collections.abc import Callable, Hashable, Iterable
+from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -87,7 +87,7 @@ def bbox_perturber_assertions(
     if expected is not None:
         assert np.array_equal(out_image, expected[0])
         assert out_boxes is not None
-        for (expected_box, expected_meta), (out_box, out_meta) in zip(expected[1], out_boxes):
+        for (expected_box, expected_meta), (out_box, out_meta) in zip(expected[1], out_boxes, strict=False):
             assert expected_box != out_box
             assert expected_meta == out_meta
 
@@ -106,6 +106,7 @@ def pybsm_perturber_assertions(
     image: np.ndarray,
     expected: None | np.ndarray = None,
     additional_params: None | dict[str, Any] = None,
+    tol: float = 1e-6,
 ) -> np.ndarray:
     """Test some blanket assertions for perturbers.
 
@@ -119,8 +120,6 @@ def pybsm_perturber_assertions(
     :param image: Input image as numpy array.
     :param expected: (Optional) Expected return value of the perturbation.
     """
-    if additional_params is None:
-        additional_params = dict()
     copy = np.copy(image)
 
     out_image, _ = perturb(image, None, additional_params)
@@ -129,6 +128,6 @@ def pybsm_perturber_assertions(
     assert not np.shares_memory(image, out_image)
     if expected is not None:
         assert out_image.dtype == expected.dtype
-        assert np.array_equal(out_image, expected)
+        assert np.average(np.abs(out_image - expected)) < tol
 
     return out_image

@@ -27,25 +27,20 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from pybsm.simulation import simulate_image
-    from pybsm.simulation.ref_image import RefImage
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-from smqtk_core.configuration import (
-    from_config_dict,
-    make_default_config,
-    to_config_dict,
-)
-
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
+
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.ref_image"])
+from pybsm.simulation import simulate_image  # noqa: E402
+from pybsm.simulation.ref_image import RefImage  # noqa: E402
+from smqtk_core.configuration import (  # noqa: E402
+    from_config_dict,
+    make_default_config,
+    to_config_dict,
+)
 
 DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call np.array within argument defaults
 
@@ -70,11 +65,10 @@ class PybsmPerturber(PerturbImage):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor,
-        scenario: PybsmScenario,
+        sensor: PybsmSensor | None = None,
+        scenario: PybsmScenario | None = None,
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_REFLECTANCE_RANGE,
         rng_seed: int = 1,
-        box_alignment_mode: str | None = None,
         **kwargs: Any,
     ) -> None:
         """Initializes the PybsmPerturber.
@@ -88,11 +82,6 @@ class PybsmPerturber(PerturbImage):
                 Array of reflectances that correspond to pixel values.
             rng_seed:
                 integer seed value that will be used for the random number generator.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
             kwargs:
                 sensor and/or scenario values to modify.
 
@@ -103,8 +92,25 @@ class PybsmPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self._rng_seed = rng_seed
+
+        if not sensor:
+            sensor = PybsmSensor(
+                name="Sensor",
+                D=275e-3,
+                f=4,
+                p_x=0.008e-3,
+                opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+            )
+        if not scenario:
+            scenario = PybsmScenario(
+                name="Scenario",
+                ihaze=1,
+                altitude=9000,
+                ground_range=0,
+            )
+
         self.sensor: PybsmSensor = copy.deepcopy(sensor)
         self.scenario: PybsmScenario = copy.deepcopy(scenario)
 
@@ -167,15 +173,20 @@ class PybsmPerturber(PerturbImage):
             raise ValueError("'img_gsd' must be present in image metadata for this perturber")
 
         # Create a `RefImage` object using the given GSD, img_pixel and reflactance values
-        ref_img = RefImage(  # type: ignore
-            image,
-            additional_params["img_gsd"],
-            np.array([image.min(), image.max()]),
-            self.reflectance_range,
+        ref_img = RefImage(
+            img=image,
+            gsd=additional_params["img_gsd"],
+            pix_values=np.array([image.min(), image.max()]),
+            refl_values=self.reflectance_range,
         )
 
         # Generate a perturbed image using the given sensor and scenario parameters
-        perturbed = simulate_image(ref_img, self.sensor(), self.scenario(), self._rng_seed)[-1]  # type: ignore
+        perturbed = simulate_image(
+            ref_img=ref_img,
+            sensor=self.sensor(),
+            scenario=self.scenario(),
+            rng=self._rng_seed,
+        )[-1]
 
         # Min-Max normalization and conversion to uint8 type
         min_perturbed_val = perturbed.min()
@@ -205,7 +216,7 @@ class PybsmPerturber(PerturbImage):
         Returns:
             :return str: Representation showing sensor and scenario names.
         """
-        return self.sensor.name + " " + self.scenario.name
+        return self.__str__()
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:

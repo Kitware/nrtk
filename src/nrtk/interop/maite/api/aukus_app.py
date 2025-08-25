@@ -4,31 +4,25 @@ from __future__ import annotations
 
 import copy
 import os
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 import requests
 
 from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import FastApiImportError, PydanticSettingsImportError
+from nrtk.utils._import_guard import import_guard
 
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from fastapi import FastAPI, HTTPException
-    from fastapi.encoders import jsonable_encoder
-
-    fastapi_available: bool = True
-except ImportError:  # pragma: no cover
-    fastapi_available: bool = False
-
-BaseSettings: type = object
-try:
-    from pydantic_settings import BaseSettings
-
-    pydantic_settings_available: bool = True
-except ImportError:  # pragma: no cover
-    pydantic_settings_available: bool = False
+fastapi_available: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
+pydantic_settings_available: bool = import_guard(
+    "pydantic_settings",
+    PydanticSettingsImportError,
+    objects=["BaseSettings"],
+)
+from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi.encoders import jsonable_encoder  # noqa: E402
+from pydantic_settings import BaseSettings  # noqa: E402
 
 
 # pyright warns about inheritance from BaseSettings which is ambiguous
@@ -55,7 +49,7 @@ class _UnusableFastApi:
 
 
 if fastapi_available:
-    AUKUS_app: FastAPI | _UnusableFastApi = FastAPI()  # pyright: ignore [reportPossiblyUnboundVariable]
+    AUKUS_app: FastAPI | _UnusableFastApi = FastAPI()
 else:
     AUKUS_app = _UnusableFastApi()
 
@@ -65,13 +59,13 @@ def _check_input(data: AukusDatasetSchema) -> None:
     if not fastapi_available:
         raise FastApiImportError
     if data.data_format != "COCO":
-        raise HTTPException(status_code=400, detail="Labels provided in incorrect format.")  # pyright: ignore [reportPossiblyUnboundVariable]
+        raise HTTPException(status_code=400, detail="Labels provided in incorrect format.")
 
     if not settings.NRTK_IP:
-        raise HTTPException(status_code=400, detail="Provide NRTK_IP in AUKUS_app.env.")  # pyright: ignore [reportPossiblyUnboundVariable]
+        raise HTTPException(status_code=400, detail="Provide NRTK_IP in AUKUS_app.env.")
     # Read NRTK configuration file and add relevant data to internalJSON
     if not os.path.isfile(data.nrtk_config):
-        raise HTTPException(status_code=400, detail="Provided NRTK config is not a valid file.")  # pyright: ignore [reportPossiblyUnboundVariable]
+        raise HTTPException(status_code=400, detail="Provided NRTK config is not a valid file.")
 
 
 @AUKUS_app.post("/")
@@ -97,7 +91,7 @@ def handle_aukus_post(data: AukusDatasetSchema) -> list[AukusDatasetSchema]:
     )
 
     # Call 'handle_post' function with processed data and get the result
-    out = requests.post(settings.NRTK_IP, json=jsonable_encoder(nrtk_input), timeout=3600).json()  # pyright: ignore [reportPossiblyUnboundVariable]
+    out = requests.post(settings.NRTK_IP, json=jsonable_encoder(nrtk_input), timeout=3600).json()
 
     # Process the result and construct return JSONs
     return_jsons = []

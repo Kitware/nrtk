@@ -14,10 +14,10 @@ from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.pybsm_perturber import PybsmPerturber
 from nrtk.utils._exceptions import PyBSMImportError
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
-INPUT_IMG_FILE = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
 
 np.random.seed(42)  # noqa: NPY002
@@ -84,6 +84,7 @@ class TestPyBSMPerturber:
         sensor, scenario = create_sample_sensor_and_scenario()
         inst = PybsmPerturber(sensor=sensor, scenario=scenario)
         for i in configuration_test_helper(inst):
+            assert i.sensor is not None
             assert i.sensor.name == sensor.name
             assert i.sensor.D == sensor.D
             assert i.sensor.f == sensor.f
@@ -107,6 +108,7 @@ class TestPyBSMPerturber:
             assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
             assert np.array_equal(i.sensor.qe, sensor.qe)
 
+            assert i.scenario is not None
             assert i.scenario.name == scenario.name
             assert i.scenario.ihaze == scenario.ihaze
             assert i.scenario.altitude == scenario.altitude
@@ -197,3 +199,16 @@ class TestPyBSMPerturber:
         sensor, scenario = create_sample_sensor_and_scenario()
         with pytest.raises(PyBSMImportError):
             PybsmPerturber(sensor=sensor, scenario=scenario)
+
+    def test_default_config(self) -> None:
+        """Test default configuration when created with no parameters."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        inst = PybsmPerturber()
+        inst.perturb(image, additional_params={"img_gsd": 3.19 / 160})
+        out_cfg = inst.get_config()
+
+        assert out_cfg["sensor"] is not None
+        assert out_cfg["scenario"] is not None
+        assert out_cfg["rng_seed"] == 1
+        assert (out_cfg["reflectance_range"] == np.array([0.05, 0.5])).all()
+        assert len(out_cfg.keys()) == 4

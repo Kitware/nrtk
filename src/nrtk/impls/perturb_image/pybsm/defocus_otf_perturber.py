@@ -15,29 +15,26 @@ from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import pybsm.radiance as radiance
-    from pybsm.otf.functional import defocus_OTF, otf_to_psf, resample_2D
-    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
-    from scipy.signal import fftconvolve
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-from smqtk_core.configuration import (
-    from_config_dict,
-    make_default_config,
-    to_config_dict,
-)
 from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._exceptions import PyBSMImportError, ScipyImportError
+from nrtk.utils._import_guard import import_guard
+
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["radiance", "otf.functional", "utils"])
+import pybsm.radiance as radiance  # noqa: E402
+from pybsm.otf.functional import defocus_OTF, otf_to_psf, resample_2D  # noqa: E402
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+
+import_guard("scipy", ScipyImportError, ["signal"])
+from scipy.signal import fftconvolve  # noqa: E402
+from smqtk_core.configuration import (  # noqa: E402
+    from_config_dict,
+    make_default_config,
+    to_config_dict,
+)
 
 
 class DefocusOTFPerturber(PerturbImage):
@@ -89,7 +86,6 @@ class DefocusOTFPerturber(PerturbImage):
         w_x: float | None = None,
         w_y: float | None = None,
         interp: bool = True,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes a DefocusOTFPerturber instance with the specified parameters.
 
@@ -104,11 +100,6 @@ class DefocusOTFPerturber(PerturbImage):
                 the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
             interp:
                 Whether to interpolate atmosphere data. Defaults to True.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If a value is provided for w_x and/or w_y those values will be used in the otf calculation.
 
@@ -126,22 +117,26 @@ class DefocusOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            else:
-                atm = load_database_atmosphere_no_interp(  # type: ignore
-                    scenario.altitude,
-                    scenario.ground_range,
-                    scenario.ihaze,
+                atm = load_database_atmosphere(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
                 )
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+            else:
+                atm = load_database_atmosphere_no_interp(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             # Use the spectral_weights variable for MTF wavelengths and weights
@@ -210,7 +205,7 @@ class DefocusOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
         self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.defocus_otf: np.ndarray[Any, Any] = defocus_OTF(uu, vv, self.w_x, self.w_y)  # type: ignore
+        self.defocus_otf: np.ndarray[Any, Any] = defocus_OTF(u=uu, v=vv, w_x=self.w_x, w_y=self.w_y)
 
         if additional_params is None:
             additional_params = dict()
@@ -222,7 +217,7 @@ class DefocusOTFPerturber(PerturbImage):
                 )
             ref_gsd = additional_params["img_gsd"]
             # Transform an optical transfer function into a point spread function
-            psf = otf_to_psf(self.defocus_otf, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
+            psf = otf_to_psf(otf=self.defocus_otf, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
             if image.ndim == 3:
@@ -232,44 +227,48 @@ class DefocusOTFPerturber(PerturbImage):
                 # the guarded import at the top of this file, but an object of
                 # this class is only instantiable if it has been successfully
                 # imported, so we can igore this
-                blur_img[:, :, 0] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                blur_img[:, :, 0] = fftconvolve(
                     image[:, :, 0],
                     psf,
                     mode="same",
                 )
                 # resample the image to the camera's ifov
-                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                resampled_img = resample_2D(
+                    img_in=blur_img[:, :, 0],
+                    dx_in=ref_gsd / self.slant_range,
+                    dx_out=self.ifov,
+                )
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    blur_img[:, :, channel] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                    blur_img[:, :, channel] = fftconvolve(
                         image[:, :, channel],
                         psf,
                         mode="same",
                     )
-                    sim_img[:, :, channel] = resample_2D(  # type: ignore
-                        blur_img[:, :, channel],
-                        ref_gsd / self.slant_range,
-                        self.ifov,
+                    sim_img[:, :, channel] = resample_2D(
+                        img_in=blur_img[:, :, channel],
+                        dx_in=ref_gsd / self.slant_range,
+                        dx_out=self.ifov,
                     )
             else:
                 # Perform convolution using scipy.signal.fftconvolve
-                blur_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+                blur_img = fftconvolve(image, psf, mode="same")
                 # resample the image to the camera's ifov
-                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=self.ifov)
 
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
-            psf = otf_to_psf(self.defocus_otf, self.df, 1 / (self.defocus_otf.shape[0] * self.df))  # type: ignore
+            psf = otf_to_psf(otf=self.defocus_otf, df=self.df, dx_out=1 / (self.defocus_otf.shape[0] * self.df))
             if image.ndim == 2:
-                sim_img = fftconvolve(image, psf, mode="same")  # pyright: ignore [reportPossiblyUnboundVariable]
+                sim_img = fftconvolve(image, psf, mode="same")
             else:
                 # image.ndim must be 3
                 sim_img = np.zeros_like(image, dtype=float)
                 for c in range(image.shape[2]):
-                    sim_img[..., c] = fftconvolve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                    sim_img[..., c] = fftconvolve(
                         image[..., c],
                         psf,
                         mode="same",
@@ -332,7 +331,6 @@ class DefocusOTFPerturber(PerturbImage):
             "w_x": self.w_x,
             "w_y": self.w_y,
             "interp": self.interp,
-            "box_alignment_mode": self.box_alignment_mode,
         }
 
     @classmethod

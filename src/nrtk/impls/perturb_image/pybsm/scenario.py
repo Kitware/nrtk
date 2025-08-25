@@ -20,17 +20,14 @@ Attributes:
 
 from typing import Any
 
-try:
-    from pybsm.simulation.scenario import Scenario
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
 from smqtk_core.configuration import Configurable
 from typing_extensions import override
 
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
+
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.scenario"])
+from pybsm.simulation.scenario import Scenario  # noqa: E402
 
 
 class PybsmScenario(Configurable):
@@ -174,12 +171,11 @@ class PybsmScenario(Configurable):
         Returns:
             :return Scenario: pybsm.Scenario object populated with instance parameters.
         """
-        # Type ignore added for pyright's handling of guarded imports
-        S = Scenario(  # noqa:N806  # pyright: ignore [reportPossiblyUnboundVariable]
-            self.name,
-            self.ihaze,
-            self.altitude,
-            self.ground_range,
+        S = Scenario(  # noqa:N806
+            name=self.name,
+            ihaze=self.ihaze,
+            altitude=self.altitude,
+            ground_range=self.ground_range,
         )
         S.aircraft_speed = self.aircraft_speed
         S.target_reflectance = self.target_reflectance

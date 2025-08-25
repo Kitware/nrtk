@@ -49,7 +49,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
 
         ious = list()
 
-        for act, pred in zip(actual, predicted):
+        for act, pred in zip(actual, predicted, strict=False):
             width, height = 1, 1
             for act_bbox, _ in act:
                 width = max(width, act_bbox.max_vertex[0])

@@ -16,12 +16,17 @@ from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
 
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
 EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
+
+
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 @pytest.mark.skipif(not JitterOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
@@ -305,7 +310,7 @@ class TestJitterOTFPerturber:
     )
     def test_regression(
         self,
-        snapshot: SnapshotAssertion,
+        tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         s_x: float | None,
         s_y: float | None,
@@ -326,8 +331,7 @@ class TestJitterOTFPerturber:
         inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",

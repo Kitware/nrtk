@@ -19,9 +19,8 @@ from nrtk.impls.perturb_image_factory.generic.linspace_step import (
 )
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.impls import DATA_DIR
 from tests.test_utils import DummyPerturber
-
-DATA_DIR = Path(__file__).parents[3] / "data"
 
 
 class TestFloatStepPertubImageFactory:

@@ -22,14 +22,13 @@ from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import Tur
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.impls import DATA_DIR
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.test_utils import CustomFloatSnapshotExtension, DummyPerturber
 
-DATA_DIR = Path(__file__).parents[3] / "data"
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
-
-@pytest.fixture()  # noqa:PT001
+@pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(CustomFloatSnapshotExtension)
 

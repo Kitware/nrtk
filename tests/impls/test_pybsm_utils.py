@@ -1,4 +1,5 @@
 import io
+from typing import Any
 
 import numpy as np
 from PIL import Image
@@ -7,12 +8,10 @@ from syrupy.extensions.single_file import SingleFileSnapshotExtension
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
 
-is_usable = True
-try:
-    from pybsm.otf import dark_current_from_density
-except ImportError:
-    is_usable = False
+is_usable: bool = import_guard("pybsm", PyBSMImportError, ["otf"])
+from pybsm.otf import dark_current_from_density  # noqa: E402
 
 
 def create_sample_sensor() -> PybsmSensor:
@@ -51,8 +50,7 @@ def create_sample_sensor() -> PybsmSensor:
     # dark current density of 1 nA/cm2 guess, guess mid range for a
     # silicon camera
     # dark current density of 1 nA/cm2 guess, guess mid range for a silicon camera
-    # Type ignore added for pyright's handling of guarded imports
-    dark_current = dark_current_from_density(1e-5, w_x, w_y)  # pyright: ignore [reportPossiblyUnboundVariable]
+    dark_current = dark_current_from_density(jd=1e-5, w_x=w_x, w_y=w_y)
 
     # rms read noise (rms electrons)
     read_noise = 25.0
@@ -136,9 +134,24 @@ def create_sample_sensor_and_scenario() -> tuple[PybsmSensor, PybsmScenario]:
 class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
     _file_extension = "tiff"
 
-    @staticmethod
-    def ndarray2bytes(data: np.ndarray) -> bytes:
+    def __init__(self, *, tol: float = 1e-3, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.tol = tol
+
+    def serialize(self, data: np.ndarray, **_: Any) -> bytes:
         im = Image.fromarray(data)
         byte_arr = io.BytesIO()
         im.save(byte_arr, format="tiff")
         return byte_arr.getvalue()
+
+    def deserialize(self, data: bytes) -> np.ndarray:
+        with Image.open(io.BytesIO(data)) as image:
+            # Force load image data to avoid lazy loading
+            image.load()
+            return np.array(image)
+
+    def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
+        expected_array = self.deserialize(snapshot_data)
+        received_array = self.deserialize(serialized_data)
+
+        return bool(np.average(np.abs(expected_array - received_array)) < self.tol)

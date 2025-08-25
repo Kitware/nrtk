@@ -2,6 +2,7 @@ from collections.abc import Sequence
 
 import numpy as np
 import pytest
+from maite.protocols.image_classification import TargetType
 
 from nrtk.interop.maite.interop.image_classification.augmentation import (
     JATICClassificationAugmentation,
@@ -9,19 +10,17 @@ from nrtk.interop.maite.interop.image_classification.augmentation import (
 from nrtk.interop.maite.interop.image_classification.dataset import (
     JATICImageClassificationDataset,
 )
-from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import is_available
 from tests.interop.maite.utils.test_utils import ResizePerturber
 
-TargetType: type = object
-if maite_available:
-    from maite.protocols.image_classification import TargetType
+maite_available: bool = is_available("maite")
 
 random = np.random.default_rng()
 
 
-@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestJATICImageClassificationDataset:
+    @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
     @pytest.mark.parametrize(
         ("dataset", "expected_lbls_out"),
         [

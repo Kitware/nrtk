@@ -16,6 +16,7 @@ General NRTK Examples
     examples/otf_visualization.ipynb
     examples/perturbers.ipynb
     examples/albumentations_perturber.ipynb
+    examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency.ipynb
     .. examples/maite/augmentations.ipynb
     .. examples/maite/compute_image_metric.ipynb
     .. examples/simple_generic_generator.ipynb
@@ -35,6 +36,12 @@ Use various image perturbation methods to simulate real-world distortions and ev
 
 Explore and visualize Albumentations perturbations in an NRTK context.
 `View notebook <examples/albumentations_perturber.html>`__.
+
+- **Image Classification Perturbation Saliency**
+
+Explore how perturbations affect model predictions and how those perturbations can be interpreted using
+saliency maps for the image classification task.
+`View notebook <examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency.html>`__.
 
 ..
     - **Visualize Item-Response Curves using NRTK** Explore and visualize the effect of varying perturbation strength

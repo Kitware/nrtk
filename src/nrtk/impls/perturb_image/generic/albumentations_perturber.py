@@ -15,22 +15,17 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable
 from typing import Any
 
-from typing_extensions import override
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import albumentations as A  # noqa N812
-    from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations
-
-    albumentations_available: bool = True
-except ImportError:  # pragma: no cover
-    albumentations_available: bool = False
-
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import AlbumentationsImportError
+from nrtk.utils._import_guard import import_guard
+
+albumentations_available: bool = import_guard("albumentations", AlbumentationsImportError, ["core.bbox_utils"])
+import albumentations as A  # noqa N812, F401
+from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations  # noqa E402
 
 
 class AlbumentationsPerturber(PerturbImage):
@@ -55,9 +50,8 @@ class AlbumentationsPerturber(PerturbImage):
 
     def __init__(
         self,
-        perturber: str,
+        perturber: str = "NoOp",
         parameters: dict[str, Any] | None = None,
-        box_alignment_mode: str | None = None,
         seed: int | None = None,
     ) -> None:
         """AlbumentationsPerturber applies a BasicTransform from Albumentations.
@@ -65,15 +59,11 @@ class AlbumentationsPerturber(PerturbImage):
         Args:
             perturber:
                 The name of the BasicTransform perturber to apply.
+                Will apply a NoOp if not provided.
             parameters:
                 Keyword arguments that should be passed to the given perturber.
             seed (int):
                 An optional seed for reproducible results.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
 
         Raises:
@@ -83,19 +73,19 @@ class AlbumentationsPerturber(PerturbImage):
         if not self.is_usable():
             raise AlbumentationsImportError
 
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.perturber = perturber
         self.parameters = parameters
 
-        if not hasattr(A, self.perturber):  # pyright: ignore [reportPossiblyUnboundVariable]
+        if not hasattr(A, self.perturber):
             raise ValueError(f'Given perturber "{self.perturber}" is not available in Albumentations')
 
-        transformer = getattr(A, self.perturber)  # pyright: ignore [reportPossiblyUnboundVariable]
+        transformer = getattr(A, self.perturber)
 
-        if not issubclass(transformer, A.BasicTransform):  # pyright: ignore [reportPossiblyUnboundVariable]
+        if not issubclass(transformer, A.BasicTransform):
             raise ValueError(f'Given perturber "{self.perturber}" does not inherit "BasicTransform"')
 
-        self.transform: A.Compose = A.Compose(  # pyright: ignore [reportPossiblyUnboundVariable]
+        self.transform: A.Compose = A.Compose(
             [transformer(**self.parameters) if self.parameters else transformer()],
         )
 
@@ -107,7 +97,7 @@ class AlbumentationsPerturber(PerturbImage):
     def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
         """Convert AxisAlignedBoundingBox to albumentations format bbox."""
         flat = np.array([[box.min_vertex[0], box.min_vertex[1], box.max_vertex[0], box.max_vertex[1]]])
-        return convert_bboxes_to_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
+        return convert_bboxes_to_albumentations(
             flat,
             "pascal_voc",
             {"height": image.shape[0], "width": image.shape[1]},
@@ -117,7 +107,7 @@ class AlbumentationsPerturber(PerturbImage):
     def _bbox_to_aabb(box: list[int], image: np.ndarray[Any, Any]) -> AxisAlignedBoundingBox:
         """Convert albumentations format bbox to AxisAlignedBoundingBox."""
         flat = np.array([[box[0], box[1], box[2], box[3]]])
-        as_aabb = convert_bboxes_from_albumentations(  # pyright: ignore [reportPossiblyUnboundVariable]
+        as_aabb = convert_bboxes_from_albumentations(
             flat,
             "pascal_voc",
             {"height": image.shape[0], "width": image.shape[1]},
@@ -164,7 +154,7 @@ class AlbumentationsPerturber(PerturbImage):
         if boxes:
             output_boxes = [
                 (AlbumentationsPerturber._bbox_to_aabb(bbox, image), label)
-                for bbox, label in zip(output["bboxes"], labels)
+                for bbox, label in zip(output["bboxes"], labels, strict=False)
             ]
         return output["image"].astype(np.uint8), output_boxes
 

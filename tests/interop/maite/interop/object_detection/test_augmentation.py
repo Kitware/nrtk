@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.image_metric import ImageMetric
@@ -19,11 +20,6 @@ from nrtk.interop.maite.interop.object_detection.dataset import JATICDetectionTa
 from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
-
-TargetType: type = object
-if maite_available:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 random = np.random.default_rng()
 
@@ -104,7 +100,7 @@ class TestJATICDetectionAugmentation:
         # Check that expectations hold
         assert np.array_equal(imgs_out[0], expected_img_out)
         assert len(targets_out) == len(expected_targets_out)
-        for expected_tgt, tgt_out in zip(expected_targets_out, targets_out):
+        for expected_tgt, tgt_out in zip(expected_targets_out, targets_out, strict=False):
             assert np.array_equal(expected_tgt.boxes, tgt_out.boxes)
             assert np.array_equal(expected_tgt.labels, tgt_out.labels)
             assert np.array_equal(expected_tgt.scores, tgt_out.scores)
@@ -113,7 +109,7 @@ class TestJATICDetectionAugmentation:
         # Check that input data was not modified
         assert np.array_equal(img_in, img_copy)
         assert len(targets_copy) == len(targets_in)
-        for tgt_copy, tgt_in in zip(targets_copy, targets_in):
+        for tgt_copy, tgt_in in zip(targets_copy, targets_in, strict=False):
             assert np.array_equal(tgt_copy.boxes, tgt_in.boxes)
             assert np.array_equal(tgt_copy.labels, tgt_in.labels)
             assert np.array_equal(tgt_copy.scores, tgt_in.scores)
@@ -137,11 +133,11 @@ class TestJATICDetectionAugmentation:
     def test_multiple_augmentations(
         self,
         perturbers: Sequence[PerturbImage],
-        targets_in: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
+        targets_in: Sequence[TargetType],
     ) -> None:
         """Test that the adapter appends, not overrides nrtk configs when multiple perturbations are applied."""
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)  # MAITE is channels-first
-        md_in: list[DatumMetadataType] = [{"id": 1}]  # pyright: ignore [reportInvalidTypeForm]
+        md_in: list[DatumMetadataType] = [{"id": 1}]
 
         imgs_out = [img_in]
         targets_out = targets_in
@@ -159,7 +155,7 @@ class TestJATICDetectionAugmentation:
 class TestJATICDetectionAugmentationWithMetric:
     img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)
     md_in: list["DatumMetadataType"] = [{"id": 1}]
-    md_aug_nop_pertuber = [{"nrtk_perturber_config": [{"box_alignment_mode": None}], "id": 1}]
+    md_aug_nop_pertuber = [{"nrtk_perturber_config": [{}], "id": 1}]
 
     @pytest.mark.parametrize(
         ("augmentations", "targets_in", "expected_targets_out", "metric_input_img2", "metric_metadata", "expectation"),
@@ -255,7 +251,7 @@ class TestJATICDetectionAugmentationWithMetric:
             # Check that expectations hold
             assert np.array_equal(imgs_out[0], expected_img_out)
             assert len(targets_out) == len(expected_targets_out)
-            for expected_tgt, tgt_out in zip(expected_targets_out, targets_out):
+            for expected_tgt, tgt_out in zip(expected_targets_out, targets_out, strict=False):
                 assert np.array_equal(expected_tgt.boxes, tgt_out.boxes)
                 assert np.array_equal(expected_tgt.labels, tgt_out.labels)
                 assert np.array_equal(expected_tgt.scores, tgt_out.scores)
@@ -264,7 +260,7 @@ class TestJATICDetectionAugmentationWithMetric:
             # Check that input data was not modified
             assert np.array_equal(self.img_in, img_copy)
             assert len(targets_copy) == len(targets_in)
-            for tgt_copy, tgt_in in zip(targets_copy, targets_in):
+            for tgt_copy, tgt_in in zip(targets_copy, targets_in, strict=False):
                 assert np.array_equal(tgt_copy.boxes, tgt_in.boxes)
                 assert np.array_equal(tgt_copy.labels, tgt_in.labels)
                 assert np.array_equal(tgt_copy.scores, tgt_in.scores)
@@ -287,8 +283,8 @@ class TestJATICDetectionAugmentationWithMetric:
     )
     def test_multiple_metrics(
         self,
-        augmentations: Sequence[tuple[PerturbImage, str]],  # pyright: ignore [reportPossiblyUnboundVariable]
-        targets_in: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
+        augmentations: Sequence[tuple[PerturbImage, str]],
+        targets_in: Sequence[TargetType],
     ) -> None:
         """Test that multiple metrics can be added to metadata."""
         imgs_out = [np.transpose(self.img_in, (2, 0, 1))]

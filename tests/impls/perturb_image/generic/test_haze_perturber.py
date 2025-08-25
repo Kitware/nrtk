@@ -9,12 +9,16 @@ from smqtk_core.configuration import configuration_test_helper
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.haze_perturber import HazePerturber
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
 
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 class TestHazePerturber:
@@ -73,7 +77,7 @@ class TestHazePerturber:
             additional_params=metadata,
         )
 
-    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = HazePerturber()
@@ -84,7 +88,7 @@ class TestHazePerturber:
             image=image,
             additional_params={"sky_color": [122], "depth_map": depth_map},
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("factor"),

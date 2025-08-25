@@ -34,27 +34,23 @@ from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
-
-try:
-    import skimage.util  # type:ignore
-
-    skimage_available: bool = True
-except ImportError:  # pragma: no cover
-    skimage_available: bool = False
-
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import ScikitImageImportError
+from nrtk.utils._import_guard import import_guard
+
+skimage_available: bool = import_guard("skimage", ScikitImageImportError, ["util"])
+import skimage.util  # noqa: E402
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = None, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, rng: np.random.Generator | int | None = 1) -> None:
         """:param rng: Pseudo-random number generator or seed."""
         if not self.is_usable():
             raise ScikitImageImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.rng = rng
 
     def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
@@ -70,23 +66,23 @@ class _SKImageNoisePerturber(PerturbImage):
         # Determine if conversion back to original dtype is possible
         dtype_str = str(image.dtype)
         convert_image = {
-            str(np.dtype(np.bool_)): skimage.util.img_as_bool,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.float32)): skimage.util.img_as_float32,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.float64)): skimage.util.img_as_float64,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.int16)): skimage.util.img_as_int,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.uint8)): skimage.util.img_as_ubyte,  # pyright: ignore [reportPossiblyUnboundVariable]
-            str(np.dtype(np.uint)): skimage.util.img_as_uint,  # pyright: ignore [reportPossiblyUnboundVariable]
+            str(np.dtype(np.bool_)): skimage.util.img_as_bool,
+            str(np.dtype(np.float32)): skimage.util.img_as_float32,
+            str(np.dtype(np.float64)): skimage.util.img_as_float64,
+            str(np.dtype(np.int16)): skimage.util.img_as_int,
+            str(np.dtype(np.uint8)): skimage.util.img_as_ubyte,
+            str(np.dtype(np.uint)): skimage.util.img_as_uint,
         }
         if dtype_str not in convert_image:
             if np.issubdtype(image.dtype, np.floating):
-                convert = skimage.util.img_as_float  # pyright: ignore [reportPossiblyUnboundVariable]
+                convert = skimage.util.img_as_float
             else:
                 raise NotImplementedError(f"Perturb not implemented for {dtype_str}")
         else:
             convert = convert_image[dtype_str]
 
         # Apply perturbation
-        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)  # pyright: ignore [reportPossiblyUnboundVariable]
+        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)
 
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)
@@ -118,14 +114,13 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
         self,
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the SPNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         """
-        super().__init__(rng=rng, box_alignment_mode=box_alignment_mode)
+        super().__init__(rng=rng)
 
         if amount < 0.0 or amount > 1.0:
             raise ValueError(
@@ -184,7 +179,6 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
@@ -193,7 +187,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         :param salt_vs_pepper: Proportion of salt vs. pepper noise on range [0, 1].
             Higher values represent more salt.
         """
-        super().__init__(amount=amount, rng=rng, box_alignment_mode=box_alignment_mode)
+        super().__init__(amount=amount, rng=rng)
 
         if salt_vs_pepper < 0.0 or salt_vs_pepper > 1.0:
             raise ValueError(
@@ -237,7 +231,6 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         rng: np.random.Generator | int | None = None,
         mean: float = 0.0,
         var: float = 0.05,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the GSNoisePerturber.
 
@@ -245,7 +238,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         :param mean: Mean of random distribution.
         :param var: Variance of random distribution.
         """
-        super().__init__(rng=rng, box_alignment_mode=box_alignment_mode)
+        super().__init__(rng=rng)
 
         if var < 0:
             raise ValueError(

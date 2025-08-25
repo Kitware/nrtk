@@ -14,12 +14,14 @@ from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.albumentations_perturber import AlbumentationsPerturber
 from nrtk.utils._exceptions import AlbumentationsImportError
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
-rng = np.random.default_rng()
 
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 @pytest.mark.skipif(not AlbumentationsPerturber.is_usable(), reason=str(AlbumentationsImportError()))
@@ -81,7 +83,7 @@ class TestAlbumentationsPerturber:
         as_aab = AlbumentationsPerturber._bbox_to_aabb(bbox, image)
         as_list = AlbumentationsPerturber._aabb_to_bbox(as_aab, image)
         assert len(bbox) == len(as_list)
-        assert [x == y for x, y in zip(bbox, as_list)]
+        assert [x == y for x, y in zip(bbox, as_list, strict=False)]
 
     def test_bbox_transform(self, snapshot: SnapshotAssertion) -> None:
         label_dict_1: dict[Hashable, float] = {"label": 1.0}
@@ -95,14 +97,14 @@ class TestAlbumentationsPerturber:
         inst = AlbumentationsPerturber(perturber="HorizontalFlip", parameters={"p": 1.0})
         image_out, bboxes_transformed = inst.perturb(
             image=image,
-            boxes=zip(bboxes, labels),
+            boxes=zip(bboxes, labels, strict=False),
         )
         _, bboxes_reverted = inst.perturb(image=image_out, boxes=bboxes_transformed)
 
         if bboxes_reverted:
             bboxes_reverted = list(bboxes_reverted)
             assert len(bboxes_reverted) == len(bboxes)
-            for bbox, label, reverted in zip(bboxes, labels, bboxes_reverted):
+            for bbox, label, reverted in zip(bboxes, labels, bboxes_reverted, strict=False):
                 assert bbox == reverted[0]
                 assert label == reverted[1]
 
@@ -136,7 +138,7 @@ class TestAlbumentationsPerturber:
             expected=out_image,
         )
 
-    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
         image = Image.new("RGB", grayscale_image.size)
@@ -151,7 +153,7 @@ class TestAlbumentationsPerturber:
             perturb=inst.perturb,
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("perturber", "parameters", "seed"),
@@ -172,6 +174,19 @@ class TestAlbumentationsPerturber:
             assert i.perturber == perturber
             assert i.parameters == parameters
             assert i.seed == seed
+
+    def test_default_config(self) -> None:
+        """Test default configuration when created with no parameters."""
+        image = np.ones((3, 3, 3)).astype(np.uint8)
+        inst = AlbumentationsPerturber()
+        out_image = perturber_assertions(perturb=inst.perturb, image=image)
+
+        cfg = dict()
+        cfg["perturber"] = "NoOp"
+        cfg["parameters"] = None
+        cfg["seed"] = None
+        assert (out_image == image).all()
+        assert inst.get_config() == cfg
 
 
 @mock.patch.object(AlbumentationsPerturber, "is_usable")

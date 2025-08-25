@@ -11,13 +11,16 @@
 
 pytest-extras:
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+  tags:
+    # - single-gpu
+    - single-gpu-g4dn.xlarge
 
 notebooks:
   extends: .notebooks
   rules: !reference [.notebooks, rules]
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
+    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
@@ -30,6 +33,7 @@ notebooks:
           "simple_generic_generator.ipynb",
           "simple_pybsm_generator.ipynb",
           "otf_visualization.ipynb",
+          "diffusion_perturber.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/pybsm"
         NOTEBOOK_FILE: [
@@ -47,10 +51,11 @@ notebooks:
           "nrtk_haze_perturber_demo.ipynb",
           "nrtk_sensor_transformation_demo.ipynb",
           "nrtk_lens_flare_demo.ipynb",
-          "nrtk_translation_perturber_demo.ipynb",
+          "nrtk_affine_perturbers_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
           "nrtk_water_droplet_perturber_demo.ipynb",
-          "nrtk_radial_distortion_perturber_demo.ipynb"
+          "nrtk_radial_distortion_perturber_demo.ipynb",
+          # "nrtk_diffusion_perturber_demo.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/maite/gradio"
         NOTEBOOK_FILE: [

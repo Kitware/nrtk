@@ -43,42 +43,25 @@ from typing import Any
 
 from typing_extensions import override
 
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import cv2
-
-    cv2_available: bool = True
-except ImportError:  # pragma: no cover
-    cv2_available: bool = False
-
-try:
-    # Guarded import check for utility function usage.
-    from shapely.geometry import Point, Polygon
-
-    shapely_available: bool = True
-except ImportError:  # pragma: no cover
-    shapely_available: bool = False
-
-try:
-    # Guarded import check for utility function usage.
-    import scipy  # noqa: F401
-
-    scipy_available: bool = True
-except ImportError:  # pragma: no cover
-    scipy_available: bool = False
-
-
-import numpy as np
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
-
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import WaterDropletImportError
+from nrtk.utils._import_guard import import_guard
 
-if shapely_available and scipy_available:
-    from nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils import (
-        get_bezier_curve,
-        get_random_points_within_min_dist,
-    )
+scipy_available: bool = import_guard("scipy", WaterDropletImportError)
+cv2_available: bool = import_guard("cv2", WaterDropletImportError)
+shapely_available: bool = import_guard("shapely", WaterDropletImportError, ["geometry"])
+geopandas_available: bool = import_guard("geopandas", WaterDropletImportError)
+import cv2  # noqa: E402
+import geopandas  # noqa: E402
+import numpy as np  # noqa: E402
+import scipy  # noqa: F401, E402
+from shapely.geometry import Polygon  # noqa: E402
+from smqtk_image_io.bbox import AxisAlignedBoundingBox  # noqa: E402
+
+from nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils import (  # noqa: E402
+    get_bezier_curve,
+    get_random_points_within_min_dist,
+)
 
 
 class WaterDropletPerturber(PerturbImage):
@@ -120,7 +103,6 @@ class WaterDropletPerturber(PerturbImage):
         f_x: int = 400,
         f_y: int = 400,
         seed: int | None = None,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
@@ -143,11 +125,6 @@ class WaterDropletPerturber(PerturbImage):
                 Camera focal length in y direction (cm).
             seed:
                 Random seed for reproducibility.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If any of the parameters are absent, the following values will be set
             as defaults:
@@ -168,7 +145,7 @@ class WaterDropletPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise WaterDropletImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
         self.size_range = size_range
         self.num_drops = num_drops
         self.blur_strength = blur_strength
@@ -329,7 +306,7 @@ class WaterDropletPerturber(PerturbImage):
         """
         p = gls
         q = np.ones(p.shape[:2]) * -1
-        for i, (center, radius) in enumerate(zip(self.g_centers, self.g_radius)):
+        for i, (center, radius) in enumerate(zip(self.g_centers, self.g_radius, strict=False)):
             dist = np.linalg.norm(p - center, axis=-1)
             # Give the true/false values of where the points of the image are within sphere
             # These values are in the coordinate system of the original image
@@ -359,33 +336,35 @@ class WaterDropletPerturber(PerturbImage):
                 enclosed_points = list()
                 for c in pts_lst:
                     points = (
-                        get_random_points_within_min_dist(  # pyright: ignore [reportPossiblyUnboundVariable]
+                        get_random_points_within_min_dist(
                             rng,
                             n=n,
                             scale=scale,
                         )
                         + c[0:2]
                     )
-                    x, y = get_bezier_curve(  # pyright: ignore [reportPossiblyUnboundVariable]
+                    x, y = get_bezier_curve(
                         points=points,
                         rad=rad,
                         edgy=edgy,
                     )
                     curve_points = np.column_stack((x, y))
-                    polygon = Polygon(curve_points)  # pyright: ignore [reportPossiblyUnboundVariable]
+                    polygon = Polygon(curve_points)
                     xmin, ymin, xmax, ymax = polygon.bounds
-                    grid_points = np.mgrid[xmin:xmax:150j, ymin:ymax:150j].reshape(2, -1).T
+                    grid_x, grid_y = np.mgrid[xmin:xmax:150j, ymin:ymax:150j]
+                    grid_x, grid_y = grid_x.flatten(), grid_y.flatten()
+                    points_gs = geopandas.GeoSeries(geopandas.points_from_xy(grid_x, grid_y))
                     enclosed_points = [
-                        np.array([int(p[0]), int(p[1])])
-                        for p in grid_points
-                        if polygon.contains(Point(p))  # pyright: ignore [reportPossiblyUnboundVariable]
+                        np.asarray([int(grid_x[i]), int(grid_y[i])])
+                        for i, val in enumerate(polygon.contains(points_gs))
+                        if val
                     ]
 
                 return enclosed_points
 
             # Draw a Bézier shape centered at the center of the sphere and
             # find all the pixels that fall within the Bézier shape
-            all_points = __get_all_points(  # pyright: ignore [reportPossiblyUnboundVariable]
+            all_points = __get_all_points(
                 cent,
                 self.rng,
                 rad=0.6,
@@ -508,7 +487,7 @@ class WaterDropletPerturber(PerturbImage):
         for idx in np.unique(q):
             if idx != -1:
                 idxs = np.where(q == idx)
-                for _, (x, y) in enumerate(zip(idxs[0], idxs[1])):
+                for _, (x, y) in enumerate(zip(idxs[0], idxs[1], strict=False)):
                     # Translate refractive distortions to the "surface" of the droplet
                     p = self._to_sphere_section_env(x, y, int(idx), intrinsic, gls)
                     u = p[0]
@@ -552,15 +531,15 @@ class WaterDropletPerturber(PerturbImage):
         blur_back = copy.deepcopy(rain_image)
         blur_values = [w / 40, w / 60]
         blur_values_adj = [int(np.floor(val / 2) * 2 + 1) for val in blur_values]
-        blur_image = cv2.GaussianBlur(  # pyright: ignore [reportPossiblyUnboundVariable]
+        blur_image = cv2.GaussianBlur(
             blur_image,
             (blur_values_adj[0], blur_values_adj[0]),
             w / 150,
         )
 
         # Blur the background of the image using the desired blur strength
-        blur_back = cv2.GaussianBlur(blur_back, (7, 7), 1.5)  # pyright: ignore [reportPossiblyUnboundVariable]
-        blur_back = cv2.addWeighted(  # pyright: ignore [reportPossiblyUnboundVariable]
+        blur_back = cv2.GaussianBlur(blur_back, (7, 7), 1.5)
+        blur_back = cv2.addWeighted(
             blur_back,
             self.blur_strength,
             rain_image,
@@ -568,7 +547,7 @@ class WaterDropletPerturber(PerturbImage):
             0,
         )
         # Blur mask to help make the boundaries of the droplets appear "fuzzier"
-        mask = cv2.GaussianBlur(  # pyright: ignore [reportPossiblyUnboundVariable]
+        mask = cv2.GaussianBlur(
             mask,
             (blur_values_adj[1], blur_values_adj[1]),
             w / 125,
@@ -644,4 +623,4 @@ class WaterDropletPerturber(PerturbImage):
         Returns:
             :return bool: True if OpenCV, Scipy and Shapely are available.
         """
-        return cv2_available and scipy_available and shapely_available
+        return cv2_available and scipy_available and shapely_available and geopandas_available

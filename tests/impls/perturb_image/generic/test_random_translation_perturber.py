@@ -9,12 +9,16 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.random_translation_perturber import RandomTranslationPerturber
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
 
-INPUT_IMG_FILE_PATH = "./docs/examples/pybsm/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 class TestRandomTranslationPerturber:
@@ -60,7 +64,7 @@ class TestRandomTranslationPerturber:
         assert np.array_equal(out_img_1, out_img_2)
 
         if out_boxes_1 is not None and out_boxes_2 is not None:
-            for (box_1, meta_1), (box_2, meta_2) in zip(out_boxes_1, out_boxes_2):
+            for (box_1, meta_1), (box_2, meta_2) in zip(out_boxes_1, out_boxes_2, strict=False):
                 assert box_1 == box_2
                 assert meta_1 == meta_2
 
@@ -167,7 +171,7 @@ class TestRandomTranslationPerturber:
         ("max_translation_limit"),
         [None, (0, 0), (0, 1), (1, 0), (100, 100)],
     )
-    def test_regression(self, snapshot: SnapshotAssertion, max_translation_limit: tuple[int, int]) -> None:
+    def test_regression(self, tiff_snapshot: SnapshotAssertion, max_translation_limit: tuple[int, int]) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
@@ -181,4 +185,4 @@ class TestRandomTranslationPerturber:
             expected=None,
             additional_params=additional_params,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from collections.abc import Hashable, Iterable
 from typing import Any
 
@@ -28,7 +29,7 @@ class ComposePerturber(PerturbImage):
         to work with perturber factories.
     """
 
-    def __init__(self, perturbers: list[PerturbImage], box_alignment_mode: str | None = None) -> None:
+    def __init__(self, perturbers: list[PerturbImage] | None = None) -> None:
         """Initializes the ComposePerturber.
 
         This has not been tested with perturber factories and is not expected to work with perturber factories.
@@ -36,13 +37,10 @@ class ComposePerturber(PerturbImage):
         Args:
             perturbers:
                 List of perturbers to apply.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
         """
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
+        if perturbers is None:
+            perturbers = list()
         self.perturbers = perturbers
 
     @override
@@ -76,6 +74,9 @@ class ComposePerturber(PerturbImage):
         # Applies series of perturbations to a the given input image
         for perturber in self.perturbers:
             out_img, out_boxes = perturber(image=out_img, boxes=out_boxes, additional_params=additional_params)
+
+        if len(self.perturbers) == 0:
+            out_img = copy.deepcopy(image)
 
         return out_img, out_boxes
 

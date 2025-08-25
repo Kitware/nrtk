@@ -24,37 +24,27 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable
 from typing import Any
 
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import cv2
-
-    cv2_available: bool = True
-except ImportError:  # pragma: no cover
-    cv2_available: bool = False
 import numpy as np
-
-try:
-    import pybsm.radiance as radiance
-    from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D
-    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
-from smqtk_core.configuration import (
-    from_config_dict,
-    make_default_config,
-    to_config_dict,
-)
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._import_guard import import_guard
+
+cv2_available: bool = import_guard("cv2", PyBSMAndOpenCVImportError)
+pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError)
+import cv2  # noqa: E402
+import pybsm.radiance as radiance  # noqa: E402
+from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D  # noqa: E402
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+from smqtk_core.configuration import (  # noqa: E402
+    from_config_dict,
+    make_default_config,
+    to_config_dict,
+)
 
 
 class DetectorOTFPerturber(PerturbImage):
@@ -89,7 +79,6 @@ class DetectorOTFPerturber(PerturbImage):
         w_y: float | None = None,
         f: float | None = None,
         interp: bool = True,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the DetectorOTFPerturber.
 
@@ -106,11 +95,6 @@ class DetectorOTFPerturber(PerturbImage):
                 Focal length (m).
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without interpolation.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If a value is provided for w_x, w_y and/or f that value(s) will be used in
             the otf calculation.
@@ -131,22 +115,26 @@ class DetectorOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            else:
-                atm = load_database_atmosphere_no_interp(  # type: ignore
-                    scenario.altitude,
-                    scenario.ground_range,
-                    scenario.ihaze,
+                atm = load_database_atmosphere(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
                 )
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+            else:
+                atm = load_database_atmosphere_no_interp(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             # Use the spectral_weights variable for MTF wavelengths and weights
@@ -219,7 +207,7 @@ class DetectorOTFPerturber(PerturbImage):
         uu, vv = np.meshgrid(u_rng, v_rng)
         # Sample spacing for the optical transfer function
         self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
-        self.det_OTF: np.ndarray[Any, Any] = detector_OTF(uu, vv, self.w_x, self.w_y, self.f)  # type: ignore
+        self.det_OTF: np.ndarray[Any, Any] = detector_OTF(u=uu, v=vv, w_x=self.w_x, w_y=self.w_y, f=self.f)
 
         if additional_params is None:
             additional_params = dict()
@@ -231,31 +219,35 @@ class DetectorOTFPerturber(PerturbImage):
             ref_gsd = additional_params["img_gsd"]
 
             # Transform an optical transfer function into a point spread function
-            psf = otf_to_psf(self.det_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
+            psf = otf_to_psf(otf=self.det_OTF, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            blur_img = cv2.filter2D(image, -1, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
-                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                resampled_img = resample_2D(
+                    img_in=blur_img[:, :, 0],
+                    dx_in=ref_gsd / self.slant_range,
+                    dx_out=self.ifov,
+                )
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    sim_img[:, :, channel] = resample_2D(  # type: ignore
-                        blur_img[:, :, channel],
-                        ref_gsd / self.slant_range,
-                        self.ifov,
+                    sim_img[:, :, channel] = resample_2D(
+                        img_in=blur_img[:, :, channel],
+                        dx_in=ref_gsd / self.slant_range,
+                        dx_out=self.ifov,
                     )
             else:
-                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=self.ifov)
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
-            psf = otf_to_psf(self.det_OTF, self.df, 1 / (self.det_OTF.shape[0] * self.df))  # type: ignore
+            psf = otf_to_psf(otf=self.det_OTF, df=self.df, dx_out=1 / (self.det_OTF.shape[0] * self.df))
 
-            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            sim_img = cv2.filter2D(image, -1, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:

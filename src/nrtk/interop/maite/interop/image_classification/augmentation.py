@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import copy
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -12,26 +12,23 @@ from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.interop.generic import NRTKDatumMetadata, _forward_md_keys
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
 
-Augmentation: type = object
-InputType: type = object
-TargetType: type = object
-DatumMetadataType: type = TypedDict
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from maite.protocols import AugmentationMetadata
-    from maite.protocols.image_classification import (
-        Augmentation,
-        DatumMetadataType,
-        InputType,
-        TargetType,
-    )
+maite_available: bool = import_guard(
+    "maite",
+    MaiteImportError,
+    ["protocols", "protocols.image_classification"],
+    ["Augmentation"],
+)
+from maite.protocols import AugmentationMetadata  # noqa: E402
+from maite.protocols.image_classification import (  # noqa: E402
+    Augmentation,
+    DatumMetadataType,
+    InputType,
+    TargetType,
+)
 
-    maite_available: bool = True
-except ImportError:  # pragma: no cover
-    maite_available: bool = False
-
-IMG_CLASSIFICATION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]  # pyright:  ignore [reportPossiblyUnboundVariable]
+IMG_CLASSIFICATION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]
 
 
 class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
@@ -53,7 +50,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
-        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
 
     def __call__(
         self,
@@ -67,7 +64,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
         aug_anns = list()  # list of individual augmented annotations
         aug_metadata = list()  # list of individual augmented image-level metadata
 
-        for img, ann, md in zip(imgs, anns, metadata):  # pyright: ignore [reportArgumentType]
+        for img, ann, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
             aug_img = np.transpose(np.asarray(copy.deepcopy(img)), (1, 2, 0))  # Convert to channels-last
             aug_img, _ = self.augment(aug_img, additional_params=dict(md))
@@ -131,7 +128,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
         """Initialize augmentation with metric wrapper."""
         self.augmentations = augmentations
         self.metric = metric
-        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)  # pyright:  ignore [reportPossiblyUnboundVariable]
+        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
 
     def _apply_augmentations(
         self,
@@ -158,7 +155,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
 
         aug_imgs, aug_anns, aug_metadata = self._apply_augmentations(batch)
 
-        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata):  # pyright: ignore [reportArgumentType]
+        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Convert from channels-first to channels-last
             img_1 = np.transpose(np.asarray(img), (1, 2, 0))
             img_2 = None if aug_img is None else np.transpose(aug_img, (1, 2, 0))

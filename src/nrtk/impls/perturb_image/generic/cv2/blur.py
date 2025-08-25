@@ -37,26 +37,23 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable
 from typing import Any
 
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import cv2
-
-    cv2_available: bool = True
-except ImportError:  # pragma: no cover
-    cv2_available: bool = False
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import OpenCVImportError
+from nrtk.utils._import_guard import import_guard
+
+cv2_available: bool = import_guard("cv2", OpenCVImportError, fake_spec=True)
+import cv2  # noqa: E402
 
 
 class _PerturbImage(PerturbImage):
-    def __init__(self, ksize: int = 1, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, ksize: int = 1) -> None:
         if not self.is_usable():
             raise OpenCVImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         self.ksize = ksize
 
@@ -100,9 +97,9 @@ class _PerturbImage(PerturbImage):
 class AverageBlurPerturber(_PerturbImage):
     """Applies average blurring to the image stimulus."""
 
-    def __init__(self, ksize: int = 1, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, ksize: int = 1) -> None:
         """:param ksize: Blurring kernel size."""
-        super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
+        super().__init__(ksize=ksize)
         min_k_size = 1
         if ksize < min_k_size:
             raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size}")
@@ -117,15 +114,15 @@ class AverageBlurPerturber(_PerturbImage):
         """Return image stimulus after applying average blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        return cv2.blur(_image, ksize=(self.ksize, self.ksize)), _boxes  # pyright: ignore [reportPossiblyUnboundVariable]
+        return cv2.blur(_image, ksize=(self.ksize, self.ksize)), _boxes
 
 
 class GaussianBlurPerturber(_PerturbImage):
     """Applies Gaussian blurring to the image stimulus."""
 
-    def __init__(self, ksize: int = 1, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, ksize: int = 1) -> None:
         """:param ksize: Blurring kernel size."""
-        super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
+        super().__init__(ksize=ksize)
         min_k_size = 1
         if ksize < min_k_size or ksize % 2 == 0:
             raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size} and odd.")
@@ -140,15 +137,15 @@ class GaussianBlurPerturber(_PerturbImage):
         """Return image stimulus after applying Gaussian blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        return cv2.GaussianBlur(_image, ksize=(self.ksize, self.ksize), sigmaX=0), _boxes  # pyright: ignore [reportPossiblyUnboundVariable]
+        return cv2.GaussianBlur(_image, ksize=(self.ksize, self.ksize), sigmaX=0), _boxes
 
 
 class MedianBlurPerturber(_PerturbImage):
     """Applies median blurring to the image stimulus."""
 
-    def __init__(self, ksize: int = 3, box_alignment_mode: str | None = None) -> None:
+    def __init__(self, ksize: int = 3) -> None:
         """:param ksize: Blurring kernel size."""
-        super().__init__(ksize=ksize, box_alignment_mode=box_alignment_mode)
+        super().__init__(ksize=ksize)
         min_k_size = 3
         if ksize < min_k_size or ksize % 2 == 0:
             raise ValueError(f"{type(self).__name__} invalid ksize ({ksize}). Must be >= {min_k_size} and odd.")
@@ -163,4 +160,4 @@ class MedianBlurPerturber(_PerturbImage):
         """Return image stimulus after applying Gaussian blurring."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, additional_params=additional_params)
 
-        return cv2.medianBlur(_image, ksize=self.ksize), _boxes  # pyright: ignore [reportPossiblyUnboundVariable]
+        return cv2.medianBlur(_image, ksize=self.ksize), _boxes

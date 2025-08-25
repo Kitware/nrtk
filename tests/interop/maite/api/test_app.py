@@ -1,21 +1,12 @@
 import os
 import unittest.mock as mock
 from collections.abc import Generator
-from importlib.util import find_spec
 from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
 import py  # type: ignore
 import pytest
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    from fastapi.encoders import jsonable_encoder
-
-    app_deps_available = True
-except ImportError:
-    app_deps_available = False
 from starlette.testclient import TestClient
 
 from nrtk.interop.maite.api.app import app
@@ -25,11 +16,14 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
     JATICObjectDetectionDataset,
 )
 from nrtk.utils._exceptions import FastApiImportError
+from nrtk.utils._import_guard import import_guard, is_available
 from tests.interop.maite import BAD_NRTK_CONFIG, DATASET_FOLDER, LABEL_FILE, NRTK_PYBSM_CONFIG
 
+app_deps_available: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
+from fastapi.encoders import jsonable_encoder  # noqa: E402
+
 deps = ["kwcoco", "maite"]
-specs = [find_spec(dep) for dep in deps]
-is_usable = all(spec is not None for spec in specs)
+is_usable = all(is_available(dep) for dep in deps)
 random = np.random.default_rng()
 
 if is_usable:
@@ -59,7 +53,7 @@ else:
 @pytest.fixture
 def test_client() -> Generator:
     # Create a test client for the FastAPI application
-    with TestClient(app) as client:  # pyright: ignore [reportArgumentType, reportPossiblyUnboundVariable]
+    with TestClient(app) as client:  # pyright: ignore [reportArgumentType]
         yield client
 
 
@@ -84,7 +78,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_client.post("/", json=jsonable_encoder(test_data))
 
         # Confirm mocked nrtk_perturber was called with the correct arguments
         kwargs = patch.call_args.kwargs
@@ -187,7 +181,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_client.post("/", json=jsonable_encoder(test_data))
 
         # Check response status code
         assert response.status_code == 400
@@ -208,7 +202,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_client.post("/", json=jsonable_encoder(test_data))
 
         # Check response status code
         assert response.status_code == 400
@@ -229,7 +223,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_client.post("/", json=jsonable_encoder(test_data))
 
         # Check response status code
         assert response.status_code == 400
@@ -254,7 +248,7 @@ class TestApp:
         )
 
         # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))  # pyright: ignore [reportPossiblyUnboundVariable]
+        response = test_client.post("/", json=jsonable_encoder(test_data))
 
         # Check response status code
         assert response.status_code == 400

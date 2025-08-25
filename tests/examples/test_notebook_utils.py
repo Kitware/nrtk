@@ -83,10 +83,11 @@ class PyrightOutput(TypedDict):
 
 
 def notebook_to_py_text(path_to_nb: Path) -> str:
-    try:
-        import jupytext
-    except ImportError:
-        raise NotebookTestingImportError from ImportError
+    from nrtk.utils._import_guard import import_guard
+
+    import_guard("jupytext", NotebookTestingImportError)
+    import jupytext
+
     ntbk = jupytext.read(path_to_nb, fmt="ipynb")
     return jupytext.writes(ntbk, fmt=".py")
 

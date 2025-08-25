@@ -96,6 +96,11 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
     poetry install --sync --with linting,tests,docs
 
+.. note::
+  Developers should also ensure their enviroment has Git LFS installed
+  before their first commit. See the `Git LFS documentation <https://git-lfs.com/>`_
+  for more details.
+
 .. :auto dev-deps:
 
 .. :auto build-docs:
@@ -186,12 +191,17 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.PIL.enhance` perturbers.
 
     **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` perturbers.
+    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` and
+    :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `shapely <https://github.com/shapely/shapely>`_.
     Required for :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and
     :mod:`~nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils` utility functions. Note: This needs
     to be installed in conjunction with either the ``graphics`` or ``headless`` extras due to the OpenCV requirement.
+
+    **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
+    `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
+    Required for :ref:`DiffusionPerturber`.
 
     **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
 
@@ -277,6 +287,9 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`DetectorOTFPerturber`
       - ``pybsm``, and (``graphics`` or ``headless``)
       - ``pyBSM``, ``OpenCV``
+    * - :ref:`DiffusionPerturber`
+      - ``diffusion``
+      - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
     * - :ref:`GaussianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
@@ -307,6 +320,9 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`RandomCropPerturber`
       - ---
       - ---
+    * - :ref:`RandomRotationPerturber`
+      - ``albumentations``
+      - ``albumentations``
     * - :ref:`RandomTranslationPerturber`
       - ---
       - ---

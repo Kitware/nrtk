@@ -10,11 +10,16 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.generic.random_crop_perturber import RandomCropPerturber
-from tests.impls import INPUT_IMG_FILE_PATH
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
+
+
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 class TestRandomCropPerturber:
@@ -60,7 +65,7 @@ class TestRandomCropPerturber:
         assert np.array_equal(out_img_1, out_img_2)
 
         if out_boxes_1 is not None and out_boxes_2 is not None:
-            for (box_1, meta_1), (box_2, meta_2) in zip(out_boxes_1, out_boxes_2):
+            for (box_1, meta_1), (box_2, meta_2) in zip(out_boxes_1, out_boxes_2, strict=False):
                 assert box_1 == box_2
                 assert meta_1 == meta_2
 
@@ -98,7 +103,24 @@ class TestRandomCropPerturber:
             expected=(out_image, []),
         )
 
-    def test_regression(self, snapshot: SnapshotAssertion) -> None:
+    def test_identity_operation(self) -> None:
+        """Test that the identity crop returns the original image."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        inst = RandomCropPerturber()  # Full image size as crop size
+        out_image, _ = bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=None,
+        )
+        bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=[],
+            expected=(out_image, []),
+        )
+
+    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomCropPerturber(crop_size=(20, 20))
@@ -108,7 +130,7 @@ class TestRandomCropPerturber:
             boxes=None,
             expected=None,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("crop_size", "seed"),

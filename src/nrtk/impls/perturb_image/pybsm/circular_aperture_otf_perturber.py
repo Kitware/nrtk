@@ -24,43 +24,32 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
-from typing_extensions import Self
-
-try:
-    # Multiple type ignores added for pyright's handling of guarded imports
-    import cv2
-
-    cv2_available: bool = True
-except ImportError:  # pragma: no cover
-    cv2_available: bool = False
-
-try:
-    import pybsm.radiance as radiance
-    from pybsm.otf.functional import (
-        circular_aperture_OTF,
-        otf_to_psf,
-        resample_2D,
-        weighted_by_wavelength,
-    )
-    from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp
-
-    pybsm_available: bool = True
-except ImportError:  # pragma: no cover
-    pybsm_available: bool = False
-
 import numpy as np
-from smqtk_core.configuration import (
-    from_config_dict,
-    make_default_config,
-    to_config_dict,
-)
-from typing_extensions import override
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import Self, override
 
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._import_guard import import_guard
+
+cv2_available: bool = import_guard("cv2", PyBSMAndOpenCVImportError)
+pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError, ["radiance", "otf.functional", "utils"])
+import cv2  # noqa: E402
+import pybsm.radiance as radiance  # noqa: E402
+from pybsm.otf.functional import (  # noqa: E402
+    circular_aperture_OTF,
+    otf_to_psf,
+    resample_2D,
+    weighted_by_wavelength,
+)
+from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+from smqtk_core.configuration import (  # noqa: E402
+    from_config_dict,
+    make_default_config,
+    to_config_dict,
+)
 
 
 class CircularApertureOTFPerturber(PerturbImage):
@@ -100,7 +89,6 @@ class CircularApertureOTFPerturber(PerturbImage):
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
         interp: bool = True,
-        box_alignment_mode: str | None = None,
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 
@@ -116,11 +104,6 @@ class CircularApertureOTFPerturber(PerturbImage):
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
-            box_alignment_mode:
-                Deprecated. Misaligned bounding boxes will always be resolved by taking the
-                smallest possible box that encases the transformed misaligned box.
-
-                .. deprecated:: 0.24.0
 
             If both sensor and scenario parameters are absent, then default values
             will be used for their parameters
@@ -142,22 +125,26 @@ class CircularApertureOTFPerturber(PerturbImage):
         """
         if not self.is_usable():
             raise PyBSMAndOpenCVImportError
-        super().__init__(box_alignment_mode=box_alignment_mode)
+        super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
         if sensor and scenario:
             if interp:
-                atm = load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)  # type: ignore
-            else:
-                atm = load_database_atmosphere_no_interp(  # type: ignore
-                    scenario.altitude,
-                    scenario.ground_range,
-                    scenario.ihaze,
+                atm = load_database_atmosphere(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
                 )
-            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(  # type: ignore
-                atm,
-                sensor.create_sensor(),
-                sensor.int_time,
+            else:
+                atm = load_database_atmosphere_no_interp(
+                    altitude=scenario.altitude,
+                    ground_range=scenario.ground_range,
+                    ihaze=scenario.ihaze,
+                )
+            _, _, spectral_weights = radiance.reflectance_to_photoelectrons(
+                atm=atm,
+                sensor=sensor.create_sensor(),
+                int_time=sensor.int_time,
             )
 
             # Use the spectral_weights variable for MTF wavelengths and weights
@@ -179,14 +166,15 @@ class CircularApertureOTFPerturber(PerturbImage):
             self.slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
             self.ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
         else:
-            self.mtf_wavelengths = (
+            self.mtf_wavelengths: np.ndarray[Any, Any] = (
                 np.asarray(mtf_wavelengths)
                 if mtf_wavelengths is not None
                 else np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6
             )
-            self.mtf_weights = (
+            self.mtf_weights: np.ndarray[Any, Any] = (
                 np.asarray(mtf_weights) if mtf_weights is not None else np.ones(len(self.mtf_wavelengths))
             )
+
             # Assume visible spectrum of light
             self.ifov: float = -1
             self.slant_range: float = -1
@@ -248,9 +236,13 @@ class CircularApertureOTFPerturber(PerturbImage):
 
         # Compute a wavelength weighted composite array based on the circular aperture OTF function.
         def ap_function(wavelengths: float) -> np.ndarray:
-            return circular_aperture_OTF(uu, vv, wavelengths, self.D, self.eta)  # type: ignore
+            return circular_aperture_OTF(u=uu, v=vv, lambda0=wavelengths, D=self.D, eta=self.eta)
 
-        self.ap_OTF: np.ndarray[Any, Any] = weighted_by_wavelength(self.mtf_wavelengths, self.mtf_weights, ap_function)  # type: ignore
+        self.ap_OTF: np.ndarray[Any, Any] = weighted_by_wavelength(
+            wavelengths=self.mtf_wavelengths,
+            weights=self.mtf_weights,
+            my_function=ap_function,
+        )
 
         if additional_params is None:
             additional_params = dict()
@@ -264,32 +256,36 @@ class CircularApertureOTFPerturber(PerturbImage):
             ref_gsd = additional_params["img_gsd"]
 
             # Transform an optical transfer function into a point spread function
-            psf = otf_to_psf(self.ap_OTF, self.df, 2 * np.arctan(ref_gsd / 2 / self.slant_range))  # type: ignore
+            psf = otf_to_psf(otf=self.ap_OTF, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            blur_img = cv2.filter2D(image, -1, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
-                resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                resampled_img = resample_2D(
+                    img_in=blur_img[:, :, 0],
+                    dx_in=ref_gsd / self.slant_range,
+                    dx_out=self.ifov,
+                )
                 sim_img = np.empty((*resampled_img.shape, 3))
                 sim_img[:, :, 0] = resampled_img
                 for channel in range(1, 3):
-                    sim_img[:, :, channel] = resample_2D(  # type: ignore
-                        blur_img[:, :, channel],
-                        ref_gsd / self.slant_range,
-                        self.ifov,
+                    sim_img[:, :, channel] = resample_2D(
+                        img_in=blur_img[:, :, channel],
+                        dx_in=ref_gsd / self.slant_range,
+                        dx_out=self.ifov,
                     )
             else:
-                sim_img = resample_2D(blur_img, ref_gsd / self.slant_range, self.ifov)  # type: ignore
+                sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=self.ifov)
 
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
-            psf = otf_to_psf(self.ap_OTF, self.df, 1 / (self.ap_OTF.shape[0] * self.df))  # type: ignore
+            psf = otf_to_psf(otf=self.ap_OTF, df=self.df, dx_out=1 / (self.ap_OTF.shape[0] * self.df))
 
-            sim_img = cv2.filter2D(image, -1, psf)  # type: ignore
+            sim_img = cv2.filter2D(image, -1, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:

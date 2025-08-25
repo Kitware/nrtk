@@ -19,24 +19,28 @@ from nrtk.impls.perturb_image.generic.PIL.enhance import (
     SharpnessPerturber,
 )
 from nrtk.utils._exceptions import PillowImportError
+from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
 
-INPUT_IMG_FILE_PATH = "./docs/examples/maite/data/visdrone_img.jpg"
+
+@pytest.fixture
+def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 @pytest.mark.skipif(not BrightnessPerturber.is_usable(), reason=str(PillowImportError()))
 class TestBrightnessPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         out_img = perturber_assertions(
             perturb=BrightnessPerturber(factor=0.2),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "factor"),
@@ -107,7 +111,7 @@ class TestBrightnessPerturber:
 
 @pytest.mark.skipif(not ColorPerturber.is_usable(), reason=str(PillowImportError()))
 class TestColorPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         factor = 0.2
@@ -116,7 +120,7 @@ class TestColorPerturber:
             perturb=ColorPerturber(factor=factor),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "factor"),
@@ -187,7 +191,7 @@ class TestColorPerturber:
 
 @pytest.mark.skipif(not ContrastPerturber.is_usable(), reason=str(PillowImportError()))
 class TestContrastPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         factor = 0.2
@@ -197,7 +201,7 @@ class TestContrastPerturber:
             perturb=ContrastPerturber(factor=factor),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "factor"),
@@ -268,7 +272,7 @@ class TestContrastPerturber:
 
 @pytest.mark.skipif(not SharpnessPerturber.is_usable(), reason=str(PillowImportError()))
 class TestSharpnessPerturber:
-    def test_consistency(self, snapshot: SnapshotAssertion) -> None:
+    def test_consistency(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         factor = 0.2
@@ -278,7 +282,7 @@ class TestSharpnessPerturber:
             perturb=SharpnessPerturber(factor=factor),
             image=image,
         )
-        assert TIFFImageSnapshotExtension.ndarray2bytes(out_img) == snapshot(extension_class=TIFFImageSnapshotExtension)
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("image", "factor"),

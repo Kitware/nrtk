@@ -1,5 +1,3 @@
-from importlib.util import find_spec
-
 import numpy as np
 import pytest
 
@@ -11,10 +9,10 @@ from nrtk.interop.maite.interop.object_detection.dataset import (
     JATICObjectDetectionDataset,
 )
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
+from nrtk.utils._import_guard import is_available
 
 deps = ["maite"]
-specs = [find_spec(dep) for dep in deps]
-maite_available = all(spec is not None for spec in specs)
+maite_available = [is_available(dep) for dep in deps]
 
 
 @pytest.mark.skipif(

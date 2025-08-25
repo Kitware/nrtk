@@ -25,7 +25,6 @@ Example:
 from __future__ import annotations
 
 import abc
-import warnings
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
@@ -38,25 +37,8 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 class PerturbImage(Plugfigurable):
     """Algorithm that generates a perturbed image for given input image stimulus as a ``numpy.ndarray`` type array."""
 
-    def __init__(self, box_alignment_mode: str | None = None) -> None:
-        """Initializes the PerturbImage.
-
-        :param box_alignment_mode: Deprecated. Misaligned bounding boxes will always be resolved
-            by taking the smallest possible box that encases the transformed misaligned box.
-
-            .. deprecated:: 0.24.0
-
-        """
-        if box_alignment_mode is not None:
-            warnings.warn(
-                "box_alignment_mode is deprecated in NRTK 0.24.0 and will be removed in a future version."
-                "Misaligned bounding boxes will always be resolved by taking the smallest possible box "
-                "that encases the transformed misaligned box.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-
-        self.box_alignment_mode = box_alignment_mode
+    def __init__(self) -> None:
+        """Initializes the PerturbImage."""
 
     @abc.abstractmethod
     def perturb(
@@ -163,4 +145,4 @@ class PerturbImage(Plugfigurable):
         Returns:
             dict[str, Any]: Configuration dictionary with current settings.
         """
-        return {"box_alignment_mode": self.box_alignment_mode}
+        return {}
