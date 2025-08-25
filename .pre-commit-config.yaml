@@ -47,3 +47,10 @@ repos:
       language: system
       entry: poetry run pyright
       types: [file, python]
+    - id: extras-yaml
+      name: Update src/nrtk/utils/_extras.yml from pyproject.toml
+      entry: poetry run python src/nrtk/utils/_extras.py
+      language: system
+      pass_filenames: false
+      always_run: true
+      stages: [pre-commit]

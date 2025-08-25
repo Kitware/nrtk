@@ -1,0 +1,43 @@
+Pillow:
+- Pillow
+albumentations:
+- albumentations
+diffusion:
+- torch
+- diffusers
+- accelerate
+- Pillow
+graphics:
+- opencv-python
+headless:
+- opencv-python-headless
+maite:
+- maite
+- fastapi
+- pydantic
+- pydantic_settings
+- uvicorn
+notebook-testing:
+- datasets
+- matplotlib
+- numba
+- tabulate
+- torch
+- torchmetrics
+- torchvision
+- transformers
+- ultralytics
+- jupytext
+- albumentations
+- xaitk-jatic
+pybsm:
+- pybsm
+scikit-image:
+- scikit-image
+tools:
+- kwcoco
+- Pillow
+waterdroplet:
+- scipy
+- shapely
+- geopandas
