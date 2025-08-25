@@ -1,0 +1,45 @@
+v0.18.0
+=======
+
+This minor release introduces new perturbation implementations, several example
+notebooks, and improvements to testing and developer tooling. It also removes
+deprecated functionality, updates dependency handling, and makes adjustments
+for Python version compatibility.
+
+Updates / New Features
+----------------------
+
+- Added new perturbations:
+
+  - ``RandomRotationPerturber`` with full unit test coverage.
+  - ``DiffusionPerturber``, with an accompanying example notebook.
+  - Added default configuration to ``PybsmPerturber`` and ``ComposePerturber``.
+
+- Example notebooks and guides:
+
+  - How-To guide for **Image Classification Perturbation Saliency** with ``xaitk-saliency``.
+  - T&E guide for **Affine perturbations**.
+
+- Performance improvements:
+
+  - ``WaterDropletPerturber`` now uses ``geopandas`` to obtain a ~3x performance boost.
+
+- Dependency and compatibility updates:
+
+  - Changed MAITE lower bound to **v0.8.2**.
+  - Dropped support for **Python 3.9** (EOL).
+  - Placed an upper bound on Python versions (``<3.13``) due to an upstream NumPy 2.0 compatibility.
+  - Updated optional dependency imports to achieve full **pyright type completeness**.
+
+- Other additions:
+
+  - Added fuzzy syrupy comparator for TIFF Snapshot Extension.
+  - Added Git LFS pointers in documentation.
+  - Added an internal debugging utility to print installed extras and their sources.
+
+Fixes
+-----
+
+- Removed deprecated ``box_alignment_mode``.
+- Updated ``tests/impls/__init__.py`` to define and centralize input image filepaths.
+- Updated ``random_noise.py`` to use ``1`` as the default ``rng`` parameter.
