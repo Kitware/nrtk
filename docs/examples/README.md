@@ -25,6 +25,40 @@ Some notebooks may require additional dependencies. See the first cell of each
 notebook ("Set Up the Environment") for instructions on how to install the
 relevant packages.
 
+### Additional Installs & Extras
+
+Many notebooks depend on optional extras from `nrtk`, which must be installed
+for the notebook to run correctly. These installs are included at the top of
+each notebook.
+
+To support both local development and Colab execution (see next section), we use
+the following installation pattern:
+
+```bash
+!{sys.executable} -c "import nrtk" || !{sys.executable} -m pip install -q "nrtk[maite,albumentations]>=X.Y.Z"
+```
+
+Here, `X.Y.Z` is the minimum `nrtk` version required for the notebook.
+
+This may look unusual, but it solves a practical issue:
+
+- On Colab, the package must be installed from PyPI rather than the local
+  development environment.
+- During development, we want to use the local version of `nrtk`.
+- Without this approach, notebooks would fail prior to a release, since the
+  required version wouldn’t yet be available on PyPI.
+
+This check-and-install pattern ensures notebooks work in both contexts.
+
+To help maintain a reproducible environment and simplify debugging (especially
+with `nrtk`’s extras), we also provide a utility function:
+
+```python
+print_extras_status()
+```
+
+This prints out all extras, their dependencies, and whether they are installed.
+
 ### Run the Notebooks from Colab
 
 Most of the notebooks have an "Open in Colab" button. Right-click on the button

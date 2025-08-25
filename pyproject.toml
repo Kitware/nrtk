@@ -220,6 +220,11 @@ doctest_optionflags = [
     "IGNORE_EXCEPTION_DETAIL",
 ]
 # :auto pytest:
+[tool.coverage.run]
+omit = [
+    "src/nrtk/utils/_extras.py",
+    "src/nrtk/utils/_extras.yml",
+]
 
 # :auto ruff:
 [tool.ruff]
