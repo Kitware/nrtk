@@ -17,6 +17,8 @@ from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
+rng = np.random.default_rng(2345)
+
 
 @pytest.fixture
 def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
@@ -207,6 +209,66 @@ class TestWaterDropletPerturber:
         inst = WaterDropletPerturber()
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
+
+
+@pytest.mark.skipif(not WaterDropletPerturber.is_usable(), reason=str(WaterDropletImportError()))
+class TestWaterDropletPerturberUtils:
+    def test_ccw_sort(
+        self,
+        tiff_snapshot: SnapshotAssertion,
+    ) -> None:
+        """Regression testing for the `ccw_sort` util function."""
+        x_in = np.linspace(0, 100, 50)
+        x_out, y_out = np.meshgrid(x_in, x_in)
+        points = np.vstack((x_out.ravel(), y_out.ravel())).T
+        points = WaterDropletPerturber.ccw_sort(points=points)
+
+        tiff_snapshot.assert_match(points)
+
+    @pytest.mark.parametrize(
+        ("rad", "edgy"),
+        [(0.2, 0), (0.5, 0), (0.7, 0), (0.2, 1), (0.5, 1), (0.7, 1)],
+    )
+    def test_regression_get_bezier_curve(
+        self,
+        tiff_snapshot: SnapshotAssertion,
+        rad: float,
+        edgy: float,
+    ) -> None:
+        """Regression testing for the `get_bezier_curve` util function."""
+        x_in = np.linspace(0, 100, 50)
+        x_out, y_out = np.meshgrid(x_in, x_in)
+        points = np.vstack((x_out.ravel(), y_out.ravel())).T
+        x, y = WaterDropletPerturber.get_bezier_curve(points=points, rad=rad, edgy=edgy)
+        curve_points = np.column_stack((x, y))
+        tiff_snapshot.assert_match(curve_points)
+
+    @pytest.mark.parametrize(
+        ("n", "scale", "min_dst", "recursive"),
+        [
+            (5, 0.8, 0.2, 0),
+            (5, 0.8, 0.2, 50),
+            (100, 0.8, 0.2, 0),
+            (100, 0.8, 0.2, 50),
+        ],
+    )
+    def test_regression_get_random_points_within_min_dist(
+        self,
+        tiff_snapshot: SnapshotAssertion,
+        n: int,
+        scale: float,
+        min_dst: float | None,
+        recursive: int,
+    ) -> None:
+        """Regression testing for the `get_random_points_within_min_dist` util function."""
+        rand_points = WaterDropletPerturber.get_random_points_within_min_dist(
+            rng=rng,
+            n=n,
+            scale=scale,
+            min_dst=min_dst,
+            recursive=recursive,
+        )
+        tiff_snapshot.assert_match(rand_points)
 
 
 @mock.patch.object(WaterDropletPerturber, "is_usable")
