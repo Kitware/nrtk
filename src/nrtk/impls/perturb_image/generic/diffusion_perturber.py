@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Hashable, Iterable
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -37,32 +37,24 @@ from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import DiffusionImportError
+from nrtk.utils._import_guard import import_guard
 
-if TYPE_CHECKING:  # pragma: no cover
-    import torch
-    from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (
-        StableDiffusionInstructPix2PixPipeline,
-    )
-    from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler
-    from PIL.Image import Image, Resampling, fromarray
-
-try:
-    import torch
-    from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (
-        StableDiffusionInstructPix2PixPipeline,
-    )
-    from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler
-
-    diffusion_available: bool = True
-except ImportError:  # pragma: no cover
-    diffusion_available: bool = False
-
-try:
-    from PIL.Image import Image, Resampling, fromarray
-
-    pillow_available: bool = True
-except ImportError:  # pragma: no cover
-    pillow_available: bool = False
+torch_available: bool = import_guard("torch", DiffusionImportError, fake_spec=True)
+diffusion_available: bool = import_guard(
+    "diffusers",
+    DiffusionImportError,
+    [
+        "pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix",
+        "schedulers.scheduling_euler_ancestral_discrete",
+    ],
+)
+pillow_available: bool = import_guard("PIL", DiffusionImportError, ["Image"])
+import torch  # noqa: E402
+from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (  # noqa: E402
+    StableDiffusionInstructPix2PixPipeline,
+)
+from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler  # noqa: E402
+from PIL.Image import Image, Resampling, fromarray  # noqa: E402
 
 
 class DiffusionPerturber(PerturbImage):
@@ -304,4 +296,4 @@ class DiffusionPerturber(PerturbImage):
         Returns:
             True if torch, diffusers, and PIL are all available; False otherwise.
         """
-        return diffusion_available and pillow_available
+        return torch_available and diffusion_available and pillow_available
