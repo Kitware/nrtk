@@ -11,18 +11,34 @@ from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 
 
-def ndarray_isclose(*, computed: np.ndarray, expected: np.ndarray, rtol: float, atol: float, int_tol: float) -> bool:
-    if np.issubdtype(computed.dtype, np.integer):
-        return bool(np.average(np.abs(expected - computed)) < int_tol)
+def ndarray_isclose(
+    *,
+    computed: np.ndarray,
+    expected: np.ndarray,
+    rtol: float,
+    atol: float,
+    normalize_arrs: bool = False,
+) -> bool:
+    # Normalize array to [0, 1]
+    def normalize(arr: np.ndarray) -> np.ndarray:
+        min_val = np.min(arr)
+        max_val = np.max(arr)
+        if (max_val - min_val) == 0:  # All values are the same
+            return np.zeros_like(arr)
+        return (arr - min_val) / (max_val - min_val)
+
+    if normalize_arrs:
+        computed = normalize(computed)
+        expected = normalize(expected)
+
     return np.allclose(computed, expected, rtol=rtol, atol=atol)
 
 
 class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
-    def __init__(self, *, rtol: float = 1e-5, atol: float = 1e-8, int_tol: float = 1e-3, **kwargs: Any) -> None:
+    def __init__(self, *, rtol: float = 1e-4, atol: float = 1e-5, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.rtol = rtol
         self.atol = atol
-        self.int_tol = int_tol
 
     def serialize(self, data: np.ndarray | float, **_: Any) -> str:
         if isinstance(data, np.ndarray):
@@ -62,7 +78,7 @@ class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
                     expected=expected,
                     rtol=self.rtol,
                     atol=self.atol,
-                    int_tol=self.int_tol,
+                    normalize_arrs=False,
                 )
 
             return serialized_data == snapshot_data
@@ -75,12 +91,24 @@ def fuzzy_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(FuzzyFloatSnapshotExtension)
 
 
+class WeakFuzzySnapshotExtension(FuzzyFloatSnapshotExtension):
+    def __init__(self, *, rtol: float = 0.5, atol: float = 1e-2, **kwargs: Any) -> None:
+        super().__init__(rtol=rtol, atol=atol, **kwargs)
+
+
+# Should not be used without maintainer approval
+@pytest.fixture
+def weak_fuzzy_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(WeakFuzzySnapshotExtension)
+
+
 class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
     _file_extension = "tiff"
 
-    def __init__(self, *, tol: float = 1e-3, **kwargs: Any) -> None:
+    def __init__(self, *, rtol: float = 1e-4, atol: float = 1e-5, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.tol = tol
+        self.rtol = rtol
+        self.atol = atol
 
     def serialize(self, data: np.ndarray, **_: Any) -> bytes:
         im = Image.fromarray(data)
@@ -101,9 +129,9 @@ class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
         return ndarray_isclose(
             computed=received_array,
             expected=expected_array,
-            rtol=self.tol,
-            atol=self.tol,
-            int_tol=self.tol,
+            rtol=self.rtol,
+            atol=self.atol,
+            normalize_arrs=True,
         )
 
 

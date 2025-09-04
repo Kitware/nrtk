@@ -209,7 +209,7 @@ class TestWaterDropletPerturber:
 class TestWaterDropletPerturberUtils:
     def test_ccw_sort(
         self,
-        fuzzy_snapshot: SnapshotAssertion,
+        weak_fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Regression testing for the `ccw_sort` util function."""
         x_in = np.linspace(0, 100, 50)
@@ -217,7 +217,7 @@ class TestWaterDropletPerturberUtils:
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
         points = WaterDropletPerturber.ccw_sort(points=points)
 
-        fuzzy_snapshot.assert_match(points)
+        weak_fuzzy_snapshot.assert_match(points)
 
     @pytest.mark.parametrize(
         ("rad", "edgy"),
@@ -225,7 +225,7 @@ class TestWaterDropletPerturberUtils:
     )
     def test_regression_get_bezier_curve(
         self,
-        fuzzy_snapshot: SnapshotAssertion,
+        weak_fuzzy_snapshot: SnapshotAssertion,
         rad: float,
         edgy: float,
     ) -> None:
@@ -235,7 +235,7 @@ class TestWaterDropletPerturberUtils:
         points = np.vstack((x_out.ravel(), y_out.ravel())).T
         x, y = WaterDropletPerturber.get_bezier_curve(points=points, rad=rad, edgy=edgy)
         curve_points = np.column_stack((x, y))
-        fuzzy_snapshot.assert_match(curve_points)
+        weak_fuzzy_snapshot.assert_match(curve_points)
 
     @pytest.mark.parametrize(
         ("n", "scale", "min_dst", "recursive"),
