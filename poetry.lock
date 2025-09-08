@@ -7323,7 +7323,7 @@ type = ["pytest-mypy"]
 
 [extras]
 albumentations = ["albumentations"]
-diffusion = ["Pillow", "accelerate", "diffusers", "torch"]
+diffusion = ["Pillow", "accelerate", "diffusers", "torch", "transformers"]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 maite = ["fastapi", "maite", "pydantic", "pydantic_settings", "uvicorn"]
@@ -7337,4 +7337,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "bd5b851c6030dd522b8c98c9e2bb06eb871262bd3f4553acf85d7dd6d1fc9c69"
+content-hash = "ac36037ce1ebbdf8c51a343b20ae26eaf42d2868cc3d5dc0b49aaaf77067afbc"

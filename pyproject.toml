@@ -106,7 +106,7 @@ scikit-image = ["scikit-image"]
 Pillow = ["Pillow"]
 albumentations = ["albumentations"]
 waterdroplet = ["scipy", "shapely", "geopandas"]
-diffusion = ["torch", "diffusers", "accelerate", "Pillow"]
+diffusion = ["torch", "diffusers", "accelerate", "Pillow", "transformers"]
 notebook-testing = [
     "datasets", "matplotlib", "numba", "tabulate", "torch",
     "torchmetrics", "torchvision", "transformers", "ultralytics",

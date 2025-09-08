@@ -243,9 +243,17 @@ class TestDiffusionPerturber:
     #     )
 
 
-@patch("nrtk.impls.perturb_image.generic.diffusion_perturber.diffusion_available", False)
-def test_missing_deps() -> None:
+@pytest.mark.parametrize(
+    "target",
+    [
+        "nrtk.impls.perturb_image.generic.diffusion_perturber.torch_available",
+        "nrtk.impls.perturb_image.generic.diffusion_perturber.diffusion_available",
+        "nrtk.impls.perturb_image.generic.diffusion_perturber.pillow_available",
+    ],
+)
+def test_missing_deps(target: str) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
-    assert not DiffusionPerturber.is_usable()
-    with pytest.raises(DiffusionImportError):
-        DiffusionPerturber()
+    with patch(target, False):
+        assert not DiffusionPerturber.is_usable()
+        with pytest.raises(DiffusionImportError):
+            DiffusionPerturber()
