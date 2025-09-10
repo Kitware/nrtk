@@ -207,7 +207,6 @@ class TestWaterDropletPerturber:
 
 @pytest.mark.skipif(not WaterDropletPerturber.is_usable(), reason=str(WaterDropletImportError()))
 class TestWaterDropletPerturberUtils:
-    @pytest.mark.skip(reason="Currently broken, nrtk#542")
     def test_ccw_sort(
         self,
         fuzzy_snapshot: SnapshotAssertion,
@@ -220,7 +219,6 @@ class TestWaterDropletPerturberUtils:
 
         fuzzy_snapshot.assert_match(points)
 
-    @pytest.mark.skip(reason="Currently broken, nrtk#542")
     @pytest.mark.parametrize(
         ("rad", "edgy"),
         [(0.2, 0), (0.5, 0), (0.7, 0), (0.2, 1), (0.5, 1), (0.7, 1)],
