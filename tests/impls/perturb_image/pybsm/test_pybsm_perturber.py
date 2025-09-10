@@ -18,35 +18,27 @@ from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
-EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
-
 np.random.seed(42)  # noqa: NPY002
 
 
 @pytest.mark.skipif(not PybsmPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestPyBSMPerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
+    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
+        """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE))
-        expected = np.array(Image.open(EXPECTED_IMG_FILE))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
+
         # Test perturb interface directly
         inst = PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000)
-        pybsm_perturber_assertions(
-            perturb=inst.perturb,
+        out_img = pybsm_perturber_assertions(
+            perturb=inst,
             image=image,
-            expected=expected,
+            expected=None,
             additional_params={"img_gsd": img_gsd},
         )
 
-        # Test callable
-        pybsm_perturber_assertions(
-            perturb=PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000),
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
+        tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("param_name", "param_value", "rng_seed"),

@@ -15,7 +15,7 @@ pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.sen
 from pybsm.simulation.sensor import Sensor  # noqa: E402
 
 
-@pytest.fixture()  # noqa:PT001
+@pytest.fixture
 def sensor_instance() -> PybsmSensor:
     """Fixture to provide a PybsmSensor instance with basic parameters."""
     return PybsmSensor(name="test_sensor", D=0.3, f=1.1, p_x=0.4, opt_trans_wavelengths=np.array([0.1, 0.4]) * 1.0e-6)
