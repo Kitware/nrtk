@@ -42,7 +42,7 @@ Perturbation Factory
    :recursive:
 
    nrtk.impls.perturb_image_factory.pybsm
-   nrtk.impls.perturb_image_factory.generic.linspace_step
+   nrtk.impls.perturb_image_factory.generic.linspace
    nrtk.impls.perturb_image_factory.generic.one_step
    nrtk.impls.perturb_image_factory.generic.step
 
