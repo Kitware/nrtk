@@ -14,8 +14,8 @@ from smqtk_core.configuration import (
 )
 
 from nrtk.impls.perturb_image.generic.skimage.random_noise import SaltNoisePerturber
-from nrtk.impls.perturb_image_factory.generic.linspace_step import (
-    LinSpacePerturbImageFactory,
+from nrtk.impls.perturb_image_factory.generic.linspace import (
+    LinspacePerturbImageFactory,
 )
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -42,7 +42,7 @@ class TestFloatStepPertubImageFactory:
         expected: tuple[int, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = LinSpacePerturbImageFactory(
+        factory = LinspacePerturbImageFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -86,7 +86,7 @@ class TestFloatStepPertubImageFactory:
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
-        factory = LinSpacePerturbImageFactory(
+        factory = LinspacePerturbImageFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -115,7 +115,7 @@ class TestFloatStepPertubImageFactory:
         expected: list[float],
     ) -> None:
         """Test the generated theta values."""
-        factory = LinSpacePerturbImageFactory(
+        factory = LinspacePerturbImageFactory(
             perturber=DummyPerturber,
             theta_key="param1",
             start=start,
@@ -142,7 +142,7 @@ class TestFloatStepPertubImageFactory:
         endpoint: bool = True,
     ) -> None:
         """Test configuration stability."""
-        inst = LinSpacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
+        inst = LinspacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber
             assert i.theta_key == theta_key
@@ -178,7 +178,7 @@ class TestFloatStepPertubImageFactory:
     def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
-            LinSpacePerturbImageFactory(**kwargs)
+            LinspacePerturbImageFactory(**kwargs)
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step"),
@@ -197,7 +197,7 @@ class TestFloatStepPertubImageFactory:
         step: int,
     ) -> None:
         """Test configuration hydration using from_config_dict."""
-        original_factory = LinSpacePerturbImageFactory(
+        original_factory = LinspacePerturbImageFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,

@@ -1,6 +1,6 @@
 {
-    "type": "nrtk.impls.perturb_image_factory.generic.linspace_step.LinSpacePerturbImageFactory",
-    "nrtk.impls.perturb_image_factory.generic.linspace_step.LinSpacePerturbImageFactory": {
+    "type": "nrtk.impls.perturb_image_factory.generic.linspace.LinspacePerturbImageFactory",
+    "nrtk.impls.perturb_image_factory.generic.linspace.LinspacePerturbImageFactory": {
         "perturber": "not a perturber",
         "theta_key": "ksize",
         "start": 1.0,
