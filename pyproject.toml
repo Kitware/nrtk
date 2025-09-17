@@ -93,7 +93,6 @@ transformers = {version = ">=4.52.1", optional = true} # CVE-2025-3777
 diffusers = {version = ">=0.21.0", optional = true}
 accelerate = {version = ">=0.20.0", optional = true}
 ultralytics = {version = ">=8.3.85", optional = true}
-xaitk-jatic = {version = ">=0.7.0", optional = true}
 jupytext = {version = ">=1.16.7", optional = true}
 
 [tool.poetry.extras]
@@ -110,7 +109,7 @@ diffusion = ["torch", "diffusers", "accelerate", "Pillow", "transformers"]
 notebook-testing = [
     "datasets", "matplotlib", "numba", "tabulate", "torch",
     "torchmetrics", "torchvision", "transformers", "ultralytics",
-    "jupytext", "albumentations", "xaitk-jatic",
+    "jupytext", "albumentations"
 ]
 
 # :auto linting:

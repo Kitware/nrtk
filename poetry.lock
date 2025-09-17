@@ -6991,65 +6991,6 @@ optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
 
 [[package]]
-name = "xaitk-jatic"
-version = "0.7.0"
-description = "Integration package to support interfacing, implementation and example needs for the JATIC."
-optional = true
-python-versions = "<4.0,>=3.9"
-files = [
-    {file = "xaitk_jatic-0.7.0-py3-none-any.whl", hash = "sha256:7ac9b4f7676807856096349682c29f8c6a8ddbcef8f810b8e263a37c6a5450d6"},
-    {file = "xaitk_jatic-0.7.0.tar.gz", hash = "sha256:98929aaa8932b3bf10118f820394abe31dd885965845f5d38d2896fb162cb766"},
-]
-
-[package.dependencies]
-maite = ">=0.8.1,<0.9.0"
-numpy = [
-    {version = ">=1.22,<2.0", markers = "python_version < \"3.12\""},
-    {version = ">=1.26,<2.0", markers = "python_version >= \"3.12\" and python_version < \"3.13\""},
-]
-scipy = ">=1.10.0"
-setuptools = ">=78.1.1"
-xaitk-saliency = ">=0.9.2"
-
-[package.extras]
-docker = ["matplotlib (>=3.4.1)", "timm (>=1.0.7,<2.0.0)", "torch (>=2.2.0)", "torchvision (>=0.21.0)", "transformers (>=4.52.1)"]
-tools = ["kwcoco (>=0.2.18)", "matplotlib (>=3.4.1)"]
-
-[[package]]
-name = "xaitk-saliency"
-version = "0.13.0"
-description = "Visual saliency map generation interfaces and baseline implementations for explainable AI."
-optional = true
-python-versions = "<4.0,>=3.9"
-files = [
-    {file = "xaitk_saliency-0.13.0-py3-none-any.whl", hash = "sha256:bff12219105383ca73b7bcdf1f9915803b3e57c54566efe0b96e7d3787cbeef6"},
-    {file = "xaitk_saliency-0.13.0.tar.gz", hash = "sha256:33162c2935ab557986443e06d8184801e0d47d44bc07e59709fcad91b355d86b"},
-]
-
-[package.dependencies]
-click = ">=8.0.3"
-numpy = [
-    {version = ">=1.25,<2.0", markers = "python_version >= \"3.9\" and python_version < \"3.12\""},
-    {version = ">=1.26,<2.0", markers = "python_version >= \"3.12\" and python_version < \"3.13\""},
-]
-scikit-image = [
-    {version = ">=0.20.0", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
-    {version = ">=0.18.1", markers = "python_version < \"3.11\""},
-    {version = ">=0.22.0", markers = "python_version >= \"3.12\""},
-]
-scikit-learn = ">=1.5.0"
-scipy = ">=1.10.0"
-setuptools = ">=78.1.1"
-smqtk-classifier = ">=0.17.0"
-smqtk-core = ">=0.18.0"
-smqtk-descriptors = ">=0.16.0"
-smqtk-detection = ">=0.19.0"
-
-[package.extras]
-example-deps = ["matplotlib (>=3.4.1)", "notebook (>=7.2.2)", "papermill (>=2.3.3)", "torch (>=2.2.0)", "torchvision (>=0.10.0)", "tqdm (>=4.66.3)"]
-tools = ["kwcoco (>=0.2.18)", "matplotlib (>=3.4.1)"]
-
-[[package]]
 name = "xarray"
 version = "2024.11.0"
 description = "N-D labeled arrays and datasets in Python"
@@ -7327,7 +7268,7 @@ diffusion = ["Pillow", "accelerate", "diffusers", "torch", "transformers"]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 maite = ["fastapi", "maite", "pydantic", "pydantic_settings", "uvicorn"]
-notebook-testing = ["albumentations", "datasets", "jupytext", "matplotlib", "numba", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics", "xaitk-jatic"]
+notebook-testing = ["albumentations", "datasets", "jupytext", "matplotlib", "numba", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics"]
 pillow = ["Pillow"]
 pybsm = ["pybsm"]
 scikit-image = ["scikit-image", "scikit-image"]
@@ -7337,4 +7278,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "ac36037ce1ebbdf8c51a343b20ae26eaf42d2868cc3d5dc0b49aaaf77067afbc"
+content-hash = "df827f9d74359aded43dc4915362f31d3c969d6d5670dc000d0d66981295303d"
