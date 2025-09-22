@@ -37,7 +37,8 @@ notebooks:
         ]
       - NOTEBOOK_DIR: "docs/examples/pybsm"
         NOTEBOOK_FILE: [
-          "pybsm_test.ipynb"
+          "pybsm_test.ipynb",
+          "pybsm_default_config.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
