@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["ComposePerturber"]
+
 import copy
 from collections.abc import Hashable, Iterable
 from typing import Any

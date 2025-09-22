@@ -18,6 +18,8 @@ Attributes:
     pybsm_available (bool): Indicates if the pybsm module is available for use.
 """
 
+__all__ = ["PybsmScenario"]
+
 from typing import Any
 
 from smqtk_core.configuration import Configurable

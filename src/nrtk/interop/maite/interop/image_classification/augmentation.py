@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["JATICClassificationAugmentation", "JATICClassificationAugmentationWithMetric"]
+
 import copy
 from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING

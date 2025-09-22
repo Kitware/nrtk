@@ -13,6 +13,8 @@ Dependencies:
 
 from __future__ import annotations
 
+__all__ = ["RandomRotationPerturber"]
+
 from collections.abc import Sequence
 from typing import Any
 

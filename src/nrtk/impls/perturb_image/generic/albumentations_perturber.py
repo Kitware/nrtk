@@ -12,6 +12,8 @@ Dependencies:
 
 from __future__ import annotations
 
+__all__ = ["AlbumentationsPerturber"]
+
 from collections.abc import Hashable, Iterable
 from typing import Any
 

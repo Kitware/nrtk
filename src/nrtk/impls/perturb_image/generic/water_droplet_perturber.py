@@ -36,6 +36,8 @@ Notes:
 
 from __future__ import annotations
 
+__all__ = ["WaterDropletPerturber"]
+
 import copy
 import math
 from collections.abc import Hashable, Iterable, Sequence

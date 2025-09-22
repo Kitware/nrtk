@@ -17,6 +17,8 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["JitterOTFPerturber"]
+
 from collections.abc import Hashable, Iterable
 from typing import Any
 

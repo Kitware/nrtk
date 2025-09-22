@@ -14,6 +14,8 @@ Example usage:
     perturbed_image = factory.create()
 """
 
+__all__ = ["OneStepPerturbImageFactory"]
+
 from typing import Any
 
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory

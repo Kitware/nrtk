@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["handle_aukus_post"]
+
 import copy
 import os
 from collections.abc import Callable

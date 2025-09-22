@@ -1,5 +1,7 @@
 """nrtk_perturber generates augmented MAITE dataset(s) based on a perturber factory configuration."""
 
+__all__ = ["nrtk_perturber"]
+
 import itertools
 import logging
 from collections.abc import Iterable

@@ -19,6 +19,8 @@ Example usage:
     image, ground_truth, metadata = generator[0]
 """
 
+__all__ = ["SimpleGenericGenerator"]
+
 from collections.abc import Hashable, Sequence
 from typing import Any
 

@@ -22,6 +22,8 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["CustomPybsmPerturbImageFactory"]
+
 from collections.abc import Iterable, Iterator, Sequence
 from typing import Any
 

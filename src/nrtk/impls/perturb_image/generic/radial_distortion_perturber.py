@@ -24,6 +24,8 @@ Dependencies:
 
 from __future__ import annotations
 
+__all__ = ["RadialDistortionPerturber"]
+
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 

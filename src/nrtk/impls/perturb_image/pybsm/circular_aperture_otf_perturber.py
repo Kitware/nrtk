@@ -21,6 +21,8 @@ Notes:
 
 from __future__ import annotations
 
+__all__ = ["CircularApertureOTFPerturber"]
+
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 

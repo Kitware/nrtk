@@ -27,6 +27,8 @@ Note:
 
 from __future__ import annotations
 
+__all__ = ["DiffusionPerturber"]
+
 import warnings
 from collections.abc import Hashable, Iterable
 from typing import Any, cast
