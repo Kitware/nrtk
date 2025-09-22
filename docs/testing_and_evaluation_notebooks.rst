@@ -48,10 +48,16 @@ Demonstrating Affine Transformations
 Explore how affine transformations affect model inputs and predictions.
 `View notebook <examples/maite/nrtk_affine_perturbers_demo.html>`__.
 
+Demonstrating Motion Jitter Perturbations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Simulate camera motion jitter and assess its impact on image quality and model inference.
+`View notebook <examples/maite/nrtk_jitter_perturber_demo.html>`__.
+
 Demonstrating Atmospheric Turbulence Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Simulate atmospheric distortion effects and assess their impact on image quality and model inference.
+Simulate atmospheric distortion effects and assess its impact on image quality and model inference.
 `View notebook <examples/maite/nrtk_turbulence_perturber_demo.html>`__.
 
 Demonstrating Rain/Water Droplet Perturbations

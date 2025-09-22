@@ -52,6 +52,7 @@ notebooks:
           "nrtk_sensor_transformation_demo.ipynb",
           "nrtk_lens_flare_demo.ipynb",
           "nrtk_affine_perturbers_demo.ipynb",
+          "nrtk_jitter_perturber_demo.ipynb",
           "nrtk_turbulence_perturber_demo.ipynb",
           "nrtk_water_droplet_perturber_demo.ipynb",
           "nrtk_radial_distortion_perturber_demo.ipynb",
