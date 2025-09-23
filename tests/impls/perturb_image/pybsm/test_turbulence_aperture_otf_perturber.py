@@ -114,9 +114,9 @@ class TestTurbulenceApertureOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
 
-        pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, additional_params=img_md)
+        pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, **img_md)
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "additional_params", "expectation"),
@@ -124,8 +124,8 @@ class TestTurbulenceApertureOTFPerturber:
             (True, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 True,
-                None,
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                dict(),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided"),
             ),
             (False, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
         ],
@@ -144,7 +144,7 @@ class TestTurbulenceApertureOTFPerturber:
         perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, additional_params=additional_params)
+            _ = perturber.perturb(img, **additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "expectation"),
@@ -452,7 +452,7 @@ class TestTurbulenceApertureOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
@@ -469,7 +469,7 @@ class TestTurbulenceApertureOTFPerturber:
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = TurbulenceApertureOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
 

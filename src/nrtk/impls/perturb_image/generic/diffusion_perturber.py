@@ -269,7 +269,7 @@ class DiffusionPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Generate a prompt-guided perturbed image using diffusion models.
 
@@ -282,7 +282,7 @@ class DiffusionPerturber(PerturbImage):
                 Input is automatically converted to RGB for processing.
             boxes: Optional iterable of tuples containing AxisAlignedBoundingBox objects
                 and their corresponding detection confidence dictionaries.
-            additional_params: Optional dictionary for future extensibility (currently unused).
+            additional_params: Additional perturbation keyword arguments (currently unused).
 
         Returns:
             A tuple containing:
@@ -295,9 +295,6 @@ class DiffusionPerturber(PerturbImage):
         """
         if self.prompt == "do not change the image":
             return image, boxes
-
-        if additional_params is None:
-            additional_params = {}
 
         try:
             pil_image = fromarray(image).convert("RGB")

@@ -19,6 +19,7 @@ from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -62,11 +63,13 @@ class RandomTranslationPerturber(PerturbImage):
         self.rng: np.random.Generator = np.random.default_rng(seed)
         self.color_fill: np.ndarray[np.int64, Any] = np.array(color_fill)
 
+    @override
     def perturb(  # noqa: C901
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        max_translation_limit: tuple[int, int] | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Randomly translates an image and adjusts bounding boxes.
 
@@ -75,22 +78,23 @@ class RandomTranslationPerturber(PerturbImage):
                 Input image as a numpy array of shape (H, W, C).
             boxes:
                 List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            max_translation_limit:
+                Max translation magnitude (translate_h, translate_w) lesser than or equal to the size of the input
+                image.
             additional_params:
-                Dictionary containing:
-                    - "max_translation_limit" (tuple[int, int]): Max translation magnitude
-                        (translate_h, translate_w) lesser than or equal to the size of the input image.
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
                 Translated image with the modified bounding boxes.
         """
         super().perturb(image=image)
-        if additional_params is None:
-            additional_params = dict()
-        translate_h, translate_w = additional_params.get(
-            "max_translation_limit",
-            (image.shape[0], image.shape[1]),
-        )
+
+        if max_translation_limit is None:
+            translate_h, translate_w = (image.shape[0], image.shape[1])
+        else:
+            translate_h, translate_w = max_translation_limit
+
         if abs(translate_h) > image.shape[0] or abs(translate_w) > image.shape[1]:
             raise ValueError(f"Max translation limit should be less than or equal to {image.shape[:2]}")
 
@@ -162,15 +166,6 @@ class RandomTranslationPerturber(PerturbImage):
                 adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
                 adjusted_bboxes.append((adjusted_box, metadata))
         return final_image, adjusted_bboxes
-
-    def __call__(
-        self,
-        image: np.ndarray[Any, Any],
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """Calls `perturb` with the given input image."""
-        return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomTranslationPerturber instance.

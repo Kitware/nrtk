@@ -21,7 +21,7 @@ class DummyPerturber(PerturbImage):
         self,
         image: np.ndarray,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,  # noqa: ARG002
+        **_: Any,
     ) -> tuple[
         np.ndarray,
         Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,

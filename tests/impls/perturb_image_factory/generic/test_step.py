@@ -282,6 +282,6 @@ class TestStepPerturbImageFactory:
                 perturb=perturber_inst,
                 image=img,
                 expected=None,
-                additional_params=img_md,
+                **img_md,
             )
             psnr_tiff_snapshot.assert_match(out_img)

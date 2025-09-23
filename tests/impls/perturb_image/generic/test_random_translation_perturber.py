@@ -158,7 +158,7 @@ class TestRandomTranslationPerturber:
                 image=image,
                 boxes=boxes,
                 expected=None,
-                additional_params={"max_translation_limit": max_translation_limit},
+                **{"max_translation_limit": max_translation_limit},
             )
 
     @pytest.mark.parametrize(
@@ -169,7 +169,7 @@ class TestRandomTranslationPerturber:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
-        additional_params = None
+        additional_params = dict()
         if max_translation_limit is not None:
             additional_params = {"max_translation_limit": max_translation_limit}
         out_img, _ = bbox_perturber_assertions(
@@ -177,6 +177,6 @@ class TestRandomTranslationPerturber:
             image=image,
             boxes=None,
             expected=None,
-            additional_params=additional_params,
+            **additional_params,
         )
         tiff_snapshot.assert_match(out_img)

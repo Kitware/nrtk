@@ -123,7 +123,7 @@ class AlbumentationsPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,  # ARG002
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Apply a BasicTransform from Albumentations to an image.
 
@@ -133,7 +133,7 @@ class AlbumentationsPerturber(PerturbImage):
             boxes:
                 List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
             additional_params:
-                Additional parameters for perturbation.
+                Additional perturbation keyword arguments.
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:

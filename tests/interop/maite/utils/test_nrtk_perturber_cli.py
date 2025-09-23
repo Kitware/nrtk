@@ -102,7 +102,7 @@ class TestNRTKPerturberCLI:
                 NRTK_PYBSM_CONFIG,
                 pytest.raises(
                     ValueError,
-                    match="'img_gsd' must be present in image metadata for this perturber",
+                    match="'img_gsd' must be provided for this perturber",
                 ),
             ),
             (NRTK_BLUR_CONFIG, does_not_raise()),
