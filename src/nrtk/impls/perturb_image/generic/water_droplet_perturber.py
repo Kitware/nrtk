@@ -256,7 +256,8 @@ class WaterDropletPerturber(PerturbImage):
         """Sorts points in counterclockwise order around a center point."""
         # Subtract original point from center point (position obtained
         # by calculating the mean)
-        d = points - np.mean(points, axis=0)
+        points128 = points.astype(np.float128)
+        d = points128 - np.mean(points128, axis=0)
         # Use atan2 to determine the angle taking into account the correct quadrant
         s = np.arctan2(d[:, 0], d[:, 1])
         # Return the sorted array of points.
@@ -267,6 +268,7 @@ class WaterDropletPerturber(PerturbImage):
         points: np.ndarray[Any, Any],
         rad: float = 0.2,
         edgy: float = 0.0,
+        tol: float = 1e-8,
     ) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         """Given an array of *points*, create a curve through those points.
 
@@ -274,6 +276,8 @@ class WaterDropletPerturber(PerturbImage):
             control points.
         *edgy* is a parameter which controls how "edgy" the curve is,
             edgy=0 is smoothest.
+        *tol* is a parameter which controls the tolerance used when
+            comparing angles. Default is 1e-8.
         """
         p = np.arctan(edgy) / np.pi + 0.5
         points = WaterDropletPerturber.ccw_sort(points)
@@ -287,7 +291,7 @@ class WaterDropletPerturber(PerturbImage):
         ang = _threshold_angle(ang)
         ang1 = ang
         ang2 = np.roll(ang, 1)
-        ang = p * ang1 + (1 - p) * ang2 + (np.abs(ang2 - ang1) > np.pi) * np.pi
+        ang = p * ang1 + (1 - p) * ang2 + (np.abs(ang2 - ang1) > (np.pi + tol)) * np.pi
         ang = np.append(ang, [ang[0]])
         points = np.append(points, np.atleast_2d(ang).T, axis=1)
 
