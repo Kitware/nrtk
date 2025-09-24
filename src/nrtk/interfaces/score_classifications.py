@@ -22,6 +22,8 @@ Example:
     scores = scorer(actual_classifications, predicted_classifications)
 """
 
+__all__ = []
+
 import abc
 from collections.abc import Sequence
 

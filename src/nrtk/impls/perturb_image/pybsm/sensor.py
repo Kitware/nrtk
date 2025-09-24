@@ -13,6 +13,8 @@ Typical usage example:
 
 from __future__ import annotations
 
+__all__ = ["PybsmSensor"]
+
 from typing import Any
 
 import numpy as np

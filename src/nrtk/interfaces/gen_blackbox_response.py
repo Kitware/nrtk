@@ -20,6 +20,8 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["gen_perturber_combinations"]
+
 import abc
 from collections.abc import Hashable, Sequence
 from typing import Any

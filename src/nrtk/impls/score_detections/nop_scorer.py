@@ -20,6 +20,8 @@ Example:
     zero_scores = nop_scorer.score(actual_detections, predicted_detections)
 """
 
+__all__ = ["NOPScorer"]
+
 from collections.abc import Hashable, Sequence
 from typing import Any
 

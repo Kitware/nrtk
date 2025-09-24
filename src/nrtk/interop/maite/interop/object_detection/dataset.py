@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["JATICObjectDetectionDataset", "COCOJATICObjectDetectionDataset"]
+
 import copy
 import logging
 from collections.abc import Sequence

@@ -21,6 +21,8 @@ Example usage:
 
 """
 
+__all__ = ["SimplePybsmGenerator"]
+
 from collections.abc import Hashable, Sequence
 from typing import Any
 

@@ -17,6 +17,8 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["NIIRSImageMetric"]
+
 import copy
 from typing import Any
 

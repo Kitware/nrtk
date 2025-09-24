@@ -34,6 +34,8 @@ Note:
 
 from __future__ import annotations
 
+__all__ = ["AverageBlurPerturber", "GaussianBlurPerturber", "MedianBlurPerturber"]
+
 from collections.abc import Hashable, Iterable
 from typing import Any
 

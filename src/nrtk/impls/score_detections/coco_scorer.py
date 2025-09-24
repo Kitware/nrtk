@@ -21,6 +21,8 @@ Example:
     scores = scorer.score(actual_detections, predicted_detections)
 """
 
+__all__ = ["COCOScorer"]
+
 import contextlib
 from collections.abc import Hashable, Sequence
 from typing import Any

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["AukusdataCollectionSchema", "AukusDatasetSchema"]
+
 from typing import Any
 
 from nrtk.utils._exceptions import PydanticImportError

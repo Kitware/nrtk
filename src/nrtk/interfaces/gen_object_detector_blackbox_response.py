@@ -23,6 +23,8 @@ Example usage:
     item_response, scores = generator.generate(factories, detector, scorer, img_batch_size=4, verbose=True)
 """
 
+__all__ = []
+
 import abc
 from collections.abc import Hashable, Sequence
 from contextlib import nullcontext

@@ -30,6 +30,14 @@ Notes:
 
 from __future__ import annotations
 
+__all__ = [
+    "SaltNoisePerturber",
+    "PepperNoisePerturber",
+    "SaltAndPepperNoisePerturber",
+    "GaussianNoisePerturber",
+    "SpeckleNoisePerturber",
+]
+
 from collections.abc import Hashable, Iterable
 from typing import Any
 
