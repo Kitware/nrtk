@@ -46,7 +46,7 @@ vcrm:
     - pandoc "${REPORTS[0]}" -o "${CI_PROJECT_DIR}/vcrm-report.html"
     # Copy the dev report so it can be exposed as an artifact
     - cp "${REPORTS[0]}" vcrm-report.md
-  
+
   artifacts:
     when: always
     name: 'VCRM Report'
