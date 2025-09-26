@@ -11,6 +11,24 @@ from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 
 
+@pytest.fixture(scope="session", autouse=True)
+def set_numpy_printoptions() -> None:
+    """Sets global NumPy print options for the entire test session."""
+    np.set_printoptions(
+        edgeitems=3,
+        threshold=1000,
+        floatmode="maxprec",
+        precision=8,
+        suppress=False,
+        linewidth=75,
+        nanstr="nan",
+        infstr="inf",
+        sign="-",
+        formatter=None,
+        legacy=False,
+    )
+
+
 class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
     def __init__(self, *, rtol: float = 1e-4, atol: float = 1e-5, **kwargs: Any) -> None:
         super().__init__(**kwargs)
