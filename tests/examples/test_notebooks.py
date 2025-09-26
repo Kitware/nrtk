@@ -17,7 +17,8 @@ class TestPyrightNotebook:
         [
             ("docs/examples/maite/gradio/nrtk-gradio.ipynb", 0),
             ("docs/examples/maite/augmentations.ipynb", 0),
-            ("docs/examples/maite/jatic-perturbations-saliency.ipynb", 0),
+            # Suppressing type checking errors related to xaitk-* imports
+            ("docs/examples/maite/jatic-perturbations-saliency.ipynb", 3),
             ("docs/examples/maite/nrtk_brightness_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_haze_perturber_demo.ipynb", 0),
             ("docs/examples/maite/nrtk_focus_perturber_demo.ipynb", 0),

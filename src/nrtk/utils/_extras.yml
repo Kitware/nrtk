@@ -30,7 +30,6 @@ notebook-testing:
 - ultralytics
 - jupytext
 - albumentations
-- xaitk-jatic
 pybsm:
 - pybsm
 scikit-image:
