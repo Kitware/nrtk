@@ -17,11 +17,11 @@ https://www.cvlibs.net/publications/Roser2010ACCVWORK.pdf
 
 Classes:
     WaterDropletPerturber: Implements the physics-based, photorealistic
-    water/rain droplet model, utilizing OpenCV and Shapely functionalities.
+    water/rain droplet model, utilizing Scipy, Shapely, and GeoPandas functionalities.
 
 Dependencies:
-    - OpenCV for image processing.
-    - Shapely for Curve generation related operations.
+    - Scipy for image processing.
+    - Shapely and GeoPandas for Curve generation related operations.
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
 Example usage:
@@ -49,13 +49,12 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import WaterDropletImportError
 from nrtk.utils._import_guard import import_guard
 
-scipy_available: bool = import_guard("scipy", WaterDropletImportError, ["special"])
-cv2_available: bool = import_guard("cv2", WaterDropletImportError)
+scipy_available: bool = import_guard("scipy", WaterDropletImportError, ["special", "ndimage"])
 shapely_available: bool = import_guard("shapely", WaterDropletImportError, ["geometry"])
 geopandas_available: bool = import_guard("geopandas", WaterDropletImportError)
-import cv2  # noqa: E402
 import geopandas  # noqa: E402
 import numpy as np  # noqa: E402
+from scipy.ndimage import gaussian_filter  # noqa: E402
 from scipy.special import binom  # noqa: E402
 from shapely.geometry import Polygon  # noqa: E402
 from smqtk_image_io.bbox import AxisAlignedBoundingBox  # noqa: E402
@@ -181,7 +180,7 @@ class WaterDropletPerturber(PerturbImage):
         n_water: float = 1.33,
         f_x: int = 400,
         f_y: int = 400,
-        seed: int | None = None,
+        seed: int | None = 1,
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
@@ -219,8 +218,8 @@ class WaterDropletPerturber(PerturbImage):
             seed = None
 
         Raises:
-            :raises ImportError: If OpenCV, Scipy or Shapely is not found, install via
-                `pip install nrtk[waterdroplet,graphics]` or `pip install nrtk[waterdroplet,headless]`.
+            :raises ImportError: If Scipy, Shapely or GeoPandas is not found,
+            install via `pip install nrtk[waterdroplet]`.
         """
         if not self.is_usable():
             raise WaterDropletImportError
@@ -695,30 +694,42 @@ class WaterDropletPerturber(PerturbImage):
         blur_back = copy.deepcopy(rain_image)
         blur_values = [w / 40, w / 60]
         blur_values_adj = [int(np.floor(val / 2) * 2 + 1) for val in blur_values]
-        blur_image = cv2.GaussianBlur(
-            blur_image,
-            (blur_values_adj[0], blur_values_adj[0]),
-            w / 150,
-        )
+
+        blur_image = self._apply_gaussian(image=blur_image, sigma=w / 150, ksize=blur_values_adj[0])
 
         # Blur the background of the image using the desired blur strength
-        blur_back = cv2.GaussianBlur(blur_back, (7, 7), 1.5)
-        blur_back = cv2.addWeighted(
-            blur_back,
-            self.blur_strength,
-            rain_image,
-            1 - self.blur_strength,
-            0,
-        )
+        blur_back = self._apply_gaussian(image=blur_back, sigma=1.5, ksize=7)
+
+        blur_back = self.blur_strength * blur_back + (1 - self.blur_strength) * rain_image
         # Blur mask to help make the boundaries of the droplets appear "fuzzier"
-        mask = cv2.GaussianBlur(
-            mask,
-            (blur_values_adj[1], blur_values_adj[1]),
-            w / 125,
-        )
+        mask = self._apply_gaussian(image=mask, sigma=w / 125, ksize=blur_values_adj[1])
+
         blur_image[mask == 0] = blur_back[mask == 0]
 
         return blur_image
+
+    def _apply_gaussian(self, image: np.ndarray[Any, Any], sigma: float, ksize: int) -> np.ndarray[Any, Any]:
+        truncate = (ksize - 1) / 2 / sigma
+        if image.ndim == 2:
+            # Grayscale
+            blurred = gaussian_filter(
+                image.astype(np.float64),
+                sigma=sigma,
+                truncate=truncate,
+                mode="grid-wrap",
+            )
+        else:
+            # Color image – apply Gaussian to each channel independently
+            blurred = np.empty_like(image, dtype=np.float64)
+            for c in range(image.shape[2]):
+                blurred[..., c] = gaussian_filter(
+                    image[..., c].astype(np.float64),
+                    sigma=sigma,
+                    truncate=truncate,
+                    mode="grid-wrap",
+                )
+
+        return blurred.astype(image.dtype)
 
     @override
     def perturb(
@@ -742,6 +753,10 @@ class WaterDropletPerturber(PerturbImage):
                 The perturbed image and bounding boxes scaled to perturbed image shape.
         """
         image, boxes = super().perturb(image=image, boxes=boxes)
+
+        # Reset RNG state when seed is provided to ensure deterministic results across multiple calls
+        if self.seed is not None:
+            self._initialize_derived_parameters()
 
         rain_image, mask = self.render(image=image)
         perturbed_image = self.blur(
@@ -782,9 +797,9 @@ class WaterDropletPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (OpenCV, Scipy and Shapely) are available.
+        """Checks if the necessary dependencies (Scipy, Shapely and GeoPandas) are available.
 
         Returns:
-            :return bool: True if OpenCV, Scipy and Shapely are available.
+            :return bool: True if Scipy, Shapely and GeoPandas are available.
         """
-        return cv2_available and scipy_available and shapely_available and geopandas_available
+        return scipy_available and shapely_available and geopandas_available

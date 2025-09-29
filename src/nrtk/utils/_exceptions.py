@@ -79,12 +79,7 @@ class ScikitImageImportError(ImportError):
 class WaterDropletImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs
-        super().__init__(
-            """
-            OpenCV, Scipy and Shapely must be installed. Please install via
-            `nrtk[waterdroplet,graphics]` or `nrtk[waterdroplet,headless]`.
-            """,
-        )
+        super().__init__("""Scipy, Shapely and GeoPandas must be installed. Please install via nrtk[waterdroplet]`.""")
 
 
 class NotebookTestingImportError(ImportError):
