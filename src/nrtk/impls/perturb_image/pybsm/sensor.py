@@ -307,6 +307,8 @@ class PybsmSensor(Configurable):
         S.p_y = self.p_y
         S.w_x = self.w_x
         S.w_y = self.w_y
+        S.s_x = self.s_x
+        S.s_y = self.s_y
         S.int_time = self.int_time
         S.n_tdi = self.n_tdi
         S.dark_current = self.dark_current
