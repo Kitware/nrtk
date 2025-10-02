@@ -137,3 +137,62 @@ class WeakTIFFImageSnapshotExtension(TIFFImageSnapshotExtension):
 @pytest.fixture
 def weak_tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(WeakTIFFImageSnapshotExtension)
+
+
+class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
+    """Snapshot extension using PSNR metric for image comparison.
+
+    This extension compares images using Peak Signal-to-Noise Ratio (PSNR)
+    instead of element-wise numerical comparison. Higher PSNR values indicate
+    more similar images. Images pass if their PSNR exceeds a threshold. The
+    default threshold of 48.13 corresponds to the psnr for uint8 images
+    where each pixel value is off by 1.
+
+    Args:
+        min_psnr: Minimum PSNR value in dB required to pass (default: 48.13)
+    """
+
+    _file_extension = "tiff"
+
+    def __init__(self, *, min_psnr: float = 48.13, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.min_psnr = min_psnr
+
+    def serialize(self, data: np.ndarray, **_: Any) -> bytes:
+        im = Image.fromarray(data)
+        byte_arr = io.BytesIO()
+        im.save(byte_arr, format="tiff")
+        return byte_arr.getvalue()
+
+    def deserialize(self, data: bytes) -> np.ndarray:
+        with Image.open(io.BytesIO(data)) as image:
+            # Force load image data to avoid lazy loading
+            image.load()
+            return np.array(image)
+
+    def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
+        expected_array = self.deserialize(snapshot_data)
+        received_array = self.deserialize(serialized_data)
+
+        # Ensure images have same shape before computing metric
+        if expected_array.shape != received_array.shape:
+            return False
+
+        # Compute Mean Squared Error
+        mse = np.mean((expected_array.astype(float) - received_array.astype(float)) ** 2)
+
+        # To get MAX value, we assume it is a float normalized between 0-1
+        # or a uint8
+        max_pixel_value = 1.0 if np.issubdtype(received_array.dtype, np.floating) else 255.0
+
+        # If MSE is zero, the images are identical, so PSNR is infinity
+        # otherise, PSNR = 10 * log10(MAX^2 / MSE)
+        psnr = float(np.inf) if mse == 0.0 else 10 * np.log10((max_pixel_value**2) / mse)
+
+        # Pass if metric value meets or exceeds minimum threshold
+        return psnr >= self.min_psnr
+
+
+@pytest.fixture
+def psnr_tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(PSNRImageSnapshotExtension)

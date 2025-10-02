@@ -23,7 +23,7 @@ np.random.seed(42)  # noqa: NPY002
 
 @pytest.mark.skipif(not PybsmPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestPyBSMPerturber:
-    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE))
         img_gsd = 3.19 / 160.0
@@ -38,7 +38,7 @@ class TestPyBSMPerturber:
             additional_params={"img_gsd": img_gsd},
         )
 
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("param_name", "param_value", "rng_seed"),
