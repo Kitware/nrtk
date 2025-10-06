@@ -256,7 +256,7 @@ class TestStepPerturbImageFactory:
     )
     def test_perturb_instance_modification(
         self,
-        weak_tiff_snapshot: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         perturber: type[PerturbImage],
         modifying_param: str,
         modifying_val: float,
@@ -284,4 +284,4 @@ class TestStepPerturbImageFactory:
                 expected=None,
                 additional_params=img_md,
             )
-            weak_tiff_snapshot.assert_match(out_img)
+            psnr_tiff_snapshot.assert_match(out_img)
