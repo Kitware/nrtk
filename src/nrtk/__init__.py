@@ -1,10 +1,18 @@
 """Define the nrtk package."""
 
-import importlib.metadata
+from collections.abc import Callable
+from importlib import metadata
+from typing import Any
 
-__version__ = importlib.metadata.version(__name__)
+import lazy_loader as lazy
 
+__getattr__: Callable[[str], Any]
+__dir__: Callable[[], list[str]]
+__all__: list[str]
 
-__all__ = ["__version__", "impls", "interfaces", "interop", "utils"]
+__version__ = metadata.version("nrtk")
 
-from . import impls, interfaces, interop, utils
+__getattr__, __dir__, __all__ = lazy.attach(
+    __name__,
+    submodules=["impls", "interfaces", "interop", "utils"],
+)

@@ -1,5 +1,15 @@
 """Object Detection."""
 
-__all__ = ["augmentation", "dataset"]
+from collections.abc import Callable
+from typing import Any
 
-from . import augmentation, dataset
+import lazy_loader as lazy
+
+__getattr__: Callable[[str], Any]
+__dir__: Callable[[], list[str]]
+__all__: list[str]
+
+__getattr__, __dir__, __all__ = lazy.attach(
+    __name__,
+    submodules=["augmentation", "dataset"],
+)

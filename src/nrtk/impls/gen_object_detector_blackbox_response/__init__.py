@@ -1,5 +1,15 @@
 """Module for implementations of GenerateObjectDetectorBlackboxResponse interface."""
 
-__all__ = ["simple_generic_generator", "simple_pybsm_generator"]
+from collections.abc import Callable
+from typing import Any
 
-from . import simple_generic_generator, simple_pybsm_generator
+import lazy_loader as lazy
+
+__getattr__: Callable[[str], Any]
+__dir__: Callable[[], list[str]]
+__all__: list[str]
+
+__getattr__, __dir__, __all__ = lazy.attach(
+    __name__,
+    submodules=["simple_generic_generator", "simple_pybsm_generator"],
+)

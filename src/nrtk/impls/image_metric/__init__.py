@@ -1,5 +1,15 @@
 """Module for implementations of ImageMetric interface."""
 
-__all__ = ["niirs_image_metric", "snr_image_metric"]
+from collections.abc import Callable
+from typing import Any
 
-from . import niirs_image_metric, snr_image_metric
+import lazy_loader as lazy
+
+__getattr__: Callable[[str], Any]
+__dir__: Callable[[], list[str]]
+__all__: list[str]
+
+__getattr__, __dir__, __all__ = lazy.attach(
+    __name__,
+    submodules=["niirs_image_metric", "snr_image_metric"],
+)

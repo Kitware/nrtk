@@ -2565,7 +2565,7 @@ tests-strict = ["coverage (==5.3.1)", "coverage (==5.3.1)", "coverage (==5.3.1)"
 name = "lazy-loader"
 version = "0.4"
 description = "Makes it easy to load subpackages and functions on demand."
-optional = true
+optional = false
 python-versions = ">=3.7"
 files = [
     {file = "lazy_loader-0.4-py3-none-any.whl", hash = "sha256:342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc"},
@@ -7278,4 +7278,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "df827f9d74359aded43dc4915362f31d3c969d6d5670dc000d0d66981295303d"
+content-hash = "94875e63d678234d6979b2086e9e7564be4c8fb67907dafa75f3cd9f4c65322d"
