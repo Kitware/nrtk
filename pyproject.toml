@@ -32,6 +32,7 @@ description = "Natural Robustness Toolkit (NRTK) is a platform for generating va
 # :auto python-version:
 python = ">=3.10,<3.13"
 # :auto python-version:
+lazy-loader = ">=0.4"
 
 # Python capped to <3.13 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
