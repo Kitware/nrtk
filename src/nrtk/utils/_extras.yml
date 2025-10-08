@@ -8,6 +8,7 @@ diffusion:
 - accelerate
 - Pillow
 - transformers
+- protobuf
 graphics:
 - opencv-python
 headless:
