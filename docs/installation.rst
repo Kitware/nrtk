@@ -163,13 +163,15 @@ description of the extra.
 
     **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
     :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
-    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`, and
-    :ref:`NIIRSImageMetric`.
+    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`,
+    :ref:`NIIRSImageMetric`, :ref:`AlbumentationsPerturber`, :ref:`RandomRotationPerturber`, and
+    :ref:`RandomScalePerturber`.
 
     **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
     :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
-    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`, and
-    :ref:`NIIRSImageMetric`.
+    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`,
+    :ref:`NIIRSImageMetric`, :ref:`AlbumentationsPerturber`, :ref:`RandomRotationPerturber`, and
+    :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
     :ref:`CustomPybsmPerturbImageFactory`, :ref:`PyBSMSensor`, :ref:`PyBSMScenario`, :ref:`PyBSMPerturber`,
@@ -191,8 +193,9 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.PIL.enhance` perturbers.
 
     **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` and
-    :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`.
+    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber`,
+    :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`, and
+    :mod:`~nrtk.impls.perturb_image.generic.random_scale_perturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `shapely <https://github.com/shapely/shapely>`_.
     Required for :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and
@@ -261,8 +264,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - Extra(s) Required
       - Key Dependencies Provided by Extra(s)
     * - :ref:`AlbumentationsPerturber`
-      - ``albumentations``
-      - ``albumentations``
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``albumentations``, ``OpenCV``
     * - :ref:`AverageBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
@@ -321,8 +324,11 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ---
       - ---
     * - :ref:`RandomRotationPerturber`
-      - ``albumentations``
-      - ``albumentations``
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``albumentations``, ``OpenCV``
+    * - :ref:`RandomScalePerturber`
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``albumentations``, ``OpenCV``
     * - :ref:`RandomTranslationPerturber`
       - ---
       - ---

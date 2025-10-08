@@ -22,10 +22,12 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import AlbumentationsImportError
+from nrtk.utils._exceptions import AlbumentationsImportError, OpenCVImportError
 from nrtk.utils._import_guard import import_guard
 
 albumentations_available: bool = import_guard("albumentations", AlbumentationsImportError, ["core.bbox_utils"])
+cv2_available: bool = import_guard("cv2", OpenCVImportError)
+
 import albumentations as A  # noqa N812, F401
 from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations  # noqa E402
 
@@ -150,15 +152,16 @@ class AlbumentationsPerturber(PerturbImage):
             image=image,
             bboxes=np.array(bboxes),
         )
+        output_image = output["image"].astype(np.uint8)
 
         # Create output_bboxes in the format expected by PerturbImage output
         output_boxes = None
         if boxes:
             output_boxes = [
-                (AlbumentationsPerturber._bbox_to_aabb(bbox, image), label)
+                (AlbumentationsPerturber._bbox_to_aabb(bbox, output_image), label)
                 for bbox, label in zip(output["bboxes"], labels, strict=False)
             ]
-        return output["image"].astype(np.uint8), output_boxes
+        return output_image, output_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:
@@ -182,4 +185,4 @@ class AlbumentationsPerturber(PerturbImage):
             :return bool: True if albumentations is installed; False otherwise.
         """
         # Requires opencv to be installed
-        return albumentations_available
+        return albumentations_available and cv2_available
