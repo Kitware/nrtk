@@ -35,14 +35,14 @@ class TestDefocusOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize("w_x", [0.5, 1.5])
@@ -59,13 +59,13 @@ class TestDefocusOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     def test_default_reproducibility(self) -> None:
@@ -82,7 +82,7 @@ class TestDefocusOTFPerturber:
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 {},
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided for this perturber"),
             ),
         ],
     )
@@ -96,7 +96,7 @@ class TestDefocusOTFPerturber:
         perturber = DefocusOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, boxes=None, additional_params=additional_params)
+            _ = perturber(image=image, boxes=None, **additional_params)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -113,7 +113,7 @@ class TestDefocusOTFPerturber:
         perturber = DefocusOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, additional_params=additional_params)
+            _ = perturber(image=image, **additional_params)
 
     @pytest.mark.parametrize("w_x", [0.5, 1.5])
     @pytest.mark.parametrize("w_y", [0.5, 1.5])
@@ -132,13 +132,13 @@ class TestDefocusOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize("w_x", [0.5])
@@ -285,7 +285,7 @@ class TestDefocusOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
@@ -311,7 +311,7 @@ class TestDefocusOTFPerturber:
             image=image,
             expected=None,
             boxes=boxes,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
 

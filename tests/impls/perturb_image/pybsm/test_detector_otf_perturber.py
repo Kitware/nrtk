@@ -35,14 +35,14 @@ class TestDetectorOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize(
@@ -68,9 +68,9 @@ class TestDetectorOTFPerturber:
 
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
 
-        pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, additional_params=img_md)
+        pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, **img_md)
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "additional_params", "expectation"),
@@ -78,8 +78,8 @@ class TestDetectorOTFPerturber:
             (True, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 True,
-                None,
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                dict(),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided for this perturber"),
             ),
             (False, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
         ],
@@ -98,7 +98,7 @@ class TestDetectorOTFPerturber:
         perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, additional_params=additional_params)
+            _ = perturber.perturb(img, **additional_params)
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "w_x", "w_y", "f", "interp"),
@@ -224,7 +224,7 @@ class TestDetectorOTFPerturber:
 
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
@@ -241,7 +241,7 @@ class TestDetectorOTFPerturber:
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = DetectorOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
 

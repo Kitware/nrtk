@@ -261,7 +261,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        img_gsd: float | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Applies turbulence and aperture-based perturbation to the provided image.
 
@@ -270,17 +271,17 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
                 The image to be perturbed.
             boxes:
                 Bounding boxes for detections in input image.
+            img_gsd:
+                GSD is the distance between the centers of two adjacent pixels in an image, measured on the ground.
             additional_params:
-                Dictionary containing:
-                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                        pixels in an image, measured on the ground.
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
                 The perturbed image and bounding boxes scaled to perturbed image shape.
 
         Raises:
-            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
+            :raises ValueError: If 'img_gsd' is None.
         """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -308,12 +309,10 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
         )
         self.turbulence_otf: np.ndarray[Any, Any] = turbulence_otf[0]
 
-        if additional_params is None:
-            additional_params = dict()
         if self.sensor and self.scenario:
-            if "img_gsd" not in additional_params:
-                raise ValueError("'img_gsd' must be present in image metadata for this perturber")
-            ref_gsd = additional_params["img_gsd"]
+            if img_gsd is None:
+                raise ValueError("'img_gsd' must be provided for this perturber")
+            ref_gsd = img_gsd
 
             # Transform an optical transfer function into a point spread function
             psf = otf_to_psf(

@@ -168,7 +168,8 @@ class JitterOTFPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        img_gsd: float | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Applies the jitter OTF-based perturbation to the provided image.
 
@@ -177,17 +178,17 @@ class JitterOTFPerturber(PerturbImage):
                 The image to be perturbed.
             boxes:
                 Bounding boxes for detections in input image.
+            img_gsd:
+                GSD is the distance between the centers of two adjacent pixels in an image, measured on the ground.
             additional_params:
-                Dictionary containing:
-                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                        pixels in an image, measured on the ground.
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
                 The perturbed image and bounding boxes scaled to perturbed image shape.
 
         Raises:
-            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
+            :raises ValueError: If 'img_gsd' is None.
         """
         # Assume if nothing else cuts us off first, diffraction will set the
         # limit for spatial frequency that the imaging system is able
@@ -202,15 +203,10 @@ class JitterOTFPerturber(PerturbImage):
         self.df: float = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
         self.jit_OTF: np.ndarray[Any, Any] = jitter_OTF(u=uu, v=vv, s_x=self.s_x, s_y=self.s_y)
 
-        if additional_params is None:
-            additional_params = dict()
         if self.ifov >= 0 and self.slant_range >= 0:
-            if "img_gsd" not in additional_params:
-                raise ValueError(
-                    "'img_gsd' must be present in image metadata\
-                                  for this perturber",
-                )
-            ref_gsd = additional_params["img_gsd"]
+            if img_gsd is None:
+                raise ValueError("'img_gsd' must be provided for this perturber")
+            ref_gsd = img_gsd
 
             # Transform an optical transfer function into a point spread function
             psf = otf_to_psf(otf=self.jit_OTF, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))

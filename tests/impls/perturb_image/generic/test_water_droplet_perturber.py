@@ -29,9 +29,9 @@ class TestWaterDropletPerturber:
 
         inst = WaterDropletPerturber()
 
-        out_img = perturber_assertions(perturb=inst, image=img, expected=None, additional_params=None)
+        out_img = perturber_assertions(perturb=inst, image=img, expected=None)
 
-        perturber_assertions(perturb=inst, image=img, expected=out_img, additional_params=None)
+        perturber_assertions(perturb=inst, image=img, expected=out_img)
 
     @pytest.mark.parametrize(
         (
@@ -82,9 +82,9 @@ class TestWaterDropletPerturber:
             seed=seed,
         )
 
-        out_img = perturber_assertions(perturb=inst, image=img, expected=None, additional_params=None)
+        out_img = perturber_assertions(perturb=inst, image=img, expected=None)
 
-        perturber_assertions(perturb=inst, image=img, expected=out_img, additional_params=None)
+        perturber_assertions(perturb=inst, image=img, expected=out_img)
 
     @pytest.mark.parametrize(
         (

@@ -91,7 +91,7 @@ class RandomCropPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        **_: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Randomly crops an image and adjusts bounding boxes.
 
@@ -101,16 +101,13 @@ class RandomCropPerturber(PerturbImage):
             boxes:
                 List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
             additional_params:
-                Unused
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
                 Cropped image with the modified bounding boxes.
         """
         image, boxes = super().perturb(image=image, boxes=boxes)
-
-        if additional_params is None:
-            additional_params = dict()
 
         # Set crop_size to image size if crop_size is None
         crop_size = self.crop_size if self.crop_size is not None else (image.shape[0], image.shape[1])

@@ -149,7 +149,8 @@ class PybsmPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        img_gsd: float | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Applies pyBSM-based perturbations to the provided image.
 
@@ -158,26 +159,24 @@ class PybsmPerturber(PerturbImage):
                 The image to be perturbed.
             boxes:
                 Bounding boxes for detections in input image.
+            img_gsd:
+                GSD is the distance between the centers of two adjacent pixels in an image, measured on the ground.
             additional_params:
-                Dictionary containing:
-                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                        pixels in an image, measured on the ground.
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             The perturbed image and bounding boxes scaled to perturbed image shape.
 
         Raises:
-            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
+            :raises ValueError: If 'img_gsd' is None.
         """
-        if additional_params is None:  # Cannot have mutable data structure in argument default
-            additional_params = dict()
-        if "img_gsd" not in additional_params:
-            raise ValueError("'img_gsd' must be present in image metadata for this perturber")
+        if img_gsd is None:
+            raise ValueError("'img_gsd' must be provided for this perturber")
 
         # Create a `RefImage` object using the given GSD, img_pixel and reflactance values
         ref_img = RefImage(
             img=image,
-            gsd=additional_params["img_gsd"],
+            gsd=img_gsd,
             pix_values=np.array([image.min(), image.max()]),
             refl_values=self.reflectance_range,
         )

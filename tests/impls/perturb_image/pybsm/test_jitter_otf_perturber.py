@@ -35,14 +35,14 @@ class TestJitterOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
@@ -59,13 +59,13 @@ class TestJitterOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     def test_default_reproducibility(self) -> None:
@@ -82,7 +82,7 @@ class TestJitterOTFPerturber:
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 {},
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided"),
             ),
         ],
     )
@@ -96,7 +96,7 @@ class TestJitterOTFPerturber:
         perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -113,7 +113,7 @@ class TestJitterOTFPerturber:
         perturber = JitterOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
     @pytest.mark.parametrize("s_y", [0.5, 1.5])
@@ -132,13 +132,13 @@ class TestJitterOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize("s_x", [0.5])
@@ -279,7 +279,7 @@ class TestJitterOTFPerturber:
 
         inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
@@ -296,7 +296,7 @@ class TestJitterOTFPerturber:
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = JitterOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
 

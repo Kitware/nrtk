@@ -33,14 +33,14 @@ class TestHazePerturber:
 
         # Test perturb interface directly
         inst = HazePerturber()
-        out_image = perturber_assertions(perturb=inst.perturb, image=image, additional_params=metadata)
+        out_image = perturber_assertions(perturb=inst.perturb, image=image, **metadata)
 
         # Test callable
         perturber_assertions(
             perturb=HazePerturber(),
             image=image,
             expected=out_image,
-            additional_params=metadata,
+            **metadata,
         )
 
     @pytest.mark.parametrize(
@@ -61,14 +61,14 @@ class TestHazePerturber:
 
         # Test perturb interface directly
         inst = HazePerturber(factor=factor)
-        out_image = perturber_assertions(perturb=inst.perturb, image=image, additional_params=metadata)
+        out_image = perturber_assertions(perturb=inst.perturb, image=image, **metadata)
 
         # Test callable
         perturber_assertions(
             perturb=HazePerturber(factor=factor),
             image=image,
             expected=out_image,
-            additional_params=metadata,
+            **metadata,
         )
 
     def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
@@ -80,7 +80,8 @@ class TestHazePerturber:
         out_img = perturber_assertions(
             perturb=inst.perturb,
             image=image,
-            additional_params={"sky_color": [122], "depth_map": depth_map},
+            sky_color=[122],
+            depth_map=depth_map,
         )
         tiff_snapshot.assert_match(out_img)
 
@@ -116,11 +117,11 @@ class TestHazePerturber:
     )
     def test_execution_bounds(
         self,
-        metadata: dict[str, Any],
+        metadata: dict,
         expectation: AbstractContextManager,
     ) -> None:
         """Raise appropriate errors for specific parameters."""
         image = np.ones((3, 3, 3))
         inst = HazePerturber()
         with expectation:
-            inst(image=image, additional_params=metadata)
+            inst(image=image, **metadata)
