@@ -410,7 +410,7 @@ class TestTurbulenceApertureOTFPerturber:
     )
     def test_regression(
         self,
-        tiff_snapshot: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         mtf_wavelengths: Sequence[float] | None,
         mtf_weights: Sequence[float] | None,
@@ -453,7 +453,7 @@ class TestTurbulenceApertureOTFPerturber:
         )
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",
