@@ -162,16 +162,12 @@ NRTK has multiple optional extras to expand functionality. The list below contai
 description of the extra.
 
     **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
-    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`,
-    :ref:`NIIRSImageMetric`, :ref:`AlbumentationsPerturber`, :ref:`RandomRotationPerturber`, and
-    :ref:`RandomScalePerturber`.
+    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`AlbumentationsPerturber`,
+    :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
-    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`,
-    :ref:`NIIRSImageMetric`, :ref:`AlbumentationsPerturber`, :ref:`RandomRotationPerturber`, and
-    :ref:`RandomScalePerturber`.
+    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`AlbumentationsPerturber`,
+    :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
     :ref:`CustomPybsmPerturbImageFactory`, :ref:`PyBSMSensor`, :ref:`PyBSMScenario`, :ref:`PyBSMPerturber`,
@@ -273,8 +269,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``Pillow``
       - ``Pillow``
     * - :ref:`CircularApertureOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`ColorPerturber`
       - ``Pillow``
       - ``Pillow``
@@ -288,8 +284,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``pybsm``
       - ``pyBSM``
     * - :ref:`DetectorOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`DiffusionPerturber`
       - ``diffusion``
       - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
@@ -303,8 +299,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ---
       - ---
     * - :ref:`JitterOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`MedianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
@@ -345,8 +341,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``scikit-image``
       - ``scikit-image``
     * - :ref:`TurbulenceApertureOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`WaterDropletPerturber`
       - ``waterdroplet``, and (``graphics`` or ``headless``)
       - ``scipy``, ``shapely``, ``OpenCV``

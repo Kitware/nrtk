@@ -1,10 +1,9 @@
 """Implements JitterOTFPerturber which applies jitter perturbations using pyBSM with sensor and scenario configs.
 
 Classes:
-    JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM and OpenCV.
+    JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM.
 
 Dependencies:
-    - OpenCV (cv2) for image processing.
     - pyBSM for OTF and radiance calculations.
     - nrtk.interfaces.perturb_image.PerturbImage for base functionality.
 
@@ -29,15 +28,16 @@ from typing_extensions import Self, override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError, ScipyImportError
 from nrtk.utils._import_guard import import_guard
 
-cv2_available: bool = import_guard("cv2", PyBSMAndOpenCVImportError)
-pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError, ["radiance", "otf.functional", "utils"])
-import cv2  # noqa: E402
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["radiance", "otf.functional", "utils"])
 import pybsm.radiance as radiance  # noqa: E402
 from pybsm.otf.functional import jitter_OTF, otf_to_psf, resample_2D  # noqa: E402
 from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+
+import_guard("scipy", ScipyImportError, ["signal"])
+from scipy.signal import oaconvolve  # noqa: E402
 from smqtk_core.configuration import (  # noqa: E402
     from_config_dict,
     make_default_config,
@@ -106,11 +106,10 @@ class JitterOTFPerturber(PerturbImage):
             in the otf calculation.
 
         Raises:
-            :raises ImportError: If OpenCV or pyBSM is not found, install via
-                `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
+            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         if not self.is_usable():
-            raise PyBSMAndOpenCVImportError
+            raise PyBSMImportError
 
         super().__init__()
 
@@ -212,7 +211,7 @@ class JitterOTFPerturber(PerturbImage):
             psf = otf_to_psf(otf=self.jit_OTF, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)
+            blur_img = self._apply_psf(image, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
@@ -231,14 +230,14 @@ class JitterOTFPerturber(PerturbImage):
                     )
             else:
                 sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / self.slant_range, dx_out=self.ifov)
-
         else:
             # Transform an optical transfer function into a point spread function
             # Note: default is to set dxout param to same value as dxin to maintain the
             # image size ratio.
             psf = otf_to_psf(otf=self.jit_OTF, df=self.df, dx_out=1 / (self.jit_OTF.shape[0] * self.df))
 
-            sim_img = cv2.filter2D(image, -1, psf)
+            # filter the image
+            sim_img = self._apply_psf(image, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:
@@ -246,6 +245,44 @@ class JitterOTFPerturber(PerturbImage):
             return sim_img.astype(np.uint8), scaled_boxes
 
         return sim_img.astype(np.uint8), boxes
+
+    def _apply_psf(self, image: np.ndarray[Any, Any], psf: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+        """Apply PSF via correlation using overlap-add FFT.
+
+        Args:
+            image:
+                The image to apply psf to
+            psf:
+                The point spread function (psf)
+
+        Returns:
+            :return np.ndarray[Any, Any]
+                The convolved image
+        """
+        # Correlation via convolution: flip kernel
+        k = psf[::-1, ::-1]
+
+        kh, kw = k.shape
+        # Asymmetric reflect padding to match correlate(mode='reflect') / OpenCV center
+        pad_top = kh // 2
+        pad_bottom = kh - 1 - pad_top
+        pad_left = kw // 2
+        pad_right = kw - 1 - pad_left
+        pads = ((pad_top, pad_bottom), (pad_left, pad_right))
+
+        if image.ndim == 2:
+            img_temp = image.astype(np.float64, copy=False)
+            img_pad = np.pad(img_temp, pads, mode="reflect")
+            blur_img = oaconvolve(img_pad, k, mode="valid")
+            return np.clip(blur_img, 0, 255).astype(np.uint8)
+
+        blur_img = np.empty_like(image, dtype=np.float64)
+        for c in range(image.shape[2]):
+            img_temp = image[..., c].astype(np.float64, copy=False)
+            img_pad = np.pad(img_temp, pads, mode="reflect")
+            blur_img[..., c] = oaconvolve(img_pad, k, mode="valid")
+
+        return np.clip(blur_img, 0, 255).astype(np.uint8)
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
@@ -284,12 +321,12 @@ class JitterOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependency (pyBSM) is available.
 
         Returns:
-            :return bool: True if both pyBSM and OpenCV are available; False otherwise.
+            :return bool: True if pyBSM is available; False otherwise.
         """
-        return cv2_available and pybsm_available
+        return pybsm_available
 
     @override
     def get_config(self) -> dict[str, Any]:

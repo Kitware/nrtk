@@ -90,7 +90,7 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         :param theta_keys: Perturber parameter(s) values to vary between instances.
 
         :raises: ImportError if pyBSM is not found,
-        installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+        installed via 'nrtk[pybsm]'.
         """
         if not self.is_usable():
             raise PyBSMImportError
@@ -239,7 +239,6 @@ class _PybsmPerturbImageFactory(PerturbImageFactory):
         Returns:
             bool: True if pybsm is installed; False otherwise.
         """
-        # Requires opencv to be installed
         return all([PybsmPerturber.is_usable(), PybsmScenario.is_usable(), PybsmSensor.is_usable()])
 
 

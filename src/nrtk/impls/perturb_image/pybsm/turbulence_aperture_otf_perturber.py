@@ -1,11 +1,10 @@
-"""Implements TurbulenceApertureOTFPerturber for turbulence aperture-based OTF image perturbations using pyBSM & OpenCV.
+"""Implements TurbulenceApertureOTFPerturber for turbulence aperture-based OTF image perturbations using pyBSM.
 
 Classes:
     TurbulenceApertureOTFPerturber: Applies OTF-based perturbations with turbulence and aperture
-    effects to images, utilizing pyBSM and OpenCV functionalities.
+    effects to images, utilizing pyBSM functionalities.
 
 Dependencies:
-    - OpenCV for image processing.
     - pyBSM for radiance and OTF-related calculations.
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
@@ -33,15 +32,16 @@ from typing_extensions import Self, override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError, ScipyImportError
 from nrtk.utils._import_guard import import_guard
 
-cv2_available: bool = import_guard("cv2", PyBSMAndOpenCVImportError)
-pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError, ["radiance", "otf.functional", "utils"])
-import cv2  # noqa: E402
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["radiance", "otf.functional", "utils"])
 import pybsm.radiance as radiance  # noqa: E402
 from pybsm.otf.functional import otf_to_psf, polychromatic_turbulence_OTF, resample_2D  # noqa: E402
 from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+
+import_guard("scipy", ScipyImportError, ["signal"])
+from scipy.signal import oaconvolve  # noqa: E402
 from smqtk_core.configuration import (  # noqa: E402
     from_config_dict,
     make_default_config,
@@ -163,14 +163,13 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             in the otf calculation.
 
         Raises:
-            :raises ImportError: If OpenCV is not found, install via `pip install
-                nrtk[graphics]` or `pip install nrtk[headless]`.
+            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
             :raises ValueError: If mtf_wavelengths and mtf_weights are not equal length
             :raises ValueError: If mtf_wavelengths is empty or mtf_weights is empty
             :raises ValueError: If cn2at1m <= 0.0
         """
         if not self.is_usable():
-            raise PyBSMAndOpenCVImportError
+            raise PyBSMImportError
         super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
@@ -322,7 +321,7 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             )
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)
+            blur_img = self._apply_psf(image, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
@@ -351,7 +350,8 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
                 dx_out=1 / (self.turbulence_otf.shape[0] * self.df),
             )
 
-            sim_img = cv2.filter2D(image, -1, psf)
+            # filter the image
+            sim_img = self._apply_psf(image, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:
@@ -359,6 +359,44 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
             return sim_img.astype(np.uint8), scaled_boxes
 
         return sim_img.astype(np.uint8), boxes
+
+    def _apply_psf(self, image: np.ndarray[Any, Any], psf: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+        """Apply PSF via correlation using overlap-add FFT.
+
+        Args:
+            image:
+                The image to apply psf to
+            psf:
+                The point spread function (psf)
+
+        Returns:
+            :return np.ndarray[Any, Any]
+                The convolved image
+        """
+        # Correlation via convolution: flip kernel
+        k = psf[::-1, ::-1]
+
+        kh, kw = k.shape
+        # Asymmetric reflect padding to match correlate(mode='reflect') / OpenCV center
+        pad_top = kh // 2
+        pad_bottom = kh - 1 - pad_top
+        pad_left = kw // 2
+        pad_right = kw - 1 - pad_left
+        pads = ((pad_top, pad_bottom), (pad_left, pad_right))
+
+        if image.ndim == 2:
+            img_temp = image.astype(np.float64, copy=False)
+            img_pad = np.pad(img_temp, pads, mode="reflect")
+            blur_img = oaconvolve(img_pad, k, mode="valid")
+            return np.clip(blur_img, 0, 255).astype(np.uint8)
+
+        blur_img = np.empty_like(image, dtype=np.float64)
+        for c in range(image.shape[2]):
+            img_temp = image[..., c].astype(np.float64, copy=False)
+            img_pad = np.pad(img_temp, pads, mode="reflect")
+            blur_img[..., c] = oaconvolve(img_pad, k, mode="valid")
+
+        return np.clip(blur_img, 0, 255).astype(np.uint8)
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
@@ -421,9 +459,9 @@ class TurbulenceApertureOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependency (pyBSM) is available.
 
         Returns:
-            :return bool: True if both pyBSM and OpenCV are available; False otherwise.
+            :return bool: True if pyBSM is available; False otherwise.
         """
-        return cv2_available and pybsm_available
+        return pybsm_available
