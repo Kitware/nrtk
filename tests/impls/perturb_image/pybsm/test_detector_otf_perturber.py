@@ -15,13 +15,13 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
-@pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
+@pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestDetectorOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -221,6 +221,11 @@ class TestDetectorOTFPerturber:
         scenario = None
         if use_sensor_scenario:
             sensor, scenario = create_sample_sensor_and_scenario()
+            # For the small f override, set scenario to a shorter altiude/range
+            # to avoid downsampling image to a single pixel
+            if f is not None:
+                scenario.altitude = 500
+                scenario.ground_range = 100
 
         inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
 
@@ -250,5 +255,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not DetectorOTFPerturber.is_usable()
-    with pytest.raises(PyBSMAndOpenCVImportError):
+    with pytest.raises(PyBSMImportError):
         DetectorOTFPerturber()

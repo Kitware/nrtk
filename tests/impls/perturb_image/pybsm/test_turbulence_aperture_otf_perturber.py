@@ -19,13 +19,13 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
     TurbulenceApertureOTFPerturber,
 )
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
-@pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
+@pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestTurbulenceApertureOTFPerturber:
     @pytest.mark.parametrize(
         (
@@ -478,5 +478,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not TurbulenceApertureOTFPerturber.is_usable()
-    with pytest.raises(PyBSMAndOpenCVImportError):
+    with pytest.raises(PyBSMImportError):
         TurbulenceApertureOTFPerturber()

@@ -92,7 +92,7 @@ pip install nrtk[graphics]
 # For basic Pillow image perturbations
 pip install nrtk[Pillow]
 # For pybsm's sensor-based perturbations
-pip install nrtk[pybsm,graphics]
+pip install nrtk[pybsm]
 ```
 
 **Note**: Choose either `graphics` or `headless` for OpenCV, not both.

@@ -5,7 +5,6 @@ Classes:
     sensor and scenario configurations.
 
 Dependencies:
-    - OpenCV for image processing.
     - pyBSM for radiance and OTF-related functionalities.
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
@@ -33,15 +32,16 @@ from typing_extensions import Self, override
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError, ScipyImportError
 from nrtk.utils._import_guard import import_guard
 
-cv2_available: bool = import_guard("cv2", PyBSMAndOpenCVImportError)
-pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError)
-import cv2  # noqa: E402
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError)
 import pybsm.radiance as radiance  # noqa: E402
 from pybsm.otf.functional import detector_OTF, otf_to_psf, resample_2D  # noqa: E402
 from pybsm.utils import load_database_atmosphere, load_database_atmosphere_no_interp  # noqa: E402
+
+import_guard("scipy", ScipyImportError, ["signal"])
+from scipy.signal import oaconvolve  # noqa: E402
 from smqtk_core.configuration import (  # noqa: E402
     from_config_dict,
     make_default_config,
@@ -54,7 +54,7 @@ class DetectorOTFPerturber(PerturbImage):
 
     The `DetectorOTFPerturber` class uses sensor and scenario configurations to apply realistic
     perturbations to images. This includes adjusting for detector width, focal length, and atmospheric
-    conditions using OpenCV and pyBSM functionalities.
+    conditions using pyBSM functionalities.
 
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
@@ -112,11 +112,11 @@ class DetectorOTFPerturber(PerturbImage):
             the absent value(s) will default to 4um for w_x/w_y and 50mm for f.
 
         Raises:
-            :raises ImportError: If OpenCV or pyBSM is not found, install via
-                `pip install nrtk[pybsm,graphics]` or `pip install nrtk[pybsm,headless]`.
+            :raises ImportError: If pyBSM is not found, install via
+                `pip install nrtk[pybsm]`.
         """
         if not self.is_usable():
-            raise PyBSMAndOpenCVImportError
+            raise PyBSMImportError
         super().__init__()
 
         # Load the pre-calculated MODTRAN atmospheric data.
@@ -221,7 +221,7 @@ class DetectorOTFPerturber(PerturbImage):
             psf = otf_to_psf(otf=self.det_OTF, df=self.df, dx_out=2 * np.arctan(ref_gsd / 2 / self.slant_range))
 
             # filter the image
-            blur_img = cv2.filter2D(image, -1, psf)
+            blur_img = self._apply_psf(image, psf)
 
             # resample the image to the camera's ifov
             if image.ndim == 3:
@@ -246,7 +246,8 @@ class DetectorOTFPerturber(PerturbImage):
             # image size ratio.
             psf = otf_to_psf(otf=self.det_OTF, df=self.df, dx_out=1 / (self.det_OTF.shape[0] * self.df))
 
-            sim_img = cv2.filter2D(image, -1, psf)
+            # filter the image
+            sim_img = self._apply_psf(image, psf)
 
         # Rescale bounding boxes to the shape of the perturbed image
         if boxes:
@@ -254,6 +255,44 @@ class DetectorOTFPerturber(PerturbImage):
             return sim_img.astype(np.uint8), scaled_boxes
 
         return sim_img.astype(np.uint8), boxes
+
+    def _apply_psf(self, image: np.ndarray[Any, Any], psf: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+        """Apply PSF via correlation using overlap-add FFT.
+
+        Args:
+            image:
+                The image to apply psf to
+            psf:
+                The point spread function (psf)
+
+        Returns:
+            :return np.ndarray[Any, Any]
+                The convolved image
+        """
+        # Correlation via convolution: flip kernel
+        k = psf[::-1, ::-1]
+
+        kh, kw = k.shape
+        # Asymmetric reflect padding to match correlate(mode='reflect') / OpenCV center
+        pad_top = kh // 2
+        pad_bottom = kh - 1 - pad_top
+        pad_left = kw // 2
+        pad_right = kw - 1 - pad_left
+        pads = ((pad_top, pad_bottom), (pad_left, pad_right))
+
+        if image.ndim == 2:
+            img_temp = image.astype(np.float64, copy=False)
+            img_pad = np.pad(img_temp, pads, mode="reflect")
+            blur_img = oaconvolve(img_pad, k, mode="valid")
+            return np.clip(blur_img, 0, 255).astype(np.uint8)
+
+        blur_img = np.empty_like(image, dtype=np.float64)
+        for c in range(image.shape[2]):
+            img_temp = image[..., c].astype(np.float64, copy=False)
+            img_pad = np.pad(img_temp, pads, mode="reflect")
+            blur_img[..., c] = oaconvolve(img_pad, k, mode="valid")
+
+        return np.clip(blur_img, 0, 255).astype(np.uint8)
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
@@ -310,9 +349,9 @@ class DetectorOTFPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (pyBSM and OpenCV) are available.
+        """Checks if the necessary dependencies (pyBSM) are available.
 
         Returns:
-            :return bool: True if both pyBSM and OpenCV are available; False otherwise.
+            :return bool: True if pyBSM is available; False otherwise.
         """
-        return cv2_available and pybsm_available
+        return pybsm_available
