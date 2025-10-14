@@ -247,6 +247,8 @@ For `Poetry`_:
 To install the ``opencv-python-headless`` version, replace ``graphics`` with ``headless`` in the above
 commands.
 
+.. _perturber-dependencies:
+
 Perturber Dependencies
 ----------------------
 The following table lists the perturbers and the extra/dependencies required to use them.
