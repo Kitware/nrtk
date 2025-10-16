@@ -114,7 +114,7 @@ class TestRandomCropPerturber:
             expected=(out_image, []),
         )
 
-    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomCropPerturber(crop_size=(20, 20))
@@ -124,7 +124,7 @@ class TestRandomCropPerturber:
             boxes=None,
             expected=None,
         )
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("crop_size", "seed"),

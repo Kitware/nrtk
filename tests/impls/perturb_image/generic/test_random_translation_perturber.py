@@ -165,7 +165,7 @@ class TestRandomTranslationPerturber:
         ("max_translation_limit"),
         [None, (0, 0), (0, 1), (1, 0), (100, 100)],
     )
-    def test_regression(self, tiff_snapshot: SnapshotAssertion, max_translation_limit: tuple[int, int]) -> None:
+    def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion, max_translation_limit: tuple[int, int]) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
@@ -179,4 +179,4 @@ class TestRandomTranslationPerturber:
             expected=None,
             **additional_params,
         )
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)

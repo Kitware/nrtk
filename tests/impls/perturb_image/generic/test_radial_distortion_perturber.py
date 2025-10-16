@@ -47,7 +47,7 @@ class TestRadialDistortionPerturber:
             ([-0.02, -0.05, 0]),
         ],
     )
-    def test_regression(self, k: Sequence[float], tiff_snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, k: Sequence[float], psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
         image = Image.new("RGB", grayscale_image.size)
@@ -58,7 +58,7 @@ class TestRadialDistortionPerturber:
             perturb=inst.perturb,
             image=image,
         )
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("color"),
