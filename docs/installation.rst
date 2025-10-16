@@ -193,10 +193,9 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`, and
     :mod:`~nrtk.impls.perturb_image.generic.random_scale_perturber`.
 
-    **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `shapely <https://github.com/shapely/shapely>`_.
-    Required for :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and
-    :mod:`~nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils` utility functions. Note: This needs
-    to be installed in conjunction with either the ``graphics`` or ``headless`` extras due to the OpenCV requirement.
+    **waterdroplet**: installs `scipy <https://scipy.org/>`_, `shapely <https://github.com/shapely/shapely>`_, and
+    `geopandas <https://geopandas.org/en/stable/>__. Required for
+    :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and utility functions.
 
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
     `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
@@ -344,8 +343,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``pybsm``
       - ``pyBSM``
     * - :ref:`WaterDropletPerturber`
-      - ``waterdroplet``, and (``graphics`` or ``headless``)
-      - ``scipy``, ``shapely``, ``OpenCV``
+      - ``waterdroplet``
+      - ``scipy``, ``shapely``, ``geopandas``
 
 .. :auto installation-links:
 
