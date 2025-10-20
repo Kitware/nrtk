@@ -21,6 +21,7 @@ classifiers = [
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
 ]
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
@@ -30,22 +31,22 @@ description = "Natural Robustness Toolkit (NRTK) is a platform for generating va
 
 [tool.poetry.dependencies]
 # :auto python-version:
-python = ">=3.10,<3.13"
+python = ">=3.10,<3.14"
 # :auto python-version:
 lazy-loader = ">=0.4"
 
-# Python capped to <3.13 because of:
+# Python capped to <3.14 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.22,<2.0", python = "<3.12" }, # CVE-2021-34141
-    {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
+    {version = "^1.26", python = "<3.13" }, # CVE-2021-34141
+    {version = ">=2.1", python = ">=3.13" } # numpy==2.1 is the first release supporting python 3.13
 ]
-smqtk-classifier = ">=0.19.0"
-smqtk-core = ">=0.19"
-smqtk-detection = ">=0.22.0"
-smqtk-image-io = ">=0.17.1"
+smqtk-classifier = ">=0.20.0"
+smqtk-core = ">=0.20"
+smqtk-detection = ">=0.23.0"
+smqtk-image-io = ">=0.18.0"
 tqdm = ">=4.64"
-pycocotools = ">=2.0.6"
+pycocotools = ">=2.0.10"
 setuptools = ">=78.1.1"
 typing-extensions = ">=4.5.0"
 

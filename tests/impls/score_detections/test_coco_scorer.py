@@ -51,6 +51,7 @@ class TestCOCOScorer:
             {"id": 1, "name": "dummy_class_1"},
             {"id": 2, "name": "dummy_class_2"},
         ],
+        "info": [],  # Required for pycocotools>=2.0.9
     }
 
     @pytest.mark.parametrize(
