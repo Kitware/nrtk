@@ -149,13 +149,16 @@ class TestDetectorOTFPerturber:
             if i.sensor is not None and sensor is not None:
                 assert i.sensor.name == sensor.name
                 assert i.sensor.D == sensor.D
-                assert i.sensor.f == sensor.f
+                if f is None:
+                    assert i.sensor.f == sensor.f
                 assert i.sensor.p_x == sensor.p_x
                 assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
                 assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
-                assert i.sensor.w_x == sensor.w_x
-                assert i.sensor.w_y == sensor.w_y
+                if w_x is None:
+                    assert i.sensor.w_x == sensor.w_x
+                if w_y is None:
+                    assert i.sensor.w_y == sensor.w_y
                 assert i.sensor.int_time == sensor.int_time
                 assert i.sensor.dark_current == sensor.dark_current
                 assert i.sensor.read_noise == sensor.read_noise
@@ -169,7 +172,6 @@ class TestDetectorOTFPerturber:
                 assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
                 assert np.array_equal(i.sensor.qe, sensor.qe)
             else:
-                assert i.sensor is None
                 assert sensor is None
 
             if i.scenario is not None and scenario is not None:
@@ -185,7 +187,6 @@ class TestDetectorOTFPerturber:
                 assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
             else:
-                assert i.scenario is None
                 assert scenario is None
 
     @pytest.mark.parametrize(

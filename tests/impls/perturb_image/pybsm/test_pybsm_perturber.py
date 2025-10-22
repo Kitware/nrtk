@@ -64,8 +64,10 @@ class TestPyBSMPerturber:
             expected=None,
             img_gsd=img_gsd,
         )
+        # Create another instance with same seed and ensure perturbed image is the same
+        inst2 = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})  # type: ignore
         pybsm_perturber_assertions(
-            perturb=inst.perturb,
+            perturb=inst2.perturb,
             image=image,
             expected=out_image,
             img_gsd=img_gsd,
@@ -113,7 +115,7 @@ class TestPyBSMPerturber:
             assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
             assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
-            assert np.array_equal(i.reflectance_range, inst.reflectance_range)
+            assert np.array_equal(i._reflectance_range, inst._reflectance_range)
 
     @pytest.mark.parametrize(
         ("reflectance_range", "expectation"),

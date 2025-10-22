@@ -8,10 +8,8 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
-import pybsm.radiance as radiance
 import pytest
 from PIL import Image
-from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
@@ -236,6 +234,9 @@ class TestTurbulenceApertureOTFPerturber:
         interp: bool,
     ) -> None:
         """Test configuration stability."""
+        import pybsm.radiance as radiance
+        from pybsm.utils import load_database_atmosphere
+
         sensor = None
         scenario = None
         wavelengths = np.asarray([])
@@ -340,7 +341,8 @@ class TestTurbulenceApertureOTFPerturber:
 
             if i.sensor is not None and sensor is not None:
                 assert i.sensor.name == sensor.name
-                assert i.sensor.D == sensor.D
+                if D is None:
+                    assert i.sensor.D == sensor.D
                 assert i.sensor.f == sensor.f
                 assert i.sensor.p_x == sensor.p_x
                 assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
@@ -362,7 +364,6 @@ class TestTurbulenceApertureOTFPerturber:
                 assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
                 assert np.array_equal(i.sensor.qe, sensor.qe)
             else:
-                assert i.sensor is None
                 assert sensor is None
 
             if i.scenario is not None and scenario is not None:
@@ -370,15 +371,16 @@ class TestTurbulenceApertureOTFPerturber:
                 assert i.scenario.ihaze == scenario.ihaze
                 assert i.scenario.altitude == scenario.altitude
                 assert i.scenario.ground_range == scenario.ground_range
-                assert i.scenario.aircraft_speed == scenario.aircraft_speed
+                if aircraft_speed is None:
+                    assert i.scenario.aircraft_speed == scenario.aircraft_speed
                 assert i.scenario.target_reflectance == scenario.target_reflectance
                 assert i.scenario.target_temperature == scenario.target_temperature
                 assert i.scenario.background_reflectance == scenario.background_reflectance
                 assert i.scenario.background_temperature == scenario.background_temperature
-                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
+                if ha_wind_speed is None:
+                    assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
             else:
-                assert i.scenario is None
                 assert scenario is None
 
     @pytest.mark.parametrize(

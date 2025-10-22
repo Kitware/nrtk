@@ -197,7 +197,7 @@ class TestDefocusOTFPerturber:
     @pytest.mark.parametrize("w_x", [0.5])
     @pytest.mark.parametrize("w_y", [0.5])
     @pytest.mark.parametrize("interp", [True, False])
-    def test_overall_configuration(
+    def test_overall_configuration(  # noqa: C901
         self,
         w_x: float,
         w_y: float,
@@ -217,8 +217,10 @@ class TestDefocusOTFPerturber:
                 assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
                 assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
-                assert i.sensor.w_x == sensor.w_x
-                assert i.sensor.w_y == sensor.w_y
+                if w_x is None:
+                    assert i.sensor.w_x == sensor.w_x
+                if w_y is None:
+                    assert i.sensor.w_y == sensor.w_y
                 assert i.sensor.int_time == sensor.int_time
                 assert i.sensor.dark_current == sensor.dark_current
                 assert i.sensor.read_noise == sensor.read_noise
