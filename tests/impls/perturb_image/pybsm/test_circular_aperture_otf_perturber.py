@@ -184,6 +184,8 @@ class TestCircularApertureOTFPerturber:
         """Test configuration stability."""
         inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights)
         for i in configuration_test_helper(inst):
+            assert i.mtf_wavelengths is not None
+            assert i.mtf_weights is not None
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
 
@@ -247,6 +249,8 @@ class TestCircularApertureOTFPerturber:
             mtf_weights=mtf_weights,
         )
         for i in configuration_test_helper(inst):
+            assert i.mtf_wavelengths is not None
+            assert i.mtf_weights is not None
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
             if i.sensor:

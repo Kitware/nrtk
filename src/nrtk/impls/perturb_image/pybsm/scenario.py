@@ -74,6 +74,7 @@ class PybsmScenario(Configurable):
         background_temperature: float = 293.0,
         ha_wind_speed: float = 21.0,
         cn2_at_1m: float = 1.7e-14,
+        interp: bool = False,
     ) -> None:
         """Initializes a PybsmScenario instance with the specified configuration parameters.
 
@@ -118,6 +119,9 @@ class PybsmScenario(Configurable):
                 the refractive index structure parameter "near the ground"
                 (e.g. at h = 1 m) used to calculate the turbulence profile; the
                 default, 1.7e-14, is the HV 5/7 profile value
+            interp:
+                A flag to indicate whether atmospheric interpolation should be used.
+                Defaults to False.
 
         Raises:
             :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
@@ -150,6 +154,7 @@ class PybsmScenario(Configurable):
         self.background_temperature = background_temperature
         self.ha_wind_speed = ha_wind_speed
         self.cn2_at_1m = cn2_at_1m
+        self.interp = interp
 
     def __str__(self) -> str:
         """Returns the provided name as the string representation.
@@ -178,6 +183,7 @@ class PybsmScenario(Configurable):
             ihaze=self.ihaze,
             altitude=self.altitude,
             ground_range=self.ground_range,
+            interp=self.interp,
         )
         S.aircraft_speed = self.aircraft_speed
         S.target_reflectance = self.target_reflectance
@@ -211,6 +217,7 @@ class PybsmScenario(Configurable):
             "background_temperature": self.background_temperature,
             "ha_wind_speed": self.ha_wind_speed,
             "cn2_at_1m": self.cn2_at_1m,
+            "interp": self.interp,
         }
 
     @classmethod

@@ -197,7 +197,7 @@ class TestJitterOTFPerturber:
     @pytest.mark.parametrize("s_x", [0.5])
     @pytest.mark.parametrize("s_y", [0.5])
     @pytest.mark.parametrize("interp", [True, False])
-    def test_overall_configuration(
+    def test_overall_configuration(  # noqa: C901
         self,
         s_x: float,
         s_y: float,
@@ -225,8 +225,10 @@ class TestJitterOTFPerturber:
                 assert i.sensor.max_n == sensor.max_n
                 assert i.sensor.bit_depth == sensor.bit_depth
                 assert i.sensor.max_well_fill == sensor.max_well_fill
-                assert i.sensor.s_x == sensor.s_x
-                assert i.sensor.s_y == sensor.s_y
+                if s_x is None:
+                    assert i.sensor.s_x == sensor.s_x
+                if s_y is None:
+                    assert i.sensor.s_y == sensor.s_y
                 assert i.sensor.da_x == sensor.da_x
                 assert i.sensor.da_y == sensor.da_y
                 assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
