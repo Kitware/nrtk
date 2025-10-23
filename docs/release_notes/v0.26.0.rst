@@ -1,0 +1,82 @@
+0.26.0
+======
+
+This release focuses on expanding T&E and saliency documentation, improving PyBSM integration and performance, adding
+Python 3.13 support, and refactoring internal utilities for better consistency and maintainability. Several fixes
+address documentation, naming, and floating-point precision issues.
+
+Updates
+-------
+
+**Documentation and Guides**
+
+* Added a T&E guide and notebook demonstrating use of the ``JitterOTFPerturber`` to simulate camera motion jitter.
+
+* Added a How-To guide for saliency maps in an object detection workflow.
+
+* Revamped the Sphinx docs landing page using the ``sphinx-design`` extension.
+
+* Updated pre-commit hook configuration to format markdown tables.
+
+* Fixed broken documentation links.
+
+**Pybsm and Perturber Improvements**
+
+* Introduced new ABC PybsmOTFPerturber to improve code quality across PyBSM perturbers.
+
+* All OTF calculations now performed entirely within PyBSM.
+
+* PyBSM now caches the PSF to improve performance across multiple perturbations.
+
+* Added default configuration support in ``src/nrtk/impls/perturb_image/pybsm/utils.py``.
+
+* Added ``docs/examples/pybsm/data/uav_default_config_nrtk.json`` and the corresponding
+  example notebook ``pybsm_default_config.ipynb``.
+
+* Replaced OpenCV calls in PyBSM perturbers with SciPy equivalents.
+
+* Fixed bug where sensor jitter amplitudes were not passed to PyBSM perturbers.
+
+
+**Perturber Interface and Regression Testing**
+
+Added ``RandomScalePerturber``.
+
+``additional_params`` in ``PerturbImage.perturb`` is now treated as ``**kwargs``.
+
+Non-PyBSM perturbers now use ``PSNRImageSnapshotExtension`` for regression testing.
+
+PyBSM perturbers now use the PSNR regression testing module.
+
+**Internal Refactoring and Consistency**
+
+* Added lazy importing to all ``__init__.py`` files.
+
+* Added ``__all__`` declarations and ``from . import ...`` statements across all modules.
+
+* Removed ``xaitk-jatic`` from NRTK dependencies and extras.
+
+* Removed OpenCV dependency from ``WaterDropletPerturber``.
+
+* Updated ``WaterDropletPerturber.__init__`` to use a default seed of 1.
+
+* Removed ``water_droplet_utils.py`` (moved helper function to ``water_droplet_perturber``).
+
+* Moved custom Syrupy extension fixtures to ``conftest.py`` for reuse and improved readability of fuzzy comparator.
+
+* Added Python 3.13 support.
+
+**Math and Utility Updates**
+
+* Updated ``ccw_sort`` to use ``numpy.float128`` arrays.
+
+* Updated ``WaterDropletPerturber``'s ``get_bezier_curve`` to include a tolerance parameter (default ``1e-8``) for
+  floating-point comparisons.
+
+* Updated snapshots for ``WaterDropletPerturber``'s ``test_ccw_sort`` and ``test_regression_get_bezier_curve``.
+
+**Compatibility and Naming**
+
+* Renamed ``linspace_step`` module to ``linspace`` to match class name.
+
+* Fixed diffusion pipeline loader compatibility with ``transformers>=4.55``.
