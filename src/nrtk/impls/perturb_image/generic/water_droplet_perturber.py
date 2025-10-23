@@ -17,11 +17,11 @@ https://www.cvlibs.net/publications/Roser2010ACCVWORK.pdf
 
 Classes:
     WaterDropletPerturber: Implements the physics-based, photorealistic
-    water/rain droplet model, utilizing OpenCV and Shapely functionalities.
+    water/rain droplet model, utilizing Scipy, Shapely, and GeoPandas functionalities.
 
 Dependencies:
-    - OpenCV for image processing.
-    - Shapely for Curve generation related operations.
+    - Scipy for image processing.
+    - Shapely and GeoPandas for Curve generation related operations.
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
 Example usage:
@@ -36,6 +36,8 @@ Notes:
 
 from __future__ import annotations
 
+__all__ = ["WaterDropletPerturber"]
+
 import copy
 import math
 from collections.abc import Hashable, Iterable, Sequence
@@ -47,21 +49,97 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import WaterDropletImportError
 from nrtk.utils._import_guard import import_guard
 
-scipy_available: bool = import_guard("scipy", WaterDropletImportError)
-cv2_available: bool = import_guard("cv2", WaterDropletImportError)
+scipy_available: bool = import_guard("scipy", WaterDropletImportError, ["special", "ndimage"])
 shapely_available: bool = import_guard("shapely", WaterDropletImportError, ["geometry"])
 geopandas_available: bool = import_guard("geopandas", WaterDropletImportError)
-import cv2  # noqa: E402
 import geopandas  # noqa: E402
 import numpy as np  # noqa: E402
-import scipy  # noqa: F401, E402
+from scipy.ndimage import gaussian_filter  # noqa: E402
+from scipy.special import binom  # noqa: E402
 from shapely.geometry import Polygon  # noqa: E402
 from smqtk_image_io.bbox import AxisAlignedBoundingBox  # noqa: E402
 
-from nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils import (  # noqa: E402
-    get_bezier_curve,
-    get_random_points_within_min_dist,
-)
+
+class Bezier:
+    """Class that computes the Bezier curve based on the segment information.
+
+    Each curve is made of a series of segments that are initialized by the
+    input points, angles, target radius and number of points needed for the
+    Bezier interpolation.
+    """
+
+    def __init__(
+        self,
+        p1: np.ndarray[Any, Any],
+        p2: np.ndarray[Any, Any],
+        angle1: float,
+        angle2: float,
+        r: float = 0.3,
+        num_points: int = 100,
+    ) -> None:
+        """Define segment parameters - points, angles, radius."""
+        self.p1 = p1
+        self.p2 = p2
+        self.angle1 = angle1
+        self.angle2 = angle2
+        self.r = r
+        self.num_points = num_points
+        self._calc_intermediate_points()
+
+    def _calc_intermediate_points(self) -> None:
+        d = np.sqrt(np.sum((self.p2 - self.p1) ** 2))
+        p = np.zeros((4, 2))
+        p[0, :] = self.p1[:]
+        p[3, :] = self.p2[:]
+        p[1, :] = self.p1 + np.array([self.r * d * np.cos(self.angle1), self.r * d * np.sin(self.angle1)])
+        p[2, :] = self.p2 + np.array(
+            [self.r * d * np.cos(self.angle2 + np.pi), self.r * d * np.sin(self.angle2 + np.pi)],
+        )
+        self.p = p
+
+    def get_curve(self) -> np.ndarray[Any, Any]:
+        """Returns curve information."""
+        return self.bezier()
+
+    def bezier(self) -> np.ndarray[Any, Any]:
+        """Draw Bézier curve by interpolating segments based on the Bernstein basis poynomial function.
+
+        The Bezier curve equation is derived by combining the Bernstein basis polynomials with the control points:
+            B(t) =  ∑(i=0 to n) B(i, n)(t) * P(i)
+        """
+
+        def _bernstein(n: int, k: int, t: np.ndarray) -> np.ndarray:
+            """Bernstein basis polynomial function.
+
+            Defined as: B(k, n)(t) = (n! / (k! * (n-k)!)) * t^k * (1 - t)^(n - k)
+
+            n is the degree of the curve
+            k is the index of the control point
+            t is a parameter that varies from 0 to 1, defining the position along the curve.
+
+            For n=2, the Bernstein polynomials are:
+            - B(0, 2)(t) = (1 - t)^2
+            - B(1, 2)(t) = 2t(1 - t)
+            - B(2, 2)(t) = t^2
+
+            For n=3, the Bernstein polynomials are:
+            - B(0, 3)(t) = (1 - t)^3
+            - B(1, 3)(t) = 3t(1 - t)^2
+            - B(2, 3)(t) = 3t^2(1 - t)
+            - B(3, 3)(t) = t^3.
+
+            """
+            return binom(n, k) * t**k * (1.0 - t) ** (n - k)
+
+        n = len(self.p)
+        t = np.linspace(0, 1, num=self.num_points)
+        curve = np.zeros((self.num_points, 2))
+        for i in range(n):
+            curve += np.outer(
+                _bernstein(n=n - 1, k=i, t=t),
+                self.p[i],
+            )
+        return curve
 
 
 class WaterDropletPerturber(PerturbImage):
@@ -102,7 +180,7 @@ class WaterDropletPerturber(PerturbImage):
         n_water: float = 1.33,
         f_x: int = 400,
         f_y: int = 400,
-        seed: int | None = None,
+        seed: int | None = 1,
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
@@ -140,8 +218,8 @@ class WaterDropletPerturber(PerturbImage):
             seed = None
 
         Raises:
-            :raises ImportError: If OpenCV, Scipy or Shapely is not found, install via
-                `pip install nrtk[waterdroplet,graphics]` or `pip install nrtk[waterdroplet,headless]`.
+            :raises ImportError: If Scipy, Shapely or GeoPandas is not found,
+            install via `pip install nrtk[waterdroplet]`.
         """
         if not self.is_usable():
             raise WaterDropletImportError
@@ -173,6 +251,91 @@ class WaterDropletPerturber(PerturbImage):
         self.g_radius = list()
         self.centers = list()
         self.radius = list()
+
+    @staticmethod
+    def ccw_sort(points: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+        """Sorts points in counterclockwise order around a center point."""
+        # Subtract original point from center point (position obtained
+        # by calculating the mean)
+        points128 = points.astype(np.float128)
+        d = points128 - np.mean(points128, axis=0)
+        # Use atan2 to determine the angle taking into account the correct quadrant
+        s = np.arctan2(d[:, 0], d[:, 1])
+        # Return the sorted array of points.
+        return points[np.argsort(s), :]
+
+    @staticmethod
+    def get_bezier_curve(
+        points: np.ndarray[Any, Any],
+        rad: float = 0.2,
+        edgy: float = 0.0,
+        tol: float = 1e-8,
+    ) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
+        """Given an array of *points*, create a curve through those points.
+
+        *rad* is a number between 0 and 1 to steer the distance of
+            control points.
+        *edgy* is a parameter which controls how "edgy" the curve is,
+            edgy=0 is smoothest.
+        *tol* is a parameter which controls the tolerance used when
+            comparing angles. Default is 1e-8.
+        """
+        p = np.arctan(edgy) / np.pi + 0.5
+        points = WaterDropletPerturber.ccw_sort(points)
+        points = np.append(points, np.atleast_2d(points[0, :]), axis=0)
+        d = np.diff(points, axis=0)
+        ang = np.arctan2(d[:, 1], d[:, 0])
+
+        def _threshold_angle(ang: np.ndarray) -> np.ndarray:
+            return (ang >= 0) * ang + (ang < 0) * (ang + 2 * np.pi)
+
+        ang = _threshold_angle(ang)
+        ang1 = ang
+        ang2 = np.roll(ang, 1)
+        ang = p * ang1 + (1 - p) * ang2 + (np.abs(ang2 - ang1) > (np.pi + tol)) * np.pi
+        ang = np.append(ang, [ang[0]])
+        points = np.append(points, np.atleast_2d(ang).T, axis=1)
+
+        def _get_curve(points: np.ndarray, r: float) -> np.ndarray:
+            """Get the segments and curve data."""
+            segments = list()
+            for i in range(len(points) - 1):
+                seg = Bezier(
+                    points[i, :2],
+                    points[i + 1, :2],
+                    points[i, 2],
+                    points[i + 1, 2],
+                    r,
+                )
+                segments.append(seg.get_curve())
+
+            return np.concatenate(segments)
+
+        c = _get_curve(points=points, r=rad)
+        x, y = c.T
+        return x, y
+
+    @staticmethod
+    def get_random_points_within_min_dist(
+        rng: np.random.Generator,
+        n: int = 5,
+        scale: float = 0.8,
+        min_dst: float | None = None,
+        recursive: int = 0,
+    ) -> np.ndarray[Any, Any]:
+        """Function to create *n* random points in the unit square, which are *min_dst* apart, then scale them."""
+        min_dst = min_dst or 0.7 / n
+        points = rng.random((n, 2))
+        d = np.sqrt(np.sum(np.diff(WaterDropletPerturber.ccw_sort(points), axis=0), axis=1) ** 2)
+        if np.all(d >= min_dst) or recursive >= 200:
+            return points * scale
+        return WaterDropletPerturber.get_random_points_within_min_dist(
+            rng,
+            n=n,
+            scale=scale,
+            min_dst=min_dst,
+            recursive=recursive + 1,
+        )
 
     def _to_glass(
         self,
@@ -336,14 +499,14 @@ class WaterDropletPerturber(PerturbImage):
                 enclosed_points = list()
                 for c in pts_lst:
                     points = (
-                        get_random_points_within_min_dist(
+                        WaterDropletPerturber.get_random_points_within_min_dist(
                             rng,
                             n=n,
                             scale=scale,
                         )
                         + c[0:2]
                     )
-                    x, y = get_bezier_curve(
+                    x, y = WaterDropletPerturber.get_bezier_curve(
                         points=points,
                         rad=rad,
                         edgy=edgy,
@@ -531,37 +694,49 @@ class WaterDropletPerturber(PerturbImage):
         blur_back = copy.deepcopy(rain_image)
         blur_values = [w / 40, w / 60]
         blur_values_adj = [int(np.floor(val / 2) * 2 + 1) for val in blur_values]
-        blur_image = cv2.GaussianBlur(
-            blur_image,
-            (blur_values_adj[0], blur_values_adj[0]),
-            w / 150,
-        )
+
+        blur_image = self._apply_gaussian(image=blur_image, sigma=w / 150, ksize=blur_values_adj[0])
 
         # Blur the background of the image using the desired blur strength
-        blur_back = cv2.GaussianBlur(blur_back, (7, 7), 1.5)
-        blur_back = cv2.addWeighted(
-            blur_back,
-            self.blur_strength,
-            rain_image,
-            1 - self.blur_strength,
-            0,
-        )
+        blur_back = self._apply_gaussian(image=blur_back, sigma=1.5, ksize=7)
+
+        blur_back = self.blur_strength * blur_back + (1 - self.blur_strength) * rain_image
         # Blur mask to help make the boundaries of the droplets appear "fuzzier"
-        mask = cv2.GaussianBlur(
-            mask,
-            (blur_values_adj[1], blur_values_adj[1]),
-            w / 125,
-        )
+        mask = self._apply_gaussian(image=mask, sigma=w / 125, ksize=blur_values_adj[1])
+
         blur_image[mask == 0] = blur_back[mask == 0]
 
         return blur_image
+
+    def _apply_gaussian(self, image: np.ndarray[Any, Any], sigma: float, ksize: int) -> np.ndarray[Any, Any]:
+        truncate = (ksize - 1) / 2 / sigma
+        if image.ndim == 2:
+            # Grayscale
+            blurred = gaussian_filter(
+                image.astype(np.float64),
+                sigma=sigma,
+                truncate=truncate,
+                mode="grid-wrap",
+            )
+        else:
+            # Color image – apply Gaussian to each channel independently
+            blurred = np.empty_like(image, dtype=np.float64)
+            for c in range(image.shape[2]):
+                blurred[..., c] = gaussian_filter(
+                    image[..., c].astype(np.float64),
+                    sigma=sigma,
+                    truncate=truncate,
+                    mode="grid-wrap",
+                )
+
+        return blurred.astype(image.dtype)
 
     @override
     def perturb(
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Applies the Water Droplet perturbation effect to the provided input image.
 
@@ -571,13 +746,17 @@ class WaterDropletPerturber(PerturbImage):
             boxes:
                 Bounding boxes for source detections.
             additional_params:
-                Additional parameters, if applicable.
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
                 The perturbed image and bounding boxes scaled to perturbed image shape.
         """
         image, boxes = super().perturb(image=image, boxes=boxes)
+
+        # Reset RNG state when seed is provided to ensure deterministic results across multiple calls
+        if self.seed is not None:
+            self._initialize_derived_parameters()
 
         rain_image, mask = self.render(image=image)
         perturbed_image = self.blur(
@@ -618,9 +797,9 @@ class WaterDropletPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (OpenCV, Scipy and Shapely) are available.
+        """Checks if the necessary dependencies (Scipy, Shapely and GeoPandas) are available.
 
         Returns:
-            :return bool: True if OpenCV, Scipy and Shapely are available.
+            :return bool: True if Scipy, Shapely and GeoPandas are available.
         """
-        return cv2_available and scipy_available and shapely_available and geopandas_available
+        return scipy_available and shapely_available and geopandas_available

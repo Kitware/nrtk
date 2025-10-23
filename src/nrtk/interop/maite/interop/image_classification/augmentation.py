@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["JATICClassificationAugmentation", "JATICClassificationAugmentationWithMetric"]
+
 import copy
 from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING
@@ -67,7 +69,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
         for img, ann, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
             aug_img = np.transpose(np.asarray(copy.deepcopy(img)), (1, 2, 0))  # Convert to channels-last
-            aug_img, _ = self.augment(aug_img, additional_params=dict(md))
+            aug_img, _ = self.augment(aug_img, boxes=None, **dict(md))
             if aug_img.ndim > 2:
                 # Convert back to channels first
                 aug_img = np.transpose(aug_img, (2, 0, 1))

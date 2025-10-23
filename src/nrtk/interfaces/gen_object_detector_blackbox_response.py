@@ -23,6 +23,8 @@ Example usage:
     item_response, scores = generator.generate(factories, detector, scorer, img_batch_size=4, verbose=True)
 """
 
+__all__ = []
+
 import abc
 from collections.abc import Hashable, Sequence
 from contextlib import nullcontext
@@ -105,7 +107,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
                     perturbed = image.copy()
 
                     for perturber in perturbers:
-                        perturbed, _ = perturber(perturbed, additional_params=extra)
+                        perturbed, _ = perturber(perturbed, **extra)
 
                     batch_images.append(perturbed)
                     batch_gt.append(actual)

@@ -14,6 +14,8 @@ Example usage:
     scores = scorer.score(actual_detections, predicted_detections)
 """
 
+__all__ = ["ClassAgnosticPixelwiseIoUScorer"]
+
 # standard library imports
 from collections.abc import Hashable, Sequence
 from typing import Any

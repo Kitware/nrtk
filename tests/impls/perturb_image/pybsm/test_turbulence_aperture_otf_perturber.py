@@ -8,10 +8,8 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import numpy as np
-import pybsm.radiance as radiance
 import pytest
 from PIL import Image
-from pybsm.utils import load_database_atmosphere
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
@@ -19,21 +17,13 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import (
     TurbulenceApertureOTFPerturber,
 )
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import (
-    TIFFImageSnapshotExtension,
-    create_sample_sensor_and_scenario,
-)
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
-
-
-@pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
+@pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestTurbulenceApertureOTFPerturber:
     @pytest.mark.parametrize(
         (
@@ -122,9 +112,9 @@ class TestTurbulenceApertureOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
 
-        pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, additional_params=img_md)
+        pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, **img_md)
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "additional_params", "expectation"),
@@ -132,8 +122,8 @@ class TestTurbulenceApertureOTFPerturber:
             (True, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 True,
-                None,
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                dict(),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided"),
             ),
             (False, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
         ],
@@ -152,7 +142,7 @@ class TestTurbulenceApertureOTFPerturber:
         perturber = TurbulenceApertureOTFPerturber(sensor=sensor, scenario=scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(img, additional_params=additional_params)
+            _ = perturber.perturb(img, **additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "expectation"),
@@ -244,6 +234,9 @@ class TestTurbulenceApertureOTFPerturber:
         interp: bool,
     ) -> None:
         """Test configuration stability."""
+        import pybsm.radiance as radiance
+        from pybsm.utils import load_database_atmosphere
+
         sensor = None
         scenario = None
         wavelengths = np.asarray([])
@@ -348,7 +341,8 @@ class TestTurbulenceApertureOTFPerturber:
 
             if i.sensor is not None and sensor is not None:
                 assert i.sensor.name == sensor.name
-                assert i.sensor.D == sensor.D
+                if D is None:
+                    assert i.sensor.D == sensor.D
                 assert i.sensor.f == sensor.f
                 assert i.sensor.p_x == sensor.p_x
                 assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
@@ -370,7 +364,6 @@ class TestTurbulenceApertureOTFPerturber:
                 assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
                 assert np.array_equal(i.sensor.qe, sensor.qe)
             else:
-                assert i.sensor is None
                 assert sensor is None
 
             if i.scenario is not None and scenario is not None:
@@ -378,15 +371,16 @@ class TestTurbulenceApertureOTFPerturber:
                 assert i.scenario.ihaze == scenario.ihaze
                 assert i.scenario.altitude == scenario.altitude
                 assert i.scenario.ground_range == scenario.ground_range
-                assert i.scenario.aircraft_speed == scenario.aircraft_speed
+                if aircraft_speed is None:
+                    assert i.scenario.aircraft_speed == scenario.aircraft_speed
                 assert i.scenario.target_reflectance == scenario.target_reflectance
                 assert i.scenario.target_temperature == scenario.target_temperature
                 assert i.scenario.background_reflectance == scenario.background_reflectance
                 assert i.scenario.background_temperature == scenario.background_temperature
-                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
+                if ha_wind_speed is None:
+                    assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
             else:
-                assert i.scenario is None
                 assert scenario is None
 
     @pytest.mark.parametrize(
@@ -418,7 +412,7 @@ class TestTurbulenceApertureOTFPerturber:
     )
     def test_regression(
         self,
-        tiff_snapshot: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         mtf_wavelengths: Sequence[float] | None,
         mtf_weights: Sequence[float] | None,
@@ -460,8 +454,8 @@ class TestTurbulenceApertureOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-        tiff_snapshot.assert_match(out_img)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",
@@ -477,7 +471,7 @@ class TestTurbulenceApertureOTFPerturber:
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = TurbulenceApertureOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
 
@@ -486,5 +480,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not TurbulenceApertureOTFPerturber.is_usable()
-    with pytest.raises(PyBSMAndOpenCVImportError):
+    with pytest.raises(PyBSMImportError):
         TurbulenceApertureOTFPerturber()

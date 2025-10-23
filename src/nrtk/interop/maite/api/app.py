@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["handle_post"]
+
 from collections.abc import Callable
 from pathlib import Path
 

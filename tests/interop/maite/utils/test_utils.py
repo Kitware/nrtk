@@ -19,11 +19,9 @@ class ResizePerturber(PerturbImage):
         self,
         image: np.ndarray,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        **_: Any,
     ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Resize image."""
-        if additional_params is None:
-            additional_params = {}
         img = Image.fromarray(image)
         img = img.resize((self.w, self.h))
         img = np.array(img)

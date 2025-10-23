@@ -27,9 +27,11 @@ Note:
 
 from __future__ import annotations
 
+__all__ = ["DiffusionPerturber"]
+
 import warnings
 from collections.abc import Hashable, Iterable
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
@@ -37,32 +39,26 @@ from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import DiffusionImportError
+from nrtk.utils._import_guard import import_guard
 
-if TYPE_CHECKING:  # pragma: no cover
-    import torch
-    from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (
-        StableDiffusionInstructPix2PixPipeline,
-    )
-    from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler
-    from PIL.Image import Image, Resampling, fromarray
-
-try:
-    import torch
-    from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (
-        StableDiffusionInstructPix2PixPipeline,
-    )
-    from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler
-
-    diffusion_available: bool = True
-except ImportError:  # pragma: no cover
-    diffusion_available: bool = False
-
-try:
-    from PIL.Image import Image, Resampling, fromarray
-
-    pillow_available: bool = True
-except ImportError:  # pragma: no cover
-    pillow_available: bool = False
+torch_available: bool = import_guard("torch", DiffusionImportError, fake_spec=True)
+transformers_available: bool = import_guard("transformers", DiffusionImportError)
+diffusion_available: bool = import_guard(
+    "diffusers",
+    DiffusionImportError,
+    [
+        "pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix",
+        "schedulers.scheduling_euler_ancestral_discrete",
+    ],
+)
+pillow_available: bool = import_guard("PIL", DiffusionImportError, ["Image"])
+import torch  # noqa: E402
+from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (  # noqa: E402
+    StableDiffusionInstructPix2PixPipeline,
+)
+from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler  # noqa: E402
+from PIL.Image import Image, Resampling, fromarray  # noqa: E402
+from transformers import CLIPTextModel  # noqa: E402
 
 
 class DiffusionPerturber(PerturbImage):
@@ -160,25 +156,81 @@ class DiffusionPerturber(PerturbImage):
 
     def _get_pipeline(self) -> StableDiffusionInstructPix2PixPipeline:
         """Get or initialize the diffusion pipeline."""
-        if self._pipeline is None:
-            try:
-                self._pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
-                    self.model_name,
-                    safety_checker=None,
-                )
-                # Cast to help type checker understand pipeline is not None
-                self._pipeline = cast(StableDiffusionInstructPix2PixPipeline, self._pipeline)
+        if self._pipeline is not None:
+            return self._pipeline
 
-                device = self._get_device()
-                self._pipeline = self._pipeline.to(device)
+        device = self._get_device()
 
-                self._warn_on_cpu_fallback(device)
+        try:
+            # First attempt: standard load, disable low-CPU path to reduce kwargs forwarding
+            self._pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
+                self.model_name,
+                safety_checker=None,
+                low_cpu_mem_usage=False,
+                torch_dtype=torch.float32,
+            )
+        except TypeError as te:
+            # transformers>=4.55 can inject `offload_state_dict` into CLIPTextModel.__init__
+            # via a weights_only=True default in the sub-loader. If so, take control of the
+            # text encoder load and set weights_only=False explicitly.
+            if "offload_state_dict" not in str(te):
+                # Unknown TypeError path; bubble it up wrapped.
+                raise RuntimeError(
+                    f"Failed to load diffusion model '{self.model_name}': {te}",
+                ) from te
 
-                self._pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(self._pipeline.scheduler.config)
-            except Exception as e:
-                raise RuntimeError(f"Failed to load diffusion model '{self.model_name}': {e}") from e
+            text_encoder = self._get_text_encoder()
+
+            self._pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
+                self.model_name,
+                safety_checker=None,
+                low_cpu_mem_usage=False,
+                text_encoder=text_encoder,  # let diffusers load tokenizer itself
+                torch_dtype=torch.float32,
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to load diffusion model '{self.model_name}': {e}",
+            ) from e
+
+        self._finalize_pipeline(device)
 
         return self._pipeline
+
+    def _get_text_encoder(self) -> CLIPTextModel:
+        # Most SD repos store the text encoder in a `text_encoder/` subfolder.
+        try:
+            text_encoder = CLIPTextModel.from_pretrained(
+                self.model_name,
+                subfolder="text_encoder",
+                low_cpu_mem_usage=False,
+                weights_only=False,
+            )
+        except (OSError, ValueError, RuntimeError):
+            # Fallback: load without subfolder if layout differs.
+            text_encoder = CLIPTextModel.from_pretrained(
+                self.model_name,
+                low_cpu_mem_usage=False,
+                weights_only=False,
+            )
+
+        return text_encoder
+
+    def _finalize_pipeline(self, device: str) -> None:
+        self._pipeline = cast(StableDiffusionInstructPix2PixPipeline, self._pipeline)
+        self._pipeline = self._pipeline.to(device)
+
+        # keep most of the pipeline in fp16, but run the CLIP image encoder in fp32
+        if hasattr(self._pipeline, "image_encoder") and self._pipeline.image_encoder is not None:
+            self._pipeline.image_encoder = self._pipeline.image_encoder.to(
+                device=self._get_device(),
+                dtype=torch.float32,
+            )
+
+        self._warn_on_cpu_fallback(device)
+        self._pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(
+            self._pipeline.scheduler.config,
+        )
 
     def _resize_image(self, image: Image) -> Image:
         """Resize image for Stable Diffusion with proper dimensions.
@@ -217,7 +269,7 @@ class DiffusionPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Generate a prompt-guided perturbed image using diffusion models.
 
@@ -230,7 +282,7 @@ class DiffusionPerturber(PerturbImage):
                 Input is automatically converted to RGB for processing.
             boxes: Optional iterable of tuples containing AxisAlignedBoundingBox objects
                 and their corresponding detection confidence dictionaries.
-            additional_params: Optional dictionary for future extensibility (currently unused).
+            additional_params: Additional perturbation keyword arguments (currently unused).
 
         Returns:
             A tuple containing:
@@ -243,9 +295,6 @@ class DiffusionPerturber(PerturbImage):
         """
         if self.prompt == "do not change the image":
             return image, boxes
-
-        if additional_params is None:
-            additional_params = {}
 
         try:
             pil_image = fromarray(image).convert("RGB")
@@ -304,4 +353,4 @@ class DiffusionPerturber(PerturbImage):
         Returns:
             True if torch, diffusers, and PIL are all available; False otherwise.
         """
-        return diffusion_available and pillow_available
+        return torch_available and diffusion_available and pillow_available

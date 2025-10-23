@@ -22,6 +22,8 @@ Example:
     scores = scorer(actual_detections, predicted_detections)
 """
 
+__all__ = []
+
 import abc
 from collections.abc import Hashable, Sequence
 from typing import Any

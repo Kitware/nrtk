@@ -25,12 +25,7 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls import DATA_DIR
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.test_utils import CustomFloatSnapshotExtension, DummyPerturber
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
+from tests.test_utils import DummyPerturber
 
 
 class TestStepPerturbImageFactory:
@@ -261,7 +256,7 @@ class TestStepPerturbImageFactory:
     )
     def test_perturb_instance_modification(
         self,
-        snapshot_custom: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         perturber: type[PerturbImage],
         modifying_param: str,
         modifying_val: float,
@@ -287,6 +282,6 @@ class TestStepPerturbImageFactory:
                 perturb=perturber_inst,
                 image=img,
                 expected=None,
-                additional_params=img_md,
+                **img_md,
             )
-            snapshot_custom.assert_match(out_img)
+            psnr_tiff_snapshot.assert_match(out_img)

@@ -82,6 +82,6 @@ class TestNRTKPerturberPyBSM:
 
         with pytest.raises(
             ValueError,
-            match="'img_gsd' must be present in image metadata for this perturber",
+            match="'img_gsd' must be provided for this perturber",
         ):
             _ = nrtk_perturber(maite_dataset=dataset, perturber_factory=pybsm_factory)

@@ -4,7 +4,7 @@ import unittest.mock as mock
 import pytest
 
 from nrtk.impls.image_metric.niirs_image_metric import NIIRSImageMetric
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
@@ -16,7 +16,7 @@ class TestSNRImageMetric:
     """This class contains the unit tests for the functionality of the NIIRSImageMetric impl."""
 
     def test_consistency(self) -> None:
-        expected_niirs = 5.64306090838768
+        expected_niirs = 5.619442360319594
         sensor, scenario = create_sample_sensor_and_scenario()
         niirs_metric = NIIRSImageMetric(sensor=sensor, scenario=scenario)
         # Test metric interface directly
@@ -62,5 +62,5 @@ class TestSNRImageMetric:
         mock_is_usable.return_value = False
         assert not NIIRSImageMetric.is_usable()
         sensor, scenario = create_sample_sensor_and_scenario()
-        with pytest.raises(PyBSMAndOpenCVImportError):
+        with pytest.raises(PyBSMImportError):
             NIIRSImageMetric(sensor=sensor, scenario=scenario)

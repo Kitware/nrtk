@@ -14,7 +14,7 @@ The following table provides a summary of risk factors. Where applicable, a T&E 
 listed as well as functionality from NRTK that can be used to simulate the operational risk.
 
 Some of these perturbation functions are not implemented in NRTK directly but can be simulated using the generic
-`Albumentations perturber <_implementations/nrtk.impls.perturb_image.generic.albumentations_perturber.rst>`__ which
+:doc:`Albumentations perturber <_implementations/nrtk.impls.perturb_image.generic.albumentations_perturber>` which
 provides a wrapper around functionality of the `Albumentations <https://albumentations.ai/>`__ library.
 Some of the risk factors listed don't have any associated functionality or documentation in NRTK but may be covered in
 the future.
@@ -22,11 +22,11 @@ the future.
 +---------------------------------+--------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------+
 | Risk Factor                     | Related Function in NRTK                                                                         | T&E Guide                                                                     |
 +=================================+==================================================================================================+===============================================================================+
-| :ref:`high-frequency-vibration` | :ref:`JitterOTFPerturber`                                                                        | \-                                                                            |
+| :ref:`high-frequency-vibration` | :ref:`JitterOTFPerturber`                                                                        | `View notebook <examples/maite/nrtk_jitter_perturber_demo.html>`__            |
 +---------------------------------+--------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------+
 | :ref:`target-out-of-focus`      | :ref:`DefocusOTFPerturber`                                                                       | `View notebook <examples/maite/nrtk_focus_perturber_demo.html>`__             |
 +---------------------------------+--------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------+
-| :ref:`noise-and-resolution`     | :ref:`PybsmSensor`                                                                               | `View notebook <examples/maite/nrtk_sensor_transofmration_demo.html>`__       |
+| :ref:`noise-and-resolution`     | :ref:`PybsmSensor`                                                                               | `View notebook <examples/maite/nrtk_sensor_transformation_demo.html>`__       |
 +---------------------------------+--------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------+
 | :ref:`lens-contamination`       | `Spatter (Albumentations) <https://explore.albumentations.ai/transform/Spatter>`__               | \-                                                                            |
 +---------------------------------+--------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------+

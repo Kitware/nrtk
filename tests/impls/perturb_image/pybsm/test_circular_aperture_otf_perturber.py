@@ -17,25 +17,13 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber import (
     CircularApertureOTFPerturber,
 )
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
-
-EXPECTED_DEFAULT_IMG_FILE_PATH = (
-    "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_default_expected_output.tiff"
-)
-EXPECTED_PROVIDED_IMG_FILE_PATH = (
-    "./tests/impls/perturb_image/pybsm/data/circular_aperture_otf_provided_expected_output.tiff"
-)
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
-
-
-@pytest.mark.skipif(not CircularApertureOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
+@pytest.mark.skipif(not CircularApertureOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestCircularApertureOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -49,58 +37,15 @@ class TestCircularApertureOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
-
-    @pytest.mark.parametrize(
-        ("interp"),
-        [
-            (True, False),
-        ],
-    )
-    def test_provided_consistency(
-        self,
-        interp: bool,
-    ) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE_PATH))
-        img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
-        # Test perturb interface directly
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=interp)
-        pybsm_perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-        # Test callable
-        pybsm_perturber_assertions(
-            perturb=CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=interp),
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-    def test_default_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE_PATH))
-        # Test perturb interface directly
-        inst = CircularApertureOTFPerturber()
-        pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected, tol=1e-2)
-
-        # Test callable
-        pybsm_perturber_assertions(perturb=CircularApertureOTFPerturber(), image=image, expected=expected, tol=1e-2)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "interp"),
@@ -131,13 +76,13 @@ class TestCircularApertureOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     def test_default_reproducibility(self) -> None:
@@ -154,7 +99,7 @@ class TestCircularApertureOTFPerturber:
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 {},
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided"),
             ),
         ],
     )
@@ -168,7 +113,7 @@ class TestCircularApertureOTFPerturber:
         perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "interp", "expectation"),
@@ -223,7 +168,7 @@ class TestCircularApertureOTFPerturber:
         perturber = CircularApertureOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights"),
@@ -239,6 +184,8 @@ class TestCircularApertureOTFPerturber:
         """Test configuration stability."""
         inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights)
         for i in configuration_test_helper(inst):
+            assert i.mtf_wavelengths is not None
+            assert i.mtf_weights is not None
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
 
@@ -302,6 +249,8 @@ class TestCircularApertureOTFPerturber:
             mtf_weights=mtf_weights,
         )
         for i in configuration_test_helper(inst):
+            assert i.mtf_wavelengths is not None
+            assert i.mtf_weights is not None
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
             if i.sensor:
@@ -354,7 +303,7 @@ class TestCircularApertureOTFPerturber:
     )
     def test_regression(
         self,
-        tiff_snapshot: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         mtf_wavelengths: Sequence[float] | None,
         mtf_weights: Sequence[float] | None,
@@ -380,9 +329,9 @@ class TestCircularApertureOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
 
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",
@@ -398,7 +347,7 @@ class TestCircularApertureOTFPerturber:
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = CircularApertureOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
 
@@ -407,5 +356,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not CircularApertureOTFPerturber.is_usable()
-    with pytest.raises(PyBSMAndOpenCVImportError):
+    with pytest.raises(PyBSMImportError):
         CircularApertureOTFPerturber()

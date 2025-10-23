@@ -7,6 +7,8 @@ diffusion:
 - diffusers
 - accelerate
 - Pillow
+- transformers
+- protobuf
 graphics:
 - opencv-python
 headless:
@@ -29,7 +31,6 @@ notebook-testing:
 - ultralytics
 - jupytext
 - albumentations
-- xaitk-jatic
 pybsm:
 - pybsm
 scikit-image:

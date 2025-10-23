@@ -22,6 +22,8 @@ Example:
 
 from __future__ import annotations
 
+__all__ = ["RandomScorer"]
+
 from collections.abc import Hashable, Sequence
 from typing import Any
 

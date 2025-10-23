@@ -138,6 +138,7 @@ class TestApp:
                     "background_temperature": 293.0,
                     "ha_wind_speed": 21.0,
                     "cn2_at_1m": 0,
+                    "interp": False,
                 },
             },
             "thetas": [[0.014, 0.012], [0.001, 0.003], [2e-05]],

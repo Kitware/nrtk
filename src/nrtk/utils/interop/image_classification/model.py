@@ -1,5 +1,7 @@
 """Utilities for interoperability with MAITE IC model protocols."""
 
+__all__ = ["HuggingFaceMaiteModel"]
+
 # Python imports
 from collections.abc import Hashable, Sequence
 from typing import Any

@@ -30,6 +30,8 @@ Notes:
 
 from __future__ import annotations
 
+__all__ = ["SNRImageMetric"]
+
 from typing import Any
 
 import numpy as np

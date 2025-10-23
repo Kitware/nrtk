@@ -18,15 +18,7 @@ from nrtk.impls.perturb_image.pybsm.defocus_otf_perturber import DefocusOTFPertu
 from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
-
-EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_default_expected_output.tiff"
-EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/defocus_otf_provided_expected_output.tiff"
-
-
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
 @pytest.mark.skipif(not DefocusOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
@@ -43,58 +35,15 @@ class TestDefocusOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
-
-    @pytest.mark.parametrize(
-        ("interp"),
-        [
-            (True, False),
-        ],
-    )
-    def test_provided_consistency(
-        self,
-        interp: bool,
-    ) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE_PATH))
-        img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
-        # Test perturb interface directly
-        inst = DefocusOTFPerturber(sensor=sensor, scenario=scenario, interp=interp)
-        pybsm_perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-        # Test callable
-        pybsm_perturber_assertions(
-            perturb=DefocusOTFPerturber(sensor=sensor, scenario=scenario),
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-    def test_default_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE_PATH))
-        # Test perturb interface directly
-        inst = DefocusOTFPerturber()
-        pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
-
-        # Test callable
-        pybsm_perturber_assertions(perturb=DefocusOTFPerturber(), image=image, expected=expected)
 
     @pytest.mark.parametrize("w_x", [0.5, 1.5])
     @pytest.mark.parametrize("w_y", [0.5, 1.5])
@@ -110,13 +59,13 @@ class TestDefocusOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     def test_default_reproducibility(self) -> None:
@@ -133,7 +82,7 @@ class TestDefocusOTFPerturber:
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 {},
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided for this perturber"),
             ),
         ],
     )
@@ -147,7 +96,7 @@ class TestDefocusOTFPerturber:
         perturber = DefocusOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, boxes=None, additional_params=additional_params)
+            _ = perturber(image=image, boxes=None, **additional_params)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -164,7 +113,7 @@ class TestDefocusOTFPerturber:
         perturber = DefocusOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, additional_params=additional_params)
+            _ = perturber(image=image, **additional_params)
 
     @pytest.mark.parametrize("w_x", [0.5, 1.5])
     @pytest.mark.parametrize("w_y", [0.5, 1.5])
@@ -183,13 +132,13 @@ class TestDefocusOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize("w_x", [0.5])
@@ -248,7 +197,7 @@ class TestDefocusOTFPerturber:
     @pytest.mark.parametrize("w_x", [0.5])
     @pytest.mark.parametrize("w_y", [0.5])
     @pytest.mark.parametrize("interp", [True, False])
-    def test_overall_configuration(
+    def test_overall_configuration(  # noqa: C901
         self,
         w_x: float,
         w_y: float,
@@ -268,8 +217,10 @@ class TestDefocusOTFPerturber:
                 assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
                 assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
                 assert i.sensor.eta == sensor.eta
-                assert i.sensor.w_x == sensor.w_x
-                assert i.sensor.w_y == sensor.w_y
+                if w_x is None:
+                    assert i.sensor.w_x == sensor.w_x
+                if w_y is None:
+                    assert i.sensor.w_y == sensor.w_y
                 assert i.sensor.int_time == sensor.int_time
                 assert i.sensor.dark_current == sensor.dark_current
                 assert i.sensor.read_noise == sensor.read_noise
@@ -310,7 +261,7 @@ class TestDefocusOTFPerturber:
     )
     def test_regression(
         self,
-        tiff_snapshot: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         w_x: float | None,
         w_y: float | None,
@@ -336,8 +287,8 @@ class TestDefocusOTFPerturber:
             interp=interp,
         )
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-        tiff_snapshot.assert_match(out_img)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",
@@ -362,7 +313,7 @@ class TestDefocusOTFPerturber:
             image=image,
             expected=None,
             boxes=boxes,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
 

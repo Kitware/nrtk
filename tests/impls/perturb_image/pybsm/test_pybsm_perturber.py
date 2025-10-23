@@ -18,35 +18,27 @@ from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
-EXPECTED_IMG_FILE = "./tests/impls/perturb_image/pybsm/data/Expected Output.tiff"
-
 np.random.seed(42)  # noqa: NPY002
 
 
 @pytest.mark.skipif(not PybsmPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestPyBSMPerturber:
-    def test_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
+    def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE))
-        expected = np.array(Image.open(EXPECTED_IMG_FILE))
         img_gsd = 3.19 / 160.0
         sensor, scenario = create_sample_sensor_and_scenario()
+
         # Test perturb interface directly
         inst = PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000)
-        pybsm_perturber_assertions(
-            perturb=inst.perturb,
+        out_img = pybsm_perturber_assertions(
+            perturb=inst,
             image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
+            expected=None,
+            img_gsd=img_gsd,
         )
 
-        # Test callable
-        pybsm_perturber_assertions(
-            perturb=PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000),
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("param_name", "param_value", "rng_seed"),
@@ -70,13 +62,15 @@ class TestPyBSMPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
+        # Create another instance with same seed and ensure perturbed image is the same
+        inst2 = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})  # type: ignore
         pybsm_perturber_assertions(
-            perturb=inst.perturb,
+            perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     def test_configuration(self) -> None:
@@ -121,7 +115,7 @@ class TestPyBSMPerturber:
             assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
             assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
-            assert np.array_equal(i.reflectance_range, inst.reflectance_range)
+            assert np.array_equal(i._reflectance_range, inst._reflectance_range)
 
     @pytest.mark.parametrize(
         ("reflectance_range", "expectation"),
@@ -155,7 +149,7 @@ class TestPyBSMPerturber:
                 {},
                 pytest.raises(
                     ValueError,
-                    match=r"'img_gsd' must be present in image metadata for this perturber",
+                    match=r"'img_gsd' must be provided for this perturber",
                 ),
             ),
         ],
@@ -166,7 +160,7 @@ class TestPyBSMPerturber:
         perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5]))
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
         "boxes",
@@ -188,7 +182,7 @@ class TestPyBSMPerturber:
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor, scenario = create_sample_sensor_and_scenario()
         inst = PybsmPerturber(sensor=sensor, scenario=scenario)
-        _, out_boxes = inst.perturb(image, boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(image, boxes=boxes, img_gsd=(3.19 / 160))
         assert out_boxes == snapshot
 
     @mock.patch.object(PybsmPerturber, "is_usable")
@@ -204,7 +198,7 @@ class TestPyBSMPerturber:
         """Test default configuration when created with no parameters."""
         image = np.array(Image.open(INPUT_IMG_FILE))
         inst = PybsmPerturber()
-        inst.perturb(image, additional_params={"img_gsd": 3.19 / 160})
+        inst.perturb(image, img_gsd=(3.19 / 160))
         out_cfg = inst.get_config()
 
         assert out_cfg["sensor"] is not None

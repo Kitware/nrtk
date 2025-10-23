@@ -19,6 +19,7 @@ Image Perturbation
    nrtk.impls.perturb_image.generic.compose_perturber
    nrtk.impls.perturb_image.generic.random_crop_perturber
    nrtk.impls.perturb_image.generic.random_rotation_perturber
+   nrtk.impls.perturb_image.generic.random_scale_perturber
    nrtk.impls.perturb_image.generic.random_translation_perturber
    nrtk.impls.perturb_image.generic.haze_perturber
    nrtk.impls.perturb_image.generic.water_droplet_perturber
@@ -42,7 +43,7 @@ Perturbation Factory
    :recursive:
 
    nrtk.impls.perturb_image_factory.pybsm
-   nrtk.impls.perturb_image_factory.generic.linspace_step
+   nrtk.impls.perturb_image_factory.generic.linspace
    nrtk.impls.perturb_image_factory.generic.one_step
    nrtk.impls.perturb_image_factory.generic.step
 

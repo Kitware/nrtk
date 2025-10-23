@@ -86,10 +86,12 @@ class TestDiffusionPerturber:
 
         expected_device = perturber._get_device()
 
-        mock_pipeline_class.from_pretrained.assert_called_once_with(
-            "test/model",
-            safety_checker=None,
-        )
+        # robust to extra kwargs; still checks the invariants we care about
+        mock_pipeline_class.from_pretrained.assert_called_once()
+        fp_args, fp_kwargs = mock_pipeline_class.from_pretrained.call_args
+        assert fp_args[0] == "test/model"
+        assert fp_kwargs["safety_checker"] is None
+
         mock_pipeline.to.assert_called_once_with(expected_device)
         mock_scheduler_class.from_config.assert_called_once_with({"test": "config"})
 
@@ -243,9 +245,17 @@ class TestDiffusionPerturber:
     #     )
 
 
-@patch("nrtk.impls.perturb_image.generic.diffusion_perturber.diffusion_available", False)
-def test_missing_deps() -> None:
+@pytest.mark.parametrize(
+    "target",
+    [
+        "nrtk.impls.perturb_image.generic.diffusion_perturber.torch_available",
+        "nrtk.impls.perturb_image.generic.diffusion_perturber.diffusion_available",
+        "nrtk.impls.perturb_image.generic.diffusion_perturber.pillow_available",
+    ],
+)
+def test_missing_deps(target: str) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
-    assert not DiffusionPerturber.is_usable()
-    with pytest.raises(DiffusionImportError):
-        DiffusionPerturber()
+    with patch(target, False):
+        assert not DiffusionPerturber.is_usable()
+        with pytest.raises(DiffusionImportError):
+            DiffusionPerturber()

@@ -162,14 +162,12 @@ NRTK has multiple optional extras to expand functionality. The list below contai
 description of the extra.
 
     **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
-    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`, and
-    :ref:`NIIRSImageMetric`.
+    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`AlbumentationsPerturber`,
+    :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`TurbulenceApertureOTFPerturber`,
-    :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`, :ref:`CircularApertureOTFPerturber`, and
-    :ref:`NIIRSImageMetric`.
+    :mod:`~nrtk.impls.perturb_image.generic.cv2.blur` perturbers, :ref:`AlbumentationsPerturber`,
+    :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
     :ref:`CustomPybsmPerturbImageFactory`, :ref:`PyBSMSensor`, :ref:`PyBSMScenario`, :ref:`PyBSMPerturber`,
@@ -191,13 +189,13 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.generic.PIL.enhance` perturbers.
 
     **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber` and
-    :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`.
+    :mod:`~nrtk.impls.perturb_image.generic.albumentations_perturber`,
+    :mod:`~nrtk.impls.perturb_image.generic.random_rotation_perturber`, and
+    :mod:`~nrtk.impls.perturb_image.generic.random_scale_perturber`.
 
-    **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `shapely <https://github.com/shapely/shapely>`_.
-    Required for :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and
-    :mod:`~nrtk.impls.perturb_image.generic.utils.water_droplet_perturber_utils` utility functions. Note: This needs
-    to be installed in conjunction with either the ``graphics`` or ``headless`` extras due to the OpenCV requirement.
+    **waterdroplet**: installs `scipy <https://scipy.org/>`_, `shapely <https://github.com/shapely/shapely>`_, and
+    `geopandas <https://geopandas.org/en/stable/>__. Required for
+    :mod:`~nrtk.impls.perturb_image.generic.water_droplet_perturber` perturber and utility functions.
 
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
     `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
@@ -249,6 +247,8 @@ For `Poetry`_:
 To install the ``opencv-python-headless`` version, replace ``graphics`` with ``headless`` in the above
 commands.
 
+.. _perturber-dependencies:
+
 Perturber Dependencies
 ----------------------
 The following table lists the perturbers and the extra/dependencies required to use them.
@@ -261,8 +261,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - Extra(s) Required
       - Key Dependencies Provided by Extra(s)
     * - :ref:`AlbumentationsPerturber`
-      - ``albumentations``
-      - ``albumentations``
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``albumentations``, ``OpenCV``
     * - :ref:`AverageBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
@@ -270,8 +270,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``Pillow``
       - ``Pillow``
     * - :ref:`CircularApertureOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`ColorPerturber`
       - ``Pillow``
       - ``Pillow``
@@ -285,8 +285,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``pybsm``
       - ``pyBSM``
     * - :ref:`DetectorOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`DiffusionPerturber`
       - ``diffusion``
       - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
@@ -300,8 +300,8 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ---
       - ---
     * - :ref:`JitterOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`MedianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
@@ -321,8 +321,11 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ---
       - ---
     * - :ref:`RandomRotationPerturber`
-      - ``albumentations``
-      - ``albumentations``
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``albumentations``, ``OpenCV``
+    * - :ref:`RandomScalePerturber`
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``albumentations``, ``OpenCV``
     * - :ref:`RandomTranslationPerturber`
       - ---
       - ---
@@ -339,11 +342,11 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``scikit-image``
       - ``scikit-image``
     * - :ref:`TurbulenceApertureOTFPerturber`
-      - ``pybsm``, and (``graphics`` or ``headless``)
-      - ``pyBSM``, ``OpenCV``
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`WaterDropletPerturber`
-      - ``waterdroplet``, and (``graphics`` or ``headless``)
-      - ``scipy``, ``shapely``, ``OpenCV``
+      - ``waterdroplet``
+      - ``scipy``, ``shapely``, ``geopandas``
 
 .. :auto installation-links:
 

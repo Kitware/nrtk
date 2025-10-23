@@ -1,0 +1,17 @@
+# serializer version: 1
+# name: TestRandomScalePerturber.test_bbox_transform
+  list([
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[2. 2.] max_vertex=[4. 6.]>,
+      dict({
+        'label': 1.0,
+      }),
+    ),
+    tuple(
+      <smqtk_image_io.bbox.AxisAlignedBoundingBox min_vertex=[6. 4.] max_vertex=[12. 16.]>,
+      dict({
+        'label': 2.0,
+      }),
+    ),
+  ])
+# ---

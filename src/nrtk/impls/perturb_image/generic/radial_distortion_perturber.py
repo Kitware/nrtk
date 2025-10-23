@@ -24,6 +24,8 @@ Dependencies:
 
 from __future__ import annotations
 
+__all__ = ["RadialDistortionPerturber"]
+
 from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
@@ -120,23 +122,23 @@ class RadialDistortionPerturber(PerturbImage):
         self,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
+        **_: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Applies a radial distortion to an image and adjusts bounding boxes.
 
         Args:
-            image (np.ndarray[Any, Any]): Input image as a numpy array of shape (H, W, C).
-            boxes (Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None): List of
-                bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-            additional_params: Unused
+            image:
+                Input image as a numpy array of shape (H, W, C).
+            boxes:
+                List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
+            additional_params:
+                Additional perturbation keyword arguments (currently unused).
 
         Returns:
             np.ndarray[Any, Any]: Distorted image as numpy array
             Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: Updated bounding boxes
         """
         super().perturb(image=image)
-        if additional_params is None:
-            additional_params = dict()
 
         # Get w, h and empty output image
         h, w = float(image.shape[0]), float(image.shape[1])
@@ -171,15 +173,6 @@ class RadialDistortionPerturber(PerturbImage):
                 boxes[i] = (self._align_box(np.transpose([x1, y1])), label)
 
         return out.astype(np.uint8), boxes
-
-    def __call__(
-        self,
-        image: np.ndarray[Any, Any],
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """Calls `perturb` with the given input image."""
-        return self.perturb(image=image, boxes=boxes, additional_params=additional_params)
 
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RadialDistortionPerturber instance.

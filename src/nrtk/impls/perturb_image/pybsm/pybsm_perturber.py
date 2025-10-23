@@ -19,33 +19,36 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["PybsmPerturber"]
+
 import copy
 from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
-from typing_extensions import override
-
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
-from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation.ref_image"])
-from pybsm.simulation import simulate_image  # noqa: E402
-from pybsm.simulation.ref_image import RefImage  # noqa: E402
-from smqtk_core.configuration import (  # noqa: E402
+from smqtk_core.configuration import (
     from_config_dict,
     make_default_config,
     to_config_dict,
 )
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
+
+from nrtk.impls.perturb_image.pybsm.pybsm_otf_perturber import PybsmOTFPerturber
+from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
+from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.utils._import_guard import import_guard
+
+# Import checks
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation"])
+
+from pybsm.simulation import ImageSimulator, SystemOTFSimulator  # noqa: E402
 
 DEFAULT_REFLECTANCE_RANGE = np.array([0.05, 0.5])  # It is bad standards to call np.array within argument defaults
 
 
-class PybsmPerturber(PerturbImage):
+class PybsmPerturber(PybsmOTFPerturber):
     """Implements image perturbation using pyBSM sensor and scenario configurations.
 
     The `PybsmPerturber` class applies realistic perturbations to images by leveraging
@@ -90,44 +93,41 @@ class PybsmPerturber(PerturbImage):
             :raises ValueError: If reflectance_range length != 2
             :raises ValueError: If reflectance_range not strictly ascending
         """
-        if not self.is_usable():
-            raise PyBSMImportError
-        super().__init__()
-        self._rng_seed = rng_seed
+        if reflectance_range.shape[0] != 2:
+            raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
+        if reflectance_range[0] >= reflectance_range[1]:
+            raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
 
-        if not sensor:
-            sensor = PybsmSensor(
-                name="Sensor",
-                D=275e-3,
-                f=4,
-                p_x=0.008e-3,
-                opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
-            )
-        if not scenario:
-            scenario = PybsmScenario(
-                name="Scenario",
-                ihaze=1,
-                altitude=9000,
-                ground_range=0,
-            )
+        # Initialize base class
+        super().__init__(sensor=sensor, scenario=scenario)
 
-        self.sensor: PybsmSensor = copy.deepcopy(sensor)
-        self.scenario: PybsmScenario = copy.deepcopy(scenario)
-
+        # Store perturber-specific overrides
+        self._rng = rng_seed
+        self._reflectance_range: np.ndarray[Any, Any] = reflectance_range
         for k in kwargs:
             if hasattr(self.sensor, k):
                 setattr(self.sensor, k, kwargs[k])
             elif hasattr(self.scenario, k):
                 setattr(self.scenario, k, kwargs[k])
 
-        if reflectance_range.shape[0] != 2:
-            raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
-        if reflectance_range[0] >= reflectance_range[1]:
-            raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
-        self.reflectance_range: np.ndarray[Any, Any] = reflectance_range
-
         # this is key:value record of the thetas use for perturbing
         self.thetas: dict[str, Any] = copy.deepcopy(kwargs)
+
+        self._simulator = self._create_simulator()
+
+    @override
+    def _create_simulator(self) -> ImageSimulator:
+        """Create SystemOTFSimulator with explicit parameters."""
+        pybsm_sensor = self.sensor.create_sensor()
+        pybsm_scenario = self.scenario.create_scenario()
+        return SystemOTFSimulator(
+            sensor=pybsm_sensor,
+            scenario=pybsm_scenario,
+            add_noise=True,
+            rng=self._rng,
+            use_reflectance=True,
+            reflectance_range=self._reflectance_range,
+        )
 
     @property
     def params(self) -> dict[str, Any]:
@@ -141,66 +141,6 @@ class PybsmPerturber(PerturbImage):
             :return dict[str, Any]: A dictionary containing additional perturbation parameters.
         """
         return self.thetas
-
-    @override
-    def perturb(
-        self,
-        image: np.ndarray[Any, Any],
-        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        additional_params: dict[str, Any] | None = None,
-    ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-        """Applies pyBSM-based perturbations to the provided image.
-
-        Args:
-            image:
-                The image to be perturbed.
-            boxes:
-                Bounding boxes for detections in input image.
-            additional_params:
-                Dictionary containing:
-                    - "img_gsd" (float): GSD is the distance between the centers of two adjacent
-                        pixels in an image, measured on the ground.
-
-        Returns:
-            The perturbed image and bounding boxes scaled to perturbed image shape.
-
-        Raises:
-            :raises ValueError: If 'img_gsd' is not provided in `additional_params`.
-        """
-        if additional_params is None:  # Cannot have mutable data structure in argument default
-            additional_params = dict()
-        if "img_gsd" not in additional_params:
-            raise ValueError("'img_gsd' must be present in image metadata for this perturber")
-
-        # Create a `RefImage` object using the given GSD, img_pixel and reflactance values
-        ref_img = RefImage(
-            img=image,
-            gsd=additional_params["img_gsd"],
-            pix_values=np.array([image.min(), image.max()]),
-            refl_values=self.reflectance_range,
-        )
-
-        # Generate a perturbed image using the given sensor and scenario parameters
-        perturbed = simulate_image(
-            ref_img=ref_img,
-            sensor=self.sensor(),
-            scenario=self.scenario(),
-            rng=self._rng_seed,
-        )[-1]
-
-        # Min-Max normalization and conversion to uint8 type
-        min_perturbed_val = perturbed.min()
-        den = perturbed.max() - min_perturbed_val
-        perturbed -= min_perturbed_val
-        perturbed /= den
-        perturbed *= 255
-
-        # Rescale bounding boxes to the shape of the perturbed image
-        if boxes:
-            scaled_boxes = self._rescale_boxes(boxes, image.shape, perturbed.shape)
-            return perturbed.astype(np.uint8), scaled_boxes
-
-        return perturbed.astype(np.uint8), boxes
 
     def __str__(self) -> str:
         """Returns a string representation combining sensor and scenario names.
@@ -217,19 +157,6 @@ class PybsmPerturber(PerturbImage):
             :return str: Representation showing sensor and scenario names.
         """
         return self.__str__()
-
-    @classmethod
-    def get_default_config(cls) -> dict[str, Any]:
-        """Retrieves the default configuration for PybsmPerturber instances.
-
-        Returns:
-            :return dict[str, Any]: A dictionary with the default configuration values.
-        """
-        cfg = super().get_default_config()
-        cfg["sensor"] = make_default_config([PybsmSensor])
-        cfg["scenario"] = make_default_config([PybsmScenario])
-        cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
-        return cfg
 
     @classmethod
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> PybsmPerturber:
@@ -252,28 +179,49 @@ class PybsmPerturber(PerturbImage):
         # Convert input data to expected constructor types
         config_dict["reflectance_range"] = np.array(config_dict["reflectance_range"])
 
-        return super().from_config(config_dict, merge_default=merge_default)
+        return super(PybsmOTFPerturber, cls).from_config(config_dict, merge_default=merge_default)
 
+    @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the PybsmPerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Get current configuration including perturber-specific parameters."""
         cfg = super().get_config()
-
-        cfg["sensor"] = to_config_dict(self.sensor)
-        cfg["scenario"] = to_config_dict(self.scenario)
-        cfg["reflectance_range"] = self.reflectance_range.tolist()
-        cfg["rng_seed"] = self._rng_seed
+        cfg["sensor"] = to_config_dict(self._sensor) if self._sensor else None
+        cfg["scenario"] = to_config_dict(self._scenario) if self._scenario else None
+        cfg["reflectance_range"] = self._reflectance_range.tolist()
+        cfg["rng_seed"] = self._rng
 
         return cfg
 
     @classmethod
-    def is_usable(cls) -> bool:
-        """Checks if the necessary dependency (pyBSM) is available.
+    def get_default_config(cls) -> dict[str, Any]:
+        """Retrieves the default configuration for PybsmPerturber instances.
 
         Returns:
-            :return bool: True pyBSM is available; False otherwise.
+            :return dict[str, Any]: A dictionary with the default configuration values.
         """
-        return pybsm_available
+        cfg = super().get_default_config()
+        cfg["sensor"] = make_default_config([PybsmSensor])
+        cfg["scenario"] = make_default_config([PybsmScenario])
+        cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
+        return cfg
+
+    def _handle_boxes_and_format(
+        self,
+        sim_img: np.ndarray,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
+        orig_shape: tuple,
+    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+        """Override to normalize and handle box rescaling and format conversion to uint8."""
+        sim = sim_img
+        smin, smax = float(sim.min()), float(sim.max())
+        if smax > smin:
+            sim = (sim - smin) / (smax - smin) * 255.0
+        # Convert to uint8
+        sim_img_uint8 = sim.astype(np.uint8)
+
+        # Rescale boxes if provided
+        if boxes:
+            scaled_boxes = self._rescale_boxes(boxes, orig_shape, sim_img.shape)
+            return sim_img_uint8, scaled_boxes
+
+        return sim_img_uint8, boxes

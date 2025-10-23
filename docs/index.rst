@@ -12,8 +12,15 @@ Welcome to NRTK's documentation!
 **The Natural Robustness Toolkit (NRTK) is an open source toolkit for generating operationally realistic perturbations
 to evaluate the natural robustness of computer vision algorithms.**
 
-======================================================================================================================
+.. container:: nrtk-quickstart-button-container
 
+   .. button-ref:: quickstart
+      :color: primary
+      :class: nrtk-quickstart-button
+
+      🚀 Get Started with NRTK QuickStart Hub
+
+======================================================================================================================
 
 Welcome to the documentation for NRTK, a tool created for developers and Test and Evaluation
 (T&E) engineers seeking to rigorously evaluate and enhance the robustness of computer vision models.
@@ -77,9 +84,9 @@ Documentation Contents:
    :maxdepth: 1
    :caption: Quick Start
 
+   quickstart
    installation
    getting_started
-   algorithm_list
 
 .. toctree::
    :maxdepth: 1
@@ -105,6 +112,7 @@ Documentation Contents:
    examples/albumentations_perturber.ipynb
    examples/diffusion_perturber.ipynb
    examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency.ipynb
+   examples/nrtk_xaitk_workflow/object_detection_perturbation_saliency.ipynb
    generating_perturbed_datasets
 
 .. toctree::

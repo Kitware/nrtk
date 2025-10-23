@@ -21,6 +21,8 @@ Below are a list of notebooks with a short description:
 * `nrtk_affine_perturbers_demo <../examples/maite/nrtk_affine_perturbers_demo.html>`_ performs random
   translations, rotations and cropping of the image using ``NRTK's`` :ref:`RandomTranslationPerturber`,
   :ref:`RandomRotationPerturber` and :ref:`RandomCropPerturber`, respectively.
+* `nrtk_jitter_perturber_demo <../examples/maite/nrtk_jitter_perturber_demo.html>`_ simulates camera
+  motion jitter using ``NRTK's`` :ref:`JitterOTFPerturber`.
 * `nrtk_turbulence_perturber_demo <../examples/maite/nrtk_turbulence_perturber_demo.html>`_ modifies atmospheric
   turbulence using ``NRTK's`` :ref:`TurbulenceApertureOTFPerturber`.
 * `nrtk_water_droplet_perturber_demo <../examples/maite/nrtk_water_droplet_perturber_demo.html>`_ simulates water

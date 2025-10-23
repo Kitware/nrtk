@@ -16,6 +16,8 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = []
+
 import abc
 from collections.abc import Iterator, Sequence
 from typing import Any

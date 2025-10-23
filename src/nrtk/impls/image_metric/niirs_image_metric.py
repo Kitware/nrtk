@@ -17,6 +17,8 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["NIIRSImageMetric"]
+
 import copy
 from typing import Any
 
@@ -25,10 +27,10 @@ import numpy as np
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.interfaces.image_metric import ImageMetric
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
-pybsm_available: bool = import_guard("pybsm", PyBSMAndOpenCVImportError, ["metrics"])
+pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["metrics"])
 from pybsm.metrics import niirs5  # noqa: E402
 from smqtk_core.configuration import to_config_dict  # noqa: E402
 from typing_extensions import override  # noqa: E402
@@ -56,10 +58,10 @@ class NIIRSImageMetric(ImageMetric):
 
         Raises:
             ImportError: If the pyBSM library is not available.
-            installed via 'nrtk[pybsm-graphics]' or 'nrtk[pybsm-headless]'.
+            installed via 'nrtk[pybsm]'.
         """
         if not self.is_usable():
-            raise PyBSMAndOpenCVImportError
+            raise PyBSMImportError
         self.sensor: PybsmSensor = copy.deepcopy(sensor)
         self.scenario: PybsmScenario = copy.deepcopy(scenario)
 

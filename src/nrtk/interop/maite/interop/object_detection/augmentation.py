@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["JATICDetectionAugmentation", "JATICDetectionAugmentationWithMetric"]
+
 import copy
 from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING
@@ -84,7 +86,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
             aug_img, aug_img_anns = self.augment(
                 np.asarray(aug_img),
                 zip(img_bboxes, img_labels, strict=False),
-                additional_params=dict(md),
+                **dict(md),
             )
             if TYPE_CHECKING and not aug_img_anns:
                 break

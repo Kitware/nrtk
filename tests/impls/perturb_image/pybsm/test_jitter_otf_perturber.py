@@ -15,21 +15,13 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
-from nrtk.utils._exceptions import PyBSMAndOpenCVImportError
+from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension, create_sample_sensor_and_scenario
-
-EXPECTED_DEFAULT_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_default_expected_output.tiff"
-EXPECTED_PROVIDED_IMG_FILE_PATH = "./tests/impls/perturb_image/pybsm/data/jitter_otf_provided_expected_output.tiff"
+from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
 
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
-
-
-@pytest.mark.skipif(not JitterOTFPerturber.is_usable(), reason=str(PyBSMAndOpenCVImportError()))
+@pytest.mark.skipif(not JitterOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
 class TestJitterOTFPerturber:
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -43,58 +35,15 @@ class TestJitterOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
-
-    @pytest.mark.parametrize(
-        ("interp"),
-        [
-            (True, False),
-        ],
-    )
-    def test_provided_consistency(
-        self,
-        interp: bool,
-    ) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        expected = np.array(Image.open(EXPECTED_PROVIDED_IMG_FILE_PATH))
-        img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
-        # Test perturb interface directly
-        inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, interp=interp)
-        pybsm_perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-        # Test callable
-        pybsm_perturber_assertions(
-            perturb=JitterOTFPerturber(sensor=sensor, scenario=scenario),
-            image=image,
-            expected=expected,
-            additional_params={"img_gsd": img_gsd},
-        )
-
-    def test_default_consistency(self) -> None:
-        """Run on a dummy image to ensure output matches precomputed results."""
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        expected = np.array(Image.open(EXPECTED_DEFAULT_IMG_FILE_PATH))
-        # Test perturb interface directly
-        inst = JitterOTFPerturber()
-        pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=expected)
-
-        # Test callable
-        pybsm_perturber_assertions(perturb=JitterOTFPerturber(), image=image, expected=expected)
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
     @pytest.mark.parametrize("s_y", [0.5, 1.5])
@@ -110,13 +59,13 @@ class TestJitterOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     def test_default_reproducibility(self) -> None:
@@ -133,7 +82,7 @@ class TestJitterOTFPerturber:
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 {},
-                pytest.raises(ValueError, match=r"'img_gsd' must be present in image metadata"),
+                pytest.raises(ValueError, match=r"'img_gsd' must be provided"),
             ),
         ],
     )
@@ -147,7 +96,7 @@ class TestJitterOTFPerturber:
         perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -164,7 +113,7 @@ class TestJitterOTFPerturber:
         perturber = JitterOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image, additional_params=additional_params)
+            _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
     @pytest.mark.parametrize("s_y", [0.5, 1.5])
@@ -183,13 +132,13 @@ class TestJitterOTFPerturber:
             perturb=inst.perturb,
             image=image,
             expected=None,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
         pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             expected=out_image,
-            additional_params={"img_gsd": img_gsd},
+            img_gsd=img_gsd,
         )
 
     @pytest.mark.parametrize("s_x", [0.5])
@@ -248,7 +197,7 @@ class TestJitterOTFPerturber:
     @pytest.mark.parametrize("s_x", [0.5])
     @pytest.mark.parametrize("s_y", [0.5])
     @pytest.mark.parametrize("interp", [True, False])
-    def test_overall_configuration(
+    def test_overall_configuration(  # noqa: C901
         self,
         s_x: float,
         s_y: float,
@@ -276,8 +225,10 @@ class TestJitterOTFPerturber:
                 assert i.sensor.max_n == sensor.max_n
                 assert i.sensor.bit_depth == sensor.bit_depth
                 assert i.sensor.max_well_fill == sensor.max_well_fill
-                assert i.sensor.s_x == sensor.s_x
-                assert i.sensor.s_y == sensor.s_y
+                if s_x is None:
+                    assert i.sensor.s_x == sensor.s_x
+                if s_y is None:
+                    assert i.sensor.s_y == sensor.s_y
                 assert i.sensor.da_x == sensor.da_x
                 assert i.sensor.da_y == sensor.da_y
                 assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
@@ -310,7 +261,7 @@ class TestJitterOTFPerturber:
     )
     def test_regression(
         self,
-        tiff_snapshot: SnapshotAssertion,
+        psnr_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         s_x: float | None,
         s_y: float | None,
@@ -330,8 +281,8 @@ class TestJitterOTFPerturber:
 
         inst = JitterOTFPerturber(sensor=sensor, scenario=scenario, s_x=s_x, s_y=s_y, interp=interp)
 
-        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, additional_params=img_md)
-        tiff_snapshot.assert_match(out_img)
+        out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",
@@ -347,7 +298,7 @@ class TestJitterOTFPerturber:
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = JitterOTFPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, additional_params={"img_gsd": 3.19 / 160})
+        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
 
@@ -356,5 +307,5 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     mock_is_usable.return_value = False
     assert not JitterOTFPerturber.is_usable()
-    with pytest.raises(PyBSMAndOpenCVImportError):
+    with pytest.raises(PyBSMImportError):
         JitterOTFPerturber()

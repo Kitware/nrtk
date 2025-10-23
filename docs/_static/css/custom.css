@@ -1,0 +1,80 @@
+/* NRTK Custom Styles */
+
+/* ============================================
+   Font Imports
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+/* ============================================
+   Quickstart Page Styles
+   ============================================ */
+
+/* Grid card styles - applies to all cards */
+.sd-card-title {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+}
+
+.sd-card {
+    min-height: 100px !important;
+    height: 100% !important;
+}
+
+.sd-col {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.sd-col > .sd-card {
+    flex: 1 !important;
+}
+
+/* Explore More section - specific styles */
+.explore-more-grid .sd-card-title {
+    font-size: 1.05rem !important;
+}
+
+.explore-more-grid .sd-card {
+    height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.explore-more-grid .sd-card-body {
+    padding: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ============================================
+   QuickStart Button Styles
+   ============================================ */
+
+.nrtk-quickstart-button-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.nrtk-quickstart-button {
+    background: #2980b9;
+    padding: 16px 32px;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    transition: background 0.3s ease;
+    text-decoration: none;
+}
+
+.nrtk-quickstart-button:hover {
+    background: #2472a4;
+    text-decoration: none;
+}
+
+.nrtk-quickstart-button-text {
+    font-size: 1.1em;
+    color: white;
+    font-weight: 500;
+}

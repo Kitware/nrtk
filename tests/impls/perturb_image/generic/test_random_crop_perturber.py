@@ -12,14 +12,8 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.generic.random_crop_perturber import RandomCropPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
-from tests.impls.test_pybsm_utils import TIFFImageSnapshotExtension
 
 rng = np.random.default_rng()
-
-
-@pytest.fixture
-def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(TIFFImageSnapshotExtension)
 
 
 class TestRandomCropPerturber:
@@ -120,7 +114,7 @@ class TestRandomCropPerturber:
             expected=(out_image, []),
         )
 
-    def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
+    def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomCropPerturber(crop_size=(20, 20))
@@ -130,7 +124,7 @@ class TestRandomCropPerturber:
             boxes=None,
             expected=None,
         )
-        tiff_snapshot.assert_match(out_img)
+        psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         ("crop_size", "seed"),
