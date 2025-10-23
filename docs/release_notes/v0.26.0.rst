@@ -1,0 +1,66 @@
+0.26.0
+======
+
+* Fix: Broken links in documentation updated.
+
+* FIX: Rename ``linspace_step`` module to be ``linspace`` to be consistent with class name
+
+* Remove ``xaitk-jatic`` from nrtk dependencies and extras.
+
+* Added a T&E guide and notebook demonstrating the use of the JitterOTFPerturber to simulate camera motion jitter.
+
+* ``additional_params`` in ``PerturbImage.perturb`` is now treated as kwargs.
+
+* Revamp the sphinx docs landing page using the ``sphinx-design`` extension to
+
+* Add ``__all__`` to all modules.
+
+* Add ``from . import ...`` to all ``__init__.py``.
+
+* Added lazy importing to all ``__init__.py``.
+
+* Added How-To guide for saliency maps in an object detection workflow.
+
+* Pybsm perturbers now use PSNR regression testing module
+
+* Add support for python 3.13.
+
+* Added ``RandomScalePerturber``.
+
+* FIX: The diffusion pipeline loader changed with ``transformers>=4.55``,
+
+* Updated ``ccw_sort`` to use ``numpy.float128`` arrays.
+
+* Updated ``get_bezier_curve`` to have a tolerance (defaults to ``1e-8``) for floating point comparisions.
+
+* Updated snapshots for ``test_ccw_sort`` and ``test_regression_get_bezier_curve``.
+
+- Added default configuration support in ``src/nrtk/impls/perturb_image/pybsm/utils.py``
+
+- Added ``docs/examples/pybsm/data/uav_default_config_nrtk.json`` which contains the
+
+- Added ``pybsm_default_config.ipynb`` in ``docs/examples/pybsm`` which shows how to
+
+* Updated precommit hook config to format markdown tables.
+
+* A new ABC was created, ``PybsmOTFPerturber``, which improves the code quality for the pybsm perturbers
+
+* All otf calculations are now done entirely within pybsm
+
+* pybsm caches the psf to improve performance when perturbing multiple images.
+
+* Fixed bug where sensor jitter amplitudes were not passed to pybsm
+
+* Removed ``cv2`` from ``WaterDropletPerturber``.
+
+* Updated ``WaterDropletPerturber.__init__`` to use a default ``seed`` of 1.
+
+* Removed ``water_droplet_utils.py`` and moved helper function to ``water_droplet_perturber``.
+
+* Replaced opencv calls in pybsm perturbers with scipy
+
+* Move custom Syrupy extension fixtures to conftest.py for reusability
+
+* Improve readability of fuzzy Syrupy comparator
+
+* Updated non-pybsm based perturbers to use ``PSNRImageSnapshotExtension`` for regression testing.
