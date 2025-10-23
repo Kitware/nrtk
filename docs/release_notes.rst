@@ -42,3 +42,4 @@ Release Notes
    release_notes/v0.23.0
    release_notes/v0.24.0
    release_notes/v0.25.0
+   release_notes/v0.26.0
