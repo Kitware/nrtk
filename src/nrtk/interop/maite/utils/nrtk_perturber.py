@@ -9,8 +9,8 @@ from collections.abc import Iterable
 import numpy as np
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from nrtk.interop.maite.interop.object_detection.augmentation import JATICDetectionAugmentation
-from nrtk.interop.maite.interop.object_detection.dataset import JATICObjectDetectionDataset
+from nrtk.interop.maite.augmentations.object_detection import JATICDetectionAugmentation
+from nrtk.interop.maite.datasets.object_detection import JATICObjectDetectionDataset
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 

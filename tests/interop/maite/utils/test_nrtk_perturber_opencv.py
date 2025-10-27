@@ -4,7 +4,7 @@ import pytest
 from nrtk.impls.perturb_image.generic.cv2.blur import AverageBlurPerturber
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from nrtk.interop.maite.interop.object_detection.dataset import (
+from nrtk.interop.maite.datasets.object_detection import (
     JATICDetectionTarget,
     JATICObjectDetectionDataset,
 )

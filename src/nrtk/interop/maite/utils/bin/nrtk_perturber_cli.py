@@ -9,10 +9,10 @@ import click  # type: ignore
 from smqtk_core.configuration import from_config_dict, make_default_config
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from nrtk.interop.maite.interop.object_detection.dataset import (
+from nrtk.interop.maite.datasets.object_detection import (
     COCOJATICObjectDetectionDataset,
 )
-from nrtk.interop.maite.interop.object_detection.utils import dataset_to_coco
+from nrtk.interop.maite.utils.detection import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError
 from nrtk.utils._import_guard import import_guard

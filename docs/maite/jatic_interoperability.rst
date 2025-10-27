@@ -23,5 +23,6 @@ For tutorials utilizing these adapters to evaluate model robustness against key 
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.interop.maite.interop.object_detection
-   nrtk.interop.maite.interop.image_classification
+   nrtk.interop.maite.augmentations
+   nrtk.interop.maite.datasets
+   nrtk.interop.maite.metadata

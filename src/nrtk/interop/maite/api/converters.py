@@ -12,7 +12,7 @@ from smqtk_core.configuration import from_config_dict
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
-from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectDetectionDataset
+from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectionDataset
 from nrtk.utils._exceptions import KWCocoImportError
 from nrtk.utils._import_guard import import_guard
 

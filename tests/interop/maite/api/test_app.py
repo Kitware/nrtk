@@ -11,7 +11,7 @@ from starlette.testclient import TestClient
 
 from nrtk.interop.maite.api.app import app
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
-from nrtk.interop.maite.interop.object_detection.dataset import (
+from nrtk.interop.maite.datasets.object_detection import (
     JATICDetectionTarget,
     JATICObjectDetectionDataset,
 )

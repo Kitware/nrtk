@@ -7,8 +7,8 @@ import pytest
 from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
 from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
-from nrtk.interop.maite.interop.object_detection.dataset import COCOJATICObjectDetectionDataset
-from nrtk.interop.maite.interop.object_detection.utils import maite_available
+from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectionDataset
+from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard

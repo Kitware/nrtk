@@ -9,8 +9,8 @@ import pytest
 from click.testing import CliRunner
 from maite.protocols.object_detection import Dataset
 
-from nrtk.interop.maite.interop.object_detection.utils import maite_available
 from nrtk.interop.maite.utils.bin.nrtk_perturber_cli import is_usable, nrtk_perturber_cli
+from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from tests.interop.maite import DATASET_FOLDER, NRTK_BLUR_CONFIG, NRTK_PYBSM_CONFIG
 
