@@ -78,3 +78,29 @@
     color: white;
     font-weight: 500;
 }
+
+.severity-btn {
+    border: 0.5px solid #333 !important;
+    border-radius: 1px !important;;
+}
+
+.severity-btn.active {
+    background-color: #2980b9 !important;
+    color: white !important; /* make text readable */
+    box-shadow: 0 0 5px #000;
+    border: none !important;
+}
+
+#custom-filters-wrapper label {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Adjust this to increase or decrease spacing */
+}
+
+.wy-table-responsive table td,
+    .wy-table-responsive table th {
+        white-space: normal !important;
+    }
+    .wy-table-responsive {
+        overflow: visible !important;
+    }
