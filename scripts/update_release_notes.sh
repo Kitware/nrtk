@@ -50,8 +50,8 @@ echo "Reference added to release_notes.rst"
 # Make git commits
 git add "${PROJECT_DIR}"/pyproject.toml
 git add "${RELEASE_NOTES_DIR}"/v"${VERSION}".rst
-git commit -m "Update version number to ${VERSION}"
+git commit --no-verify -m "Update version number to ${VERSION}"
 
 # Clear pending_release
 git rm "${PENDING_RELEASE_NOTES_DIR}/*.rst"
-git commit -m "Clear release notes fragments"
+git commit --no-verify -m "Clear release notes fragments"
