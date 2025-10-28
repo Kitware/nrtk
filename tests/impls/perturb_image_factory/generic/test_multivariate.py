@@ -1,0 +1,171 @@
+import json
+from collections.abc import Sequence
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
+from pathlib import Path
+from typing import Any
+
+import pytest
+from smqtk_core.configuration import (
+    configuration_test_helper,
+    from_config_dict,
+    to_config_dict,
+)
+
+from nrtk.impls.perturb_image_factory.generic.multivariate import MultivariatePerturbImageFactory
+from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.test_utils import DummyPerturber
+
+
+class TestMultivariatePerturbImageFactory:
+    @pytest.mark.parametrize(
+        ("perturber", "theta_keys", "thetas", "expected"),
+        [
+            (
+                DummyPerturber,
+                ["param1"],
+                [[1, 3, 5]],
+                ((1,), (3,), (5,)),
+            ),
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+                ((1, 2), (1, 4), (3, 2), (3, 4)),
+            ),
+        ],
+    )
+    def test_iteration(
+        self,
+        perturber: type[PerturbImage],
+        theta_keys: Sequence[str],
+        thetas: Sequence[Any],
+        expected: tuple[tuple[int, ...]],
+    ) -> None:
+        """Ensure factory can be iterated upon and the varied parameter matches expectations."""
+        factory = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        assert len(expected) == len(factory)
+        for idx, p in enumerate(factory):
+            for count, _ in enumerate(theta_keys):
+                perturb_cfg = p.get_config()
+                assert perturb_cfg[theta_keys[count]] == expected[idx][count]
+
+    @pytest.mark.parametrize(
+        ("perturber", "theta_keys", "thetas", "idx", "expected_val", "expectation"),
+        [
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+                0,
+                (1, 2),
+                does_not_raise(),
+            ),
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+                3,
+                (3, 4),
+                does_not_raise(),
+            ),
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+                4,
+                (-1, -1),
+                pytest.raises(IndexError),
+            ),
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+                -1,
+                (3, 4),
+                does_not_raise(),
+            ),
+        ],
+        ids=["first idx", "last idx", "idx == len", "neg idx"],
+    )
+    def test_indexing(
+        self,
+        perturber: type[PerturbImage],
+        theta_keys: Sequence[str],
+        thetas: Sequence[Any],
+        idx: int,
+        expected_val: tuple[int, ...],
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Ensure it is possible to access a perturber instance via indexing."""
+        factory = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        with expectation:
+            for count, _ in enumerate(theta_keys):
+                perturb_cfg = factory[idx].get_config()
+                assert perturb_cfg[theta_keys[count]] == expected_val[count]
+
+    @pytest.mark.parametrize(
+        ("perturber", "theta_keys", "thetas", "expected_sets"),
+        [
+            (DummyPerturber, ["param1"], [[1, 2, 3, 4]], [[0], [1], [2], [3]]),
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+                [[0, 0], [0, 1], [1, 0], [1, 1]],
+            ),
+        ],
+    )
+    def test_configuration(
+        self,
+        perturber: type[PerturbImage],
+        theta_keys: Sequence[str],
+        thetas: Sequence[Any],
+        expected_sets: Sequence[Sequence[int]],
+    ) -> None:
+        """Test configuration stability."""
+        inst = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+
+        for i in configuration_test_helper(inst):
+            assert i.theta_keys == theta_keys
+            assert i.thetas == thetas
+            assert i.sets == expected_sets
+
+    @pytest.mark.parametrize(
+        ("perturber", "theta_keys", "thetas"),
+        [
+            (
+                DummyPerturber,
+                ["param1"],
+                [[1, 2, 3, 4]],
+            ),
+            (
+                DummyPerturber,
+                ["param1", "param2"],
+                [[1, 3], [2, 4]],
+            ),
+        ],
+    )
+    def test_hydration(
+        self,
+        perturber: type[PerturbImage],
+        tmp_path: Path,
+        theta_keys: Sequence[str],
+        thetas: Sequence[Any],
+    ) -> None:
+        """Test configuration hydration using from_config_dict."""
+        original_factory = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+
+        original_factory_config = original_factory.get_config()
+
+        config_file_path = tmp_path / "config.json"
+        with open(str(config_file_path), "w") as f:
+            json.dump(to_config_dict(original_factory), f)
+
+        with open(str(config_file_path)) as config_file:
+            config = json.load(config_file)
+            hydrated_factory = from_config_dict(config, PerturbImageFactory.get_impls())
+            hydrated_factory_config = hydrated_factory.get_config()
+
+            assert original_factory_config == hydrated_factory_config
