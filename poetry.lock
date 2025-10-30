@@ -2653,13 +2653,13 @@ files = [
 
 [[package]]
 name = "maite"
-version = "0.8.2"
+version = "0.9.0"
 description = "Library of common types, protocols (a.k.a. structural subtypes), and utilities to support AI test and evaluation"
 optional = true
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 files = [
-    {file = "maite-0.8.2-py3-none-any.whl", hash = "sha256:aed312e5e0cd04eac7042d4367ed26882562e37ad21fa21ec11af65e993d9ed1"},
-    {file = "maite-0.8.2.tar.gz", hash = "sha256:eefe1cbb86de96de4bbccbddd74f11daf8b61f5033b198ba1fb67b57878ad5ac"},
+    {file = "maite-0.9.0-py3-none-any.whl", hash = "sha256:30a4b33eb6d43ebb99855eacd25ae9f5ed593bfc7a1863285c0e04cf9b5f3ae6"},
+    {file = "maite-0.9.0.tar.gz", hash = "sha256:002cd05302d55b1e3be6542b01fce671e8a85be700377b1f28bb703ef9995969"},
 ]
 
 [package.dependencies]
@@ -7431,4 +7431,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.14"
-content-hash = "ace3616bbdaa98109a4092e50fd0e8a84cde8aa0f235165db2566a71adbd7327"
+content-hash = "af0d565a7fe386e6ca463cc354c5e0054eebe900ea5b0a7bb6a32299dcf602f4"
