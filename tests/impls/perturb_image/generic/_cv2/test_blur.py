@@ -12,7 +12,7 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.cv2.blur import (
+from nrtk.impls.perturb_image.generic.blur import (
     AverageBlurPerturber,
     GaussianBlurPerturber,
     MedianBlurPerturber,

@@ -14,13 +14,15 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.skimage.random_noise import (
+from nrtk.impls.perturb_image.generic._skimage.random_noise import (
+    _SKImageNoisePerturber,
+)
+from nrtk.impls.perturb_image.generic.noise import (
     GaussianNoisePerturber,
     PepperNoisePerturber,
     SaltAndPepperNoisePerturber,
     SaltNoisePerturber,
     SpeckleNoisePerturber,
-    _SKImageNoisePerturber,
 )
 from nrtk.utils._exceptions import ScikitImageImportError
 from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH

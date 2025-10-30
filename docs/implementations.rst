@@ -11,10 +11,10 @@ Image Perturbation
    :template: custom-module-template.rst
    :recursive:
 
+   nrtk.impls.perturb_image.generic.blur
+   nrtk.impls.perturb_image.generic.enhance
+   nrtk.impls.perturb_image.generic.noise
    nrtk.impls.perturb_image.generic.albumentations_perturber
-   nrtk.impls.perturb_image.generic.cv2.blur
-   nrtk.impls.perturb_image.generic.PIL.enhance
-   nrtk.impls.perturb_image.generic.skimage.random_noise
    nrtk.impls.perturb_image.generic.nop_perturber
    nrtk.impls.perturb_image.generic.compose_perturber
    nrtk.impls.perturb_image.generic.random_crop_perturber

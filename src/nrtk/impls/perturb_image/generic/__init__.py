@@ -12,18 +12,19 @@ __all__: list[str]
 __getattr__, __dir__, __all__ = lazy.attach(
     __name__,
     submodules=[
+        "blur",
+        "enhance",
+        "noise",
         "albumentations_perturber",
         "compose_perturber",
-        "cv2",
         "diffusion_perturber",
         "haze_perturber",
         "nop_perturber",
-        "PIL",
         "radial_distortion_perturber",
         "random_crop_perturber",
         "random_rotation_perturber",
+        "random_scale_perturber",
         "random_translation_perturber",
-        "skimage",
         "water_droplet_perturber",
     ],
 )
