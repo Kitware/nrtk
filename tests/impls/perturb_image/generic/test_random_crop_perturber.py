@@ -21,10 +21,10 @@ class TestRandomCropPerturber:
         ("input_test_box", "expected"),
         [
             (
-                [(AxisAlignedBoundingBox(min_vertex=(1, 0), max_vertex=(2, 1)), {"meta": 1})],
+                [(AxisAlignedBoundingBox(min_vertex=(1, 0), max_vertex=(3, 1)), {"meta": 1})],
                 (
                     np.array([[1, 2], [4, 5]], dtype=np.uint8),
-                    [(AxisAlignedBoundingBox(min_vertex=(1, 0), max_vertex=(1, 1)), {"meta": 1})],
+                    [(AxisAlignedBoundingBox(min_vertex=(1, 0), max_vertex=(2, 1)), {"meta": 1})],
                 ),
             ),
             (
