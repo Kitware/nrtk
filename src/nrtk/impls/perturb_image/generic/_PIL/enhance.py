@@ -37,6 +37,7 @@ from collections.abc import Hashable, Iterable
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import numpy as np
+from numpy.typing import NDArray
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
@@ -75,8 +76,8 @@ class _PerturbImage(PerturbImage):
     def _perturb(
         self,
         enhancement: type[_Enhancement],
-        image: np.ndarray,
-    ) -> np.ndarray:
+        image: NDArray[Any],
+    ) -> NDArray[Any]:
         """Call appropriate enhancement interface and perform any necessary data type conversion.
 
         :param enhancement: Ehancement to apply.
@@ -129,10 +130,10 @@ class BrightnessPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted brightness."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
 
@@ -151,10 +152,10 @@ class ColorPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted color balance."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
 
@@ -173,10 +174,10 @@ class ContrastPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted contrast."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
 
@@ -204,10 +205,10 @@ class SharpnessPerturber(_PerturbImage):
     @override
     def perturb(
         self,
-        image: np.ndarray,
+        image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
-    ) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
+    ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted sharpness."""
         _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
 

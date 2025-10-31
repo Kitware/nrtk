@@ -1,7 +1,7 @@
 {
     "type": "nrtk.impls.perturb_image_factory.generic.linspace.LinspacePerturbImageFactory",
     "nrtk.impls.perturb_image_factory.generic.linspace.LinspacePerturbImageFactory": {
-        "perturber": "nrtk.impls.perturb_image.generic.skimage.random_noise.SaltNoisePerturber",
+        "perturber": "nrtk.impls.perturb_image.generic.noise.SaltNoisePerturber",
         "theta_key": "amount",
         "start": 0.1,
         "stop": 0.9,

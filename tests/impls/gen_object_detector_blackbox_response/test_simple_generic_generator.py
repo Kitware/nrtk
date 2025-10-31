@@ -11,7 +11,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator import (
     SimpleGenericGenerator,
 )
-from nrtk.impls.perturb_image.generic.PIL.enhance import (
+from nrtk.impls.perturb_image.generic.enhance import (
     BrightnessPerturber,
     ContrastPerturber,
 )

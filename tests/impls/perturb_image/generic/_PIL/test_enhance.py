@@ -12,7 +12,7 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.generic.PIL.enhance import (
+from nrtk.impls.perturb_image.generic.enhance import (
     BrightnessPerturber,
     ColorPerturber,
     ContrastPerturber,
