@@ -11,5 +11,5 @@ __all__: list[str]
 
 __getattr__, __dir__, __all__ = lazy.attach(
     __name__,
-    submodules=["linspace", "one_step", "step"],
+    submodules=["linspace", "one_step", "step", "multivariate"],
 )

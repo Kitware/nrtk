@@ -193,6 +193,7 @@ Pillow = ">=10.3.0" # CVE-2024-28219
 "impls.perturb_image_factory.generic.step" = "nrtk.impls.perturb_image_factory.generic.step"
 "impls.perturb_image_factory.generic.one_step" = "nrtk.impls.perturb_image_factory.generic.one_step"
 "impls.perturb_image_factory.generic.linspace" = "nrtk.impls.perturb_image_factory.generic.linspace"
+"impls.perturb_image_factory.generic.multivariate" = "nrtk.impls.perturb_image_factory.generic.multivariate"
 "impls.perturb_image_factory.pybsm" = "nrtk.impls.perturb_image_factory.pybsm"
 "impls.score_detections.class_agnostic_pixelwise_iou_scorer" = "nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer"
 "impls.score_detections.coco_scorer" = "nrtk.impls.score_detections.coco_scorer"
