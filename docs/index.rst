@@ -113,6 +113,7 @@ Documentation Contents:
    examples/diffusion_perturber.ipynb
    examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency.ipynb
    examples/nrtk_xaitk_workflow/object_detection_perturbation_saliency.ipynb
+   examples/pybsm/pybsm_default_config.ipynb
    generating_perturbed_datasets
 
 .. toctree::
