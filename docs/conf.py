@@ -40,6 +40,8 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_click",
     "sphinx_design",
+    "sphinxcontrib.jquery",
+    "sphinx_datatables",
     "myst_nb",
 ]
 
@@ -62,7 +64,14 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 html_css_files = [
+    "https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css",
     "css/custom.css",
+]
+html_js_files = [
+    "https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js",
+    "https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js",
+    "https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js",
+    "javascript/custom.js",
 ]
 
 # -- MyST-NB settings---------------------------------------------------------
@@ -70,3 +79,22 @@ nb_execution_mode = "off"
 
 # -- LaTeX engine ------------------------------------------------------------
 latex_engine = "lualatex"
+
+# -- Datatables --------------------------------------------------------------
+# set the version to use for DataTables plugin
+datatables_version = "2.3.0"
+
+# name of the class to use for tables to enable DataTables
+datatables_class = "sphinx-datatable"
+
+datatables_options = {
+    "pageLength": -1,
+    "paging": False,
+    "scrollX": False,
+    "layout": {
+        "topStart": "search",
+        "topEnd": "buttons",
+        "bottomStart": None,
+        "bottomEnd": None,
+    },
+}
