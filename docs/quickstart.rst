@@ -83,6 +83,10 @@ your scenario to the right tools.
          :link: implementations
          :link-type: doc
 
+      .. grid-item-card:: 📋 User Input Requirements
+         :link: user_input_requirements
+         :link-type: doc
+
       .. grid-item-card:: ✅ Validation and Trust
          :link: maite/jatic_interoperability
          :link-type: doc
