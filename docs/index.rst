@@ -121,6 +121,7 @@ Documentation Contents:
    :caption: Reference
 
    interfaces
+   user_input_requirements
    implementations
    maite/jatic_interoperability
    glossary
