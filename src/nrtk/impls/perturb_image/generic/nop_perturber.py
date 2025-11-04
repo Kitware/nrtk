@@ -22,6 +22,7 @@ from __future__ import annotations
 __all__ = ["NOPPerturber"]
 
 from collections.abc import Hashable, Iterable
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
@@ -40,6 +41,19 @@ class NOPPerturber(PerturbImage):
     This class, in particular, serves as pass-through "no operation" (NOP)
     perturber.
     """
+
+    def __init__(self, theta: int = 0) -> None:
+        """Initializes a NOPPerturber instance.
+
+        The NOPPerturber performs no modification to the input image, returning
+        it unchanged. The ``theta`` parameter is reserved for interface
+        compatibility.
+
+        Args:
+            theta (int, optional): Placeholder parameter for interface consistency.
+                Defaults to 0.
+        """
+        self._theta = theta
 
     @override
     def perturb(
@@ -62,4 +76,15 @@ class NOPPerturber(PerturbImage):
             :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
                 Returns the source image and bounding boxes.
         """
-        return np.copy(image), boxes
+        return np.copy(image), deepcopy(boxes)
+
+    @override
+    def get_config(self) -> dict[str, Any]:
+        """Returns the current configuration of the NOPPerturber instance.
+
+        Returns:
+            dict[str, Any]: Configuration dictionary with current settings.
+        """
+        cfg = super().get_config()
+        cfg["theta"] = self._theta
+        return cfg
