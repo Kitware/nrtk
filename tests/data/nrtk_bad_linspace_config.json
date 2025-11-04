@@ -5,6 +5,6 @@
         "theta_key": "ksize",
         "start": 1.0,
         "stop": 10.0,
-        "step": 2
+        "num": 2
     }
 }

@@ -25,7 +25,7 @@ from tests.test_utils import DummyPerturber
 
 class TestFloatStepPertubImageFactory:
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step", "expected"),
+        ("perturber", "theta_key", "start", "stop", "num", "expected"),
         [
             (DummyPerturber, "param1", 1, 3, 5, (1, 1.5, 2.0, 2.5, 3)),
             (DummyPerturber, "param2", 3, 9, 2, (3, 9)),
@@ -38,7 +38,7 @@ class TestFloatStepPertubImageFactory:
         theta_key: str,
         start: int,
         stop: int,
-        step: int,
+        num: int,
         expected: tuple[int, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
@@ -47,7 +47,7 @@ class TestFloatStepPertubImageFactory:
             theta_key=theta_key,
             start=start,
             stop=stop,
-            step=step,
+            num=num,
         )
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
@@ -60,7 +60,7 @@ class TestFloatStepPertubImageFactory:
             "theta_key",
             "start",
             "stop",
-            "step",
+            "num",
             "idx",
             "expected_val",
             "expectation",
@@ -80,7 +80,7 @@ class TestFloatStepPertubImageFactory:
         theta_key: str,
         start: int,
         stop: int,
-        step: int,
+        num: int,
         idx: int,
         expected_val: int,
         expectation: AbstractContextManager,
@@ -91,14 +91,14 @@ class TestFloatStepPertubImageFactory:
             theta_key=theta_key,
             start=start,
             stop=stop,
-            step=step,
+            num=num,
         )
         with expectation:
             print(idx, factory[idx].get_config(), expected_val)
             assert factory[idx].get_config()[theta_key] == expected_val
 
     @pytest.mark.parametrize(
-        ("start", "stop", "step", "endpoint", "expected"),
+        ("start", "stop", "num", "endpoint", "expected"),
         [
             (0.0, 1.0, 2, True, [0.0, 1.0]),
             (0.0, 1.0, 2, False, [0.0, 0.5]),
@@ -110,7 +110,7 @@ class TestFloatStepPertubImageFactory:
         self,
         start: float,
         stop: float,
-        step: int,
+        num: int,
         endpoint: bool,
         expected: list[float],
     ) -> None:
@@ -120,13 +120,13 @@ class TestFloatStepPertubImageFactory:
             theta_key="param1",
             start=start,
             stop=stop,
-            step=step,
+            num=num,
             endpoint=endpoint,
         )
         assert factory.thetas == expected
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step"),
+        ("perturber", "theta_key", "start", "stop", "num"),
         [
             (DummyPerturber, "param1", 1.0, 5.0, 2),
             (DummyPerturber, "param2", 3.0, 9.0, 3),
@@ -138,17 +138,17 @@ class TestFloatStepPertubImageFactory:
         theta_key: str,
         start: float,
         stop: float,
-        step: int,
+        num: int,
         endpoint: bool = True,
     ) -> None:
         """Test configuration stability."""
-        inst = LinspacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
+        inst = LinspacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, num=num)
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber
             assert i.theta_key == theta_key
             assert i.start == start
             assert i.stop == stop
-            assert i.step == step
+            assert i.num == num
             assert start in i.thetas
             assert stop not in i.thetas if not endpoint else stop in i.thetas
 
@@ -181,7 +181,7 @@ class TestFloatStepPertubImageFactory:
             LinspacePerturbImageFactory(**kwargs)
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step"),
+        ("perturber", "theta_key", "start", "stop", "num"),
         [
             (DummyPerturber, "param1", 1.0, 5.0, 2),
             (DummyPerturber, "param2", 3.0, 9.0, 3),
@@ -194,7 +194,7 @@ class TestFloatStepPertubImageFactory:
         theta_key: str,
         start: float,
         stop: float,
-        step: int,
+        num: int,
     ) -> None:
         """Test configuration hydration using from_config_dict."""
         original_factory = LinspacePerturbImageFactory(
@@ -202,7 +202,7 @@ class TestFloatStepPertubImageFactory:
             theta_key=theta_key,
             start=start,
             stop=stop,
-            step=step,
+            num=num,
         )
 
         original_factory_config = original_factory.get_config()

@@ -10,7 +10,7 @@ Dependencies:
 
 Usage:
     To use `LinspacePerturbImageFactory`, initialize it with a `PerturbImage` type, a `theta_key`
-    to vary, and specify the start, stop, and number of steps. This factory can then be used to
+    to vary, and specify the start, stop, and number of samples. This factory can then be used to
     generate perturbed image instances with linearly spaced parameter variations.
 
 Example:
@@ -19,7 +19,7 @@ Example:
         theta_key="parameter",
         start=0.0,
         stop=10.0,
-        step=5
+        num=5
     )
     theta_values = factory.thetas  # Access generated linearly spaced values
 """
@@ -47,13 +47,13 @@ class LinspacePerturbImageFactory(PerturbImageFactory):
         theta_key: str,
         start: float,
         stop: float,
-        step: int = 1,
+        num: int = 1,
         endpoint: bool = True,
     ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
-        varying the given ``theta_key`` parameter from start to stop with given step.
+        varying the given ``theta_key`` parameter from start to stop with given num.
 
         :param perturber: Python implementation type of the PerturbImage interface
             to produce.
@@ -64,7 +64,7 @@ class LinspacePerturbImageFactory(PerturbImageFactory):
 
         :param stop: Final value of desired range (exclusive).
 
-        :param step: Number of instances to generate.
+        :param num: Number of instances to generate.
 
         :raises TypeError: Given a perturber instance instead of type.
         """
@@ -72,20 +72,20 @@ class LinspacePerturbImageFactory(PerturbImageFactory):
 
         self.start = start
         self.stop = stop
-        self.step = step
+        self.num = num
         self.endpoint = endpoint
 
     @property
     @override
     def thetas(self) -> Sequence[float]:
         """Use linspace to generate the desired range of values."""
-        return np.linspace(self.start, self.stop, self.step, endpoint=self.endpoint).tolist()
+        return np.linspace(self.start, self.stop, self.num, endpoint=self.endpoint).tolist()
 
     @override
     def get_config(self) -> dict[str, Any]:
         cfg = super().get_config()
         cfg["start"] = self.start
         cfg["stop"] = self.stop
-        cfg["step"] = self.step
+        cfg["num"] = self.num
         cfg["endpoint"] = self.endpoint
         return cfg
