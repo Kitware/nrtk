@@ -25,7 +25,7 @@ import abc
 from typing import Any
 
 import numpy as np
-from smqtk_core import Plugfigurable
+from smqtk_core.plugfigurable import Plugfigurable
 
 
 class ImageMetric(Plugfigurable):

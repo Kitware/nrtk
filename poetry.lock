@@ -5768,13 +5768,13 @@ sklearn = ["scikit-learn (>=1.6)"]
 
 [[package]]
 name = "smqtk-core"
-version = "0.20.0"
+version = "0.21.0"
 description = "Python toolkit for pluggable algorithms and data structures for multimedia-based machine learning."
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "smqtk_core-0.20.0-py3-none-any.whl", hash = "sha256:4ff0d4bbb7ed03018c432a5cbb43e97e43b45c1752c61affe7748e20bc768fe0"},
-    {file = "smqtk_core-0.20.0.tar.gz", hash = "sha256:64e2992ed4923f7f0cfe2111edc93dfd54913800eb4cbdd1f77e9c90d310686f"},
+    {file = "smqtk_core-0.21.0-py3-none-any.whl", hash = "sha256:efb94a65fb9efa5106afee3b61c2cf2c5cebcb4004bf190cb1797796343a69de"},
+    {file = "smqtk_core-0.21.0.tar.gz", hash = "sha256:3be63308f2146b16351e5274dac587707ac31d47ef6f4816caceddc6aaa2c83d"},
 ]
 
 [[package]]
@@ -7463,4 +7463,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.14"
-content-hash = "af056489142a1613bfe22ac8bbef4b628b7f1c896088b03488b87b95eff97e03"
+content-hash = "f60f46066966f6bba7cf72277dbe9e65090292e7412ce818ee95e3bbeffc2ad3"
