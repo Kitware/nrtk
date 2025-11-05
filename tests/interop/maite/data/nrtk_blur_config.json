@@ -4,7 +4,8 @@
         "nrtk.impls.perturb_image_factory.generic.one_step.OneStepPerturbImageFactory": {
             "perturber": "nrtk.impls.perturb_image.generic.blur.GaussianBlurPerturber",
             "theta_key": "ksize",
-            "theta_value": 1
+            "theta_value": 1,
+            "to_int": true
         }
     }
 }

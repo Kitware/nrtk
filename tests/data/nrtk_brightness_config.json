@@ -5,6 +5,7 @@
         "theta_key": "factor",
         "start": 1,
         "stop": 10,
-        "step": 1
+        "step": 1,
+        "to_int": true
     }
 }

@@ -50,7 +50,7 @@ class TestStepPerturbImageFactory:
             assert i.theta_value == theta_value
             assert i.stop == theta_value + 0.1
             assert i.step == 1.0
-            assert i.to_int
+            assert not i.to_int
             assert i.theta_value in i.thetas
             assert i.stop not in i.thetas
 
