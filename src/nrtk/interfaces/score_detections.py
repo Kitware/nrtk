@@ -28,7 +28,7 @@ import abc
 from collections.abc import Hashable, Sequence
 from typing import Any
 
-from smqtk_core import Plugfigurable
+from smqtk_core.plugfigurable import Plugfigurable
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 

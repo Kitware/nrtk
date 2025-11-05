@@ -28,7 +28,7 @@ import abc
 from collections.abc import Sequence
 
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
-from smqtk_core import Plugfigurable
+from smqtk_core.plugfigurable import Plugfigurable
 
 
 class ScoreClassifications(Plugfigurable):

@@ -22,7 +22,7 @@ import abc
 from collections.abc import Iterator, Sequence
 from typing import Any
 
-from smqtk_core import Plugfigurable
+from smqtk_core.plugfigurable import Plugfigurable
 from typing_extensions import Self
 
 from nrtk.interfaces.perturb_image import PerturbImage

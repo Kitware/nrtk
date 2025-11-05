@@ -28,7 +28,7 @@ from typing import Any
 
 import numpy as np
 from smqtk_classifier.interfaces.classification_element import CLASSIFICATION_DICT_T
-from smqtk_core import Plugfigurable
+from smqtk_core.plugfigurable import Plugfigurable
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
