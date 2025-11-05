@@ -36,6 +36,7 @@ class TestNRTKPerturberOpenCV:
                     start=1,
                     stop=5,
                     step=2,
+                    to_int=True,
                 ),
                 ["_ksize-1", "_ksize-3"],
             ),

@@ -30,6 +30,7 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         perturber: type[PerturbImage],
         theta_key: str,
         theta_value: float,
+        to_int: bool = False,
     ) -> None:
         """Initialize the factory to produce an instance of PerturbImage for the given type.
 
@@ -43,9 +44,19 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
 
         :param theta_value: Initial and only value of ``theta_key``.
 
+        :param to_int: Boolean variable determining whether the theta is cast as
+                       int or float. Defaults to False.
+
         :raises TypeError: Given a perturber instance instead of type.
         """
-        super().__init__(perturber=perturber, theta_key=theta_key, start=theta_value, stop=theta_value + 0.1, step=1.0)
+        super().__init__(
+            perturber=perturber,
+            theta_key=theta_key,
+            start=theta_value,
+            stop=theta_value + 0.1,
+            step=1.0,
+            to_int=to_int,
+        )
 
         self.theta_value = theta_value
 
@@ -57,4 +68,4 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         """
         cfg = super().get_config()
         cfg["theta_value"] = self.theta_value
-        return {k: cfg[k] for k in ("perturber", "theta_key", "theta_value")}
+        return {k: cfg[k] for k in ("perturber", "theta_key", "theta_value", "to_int")}

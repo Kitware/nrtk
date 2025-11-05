@@ -49,7 +49,7 @@ class StepPerturbImageFactory(PerturbImageFactory):
         start: float,
         stop: float,
         step: float = 1.0,
-        to_int: bool = True,
+        to_int: bool = False,
     ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
@@ -68,7 +68,7 @@ class StepPerturbImageFactory(PerturbImageFactory):
         :param step: Step value between instances.
 
         :param to_int: Boolean variable determining whether the thetas are cast as
-                       ints or floats.
+                       ints or floats. Defaults to False.
 
         :raises TypeError: Given a perturber instance instead of type.
         """

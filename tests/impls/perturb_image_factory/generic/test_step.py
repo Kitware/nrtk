@@ -93,7 +93,14 @@ class TestStepPerturbImageFactory:
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
-        factory = StepPerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, step=step)
+        factory = StepPerturbImageFactory(
+            perturber=perturber,
+            theta_key=theta_key,
+            start=start,
+            stop=stop,
+            step=step,
+            to_int=True,
+        )
         with expectation:
             assert factory[idx].get_config()[theta_key] == expected_val
 
