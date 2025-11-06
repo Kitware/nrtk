@@ -21,7 +21,6 @@ from __future__ import annotations
 
 __all__ = ["PybsmPerturber"]
 
-import copy
 from collections.abc import Hashable, Iterable
 from typing import Any
 
@@ -66,7 +65,7 @@ class PybsmPerturber(PybsmOTFPerturber):
             Default reflectance range for image simulation.
     """
 
-    def __init__(  # noqa: C901
+    def __init__(
         self,
         sensor: PybsmSensor | None = None,
         scenario: PybsmScenario | None = None,
@@ -98,20 +97,12 @@ class PybsmPerturber(PybsmOTFPerturber):
         if reflectance_range[0] >= reflectance_range[1]:
             raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
 
-        # Initialize base class
-        super().__init__(sensor=sensor, scenario=scenario)
+        # Initialize base class (which handles kwargs application to sensor/scenario)
+        super().__init__(sensor=sensor, scenario=scenario, **kwargs)
 
         # Store perturber-specific overrides
         self._rng = rng_seed
         self._reflectance_range: np.ndarray[Any, Any] = reflectance_range
-        for k in kwargs:
-            if hasattr(self.sensor, k):
-                setattr(self.sensor, k, kwargs[k])
-            elif hasattr(self.scenario, k):
-                setattr(self.scenario, k, kwargs[k])
-
-        # this is key:value record of the thetas use for perturbing
-        self.thetas: dict[str, Any] = copy.deepcopy(kwargs)
 
         self._simulator = self._create_simulator()
 
@@ -128,19 +119,6 @@ class PybsmPerturber(PybsmOTFPerturber):
             use_reflectance=True,
             reflectance_range=self._reflectance_range,
         )
-
-    @property
-    def params(self) -> dict[str, Any]:
-        """Retrieves the theta parameters related to the perturbation configuration.
-
-        This method retrieves extra configuration details for the `PybsmPerturber` instance,
-        which may include specific parameters related to the sensor, scenario, or any
-        additional customizations applied during initialization.
-
-        Returns:
-            :return dict[str, Any]: A dictionary containing additional perturbation parameters.
-        """
-        return self.thetas
 
     def __str__(self) -> str:
         """Returns a string representation combining sensor and scenario names.

@@ -71,6 +71,7 @@ class JitterOTFPerturber(PybsmOTFPerturber):
         s_x: float | None = None,
         s_y: float | None = None,
         interp: bool = True,
+        **kwargs: Any,
     ) -> None:
         """Initializes the JitterOTFPerturber.
 
@@ -85,6 +86,8 @@ class JitterOTFPerturber(PybsmOTFPerturber):
                 root-mean-squared jitter amplitudes in the y direction (rad).
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without interpolation.
+            kwargs:
+                sensor and/or scenario values to modify
 
             If both sensor and scenario parameters are not present, then default values
             will be used for their parameters
@@ -101,8 +104,8 @@ class JitterOTFPerturber(PybsmOTFPerturber):
         Raises:
             :raises ImportError: If pyBSM is not found
         """
-        # Initialize base class
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp)
+        # Initialize base class (which handles kwargs application to sensor/scenario)
+        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
 
         # Store perturber-specific overrides
         self._override_s_x = s_x

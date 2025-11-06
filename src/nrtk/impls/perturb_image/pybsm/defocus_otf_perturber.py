@@ -81,6 +81,7 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
         w_x: float | None = None,
         w_y: float | None = None,
         interp: bool = True,
+        **kwargs: Any,
     ) -> None:
         """Initializes a DefocusOTFPerturber instance with the specified parameters.
 
@@ -95,6 +96,8 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
                 the 1/e blur spot radii in the y direction. Defaults to the sensor's value if provided.
             interp:
                 Whether to interpolate atmosphere data. Defaults to True.
+            kwargs:
+                sensor and/or scenario values to modify
 
             If a value is provided for w_x and/or w_y those values will be used in the otf calculation.
 
@@ -110,8 +113,8 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
         Raises:
             :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
-        # Initialize base class
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp)
+        # Initialize base class (which handles kwargs application to sensor/scenario)
+        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
 
         # Store perturber-specific overrides
         self._override_w_x = w_x
