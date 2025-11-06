@@ -54,12 +54,17 @@ import skimage.util  # noqa: E402
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = 1) -> None:
-        """:param rng: Pseudo-random number generator or seed."""
+    def __init__(self, rng: np.random.Generator | int | None = 1, clip: bool = True) -> None:
+        """Base class for skimage perturbers.
+
+        :param rng: Pseudo-random number generator or seed.
+        :param clip: Decide if output is clipped between the range of [-1, 1].
+        """
         if not self.is_usable():
             raise ScikitImageImportError
         super().__init__()
         self.rng = rng
+        self.clip = clip
 
     def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
         """Call skimage.util.random_noise with appropriate arguments and convert back to input dtype.
@@ -90,7 +95,7 @@ class _SKImageNoisePerturber(PerturbImage):
             convert = convert_image[dtype_str]
 
         # Apply perturbation
-        image_noise = skimage.util.random_noise(image, rng=self.rng, **kwargs)
+        image_noise = skimage.util.random_noise(image, rng=self.rng, clip=self.clip, **kwargs)
 
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)
@@ -104,6 +109,7 @@ class _SKImageNoisePerturber(PerturbImage):
         """
         cfg = super().get_config()
         cfg["rng"] = self.rng
+        cfg["clip"] = self.clip
         return cfg
 
     @classmethod
@@ -122,13 +128,15 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
         self,
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
+        clip: bool = True,
     ) -> None:
         """Initializes the SPNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
+        :param clip: Decide if output is clipped between the range of [-1, 1].
         """
-        super().__init__(rng=rng)
+        super().__init__(rng=rng, clip=clip)
 
         if amount < 0.0 or amount > 1.0:
             raise ValueError(
@@ -187,6 +195,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         rng: np.random.Generator | int | None = None,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
+        clip: bool = True,
     ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
@@ -195,7 +204,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         :param salt_vs_pepper: Proportion of salt vs. pepper noise on range [0, 1].
             Higher values represent more salt.
         """
-        super().__init__(amount=amount, rng=rng)
+        super().__init__(amount=amount, rng=rng, clip=clip)
 
         if salt_vs_pepper < 0.0 or salt_vs_pepper > 1.0:
             raise ValueError(
@@ -239,14 +248,16 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
         rng: np.random.Generator | int | None = None,
         mean: float = 0.0,
         var: float = 0.05,
+        clip: bool = True,
     ) -> None:
         """Initializes the GSNoisePerturber.
 
         :param rng: Pseudo-random number generator or seed.
         :param mean: Mean of random distribution.
         :param var: Variance of random distribution.
+        :param clip: Decide if output is clipped between the range of [-1, 1].
         """
-        super().__init__(rng=rng)
+        super().__init__(rng=rng, clip=clip)
 
         if var < 0:
             raise ValueError(
