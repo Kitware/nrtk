@@ -135,7 +135,7 @@ class PybsmScenario(Configurable):
             raise ValueError(
                 f"Invalid ihaze value ({ihaze}) must be in {PybsmScenario.ihaze_values}",
             )
-        if altitude not in PybsmScenario.altitude_values:
+        if altitude <= PybsmScenario.altitude_values[-1] and altitude not in PybsmScenario.altitude_values:
             raise ValueError(f"Invalid altitude value ({altitude})")
         if ground_range not in PybsmScenario.ground_range_values:
             raise ValueError(f"Invalid ground range value ({ground_range})")

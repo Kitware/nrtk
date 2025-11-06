@@ -263,7 +263,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
             raise ValueError(
                 f"Invalid ihaze value ({ihaze}) must be in {PybsmOTFPerturber.ihaze_values}",
             )
-        if altitude not in PybsmOTFPerturber.altitude_values:
+        if altitude <= PybsmOTFPerturber.altitude_values[-1] and altitude not in PybsmOTFPerturber.altitude_values:
             raise ValueError(f"Invalid altitude value ({altitude})")
         if ground_range not in PybsmOTFPerturber.ground_range_values:
             raise ValueError(f"Invalid ground range value ({ground_range})")
