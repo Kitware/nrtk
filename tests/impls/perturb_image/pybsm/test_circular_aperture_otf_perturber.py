@@ -48,16 +48,19 @@ class TestCircularApertureOTFPerturber:
         )
 
     @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights", "interp"),
+        ("mtf_wavelengths", "mtf_weights", "D", "eta", "interp"),
         [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5], True),
-            ([0.2e-6, 0.4e-6, 0.6e-6], [1.0, 0.5, 1.0], False),
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], None, None, True),
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.275, 0.4, True),
+            ([0.2e-6, 0.4e-6, 0.6e-6], [1.0, 0.5, 1.0], 0.4, 0.1, False),
         ],
     )
     def test_provided_reproducibility(
         self,
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
+        D: float,  # noqa N802
+        eta: float,
         interp: bool,
     ) -> None:
         """Ensure results are reproducible."""
@@ -69,6 +72,8 @@ class TestCircularApertureOTFPerturber:
             scenario=scenario,
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
+            D=D,
+            eta=eta,
             interp=interp,
         )
         img_gsd = 3.19 / 160.0
@@ -116,24 +121,30 @@ class TestCircularApertureOTFPerturber:
             _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights", "interp", "expectation"),
+        ("mtf_wavelengths", "mtf_weights", "D", "eta", "interp", "expectation"),
         [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5], True, does_not_raise()),
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0, True, does_not_raise()),
             (
                 [0.5e-6, 0.6e-6],
                 [],
+                0.003,
+                0.0,
                 False,
                 pytest.raises(ValueError, match=r"mtf_weights is empty"),
             ),
             (
                 [],
                 [0.5, 0.5],
+                0.003,
+                0.0,
                 True,
                 pytest.raises(ValueError, match=r"mtf_wavelengths is empty"),
             ),
             (
                 [0.5e-6, 0.6e-6],
                 [0.5],
+                0.003,
+                0.0,
                 True,
                 pytest.raises(
                     ValueError,
@@ -146,12 +157,20 @@ class TestCircularApertureOTFPerturber:
         self,
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
+        D: float,  # noqa N802
+        eta: float,
         interp: bool,
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
         with expectation:
-            _ = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights, interp=interp)
+            _ = CircularApertureOTFPerturber(
+                mtf_wavelengths=mtf_wavelengths,
+                mtf_weights=mtf_weights,
+                D=D,
+                eta=eta,
+                interp=interp,
+            )
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -171,23 +190,27 @@ class TestCircularApertureOTFPerturber:
             _ = perturber(image, **additional_params)
 
     @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights"),
+        ("mtf_wavelengths", "mtf_weights", "D", "eta"),
         [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0),
         ],
     )
-    def test_mtf_wavelength_and_weight_configuration(
+    def test_parameter_configuration(
         self,
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
+        D: float,  # noqa N802
+        eta: float,
     ) -> None:
         """Test configuration stability."""
-        inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights)
+        inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights, D=D, eta=eta)
         for i in configuration_test_helper(inst):
             assert i.mtf_wavelengths is not None
             assert i.mtf_weights is not None
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
+            assert i.D == D
+            assert i.eta == eta
 
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
@@ -230,15 +253,17 @@ class TestCircularApertureOTFPerturber:
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
     @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights"),
+        ("mtf_wavelengths", "mtf_weights", "D", "eta"),
         [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5]),
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0),
         ],
     )
     def test_overall_configuration(
         self,
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
+        D: float,  # noqa N802
+        eta: float,
     ) -> None:
         """Test configuration stability."""
         sensor, scenario = create_sample_sensor_and_scenario()
@@ -247,20 +272,24 @@ class TestCircularApertureOTFPerturber:
             scenario=scenario,
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
+            D=D,
+            eta=eta,
         )
         for i in configuration_test_helper(inst):
             assert i.mtf_wavelengths is not None
             assert i.mtf_weights is not None
             assert np.array_equal(i.mtf_wavelengths, mtf_wavelengths)
             assert np.array_equal(i.mtf_weights, mtf_weights)
+            assert i.D == D
+            assert i.eta == eta
             if i.sensor:
                 assert i.sensor.name == sensor.name
-                assert i.sensor.D == sensor.D
+                assert i.sensor.D == D
                 assert i.sensor.f == sensor.f
                 assert i.sensor.p_x == sensor.p_x
                 assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
                 assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
-                assert i.sensor.eta == sensor.eta
+                assert i.sensor.eta == eta
                 assert i.sensor.w_x == sensor.w_x
                 assert i.sensor.w_y == sensor.w_y
                 assert i.sensor.int_time == sensor.int_time
@@ -289,16 +318,16 @@ class TestCircularApertureOTFPerturber:
                 assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
     @pytest.mark.parametrize(
-        ("use_sensor_scenario", "mtf_wavelengths", "mtf_weights", "interp", "is_rgb"),
+        ("use_sensor_scenario", "mtf_wavelengths", "mtf_weights", "D", "eta", "interp", "is_rgb"),
         [
-            (False, None, None, None, False),
-            (True, None, None, None, True),
-            (False, None, None, None, True),
-            (True, None, None, None, False),
-            (True, [0.5e-6, 0.6e-6], [0.5, 0.5], False, True),
-            (False, [0.5e-6, 0.6e-6], [0.5, 0.5], True, False),
-            (True, [0.5e-6, 0.6e-6], [0.5, 0.5], False, False),
-            (False, [0.5e-6, 0.6e-6], [0.5, 0.5], True, True),
+            (False, None, None, None, None, None, False),
+            (True, None, None, None, None, None, True),
+            (False, None, None, None, None, None, True),
+            (True, None, None, None, None, None, False),
+            (True, [0.5e-6, 0.6e-6], [0.5, 0.5], 0.275, 0.4, False, True),
+            (False, [0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0, True, False),
+            (True, [0.5e-6, 0.6e-6], [0.5, 0.5], 0.275, 0.4, False, False),
+            (False, [0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0, True, True),
         ],
     )
     def test_regression(
@@ -307,6 +336,8 @@ class TestCircularApertureOTFPerturber:
         use_sensor_scenario: bool,
         mtf_wavelengths: Sequence[float] | None,
         mtf_weights: Sequence[float] | None,
+        D: float | None,  # noqa N802
+        eta: float | None,
         interp: bool,
         is_rgb: bool,
     ) -> None:
@@ -326,6 +357,8 @@ class TestCircularApertureOTFPerturber:
             scenario=scenario,
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
+            D=D,
+            eta=eta,
             interp=interp,
         )
 

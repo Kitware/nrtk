@@ -239,6 +239,11 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         return self._simulator.sensor.D
 
     @property
+    def eta(self) -> float:
+        """Getter for eta."""
+        return self._simulator.sensor.eta
+
+    @property
     def int_time(self) -> float:
         """Getter for int_time."""
         return self._simulator.sensor.int_time
