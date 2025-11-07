@@ -116,32 +116,34 @@ class TestSaltNoisePerturber:
         rng_assertions(perturber=SaltNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
-        ("rng", "amount"),
-        [(42, 0.8), (np.random.default_rng(12345), 0.3)],
+        ("rng", "amount", "clip"),
+        [(42, 0.8, True), (np.random.default_rng(12345), 0.3, False)],
     )
     def test_configuration(
         self,
         rng: np.random.Generator | int,
         amount: float,
+        clip: bool,
     ) -> None:
         """Test configuration stability."""
-        inst = SaltNoisePerturber(rng=rng, amount=amount)
+        inst = SaltNoisePerturber(rng=rng, amount=amount, clip=clip)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
+            assert i.clip == clip
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),
         [
-            ({"amount": 0.5}, does_not_raise()),
-            ({"amount": 0}, does_not_raise()),
-            ({"amount": 1}, does_not_raise()),
+            ({"amount": 0.5, "clip": True}, does_not_raise()),
+            ({"amount": 0, "clip": True}, does_not_raise()),
+            ({"amount": 1, "clip": False}, does_not_raise()),
             (
-                {"amount": 2.0},
+                {"amount": 2.0, "clip": True},
                 pytest.raises(ValueError, match=r"SaltNoisePerturber invalid amount"),
             ),
             (
-                {"amount": -3.0},
+                {"amount": -3.0, "clip": False},
                 pytest.raises(ValueError, match=r"SaltNoisePerturber invalid amount"),
             ),
         ],
@@ -228,32 +230,34 @@ class TestPepperNoisePerturber:
         rng_assertions(perturber=PepperNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
-        ("rng", "amount"),
-        [(42, 0.8), (np.random.default_rng(12345), 0.3)],
+        ("rng", "amount", "clip"),
+        [(42, 0.8, True), (np.random.default_rng(12345), 0.3, False)],
     )
     def test_configuration(
         self,
         rng: np.random.Generator | int,
         amount: float,
+        clip: bool,
     ) -> None:
         """Test configuration stability."""
-        inst = PepperNoisePerturber(rng=rng, amount=amount)
+        inst = PepperNoisePerturber(rng=rng, amount=amount, clip=clip)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
+            assert i.clip == clip
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),
         [
-            ({"amount": 0.25}, does_not_raise()),
-            ({"amount": 0}, does_not_raise()),
-            ({"amount": 1}, does_not_raise()),
+            ({"amount": 0.25, "clip": True}, does_not_raise()),
+            ({"amount": 0, "clip": True}, does_not_raise()),
+            ({"amount": 1, "clip": False}, does_not_raise()),
             (
-                {"amount": 2.5},
+                {"amount": 2.5, "clip": True},
                 pytest.raises(ValueError, match=r"PepperNoisePerturber invalid amount"),
             ),
             (
-                {"amount": -4.2},
+                {"amount": -4.2, "clip": False},
                 pytest.raises(ValueError, match=r"PepperNoisePerturber invalid amount"),
             ),
         ],
@@ -345,51 +349,54 @@ class TestSaltAndPepperNoisePerturber:
         rng_assertions(perturber=SaltAndPepperNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
-        ("rng", "amount", "salt_vs_pepper"),
-        [(42, 0.8, 0.25), (np.random.default_rng(12345), 0.3, 0.2)],
+        ("rng", "amount", "salt_vs_pepper", "clip"),
+        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
     )
     def test_configuration(
         self,
         rng: np.random.Generator | int,
         amount: float,
         salt_vs_pepper: float,
+        clip: bool,
     ) -> None:
         """Test configuration stability."""
         inst = SaltAndPepperNoisePerturber(
             rng=rng,
             amount=amount,
             salt_vs_pepper=salt_vs_pepper,
+            clip=clip,
         )
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.amount == amount
             assert i.salt_vs_pepper == salt_vs_pepper
+            assert i.clip == clip
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),
         [
-            ({"amount": 0.45}, does_not_raise()),
-            ({"amount": 0}, does_not_raise()),
-            ({"amount": 1}, does_not_raise()),
+            ({"amount": 0.45, "clip": True}, does_not_raise()),
+            ({"amount": 0, "clip": True}, does_not_raise()),
+            ({"amount": 1, "clip": False}, does_not_raise()),
             (
-                {"amount": 1.2},
+                {"amount": 1.2, "clip": True},
                 pytest.raises(
                     ValueError,
                     match=r"SaltAndPepperNoisePerturber invalid amount",
                 ),
             ),
             (
-                {"amount": -0.2},
+                {"amount": -0.2, "clip": False},
                 pytest.raises(
                     ValueError,
                     match=r"SaltAndPepperNoisePerturber invalid amount",
                 ),
             ),
-            ({"salt_vs_pepper": 0.2}, does_not_raise()),
-            ({"salt_vs_pepper": 0}, does_not_raise()),
-            ({"salt_vs_pepper": 1}, does_not_raise()),
+            ({"salt_vs_pepper": 0.2, "clip": True}, does_not_raise()),
+            ({"salt_vs_pepper": 0, "clip": True}, does_not_raise()),
+            ({"salt_vs_pepper": 1, "clip": False}, does_not_raise()),
             (
-                {"salt_vs_pepper": 5},
+                {"salt_vs_pepper": 5, "clip": False},
                 pytest.raises(
                     ValueError,
                     match=r"SaltAndPepperNoisePerturber invalid salt_vs_pepper",
@@ -487,29 +494,31 @@ class TestGaussianNoisePerturber:
         rng_assertions(perturber=GaussianNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
-        ("rng", "mean", "var"),
-        [(42, 0.8, 0.25), (np.random.default_rng(12345), 0.3, 0.2)],
+        ("rng", "mean", "var", "clip"),
+        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
     )
     def test_configuration(
         self,
         rng: np.random.Generator | int,
         mean: float,
         var: float,
+        clip: bool,
     ) -> None:
         """Test configuration stability."""
-        inst = GaussianNoisePerturber(rng=rng, mean=mean, var=var)
+        inst = GaussianNoisePerturber(rng=rng, mean=mean, var=var, clip=clip)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.mean == mean
             assert i.var == var
+            assert i.clip == clip
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),
         [
-            ({"var": 0.75}, does_not_raise()),
-            ({"var": 0}, does_not_raise()),
+            ({"var": 0.75, "clip": True}, does_not_raise()),
+            ({"var": 0, "clip": False}, does_not_raise()),
             (
-                {"var": -10},
+                {"var": -10, "clip": True},
                 pytest.raises(ValueError, match=r"GaussianNoisePerturber invalid var"),
             ),
         ],
@@ -597,29 +606,31 @@ class TestSpeckleNoisePerturber:
         rng_assertions(perturber=SpeckleNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
-        ("rng", "mean", "var"),
-        [(42, 0.8, 0.25), (np.random.default_rng(12345), 0.3, 0.2)],
+        ("rng", "mean", "var", "clip"),
+        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
     )
     def test_configuration(
         self,
         rng: np.random.Generator | int,
         mean: float,
         var: float,
+        clip: bool,
     ) -> None:
         """Test configuration stability."""
-        inst = SpeckleNoisePerturber(rng=rng, mean=mean, var=var)
+        inst = SpeckleNoisePerturber(rng=rng, mean=mean, var=var, clip=clip)
         for i in configuration_test_helper(inst):
             assert i.rng == rng
             assert i.mean == mean
             assert i.var == var
+            assert i.clip == clip
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),
         [
-            ({"var": 0.123}, does_not_raise()),
-            ({"var": 0}, does_not_raise()),
+            ({"var": 0.123, "clip": True}, does_not_raise()),
+            ({"var": 0, "clip": False}, does_not_raise()),
             (
-                {"var": -10},
+                {"var": -10, "clip": True},
                 pytest.raises(ValueError, match=r"SpeckleNoisePerturber invalid var"),
             ),
         ],
