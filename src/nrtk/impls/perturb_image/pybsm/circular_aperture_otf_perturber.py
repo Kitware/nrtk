@@ -79,6 +79,8 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         scenario: PybsmScenario | None = None,
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
+        D: float | None = None,  # noqa N802
+        eta: float | None = None,
         interp: bool = True,
         **kwargs: Any,
     ) -> None:
@@ -93,6 +95,10 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
                 a numpy array of wavelengths (m)
             mtf_weights:
                 a numpy array of weights for each wavelength contribution (arb)
+            D:
+                a float representing effective aperture diameter (m)
+            eta:
+                a float representing relative linear obscuration (arb)
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
@@ -143,6 +149,9 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         else:
             self._override_mtf_weights = None
 
+        self._override_D: float | None = D
+        self._override_eta: float | None = eta
+
         self._simulator = self._create_simulator()
 
     @override
@@ -153,8 +162,14 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             self.sensor.D = 0.003
             self.sensor.eta = 0.0
 
+        if self._override_D is not None:
+            self.sensor.D = self._override_D
+        if self._override_eta is not None:
+            self.sensor.eta = self._override_eta
+
         pybsm_sensor = self.sensor.create_sensor()
         pybsm_scenario = self.scenario.create_scenario()
+
         return CircularApertureSimulator(
             sensor=pybsm_sensor,
             scenario=pybsm_scenario,
@@ -170,6 +185,8 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
         cfg["mtf_wavelengths"] = self.mtf_wavelengths
         cfg["mtf_weights"] = self.mtf_weights
+        cfg["D"] = self.D
+        cfg["eta"] = self.eta
         cfg["interp"] = self.interp
 
         return cfg
