@@ -80,6 +80,7 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
         interp: bool = True,
+        **kwargs: Any,
     ) -> None:
         """Initializes the CircularApertureOTFPerturber.
 
@@ -95,6 +96,8 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
+            kwargs:
+                sensor and/or scenario values to modify
 
             If both sensor and scenario parameters are absent, then default values
             will be used for their parameters
@@ -122,8 +125,8 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         if mtf_wavelengths is not None and mtf_weights is not None and len(mtf_wavelengths) != len(mtf_weights):
             raise ValueError("mtf_wavelengths and mtf_weights are not the same length")
 
-        # Initialize base class
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp)
+        # Initialize base class (which handles kwargs application to sensor/scenario)
+        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
 
         # Store perturber-specific overrides
         if mtf_wavelengths is not None:

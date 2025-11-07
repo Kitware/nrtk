@@ -350,6 +350,29 @@ class TestCircularApertureOTFPerturber:
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
 
+    @pytest.mark.parametrize(
+        ("param_name", "param_value"),
+        [
+            ("ground_range", 10000),
+            ("altitude", 5000),
+            ("ihaze", 2),
+        ],
+    )
+    def test_kwargs_application(self, param_name: str, param_value: int) -> None:
+        """Test that kwargs are properly applied to sensor/scenario."""
+        sensor, scenario = create_sample_sensor_and_scenario()
+        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, **{param_name: param_value})  # type: ignore[arg-type]
+
+        # Verify the parameter was applied
+        assert hasattr(inst.sensor, param_name) or hasattr(inst.scenario, param_name)
+        if hasattr(inst.scenario, param_name):
+            assert getattr(inst.scenario, param_name) == param_value
+        elif hasattr(inst.sensor, param_name):
+            assert getattr(inst.sensor, param_name) == param_value
+
+        # Verify params property returns the kwargs
+        assert inst.params == {param_name: param_value}
+
 
 @mock.patch.object(CircularApertureOTFPerturber, "is_usable")
 def test_missing_deps(mock_is_usable: MagicMock) -> None:

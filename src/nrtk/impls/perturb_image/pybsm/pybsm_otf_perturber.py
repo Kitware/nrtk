@@ -59,6 +59,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         sensor: PybsmSensor | None = None,
         scenario: PybsmScenario | None = None,
         interp: bool = True,
+        **kwargs: Any,
     ) -> None:
         """Initialize the pybsm OTF perturber.
 
@@ -66,6 +67,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
             sensor: pyBSM sensor configuration
             scenario: pyBSM scenario configuration
             interp: Whether to use interpolated atmospheric data
+            kwargs: sensor and/or scenario values to modify
         Raises:
             :raises ImportError: pyBSM is not found, install via
                 `pip install nrtk[pybsm]`.
@@ -97,6 +99,16 @@ class PybsmOTFPerturber(PerturbImage, ABC):
             self._scenario: PybsmScenario = self._create_default_scenario()
         else:
             self._scenario: PybsmScenario = scenario
+
+        # Apply kwargs to sensor and scenario
+        for k in kwargs:
+            if hasattr(self._sensor, k):
+                setattr(self._sensor, k, kwargs[k])
+            elif hasattr(self._scenario, k):
+                setattr(self._scenario, k, kwargs[k])
+
+        # Store kwargs for retrieval
+        self.thetas: dict[str, Any] = copy.deepcopy(kwargs)
 
     @abstractmethod
     def _create_simulator(self) -> ImageSimulator:
@@ -270,6 +282,19 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     def scenario(self) -> PybsmScenario:
         """Getter for scenario."""
         return self._scenario
+
+    @property
+    def params(self) -> dict[str, Any]:
+        """Retrieves the theta parameters related to the perturbation configuration.
+
+        This method retrieves extra configuration details for the perturber instance,
+        which may include specific parameters related to the sensor, scenario, or any
+        additional customizations applied during initialization.
+
+        Returns:
+            :return dict[str, Any]: A dictionary containing additional perturbation parameters.
+        """
+        return self.thetas
 
     def _create_default_sensor(self) -> PybsmSensor:
         """Create a default sensor when none is provided."""
