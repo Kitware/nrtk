@@ -37,7 +37,6 @@ Interactive Risk Matrix
        "Turbulence", "TurbulenceApertureOTF", "sensor, scenario", ":ref:`Learn more <turbulence>`", "high", "Optical"
        "Radial Distortion", "RadialDistortion", "coefficients", ":ref:`Learn more <radial-distortion>`", "high", "Optical"
 
-
 .. _high-frequency-vibration:
 
 High-Frequency Vibration
@@ -202,6 +201,11 @@ Strong shadows are cast in the target area due to direct illumination.
 Mist / Fog / Snow / Etc
 -----------------------
 
+.. toctree::
+   :hidden:
+
+   operational_risk_modules/haze
+
 Weather conditions reduce visibility between sensor and target.
 
 +-------------------------+--------------------------------------------------------------------------------------------------+
@@ -210,6 +214,8 @@ Weather conditions reduce visibility between sensor and target.
 | **Root Cause**          | Optic Path                                                                                       |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                      |
++-------------------------+--------------------------------------------------------------------------------------------------+
+| **T&E Simulation**      | Refer to :doc:`operational_risk_modules/haze`                                                    |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
 .. figure:: images/risks/mist.png
