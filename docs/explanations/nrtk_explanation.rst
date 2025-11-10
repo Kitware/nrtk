@@ -100,6 +100,89 @@ In addition to NRTK's built in scoring and model evaluation, NRTK has interopera
 `maite <https://github.com/mit-ll-ai-technology/maite>`_ library and integration with other
 `JATIC <https://cdao.pages.jatic.net/public/>`_ tools.
 
+Interpreting Robustness Results
+--------------------------------
+
+NRTK generates performance curves that show how model behavior changes with increasing perturbation strength.
+Understanding how to interpret these results is critical for making informed decisions about model robustness.
+
+Understanding Perturbation Parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* **Increasing parameter values** (e.g., blur sigma, noise amplitude, ground range) represent progressively
+  stronger degradations or more challenging imaging conditions.
+* **Parameter ranges** should reflect realistic operational bounds. For example, ground-range variations should
+  correspond to actual deployment scenarios, not arbitrary numerical sweeps.
+* **Linear vs. non-linear effects**: Single-parameter sweeps often show monotonic performance changes, but
+  multi-parameter sweeps can exhibit complex interactions where the effect is non-additive.
+* **Effective limits**: Some parameters reach saturation points where further increases produce negligible
+  additional degradation (e.g., extreme blur, where the model has already lost any useful signal).
+
+Reading Performance Curves
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Performance curves plot model metrics (accuracy, precision, recall, mAP) against perturbation strength:
+
+* **Steep drops** indicate sensitivity to that perturbation type - a potential operational vulnerability that
+  warrants investigation or mitigation.
+* **Gradual degradation** suggests robustness; the model degrades predictably as imaging conditions worsen,
+  which is often acceptable for operational use.
+* **Performance cliffs** (sudden drops at specific parameter values) are particularly concerning as they indicate
+  narrow operating ranges in which small changes in conditions cause large performance impacts.
+* **Plateau regions** show where the model has reached its failure threshold; additional perturbation doesn't
+  further degrade performance because the model has already lost critical information.
+* **Non-monotonic curves** (performance improving then declining) may indicate overfitting to specific conditions
+  or unexpected model behavior worth investigating.
+
+Comparing Models
+^^^^^^^^^^^^^^^^
+
+When evaluating multiple models under identical perturbations, consider the following factors:
+
+* **Consistent performance advantage**: Performance across perturbation strengths indicates greater robustness,
+  though this should be verified with operational data before making deployment decisions.
+* **Crossover points**: When one model outperforms another at different perturbation levels, this suggests different
+  robustness profiles. Consider which conditions are most operationally relevant.
+* **Perturbation-specific sensitivity**: Models often show different vulnerabilities (e.g., robust to blur but
+  sensitive to noise). Map these sensitivities to operational risk factors to prioritize concerns.
+* **Divergence magnitude**: Differences between models under perturbation reveal how much robustness varies; small
+  differences may not be operationally significant even if statistically measurable.
+
+Material vs. Nominal Changes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Determining whether a performance change requires action depends on operational context:
+
+* **Material change**: Performance drop exceeds mission-critical thresholds (e.g., >5% accuracy loss,
+  unacceptable missed detections). Requires mitigation strategies or operational constraints.
+* **Nominal change**: Performance remains within acceptable operational bounds. May warrant monitoring but
+  doesn't require immediate intervention.
+* **Define thresholds before testing**: What constitutes "material" depends on mission requirements, not NRTK.
+  Establish acceptable performance ranges based on operational consequences before running experiments.
+* **Task-specific interpretation**: A 2% detection accuracy drop might be nominal for vehicle counting but
+  material for threat identification. Consider the trade-offs between false positives and negatives for your
+  specific application.
+* **Statistical vs. practical significance**: Statistically significant changes may not be operationally
+  meaningful if they fall within acceptable performance bounds.
+
+Integration with Operational Risk Assessment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+NRTK results inform but do not replace operational validation:
+
+* **Link to risk factors**: Connect observed sensitivities to operational conditions using the
+  :doc:`risk_factors` mapping. If a model is sensitive to jitter perturbations, consider vibration risks in
+  your deployment environment.
+* **Prioritize validation efforts**: Use NRTK to identify which perturbation types cause material performance
+  changes, then prioritize collecting real-world data for those specific conditions.
+* **Communicate uncertainty**: NRTK perturbations are approximations of real-world effects. Present results as
+  "indicative of potential sensitivity" rather than "proof of operational failure."
+* **Iterative refinement**: Use initial NRTK screening to guide data collection, then validate findings with
+  operational data and refine your understanding of model robustness.
+
+For additional context on when NRTK results should inform decisions versus when additional validation is needed,
+see :doc:`validation_and_trust`.
+
 NRTK Algorithms
 ---------------
 
