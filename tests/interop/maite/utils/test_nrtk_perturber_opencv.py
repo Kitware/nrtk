@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from nrtk.impls.perturb_image.generic.blur import AverageBlurPerturber
+from nrtk.impls.perturb.photometric.blur import AverageBlurPerturber
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.datasets.object_detection import (
@@ -17,7 +17,7 @@ maite_available = [is_available(dep) for dep in deps]
 
 @pytest.mark.skipif(
     not AverageBlurPerturber.is_usable(),
-    reason="nrtk.impls.perturb_image.generic.cv2 submodule unavailable.",
+    reason="nrtk.impls.perturb.photometric submodule unavailable.",
 )
 @pytest.mark.skipif(not maite_available, reason="maite unavailable.")
 class TestNRTKPerturberOpenCV:

@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from smqtk_core.configuration import to_config_dict
 
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+from nrtk.impls.utils.scenario import PybsmScenario
+from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.interop.maite.api.converters import build_factory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError

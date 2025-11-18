@@ -15,10 +15,10 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator import (
     SimplePybsmGenerator,
 )
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
 from nrtk.impls.score_detections.random_scorer import RandomScorer
+from nrtk.impls.utils.scenario import PybsmScenario
+from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
 from tests.impls.gen_object_detector_blackbox_response.test_generator_utils import gen_rand_dets, generator_assertions

@@ -9,7 +9,6 @@ import numpy as np
 import pytest
 from maite.protocols.object_detection import DatumMetadataType, TargetType
 
-from nrtk.impls.perturb_image.generic.nop_perturber import NOPPerturber
 from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.augmentations.object_detection import (
@@ -20,6 +19,7 @@ from nrtk.interop.maite.datasets.object_detection import JATICDetectionTarget
 from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.utils._exceptions import MaiteImportError
 from tests.interop.maite.utils.test_utils import ResizePerturber
+from tests.utils.impls.perturb.nop_perturber import NOPPerturber
 
 random = np.random.default_rng()
 

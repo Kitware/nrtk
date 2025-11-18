@@ -1,7 +1,7 @@
 import numpy as np
 
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
+from nrtk.impls.utils.scenario import PybsmScenario
+from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
