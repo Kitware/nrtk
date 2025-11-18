@@ -43,12 +43,12 @@ class TestSNRImageMetric:
 
         niirs_metric_config = niirs_metric.get_config()
         assert niirs_metric_config["sensor"] == {
-            "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor": sensor.get_config(),
-            "type": "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor",
+            "nrtk.impls.utils.sensor.PybsmSensor": sensor.get_config(),
+            "type": "nrtk.impls.utils.sensor.PybsmSensor",
         }
         assert niirs_metric_config["scenario"] == {
-            "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario": scenario.get_config(),
-            "type": "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario",
+            "nrtk.impls.utils.scenario.PybsmScenario": scenario.get_config(),
+            "type": "nrtk.impls.utils.scenario.PybsmScenario",
         }
 
     def test_classname(self) -> None:

@@ -16,15 +16,15 @@ from smqtk_core.configuration import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.pybsm.detector_otf_perturber import DetectorOTFPerturber
-from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
-from nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
+from nrtk.impls.perturb.optical.detector_otf_perturber import DetectorOTFPerturber
+from nrtk.impls.perturb.optical.jitter_otf_perturber import JitterOTFPerturber
+from nrtk.impls.perturb.optical.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
 from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls import DATA_DIR
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb.test_perturber_utils import pybsm_perturber_assertions
 from tests.test_utils import DummyPerturber
 
 

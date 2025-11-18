@@ -4,9 +4,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from nrtk.impls.perturb_image.pybsm.scenario import PybsmScenario
-from nrtk.impls.perturb_image.pybsm.sensor import PybsmSensor
 from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
+from nrtk.impls.utils.scenario import PybsmScenario
+from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectionDataset
 from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber

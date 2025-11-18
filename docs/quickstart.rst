@@ -35,8 +35,7 @@ your scenario to the right tools.
 
       .. code-block:: python
 
-         from nrtk.impls.perturb_image.generic.haze_perturber
-         import HazePerturber
+         from nrtk.impls.perturb.environment.haze_perturber import HazePerturber
          img_out = HazePerturber(img_in)
 
       See example outputs in our :doc:`Visual Perturbation Gallery <examples/perturbers>`.

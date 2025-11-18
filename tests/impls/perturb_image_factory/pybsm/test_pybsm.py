@@ -57,8 +57,8 @@ class TestStepPerturbImageFactory:
         for idx, p in enumerate(factory):
             for count, _ in enumerate(theta_keys):
                 perturb_cfg = p.get_config()
-                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"]
-                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"]
+                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.utils.sensor.PybsmSensor"]
+                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.utils.scenario.PybsmScenario"]
 
                 if theta_keys[count] in sensor_cfg:
                     assert sensor_cfg[theta_keys[count]] == expected[idx][count]
@@ -117,8 +117,8 @@ class TestStepPerturbImageFactory:
         with expectation:
             for count, _ in enumerate(theta_keys):
                 perturb_cfg = factory[idx].get_config()
-                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor"]
-                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario"]
+                sensor_cfg = perturb_cfg["sensor"]["nrtk.impls.utils.sensor.PybsmSensor"]
+                sce_cfg = perturb_cfg["scenario"]["nrtk.impls.utils.scenario.PybsmScenario"]
 
                 if theta_keys[count] in sensor_cfg:
                     assert sensor_cfg[theta_keys[count]] == expected_val[count]

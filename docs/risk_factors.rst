@@ -13,8 +13,8 @@ challenges.
 The following table provides a summary of risk factors. Where applicable, a T&E guide providing a detailed example is
 listed as well as functionality from NRTK that can be used to simulate the operational risk.
 
-Some of these perturbation functions are not implemented in NRTK directly but can be simulated using the generic
-:doc:`Albumentations perturber <_implementations/nrtk.impls.perturb_image.generic.albumentations_perturber>` which
+Some of these perturbation functions are not implemented in NRTK directly but can be simulated using the
+:doc:`Albumentations perturber <_implementations/nrtk.impls.perturb.wrapper.albumentations_perturber>` which
 provides a wrapper around functionality of the `Albumentations <https://albumentations.ai/>`__ library.
 Some of the risk factors listed don't have any associated functionality or documentation in NRTK but may be covered in
 the future.

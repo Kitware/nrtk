@@ -88,8 +88,8 @@ class TestApp:
         assert factory_config == {
             "theta_keys": ["f", "D", "p_x"],
             "sensor": {
-                "type": "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor",
-                "nrtk.impls.perturb_image.pybsm.sensor.PybsmSensor": {
+                "type": "nrtk.impls.utils.sensor.PybsmSensor",
+                "nrtk.impls.utils.sensor.PybsmSensor": {
                     "name": "L32511x",
                     "D": 0.004,
                     "f": 0.014285714285714287,
@@ -125,8 +125,8 @@ class TestApp:
                 },
             },
             "scenario": {
-                "type": "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario",
-                "nrtk.impls.perturb_image.pybsm.scenario.PybsmScenario": {
+                "type": "nrtk.impls.utils.scenario.PybsmScenario",
+                "nrtk.impls.utils.scenario.PybsmScenario": {
                     "name": "niceday",
                     "ihaze": 2,
                     "altitude": 75,
