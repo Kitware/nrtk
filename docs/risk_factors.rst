@@ -27,15 +27,15 @@ Interactive Risk Matrix
        :class: sphinx-datatable
        :name: subset-example
 
-       "Operational Risk","NRTK Perturbation(s)", "Key Parameters", "Actions", "severity", "dropdown"
-       "High Frequency Vibration", "JitterOTF", "amplitudes", ":ref:`Learn more <high-frequency-vibration>`", "high", "Optical"
-       "Target Out of Focus", "DefocusOTF", "strength", ":ref:`Learn more <target-out-of-focus>`", "low", "Optical"
-       "Noise and Resolution", "pyBSM", "sensor, scenario", ":ref:`Learn more <noise-and-resolution>`", "high", "Optical"
-       "Lens Water Droplet", "WaterDroplet", "strength, size, num_of_droplets", ":ref:`Learn more <lens-water-droplet>`", "low", "Environmental"
-       "Extreme Illumination", "Brightness", "factor", ":ref:`Learn more <extreme-illumination>`", "low", "Environmental"
-       "Mist, Fog, or Snow", "Haze", "factor, depth_map", ":ref:`Learn more <mist-fog-snow>`", "low", "Environmental"
-       "Turbulence", "TurbulenceApertureOTF", "sensor, scenario", ":ref:`Learn more <turbulence>`", "high", "Optical"
-       "Radial Distortion", "RadialDistortion", "coefficients", ":ref:`Learn more <radial-distortion>`", "high", "Optical"
+       "Operational Risk","NRTK Perturbation(s)","Key Parameters","severity","dropdown"
+       ":ref:`High Frequency Vibration <high-frequency-vibration>` ","JitterOTF","amplitudes","high","Optical"
+       ":ref:`Target Out of Focus <target-out-of-focus>`","DefocusOTF","strength","low","Optical"
+       ":ref:`Noise and Resolution <noise-and-resolution>`","pyBSM","sensor, scenario","high","Optical"
+       ":ref:`Lens Water Droplet <lens-water-droplet>`","WaterDroplet","strength, size, num_of_droplets","low","Environmental"
+       ":ref:`Extreme Illumination <extreme-illumination>`","Brightness","factor","low","Environmental"
+       ":ref:`Mist, Fog, or Snow  <mist-fog-snow>`","Haze","factor, depth_map","low","Environmental"
+       ":ref:`Turbulence <turbulence>`","TurbulenceApertureOTF","sensor, scenario","high","Optical"
+       ":ref:`Radial Distortion  <radial-distortion>`","RadialDistortion","coefficients","high","Optical"
 
 .. _high-frequency-vibration:
 
@@ -198,30 +198,33 @@ Strong shadows are cast in the target area due to direct illumination.
 
 .. _mist-fog-snow:
 
-Mist / Fog / Snow / Etc
------------------------
+Mist / Fog / Snow
+-----------------
 
 .. toctree::
    :hidden:
+   :maxdepth: 3
 
    operational_risk_modules/haze
 
-Weather conditions reduce visibility between sensor and target.
+Reduced visibility conditions such as fog, mist, or blowing snow decrease contrast and obscure scene details.
+These effects commonly degrade computer-vision performance in outdoor environments by making targets harder to
+distinguish from the background.
 
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **Impact**              | Targets become occluded or have lower contrast.                                                  |
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **Root Cause**          | Optic Path                                                                                       |
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **Affected Domains**    | Ground, Sea                                                                                      |
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **T&E Simulation**      | Refer to :doc:`operational_risk_modules/haze`                                                    |
-+-------------------------+--------------------------------------------------------------------------------------------------+
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Impact of Risk Factor** | Lower contrast and partial occlusion of features.                                                |
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Root Cause**            | Optical Path                                                                                     |
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Affected Domains**      | Ground, Sea                                                                                      |
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Learn More**            | :doc:`operational_risk_modules/haze`                                                             |
++---------------------------+--------------------------------------------------------------------------------------------------+
 
 .. figure:: images/risks/mist.png
   :width: 500px
 
-  mevadata.org
+  *Source: mevadata.org*
 
 .. _clouds:
 

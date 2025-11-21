@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // -------------------------------
         // Hide columns
         // -------------------------------
-        table.column(4).visible(false); // Severity
-        table.column(5).visible(false); // Type
+        table.column(3).visible(false); // Severity
+        table.column(4).visible(false); // Type
 
         // -------------------------------
         // Create custom wrapper for filters
@@ -54,11 +54,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 className: 'severity-btn high custom-btn',
                 action: function (e, dt, node) {
                   if (activeFilter === 'high') {
-                    dt.column(4).search('').draw();
+                    dt.column(3).search('').draw();
                     activeFilter = null;
                     $(node).removeClass('active');
                   } else {
-                    dt.column(4).search('^high$', true, false).draw();
+                    dt.column(3).search('^high$', true, false).draw();
                     activeFilter = 'high';
                     $('.severity-btn').removeClass('active');
                     $(node).addClass('active');
@@ -70,11 +70,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 className: 'severity-btn low custom-btn',
                 action: function (e, dt, node) {
                   if (activeFilter === 'low') {
-                    dt.column(4).search('').draw();
+                    dt.column(3).search('').draw();
                     activeFilter = null;
                     $(node).removeClass('active');
                   } else {
-                    dt.column(4).search('^low$', true, false).draw();
+                    dt.column(3).search('^low$', true, false).draw();
                     activeFilter = 'low';
                     $('.severity-btn').removeClass('active');
                     $(node).addClass('active');
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // -------------------------------
-        // Dropdown for Type column (6th column)
+        // Dropdown for Type column (5th column)
         // -------------------------------
         if (!document.getElementById('type-label')) {
           const dropdownWrapper = document.createElement('div');
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
           dropdown.style.marginLeft = '5px';
           dropdown.innerHTML = '<option value="">All</option>';
 
-          table.column(5).data().map(d => {
+          table.column(4).data().map(d => {
             const div = document.createElement('div');
             div.innerHTML = d;
             return div.textContent.trim();
@@ -117,8 +117,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
           dropdown.addEventListener('change', function () {
             const val = this.value;
-            if (val) table.column(5).search('^' + val + '$', true, false).draw();
-            else table.column(5).search('').draw();
+            if (val) table.column(4).search('^' + val + '$', true, false).draw();
+            else table.column(4).search('').draw();
           });
 
           dropdownWrapper.appendChild(dropdown);
@@ -154,14 +154,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             // 2. Reset severity
-            table.column(4).search('').draw();
+            table.column(3).search('').draw();
             $('.severity-btn').removeClass('active');
 
             // 3. Reset dropdown
             const dropdown = document.getElementById('column6-filter');
             if (dropdown) {
               dropdown.value = '';
-              table.column(5).search('').draw();
+              table.column(4).search('').draw();
             }
 
             // 4. Hide link again
