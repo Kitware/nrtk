@@ -61,7 +61,55 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
+
+# -- PyData Sphinx Theme configuration ---------------------------------------
+html_theme_options = {
+    "logo": {
+        "image_light": "figures/nrtk-wordmark.png",
+        "image_dark": "figures/nrtk-wordmark.png",
+        "alt_text": "NRTK Documentation",
+    },
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["navbar-icon-links", "theme-switcher"],
+    "navbar_align": "left",
+    "show_nav_level": 1,  # Show only top-level navigation initially
+    "navigation_depth": 4,  # Allow deeper navigation hierarchy in sidebar
+    "collapse_navigation": True,  # Enable collapse/expand functionality
+    "navigation_with_keys": True,
+    "header_links_before_dropdown": 3,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/Kitware/nrtk",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/nrtk/",
+            "icon": "fa-brands fa-python",
+            "type": "fontawesome",
+        },
+        {
+            "name": "conda-forge",
+            "url": "https://github.com/conda-forge/nrtk-feedstock",
+            "icon": "fa-solid fa-box-open",
+            "type": "fontawesome",
+        },
+    ],
+    "footer_start": ["copyright"],
+    "footer_end": ["sphinx-version", "theme-version"],
+    "secondary_sidebar_items": ["page-toc", "edit-this-page"],
+    "use_edit_page_button": False,
+}
+
+# Configure sidebar templates
+html_sidebars = {
+    "**": ["sidebar-nav-bs"],  # Show navigation tree in sidebar
+}
+
 html_static_path = ["_static"]
 html_css_files = [
     "https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css",
