@@ -101,12 +101,62 @@ table th {
     height: auto;
 }
 
+/* Header anchor links - show only on hover */
+.headerlink {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+h1:hover .headerlink,
+h2:hover .headerlink,
+h3:hover .headerlink,
+h4:hover .headerlink,
+h5:hover .headerlink,
+h6:hover .headerlink {
+    opacity: 1;
+}
+
+/* Navbar logo size */
+.navbar-brand img {
+    max-height: 40px;
+    width: auto;
+}
+
+/* Force hide any persistent search fields in navbar - only search button should be visible */
+#pst-search-dialog:not([open]) {
+    display: none !important;
+}
+
+/* Hide search field in navbar center */
+.navbar-center .bd-search,
+.navbar-center form[action="search.html"],
+.navbar-header-items__center .bd-search,
+.navbar-header-items__center form[action="search.html"],
+header .bd-search:not(dialog .bd-search),
+header form.bd-search:not(#pst-search-dialog form.bd-search) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Hide the search button field variant (not the icon button) */
+.search-button-field {
+    display: none !important;
+}
+
 /* Mobile - work with theme's native drawer pattern */
 @media (max-width: 991.98px) {
     /* Ensure article container has appropriate spacing */
     .bd-article-container {
         padding: 1rem;
         box-sizing: border-box;
+    }
+
+    /* Ensure search button remains visible */
+    .search-button__button,
+    button.search-button__button,
+    .pst-navbar-icon.search-button {
+        display: inline-block !important;
+        visibility: visible !important;
     }
 }
 
