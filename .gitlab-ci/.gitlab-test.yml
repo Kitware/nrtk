@@ -1,20 +1,78 @@
 ###############################################################################
+###############################################################################
 # Stage -- Unit Testing
 ###############################################################################
-#
-# Overrides:
-#
-# 1) nrtk specific notebooks.
-# 2) Poetry install for optional dependencies
-#
-###############################################################################
 
+.test-setup:
+  extends: .shared-setup
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - !reference [.shared-setup, rules]
+  variables:
+    FORCE_COLOR: "1"
+  before_script:
+    - !reference [.shared-setup, before_script]
+    # Install dependencies: if EXTRAS equals "extras", install additional optional deps.
+    - |
+      if [ -n "$EXTRAS" ]; then
+        poetry install --sync --only main,tests --extras "$EXTRAS"
+      else
+        poetry install --sync --only main,tests
+      fi
+    - !reference [.opencv-headless, script]
+
+# ------------------------------------------------------------------------------
+# Job 1: Run without extras
+pytest-core:
+  extends: [.test-setup, .python-versions]
+  image: python:${PYTHON_VERSION}
+  variables:
+    JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
+  script:
+    - poetry run pytest --junit-xml="${JUNIT_TARGET}" -rs
+
+# ------------------------------------------------------------------------------
+# Job 2: Run with 'test' extras
 pytest-extras:
+  extends: pytest-core
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   variables:
     EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+    UNDERSCORE_EXTRAS: "${EXTRAS// /_}"
+    COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}_${UNDERSCORE_EXTRAS}"
+    JUNIT_TARGET: ".junit-py${PYTHON_VERSION}_${UNDERSCORE_EXTRAS}.xml"
   tags:
     # - single-gpu
     - single-gpu-g4dn.xlarge
+  script:
+    - !reference [pytest-core, script]
+    - mv .coverage "${COVERAGE_TARGET}"
+  artifacts:
+    paths:
+      - ${COVERAGE_TARGET}
+    reports:
+      junit: "${JUNIT_TARGET}"
+    expire_in: 1 day
+
+.notebooks:
+  extends: .test-setup
+  dependencies: []
+  rules:
+    # If changes are made to an active merge request.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+  allow_failure: true
+  # Using default container image defined above
+  script:
+    - cd "${NOTEBOOK_DIR}"
+    - poetry run papermill
+        --progress-bar -k python3 --stdout-file - --stderr-file -
+        "${NOTEBOOK_FILE}" /dev/null
 
 notebooks:
   extends: .notebooks
@@ -63,3 +121,30 @@ notebooks:
         NOTEBOOK_FILE: [
           "nrtk-gradio.ipynb"
         ]
+
+coverage:
+  extends: .test-setup
+  dependencies:
+    - pytest-extras
+  needs:
+    - job: pytest-extras
+      artifacts: true
+  allow_failure: true
+  script:
+    # Combine all the coverage reports from the pytest matrix into a single
+    # database file.
+    - poetry run coverage combine ./.coverage*
+    # This converts the now combined `.coverage` database file into a single
+    # `coverage.xml` file
+    - poetry run coverage xml
+    # 90% is defined under JATIC SDP requirements
+    - poetry run coverage report --precision=2 --fail-under=90
+  artifacts:
+    when: always
+    paths:
+      - ".coverage"
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    expire_in: 1 day

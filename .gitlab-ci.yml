@@ -1,15 +1,60 @@
+stages:
+  # trigger stages need to come first
+  - container
+  - compliance
+
+  # Our CI/CD Jobs
+  - test
+  - quality
+  - docs
+
+  # Development / Maintenance
+  - mirror
+  - publish
+  - devel
+
+  # JATIC Required Stages
+  - security # this can be replaced with DevSecOps security job
+
+.unschedulable: &unschedulable
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+    when: never
+  - when: always
+
+.skippable: &skippable
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+    when: never
+  - when: always
+
 include:
-  - project: "jatic/kitware/devel-jatic"
-    ref: "main"
-    file: ".gitlab-ci.yml"
+  - local: .gitlab-ci/.gitlab-shared.yml
 
-  # job overrides specific to this repo
-  - local: .gitlab-ci/.gitlab-container.yml
-  - local: .gitlab-ci/.gitlab-docs.yml
-  - local: .gitlab-ci/.gitlab-quality.yml
   - local: .gitlab-ci/.gitlab-test.yml
-  - local: .gitlab-ci/.gitlab-vcrm.yml
+  - local: .gitlab-ci/.gitlab-quality.yml
+  - local: .gitlab-ci/.gitlab-docs.yml
+    <<: *unschedulable
 
+  - local: .gitlab-ci/.gitlab-mirror.yml
+    <<: *skippable
+  - local: .gitlab-ci/.gitlab-publish.yml
+    <<: *skippable
+  - local: .gitlab-ci/.gitlab-container.yml
+
+  - local: .gitlab-ci/.gitlab-security.yml
+    <<: *unschedulable
+
+# ###############################################################################
+# # Stage -- Trigger the DevSecOps components
+# ###############################################################################
+.trigger_compliance:
+  stage: compliance
+  trigger:
+    include: ".gitlab-ci/pipelines/.gitlab-compliance.yml"
+    strategy: depend
+  rules: !reference [.unschedulable, rules]
+  allow_failure: true
 
 trigger_compliance:
   extends: .trigger_compliance

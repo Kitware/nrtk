@@ -1,0 +1,133 @@
+###############################################################################
+# Stage -- Build and publish Docker images
+###############################################################################
+stages:
+  - build
+  - scan
+  - test
+
+include:
+  - project: "jatic/kitware/nrtk"
+    ref: "main"
+    file: ".gitlab-ci/.gitlab-shared.yml"
+
+.container-setup:
+    extends: .shared-setup
+    variables:
+      # Minimum supported version of Python
+      PYTHON_VERSION: "3.10"
+      HARBOR_URL: "harbor.jatic.net"
+      HARBOR_PORT: "443"
+      HARBOR_PROJECT: "kitware"
+      HARBOR_REPO: "$CI_PROJECT_NAME"
+    before_script:
+      - echo ${KITWARE_HARBOR_TOKEN} | docker login ${HARBOR_URL}:${HARBOR_PORT}/v2 --username 'robot$kitware+robot' --password-stdin || echo "Failed to login to Harbor..."
+      # create the docker image tag
+      - IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${CI_COMMIT_SHORT_SHA}"
+    after_script:
+      - echo "Logging out from Harbor..."
+      - docker logout ${HARBOR_URL}:${HARBOR_PORT} || echo "Failed to logout from Harbor..."
+    rules:
+      - when: always
+    allow_failure: false
+    image: docker:25.0.5-git
+
+# Job to build the Docker image for an MR branch
+build:
+  extends: .container-setup
+  stage: build
+  script:
+    # - echo "Image tag: ${IMAGE_PATH}"
+    - |
+      echo "Image tag: ${IMAGE_PATH}"
+
+      docker build --quiet \
+      --tag="${IMAGE_PATH}" \
+      --build-arg="PYTHON_VERSION=${PYTHON_VERSION}" \
+      --build-arg="PROJECT_PATH=${CI_BUILDS_DIR}/${CI_PROJECT_PATH}" \
+      --build-arg="CI_JOB_TOKEN=${CI_JOB_TOKEN}" \
+      --no-cache \
+      -f "${DOCKERFILE_FILE}" \
+      .
+
+    - echo "Pushing image to Harbor..."
+    - docker push ${IMAGE_PATH}
+
+scan:
+  extends: .container-setup
+  stage: scan
+  needs:
+    - job: build
+      artifacts: false
+  allow_failure: true
+  script:
+    - apk add --no-cache curl docker
+    - echo "Installing Trivy..."
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+    - curl -sSfL -o junit.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/junit.tpl
+
+    - echo "Pulling image from Harbor..."
+    - docker pull "${IMAGE_PATH}"
+
+    - echo "Scanning image with Trivy..."
+    - ./bin/trivy image "${IMAGE_PATH}" --scanners vuln --format template --template "@junit.tpl" -o trivy.xml --severity HIGH,CRITICAL --exit-code 1
+  artifacts:
+    untracked: false
+    when: on_failure
+    paths:
+      - trivy.xml
+
+test:
+  extends: .container-setup
+  stage: test
+  needs:
+    - job: build
+      artifacts: false
+  allow_failure: false
+  before_script:
+    - !reference [.container-setup, before_script]
+    - echo "Pulling image from Harbor..."
+    - docker pull "${IMAGE_PATH}"
+  script:
+    - docker run --rm "${IMAGE_PATH}"
+
+# ###############################################################################
+# These two should be combined into one eventually
+# ###############################################################################
+# .cleanup:
+#   extends: .container-setup
+#   stage: .post
+#   needs:
+#     - job: build
+#       artifacts: false
+#   allow_failure: true
+
+# cleanup_remote:
+#   extends: .cleanup
+#   rules:
+#   - if: '$PIPELINE_CONTEXT == "merge_request_event"'
+#     when: always
+#   - when: never
+#   script:
+#     - apk update
+#     - apk add --no-cache curl jq
+#     - |
+#       # Set the correct repo path
+#       ARTIFACT_API="https://${HARBOR_URL}/api/v2.0/projects/${HARBOR_PROJECT}/repositories/${HARBOR_REPO}%252F${CONTAINER_NAME}/artifacts"
+
+#       echo "Fetching artifacts from: $ARTIFACT_API"
+
+#       RESPONSE=$(curl -X 'GET' -u "robot$kitware+robot:${KITWARE_HARBOR_TOKEN}" \
+#         -H 'accept: application/json' \
+#         "$ARTIFACT_API")
+
+#       DIGEST=$(echo "$RESPONSE" | jq -r --arg TAG "$CI_COMMIT_SHORT_SHA" '.[] | select(.tags[]?.name == $TAG) | .digest')
+
+#       echo "Extracted digest: $DIGEST"
+#       ENCODED_DIGEST="${DIGEST/:/%3A}"
+
+#       DELETE_API="${ARTIFACT_API}/${ENCODED_DIGEST}"
+
+#       echo "Deleting artifact from: $DELETE_API"
+
+#       curl -X 'DELETE' -u "robot$kitware+robot:${KITWARE_HARBOR_TOKEN}" -H 'accept: application/json' "$DELETE_API"
