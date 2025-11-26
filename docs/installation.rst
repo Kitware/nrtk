@@ -188,7 +188,7 @@ description of the extra.
     **Pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
     :mod:`~nrtk.impls.perturb.photometric.enhance` perturbers.
 
-    **albumentations**: installs `albumentations <https://albumentations.ai/>`_. Required for
+    **albumentations**: installs `nrtk-albumentations <https://github.com/Kitware/nrtk-albumentations>`_. Required for
     :mod:`~nrtk.impls.perturb.wrapper.albumentations_perturber`,
     :mod:`~nrtk.impls.perturb.geometric.random_rotation_perturber`, and
     :mod:`~nrtk.impls.perturb.geometric.random_scale_perturber`.
@@ -262,7 +262,7 @@ The following table lists the perturbers and the extra/dependencies required to 
       - Key Dependencies Provided by Extra(s)
     * - :ref:`AlbumentationsPerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
-      - ``albumentations``, ``OpenCV``
+      - ``nrtk-albumentations``, ``OpenCV``
     * - :ref:`AverageBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
@@ -325,10 +325,10 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ---
     * - :ref:`RandomRotationPerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
-      - ``albumentations``, ``OpenCV``
+      - ``nrtk-albumentations``, ``OpenCV``
     * - :ref:`RandomScalePerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
-      - ``albumentations``, ``OpenCV``
+      - ``nrtk-albumentations``, ``OpenCV``
     * - :ref:`RandomTranslationPerturber`
       - ---
       - ---

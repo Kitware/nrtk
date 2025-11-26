@@ -1,7 +1,7 @@
 Pillow:
 - Pillow
 albumentations:
-- albumentations
+- nrtk-albumentations
 diffusion:
 - torch
 - diffusers
@@ -30,7 +30,7 @@ notebook-testing:
 - transformers
 - ultralytics
 - jupytext
-- albumentations
+- nrtk-albumentations
 pybsm:
 - pybsm
 scikit-image:
