@@ -15,7 +15,7 @@ class TestPyrightNotebook:
     @pytest.mark.parametrize(
         ("filepath", "expected_num_errors"),
         [
-            ("docs/examples/maite/gradio/nrtk-gradio.ipynb", 0),
+            # ("docs/examples/maite/gradio/nrtk-gradio.ipynb", 0), Temporarily removed until sensor/scenario are removed
             ("docs/examples/maite/augmentations.ipynb", 0),
             # Suppressing type checking errors related to xaitk-* imports
             ("docs/examples/maite/jatic-perturbations-saliency.ipynb", 3),

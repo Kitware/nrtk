@@ -9,9 +9,9 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
 Example usage:
-    sensor = PybsmSensor(...)
-    scenario = PybsmScenario(...)
-    perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
+    sensor = {...}
+    scenario = {...}
+    perturber = DetectorOTFPerturber(**sensor, **scenario)
     perturbed_image, boxes = perturber.perturb(image, boxes)
 
 Notes:
@@ -25,14 +25,9 @@ __all__ = ["DetectorOTFPerturber"]
 from typing import Any
 
 import numpy as np
-from smqtk_core.configuration import (
-    to_config_dict,
-)
 from typing_extensions import override
 
 from nrtk.impls.perturb.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -52,10 +47,6 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
     Attributes:
-        sensor (PybsmSensor | None):
-            The sensor configuration used to define perturbation parameters.
-        scenario (PybsmScenario | None):
-            Scenario configuration providing environmental context.
         w_x (float | None):
             Detector width in the x direction (meters).
         w_y (float | None):
@@ -68,8 +59,6 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
 
     def __init__(
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
         w_x: float | None = None,
         w_y: float | None = None,
         f: float | None = None,
@@ -79,10 +68,6 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
         """Initializes the DetectorOTFPerturber.
 
         Args:
-            sensor:
-                pyBSM sensor object.
-            scenario:
-                pyBSM scenario object.
             w_x:
                 Detector width in the x direction (m).
             w_y:
@@ -111,7 +96,8 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
             :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
+        super().__init__(interp=interp, **kwargs)
+        self._use_default_psf = not kwargs
 
         # Store perturber-specific overrides
         self._override_w_x = w_x
@@ -139,20 +125,15 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
         if self._override_f:
             self.sensor.f = self._override_f
 
-        pybsm_sensor = self.sensor.create_sensor()
-        pybsm_scenario = self.scenario.create_scenario()
-
         return DetectorSimulator(
-            sensor=pybsm_sensor,
-            scenario=pybsm_scenario,
+            sensor=self.sensor,
+            scenario=self.scenario,
         )
 
     @override
     def get_config(self) -> dict[str, Any]:
         """Get current configuration including perturber-specific parameters."""
-        cfg = super().get_config()
-        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
-        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg = {}
         cfg["w_x"] = self.w_x
         cfg["w_y"] = self.w_y
         cfg["f"] = self.f

@@ -8,27 +8,23 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage for base functionality.
 
 Example usage:
-    sensor = PybsmSensor(...)
-    scenario = PybsmScenario(...)
-    perturber = JitterOTFPerturber(sensor=sensor, scenario=scenario)
+    sensor = {...}
+    scenario = {...}
+    perturber = JitterOTFPerturber(**sensor, **scenario)
     perturbed_image = perturber.perturb(image)
 """
 
 from __future__ import annotations
 
-__all__ = ["JitterOTFPerturber"]
-
 from typing import Any
 
+__all__ = ["JitterOTFPerturber"]
+
+
 import numpy as np
-from smqtk_core.configuration import (
-    to_config_dict,
-)
 from typing_extensions import override
 
 from nrtk.impls.perturb.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -47,14 +43,6 @@ class JitterOTFPerturber(PybsmOTFPerturber):
 
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
-    Attributes:
-        sensor (PybsmSensor | None):
-            The sensor configuration used to define perturbation parameters.
-        scenario (PybsmScenario | None):
-            Scenario configuration providing environmental context for perturbations.
-        additional_params (dict):
-            Additional configuration options for customizing perturbations.
-
     Methods:
         perturb(image):
             Applies the jitter-based OTF perturbation to the provided image.
@@ -66,8 +54,6 @@ class JitterOTFPerturber(PybsmOTFPerturber):
 
     def __init__(
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
         s_x: float | None = None,
         s_y: float | None = None,
         interp: bool = True,
@@ -76,10 +62,6 @@ class JitterOTFPerturber(PybsmOTFPerturber):
         """Initializes the JitterOTFPerturber.
 
         Args:
-            sensor:
-                pyBSM sensor object.
-            scenario:
-                pyBSM scenario object
             s_x:
                 root-mean-squared jitter amplitudes in the x direction (rad).
             s_y:
@@ -104,10 +86,9 @@ class JitterOTFPerturber(PybsmOTFPerturber):
         Raises:
             :raises ImportError: If pyBSM is not found
         """
-        # Initialize base class (which handles kwargs application to sensor/scenario)
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
+        super().__init__(interp=interp, **kwargs)
+        self._use_default_psf = not kwargs
 
-        # Store perturber-specific overrides
         self._override_s_x = s_x
         self._override_s_y = s_y
 
@@ -127,22 +108,17 @@ class JitterOTFPerturber(PybsmOTFPerturber):
         if self._override_s_y:
             self.sensor.s_y = self._override_s_y
 
-        pybsm_sensor = self.sensor.create_sensor()
-        pybsm_scenario = self.scenario.create_scenario()
-
         return JitterSimulator(
-            sensor=pybsm_sensor,
-            scenario=pybsm_scenario,
+            sensor=self.sensor,
+            scenario=self.scenario,
         )
 
     @override
     def get_config(self) -> dict[str, Any]:
         """Get current configuration including perturber-specific parameters."""
-        cfg = super().get_config()
-        cfg["sensor"] = to_config_dict(self._sensor) if self._sensor else None
-        cfg["scenario"] = to_config_dict(self._scenario) if self._scenario else None
+        cfg = {}
         cfg["s_x"] = self.s_x
         cfg["s_y"] = self.s_y
-        cfg["interp"] = self._interp
+        cfg["interp"] = self.interp
 
         return cfg

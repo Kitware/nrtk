@@ -170,7 +170,7 @@ description of the extra.
     :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
-    :ref:`CustomPybsmPerturbImageFactory`, :ref:`PyBSMSensor`, :ref:`PyBSMScenario`, :ref:`PyBSMPerturber`,
+    :ref:`PyBSMPerturber`, :ref:`PyBSMOTFPerturber`
     :ref:`TurbulenceApertureOTFPerturber`, :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`,
     :ref:`CircularApertureOTFPerturber`, :ref:`DefocusOTFPerturber`, :ref:`SimplePybsmGenerator`, and
     :ref:`NIIRSImageMetric`.
@@ -311,6 +311,9 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`PepperNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
+    * - :ref:`PyBSMOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
     * - :ref:`PyBSMPerturber`
       - ``pybsm``
       - ``pyBSM``

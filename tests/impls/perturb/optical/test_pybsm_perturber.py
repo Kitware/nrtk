@@ -27,10 +27,12 @@ class TestPyBSMPerturber:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE))
         img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+
+        sensor_and_scenario["ground_range"] = 10000
 
         # Test perturb interface directly
-        inst = PybsmPerturber(sensor=sensor, scenario=scenario, ground_range=10000)
+        inst = PybsmPerturber(**sensor_and_scenario)
         out_img = pybsm_perturber_assertions(
             perturb=inst,
             image=image,
@@ -54,9 +56,10 @@ class TestPyBSMPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario[param_name] = param_value
         # For type: ignore below, see https://github.com/microsoft/pyright/issues/5545#issuecomment-1644027877
-        inst = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})  # type: ignore
+        inst = PybsmPerturber(rng_seed=rng_seed, **sensor_and_scenario)
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
@@ -65,7 +68,7 @@ class TestPyBSMPerturber:
             img_gsd=img_gsd,
         )
         # Create another instance with same seed and ensure perturbed image is the same
-        inst2 = PybsmPerturber(sensor=sensor, scenario=scenario, rng_seed=rng_seed, **{param_name: param_value})  # type: ignore
+        inst2 = PybsmPerturber(rng_seed=rng_seed, **sensor_and_scenario)
         pybsm_perturber_assertions(
             perturb=inst2.perturb,
             image=image,
@@ -73,47 +76,25 @@ class TestPyBSMPerturber:
             img_gsd=img_gsd,
         )
 
-    def test_configuration(self) -> None:
+    def test_configuration(self) -> None:  # noqa: C901
         """Test configuration stability."""
-        sensor, scenario = create_sample_sensor_and_scenario()
-        inst = PybsmPerturber(sensor=sensor, scenario=scenario)
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        inst = PybsmPerturber(**sensor_and_scenario)
         for i in configuration_test_helper(inst):
             assert i.sensor is not None
-            assert i.sensor.name == sensor.name
-            assert i.sensor.D == sensor.D
-            assert i.sensor.f == sensor.f
-            assert i.sensor.p_x == sensor.p_x
-            assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
-            assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
-            assert i.sensor.eta == sensor.eta
-            assert i.sensor.w_x == sensor.w_x
-            assert i.sensor.w_y == sensor.w_y
-            assert i.sensor.int_time == sensor.int_time
-            assert i.sensor.n_tdi == sensor.n_tdi
-            assert i.sensor.dark_current == sensor.dark_current
-            assert i.sensor.read_noise == sensor.read_noise
-            assert i.sensor.max_n == sensor.max_n
-            assert i.sensor.bit_depth == sensor.bit_depth
-            assert i.sensor.max_well_fill == sensor.max_well_fill
-            assert i.sensor.s_x == sensor.s_x
-            assert i.sensor.s_y == sensor.s_y
-            assert i.sensor.da_x == sensor.da_x
-            assert i.sensor.da_y == sensor.da_y
-            assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
-            assert np.array_equal(i.sensor.qe, sensor.qe)
-
             assert i.scenario is not None
-            assert i.scenario.name == scenario.name
-            assert i.scenario.ihaze == scenario.ihaze
-            assert i.scenario.altitude == scenario.altitude
-            assert i.scenario.ground_range == scenario.ground_range
-            assert i.scenario.aircraft_speed == scenario.aircraft_speed
-            assert i.scenario.target_reflectance == scenario.target_reflectance
-            assert i.scenario.target_temperature == scenario.target_temperature
-            assert i.scenario.background_reflectance == scenario.background_reflectance
-            assert i.scenario.background_temperature == scenario.background_temperature
-            assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
-            assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
+
+            for param_name, param_value in sensor_and_scenario.items():
+                if hasattr(i.sensor, param_name):
+                    if type(param_value) is np.ndarray:
+                        assert np.allclose(i.sensor.__getattribute__(param_name), param_value)
+                    else:
+                        assert i.sensor.__getattribute__(param_name) == param_value
+                if hasattr(i.scenario, param_name):
+                    if type(param_value) is np.ndarray:
+                        assert np.allclose(i.scenario.__getattribute__(param_name), param_value)
+                    else:
+                        assert i.scenario.__getattribute__(param_name) == param_value
 
             assert np.array_equal(i._reflectance_range, inst._reflectance_range)
 
@@ -137,9 +118,8 @@ class TestPyBSMPerturber:
     )
     def test_configuration_bounds(self, reflectance_range: np.ndarray, expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
-        sensor, scenario = create_sample_sensor_and_scenario()
         with expectation:
-            PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=reflectance_range)
+            PybsmPerturber(reflectance_range=reflectance_range)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -156,8 +136,8 @@ class TestPyBSMPerturber:
     )
     def test_additional_params(self, additional_params: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test variations of additional params."""
-        sensor, scenario = create_sample_sensor_and_scenario()
-        perturber = PybsmPerturber(sensor=sensor, scenario=scenario, reflectance_range=np.array([0.05, 0.5]))
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        perturber = PybsmPerturber(reflectance_range=np.array([0.05, 0.5]), **sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
             _ = perturber(image, **additional_params)
@@ -180,8 +160,8 @@ class TestPyBSMPerturber:
     ) -> None:
         """Test that bounding boxes scale as expected during perturb."""
         image = np.array(Image.open(INPUT_IMG_FILE))
-        sensor, scenario = create_sample_sensor_and_scenario()
-        inst = PybsmPerturber(sensor=sensor, scenario=scenario)
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        inst = PybsmPerturber(**sensor_and_scenario)
         _, out_boxes = inst.perturb(image, boxes=boxes, img_gsd=(3.19 / 160))
         assert out_boxes == snapshot
 
@@ -190,19 +170,5 @@ class TestPyBSMPerturber:
         """Test that an exception is raised when required dependencies are not installed."""
         mock_is_usable.return_value = False
         assert not PybsmPerturber.is_usable()
-        sensor, scenario = create_sample_sensor_and_scenario()
         with pytest.raises(PyBSMImportError):
-            PybsmPerturber(sensor=sensor, scenario=scenario)
-
-    def test_default_config(self) -> None:
-        """Test default configuration when created with no parameters."""
-        image = np.array(Image.open(INPUT_IMG_FILE))
-        inst = PybsmPerturber()
-        inst.perturb(image, img_gsd=(3.19 / 160))
-        out_cfg = inst.get_config()
-
-        assert out_cfg["sensor"] is not None
-        assert out_cfg["scenario"] is not None
-        assert out_cfg["rng_seed"] == 1
-        assert (out_cfg["reflectance_range"] == np.array([0.05, 0.5])).all()
-        assert len(out_cfg.keys()) == 4
+            PybsmPerturber()

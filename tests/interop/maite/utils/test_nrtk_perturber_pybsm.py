@@ -1,12 +1,10 @@
 import json
 from pathlib import Path
 
-import numpy as np
 import pytest
 
-from nrtk.impls.perturb_image_factory.pybsm import CustomPybsmPerturbImageFactory
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
+from nrtk.impls.perturb.optical.pybsm_perturber import PybsmPerturber
+from nrtk.impls.perturb_image_factory.generic.multivariate import MultivariatePerturbImageFactory
 from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectionDataset
 from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
@@ -42,9 +40,7 @@ def _load_dataset(dataset_path: str, load_metadata: bool = True) -> COCOJATICObj
     not COCOJATICObjectDetectionDataset.is_usable(),
     reason="COCOJATICObjectDetectionDataset not usable",
 )
-@pytest.mark.skipif(not CustomPybsmPerturbImageFactory.is_usable(), reason="CustomPybsmPerturbImageFactory not usable")
-@pytest.mark.skipif(not PybsmSensor.is_usable(), reason="PybsmSensor not usable")
-@pytest.mark.skipif(not PybsmScenario.is_usable(), reason="PybsmScenario not usable")
+@pytest.mark.skipif(not PybsmPerturber.is_usable(), reason="PybsmPerturber not usable")
 @pytest.mark.skipif(not kwcoco_available, reason=str(KWCocoImportError()))
 @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestNRTKPerturberPyBSM:
@@ -57,25 +53,8 @@ class TestNRTKPerturberPyBSM:
         """Test that an appropriate error is raised if required metadata is missing."""
         dataset = _load_dataset(dataset_path=str(DATASET_FOLDER), load_metadata=False)
 
-        pybsm_factory = CustomPybsmPerturbImageFactory(
-            sensor=PybsmSensor(
-                name="L32511x",
-                D=0.004,
-                f=0.014285714285714287,
-                p_x=0.00002,
-                opt_trans_wavelengths=np.array([3.8e-7, 7.0e-7]),
-                eta=0.4,
-                int_time=0.3,
-                read_noise=25.0,
-                max_n=96000,
-                bit_depth=11.9,
-                max_well_fill=0.005,
-                da_x=0.0001,
-                da_y=0.0001,
-                qe_wavelengths=np.array([3.0e-7, 4.0e-7, 5.0e-7, 6.0e-7, 7.0e-7, 8.0e-7, 9.0e-7, 1.0e-6, 1.1e-6]),
-                qe=np.array([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0]),
-            ),
-            scenario=PybsmScenario(name="niceday", ihaze=2, altitude=75, ground_range=0),
+        pybsm_factory = MultivariatePerturbImageFactory(
+            perturber=PybsmPerturber,
             theta_keys=["f", "D"],
             thetas=[[0.014, 0.012], [0.001]],
         )

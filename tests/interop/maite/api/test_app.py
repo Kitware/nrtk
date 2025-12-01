@@ -85,31 +85,30 @@ class TestApp:
         assert len(kwargs["maite_dataset"]) == 11
 
         factory_config = kwargs["perturber_factory"].get_config()
-        assert factory_config == {
-            "theta_keys": ["f", "D", "p_x"],
-            "sensor": {
-                "type": "nrtk.impls.utils.sensor.PybsmSensor",
-                "nrtk.impls.utils.sensor.PybsmSensor": {
-                    "name": "L32511x",
+
+        np.testing.assert_equal(
+            factory_config,
+            {
+                "perturber": "nrtk.impls.perturb.optical.pybsm_perturber.PybsmPerturber",
+                "theta_keys": ["f", "D", "p_x"],
+                "perturber_kwargs": {
+                    "sensor_name": "L32511x",
                     "D": 0.004,
                     "f": 0.014285714285714287,
                     "p_x": 2e-05,
                     "opt_trans_wavelengths": [3.8e-07, 7e-07],
-                    "optics_transmission": [1.0, 1.0],
+                    "optics_transmission": None,
                     "eta": 0.4,
-                    "w_x": 2e-05,
-                    "w_y": 2e-05,
+                    "w_x": None,
+                    "w_y": None,
                     "int_time": 0.03,
                     "dark_current": 0.0,
                     "read_noise": 25.0,
                     "max_n": 96000.0,
                     "bit_depth": 11.9,
                     "max_well_fill": 0.005,
-                    "n_tdi": 1.0,
                     "s_x": 0.0,
                     "s_y": 0.0,
-                    "da_x": 0.0001,
-                    "da_y": 0.0001,
                     "qe_wavelengths": [
                         3e-07,
                         4e-07,
@@ -122,12 +121,7 @@ class TestApp:
                         1.1e-06,
                     ],
                     "qe": [0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0.0],
-                },
-            },
-            "scenario": {
-                "type": "nrtk.impls.utils.scenario.PybsmScenario",
-                "nrtk.impls.utils.scenario.PybsmScenario": {
-                    "name": "niceday",
+                    "scenario_name": "niceday",
                     "ihaze": 2,
                     "altitude": 75,
                     "ground_range": 0,
@@ -138,11 +132,10 @@ class TestApp:
                     "background_temperature": 293.0,
                     "ha_wind_speed": 21.0,
                     "cn2_at_1m": 0,
-                    "interp": False,
                 },
+                "thetas": [[0.014, 0.012], [0.001, 0.003], [2e-05]],
             },
-            "thetas": [[0.014, 0.012], [0.001, 0.003], [2e-05]],
-        }
+        )
 
         # Check if the response status code is 200 OK
         assert response.status_code == 200

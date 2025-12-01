@@ -29,10 +29,10 @@ class TestCircularApertureOTFPerturber:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
-        inst2 = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
+        inst = CircularApertureOTFPerturber(interp=True, **sensor_and_scenario)
+        inst2 = CircularApertureOTFPerturber(interp=False, **sensor_and_scenario)
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -66,15 +66,14 @@ class TestCircularApertureOTFPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario["D"] = D
+        sensor_and_scenario["eta"] = eta
         inst = CircularApertureOTFPerturber(
-            sensor=sensor,
-            scenario=scenario,
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
-            D=D,
-            eta=eta,
             interp=interp,
+            **sensor_and_scenario,
         )
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(
@@ -95,8 +94,9 @@ class TestCircularApertureOTFPerturber:
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = CircularApertureOTFPerturber()
-        out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None)
-        pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image)
+        img_gsd = 3.19 / 160.0
+        out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None, img_gsd=img_gsd)
+        pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image, img_gsd=img_gsd)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
@@ -114,8 +114,8 @@ class TestCircularApertureOTFPerturber:
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
-        sensor, scenario = create_sample_sensor_and_scenario()
-        perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        perturber = CircularApertureOTFPerturber(**sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber(image, **additional_params)
@@ -173,23 +173,6 @@ class TestCircularApertureOTFPerturber:
             )
 
     @pytest.mark.parametrize(
-        ("additional_params", "expectation"),
-        [
-            ({}, does_not_raise()),
-        ],
-    )
-    def test_default_additional_params(
-        self,
-        additional_params: dict[str, Any],
-        expectation: AbstractContextManager,
-    ) -> None:
-        """Test variations of additional params."""
-        perturber = CircularApertureOTFPerturber()
-        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        with expectation:
-            _ = perturber(image, **additional_params)
-
-    @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "D", "eta"),
         [
             ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0),
@@ -214,43 +197,13 @@ class TestCircularApertureOTFPerturber:
 
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
-        sensor, scenario = create_sample_sensor_and_scenario()
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        inst = CircularApertureOTFPerturber(**sensor_and_scenario)
         for i in configuration_test_helper(inst):
-            if i.sensor:
-                assert i.sensor.name == sensor.name
-                assert i.sensor.D == sensor.D
-                assert i.sensor.f == sensor.f
-                assert i.sensor.p_x == sensor.p_x
-                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
-                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
-                assert i.sensor.eta == sensor.eta
-                assert i.sensor.w_x == sensor.w_x
-                assert i.sensor.w_y == sensor.w_y
-                assert i.sensor.int_time == sensor.int_time
-                assert i.sensor.dark_current == sensor.dark_current
-                assert i.sensor.read_noise == sensor.read_noise
-                assert i.sensor.max_n == sensor.max_n
-                assert i.sensor.bit_depth == sensor.bit_depth
-                assert i.sensor.max_well_fill == sensor.max_well_fill
-                assert i.sensor.s_x == sensor.s_x
-                assert i.sensor.s_y == sensor.s_y
-                assert i.sensor.da_x == sensor.da_x
-                assert i.sensor.da_y == sensor.da_y
-                assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
-                assert np.array_equal(i.sensor.qe, sensor.qe)
-            if i.scenario:
-                assert i.scenario.name == scenario.name
-                assert i.scenario.ihaze == scenario.ihaze
-                assert i.scenario.altitude == scenario.altitude
-                assert i.scenario.ground_range == scenario.ground_range
-                assert i.scenario.aircraft_speed == scenario.aircraft_speed
-                assert i.scenario.target_reflectance == scenario.target_reflectance
-                assert i.scenario.target_temperature == scenario.target_temperature
-                assert i.scenario.background_reflectance == scenario.background_reflectance
-                assert i.scenario.background_temperature == scenario.background_temperature
-                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
-                assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
+            assert i.mtf_wavelengths is not None
+            assert i.mtf_weights is not None
+            assert sensor_and_scenario["D"] == i.D
+            assert i.eta == sensor_and_scenario["eta"]
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "D", "eta"),
@@ -266,14 +219,13 @@ class TestCircularApertureOTFPerturber:
         eta: float,
     ) -> None:
         """Test configuration stability."""
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario["D"] = D
+        sensor_and_scenario["eta"] = eta
         inst = CircularApertureOTFPerturber(
-            sensor=sensor,
-            scenario=scenario,
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
-            D=D,
-            eta=eta,
+            **sensor_and_scenario,
         )
         for i in configuration_test_helper(inst):
             assert i.mtf_wavelengths is not None
@@ -282,40 +234,6 @@ class TestCircularApertureOTFPerturber:
             assert np.array_equal(i.mtf_weights, mtf_weights)
             assert i.D == D
             assert i.eta == eta
-            if i.sensor:
-                assert i.sensor.name == sensor.name
-                assert i.sensor.D == D
-                assert i.sensor.f == sensor.f
-                assert i.sensor.p_x == sensor.p_x
-                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
-                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
-                assert i.sensor.eta == eta
-                assert i.sensor.w_x == sensor.w_x
-                assert i.sensor.w_y == sensor.w_y
-                assert i.sensor.int_time == sensor.int_time
-                assert i.sensor.dark_current == sensor.dark_current
-                assert i.sensor.read_noise == sensor.read_noise
-                assert i.sensor.max_n == sensor.max_n
-                assert i.sensor.bit_depth == sensor.bit_depth
-                assert i.sensor.max_well_fill == sensor.max_well_fill
-                assert i.sensor.s_x == sensor.s_x
-                assert i.sensor.s_y == sensor.s_y
-                assert i.sensor.da_x == sensor.da_x
-                assert i.sensor.da_y == sensor.da_y
-                assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
-                assert np.array_equal(i.sensor.qe, sensor.qe)
-            if i.scenario:
-                assert i.scenario.name == scenario.name
-                assert i.scenario.ihaze == scenario.ihaze
-                assert i.scenario.altitude == scenario.altitude
-                assert i.scenario.ground_range == scenario.ground_range
-                assert i.scenario.aircraft_speed == scenario.aircraft_speed
-                assert i.scenario.target_reflectance == scenario.target_reflectance
-                assert i.scenario.target_temperature == scenario.target_temperature
-                assert i.scenario.background_reflectance == scenario.background_reflectance
-                assert i.scenario.background_temperature == scenario.background_temperature
-                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
-                assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "mtf_wavelengths", "mtf_weights", "D", "eta", "interp", "is_rgb"),
@@ -347,19 +265,20 @@ class TestCircularApertureOTFPerturber:
             img = np.stack((img,) * 3, axis=-1)
         img_md = {"img_gsd": 3.19 / 160.0}
 
-        sensor = None
-        scenario = None
+        sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = create_sample_sensor_and_scenario()
+
+        if D is not None:
+            sensor_and_scenario["D"] = D
+        if eta is not None:
+            sensor_and_scenario["eta"] = eta
 
         inst = CircularApertureOTFPerturber(
-            sensor=sensor,
-            scenario=scenario,
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
-            D=D,
-            eta=eta,
             interp=interp,
+            **sensor_and_scenario,
         )
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
@@ -382,29 +301,6 @@ class TestCircularApertureOTFPerturber:
         inst = CircularApertureOTFPerturber()
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
-
-    @pytest.mark.parametrize(
-        ("param_name", "param_value"),
-        [
-            ("ground_range", 10000),
-            ("altitude", 5000),
-            ("ihaze", 2),
-        ],
-    )
-    def test_kwargs_application(self, param_name: str, param_value: int) -> None:
-        """Test that kwargs are properly applied to sensor/scenario."""
-        sensor, scenario = create_sample_sensor_and_scenario()
-        inst = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario, **{param_name: param_value})  # type: ignore[arg-type]
-
-        # Verify the parameter was applied
-        assert hasattr(inst.sensor, param_name) or hasattr(inst.scenario, param_name)
-        if hasattr(inst.scenario, param_name):
-            assert getattr(inst.scenario, param_name) == param_value
-        elif hasattr(inst.sensor, param_name):
-            assert getattr(inst.sensor, param_name) == param_value
-
-        # Verify params property returns the kwargs
-        assert inst.params == {param_name: param_value}
 
 
 @mock.patch.object(CircularApertureOTFPerturber, "is_usable")

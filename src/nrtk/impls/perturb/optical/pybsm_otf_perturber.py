@@ -20,19 +20,61 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
-from typing_extensions import Self, override
+from typing_extensions import override
 
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
 # Import checks
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation"])
+pybsm_available: bool = import_guard(
+    "pybsm",
+    PyBSMImportError,
+    ["simulation", "simulation.scenario", "simulation.sensor"],
+)
 
 from pybsm.simulation import ImageSimulator  # noqa: E402
-from smqtk_core.configuration import from_config_dict, make_default_config  # noqa: E402
+from pybsm.simulation.scenario import Scenario  # noqa: E402
+from pybsm.simulation.sensor import Sensor  # noqa: E402
+
+# Default parameter values used in __init__ and get_default_config
+DEFAULT_PARAMS: dict[str, Any] = {
+    # Sensor parameters
+    "sensor_name": "Sensor",
+    "D": 275e-3,
+    "f": 4,
+    "p_x": 0.008e-3,
+    "p_y": None,
+    "opt_trans_wavelengths": np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+    "optics_transmission": None,
+    "eta": 0.0,
+    "w_x": None,
+    "w_y": None,
+    "int_time": 1.0,
+    "n_tdi": 1.0,
+    "dark_current": 0.0,
+    "read_noise": 0.0,
+    "max_n": int(100.0e6),
+    "bit_depth": 100.0,
+    "max_well_fill": 1.0,
+    "s_x": 0.0,
+    "s_y": 0.0,
+    "qe_wavelengths": None,
+    "qe": None,
+    # Scenario parameters
+    "scenario_name": "Scenario",
+    "ihaze": 1,
+    "altitude": 9000,
+    "ground_range": 0,
+    "aircraft_speed": 0.0,
+    "target_reflectance": 0.15,
+    "target_temperature": 295.0,
+    "background_reflectance": 0.07,
+    "background_temperature": 293.0,
+    "ha_wind_speed": 21.0,
+    "cn2_at_1m": 1.7e-14,
+    "interp": True,
+}
 
 
 class PybsmOTFPerturber(PerturbImage, ABC):
@@ -46,27 +88,167 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     - Dependency checking
 
     Attributes:
-        sensor (PybsmSensor | None):
-            The sensor configuration for the perturbation.
-        scenario (PybsmScenario | None):
-            The scenario configuration used for perturbation.
         interp (bool):
             Specifies whether to use interpolated atmospheric data.
     """
 
+    ihaze_values: list[int] = [1, 2]
+    altitude_values: list[float] = (
+        [2, 32.55, 75, 150, 225, 500] + list(range(1000, 12001, 1000)) + list(range(14000, 20001, 2000)) + [24500]
+    )
+    ground_range_values: list[int] = (
+        [0, 100, 500]
+        + list(range(1000, 20001, 1000))
+        + list(range(22000, 80001, 2000))
+        + list(range(85000, 300001, 5000))
+    )
+
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
-        interp: bool = True,
+        sensor_name: str = DEFAULT_PARAMS["sensor_name"],
+        D: float = DEFAULT_PARAMS["D"],  # noqa:N803
+        f: float = DEFAULT_PARAMS["f"],
+        p_x: float = DEFAULT_PARAMS["p_x"],
+        p_y: float | None = DEFAULT_PARAMS["p_y"],  # Defaults to None since the default value is dependent on p_x
+        opt_trans_wavelengths: np.ndarray[Any, Any] = DEFAULT_PARAMS["opt_trans_wavelengths"],
+        optics_transmission: np.ndarray[Any, Any] | None = DEFAULT_PARAMS[
+            "optics_transmission"
+        ],  # Defaults to None since the default value is dependent on opt_trans_wavelengths
+        eta: float = DEFAULT_PARAMS["eta"],
+        w_x: float | None = DEFAULT_PARAMS["w_x"],  # Defaults to None since the default value is dependent on p_x
+        w_y: float | None = DEFAULT_PARAMS["w_y"],  # Defaults to None since the default value is dependent on p_x
+        int_time: float = DEFAULT_PARAMS["int_time"],
+        n_tdi: float = DEFAULT_PARAMS["n_tdi"],
+        dark_current: float = DEFAULT_PARAMS["dark_current"],
+        read_noise: float = DEFAULT_PARAMS["read_noise"],
+        max_n: int = DEFAULT_PARAMS["max_n"],
+        bit_depth: float = DEFAULT_PARAMS["bit_depth"],
+        max_well_fill: float = DEFAULT_PARAMS["max_well_fill"],
+        s_x: float = DEFAULT_PARAMS["s_x"],
+        s_y: float = DEFAULT_PARAMS["s_y"],
+        qe_wavelengths: np.ndarray[Any, Any] | None = DEFAULT_PARAMS[
+            "qe_wavelengths"
+        ],  # Defaults to None since the default value is dependent on opt_trans_wavelengths
+        qe: np.ndarray[Any, Any] | None = DEFAULT_PARAMS[
+            "qe"
+        ],  # Defaults to None since the default value is dependent on opt_trans_wavelengths
+        scenario_name: str = DEFAULT_PARAMS["scenario_name"],
+        ihaze: int = DEFAULT_PARAMS["ihaze"],
+        altitude: float = DEFAULT_PARAMS["altitude"],
+        ground_range: float = DEFAULT_PARAMS["ground_range"],
+        aircraft_speed: float = DEFAULT_PARAMS["aircraft_speed"],
+        target_reflectance: float = DEFAULT_PARAMS["target_reflectance"],
+        target_temperature: float = DEFAULT_PARAMS["target_temperature"],
+        background_reflectance: float = DEFAULT_PARAMS["background_reflectance"],
+        background_temperature: float = DEFAULT_PARAMS["background_temperature"],
+        ha_wind_speed: float = DEFAULT_PARAMS["ha_wind_speed"],
+        cn2_at_1m: float = DEFAULT_PARAMS["cn2_at_1m"],
+        interp: bool = DEFAULT_PARAMS["interp"],
         **kwargs: Any,
     ) -> None:
         """Initialize the pybsm OTF perturber.
 
         Args:
-            sensor: pyBSM sensor configuration
-            scenario: pyBSM scenario configuration
-            interp: Whether to use interpolated atmospheric data
+            sensor_name:
+                name of the sensor
+            D:
+                effective aperture diameter (m)
+            f:
+                focal length (m)
+            p_x:
+                detector center-to-center spacings (pitch) in the x and y directions
+                (meters); if p_y is not provided, it is assumed equal to p_x
+            opt_trans_wavelengths:
+                specifies the spectral bandpass of the camera (m); at minimum, specify
+                a start and end wavelength
+            optics_transmission:
+                full system in-band optical transmission (unitless); do not include loss
+                due to any telescope obscuration in this optical transmission array
+            eta:
+                relative linear obscuration (unitless); obscuration of the aperture
+                commonly occurs within telescopes due to secondary mirror or spider
+                supports
+            p_y:
+                detector center-to-center spacings (pitch) in the x and y directions
+                (meters); if p_y is not provided, it is assumed equal to p_x
+            w_x:
+                detector width in the x and y directions (m); if set equal to p_x and
+                p_y, this corresponds to an assumed full pixel fill factor. In general,
+                w_x and w_y are less than p_x and p_y due to non-photo-sensitive area
+                (typically transistors) around each pixel.
+            w_y:
+                detector width in the x and y directions (m); if set equal to p_x and
+                p_y, this corresponds to an assumed full pixel fill factor. In general,
+                w_x and w_y are less than p_x and p_y due to non-photo-sensitive area
+                (typically transistors) around each pixel.
+            int_time:
+                maximum integration time (s)
+            qe:
+                quantum efficiency as a function of wavelength (e-/photon)
+            qe_wavelengths:
+                wavelengths corresponding to the array qe (m)
+            dark_current:
+                detector dark current (e-/s); dark current is the relatively small
+                electric current that flows through photosensitive devices even when no
+                photons enter the device
+            read_noise:
+                amount of noise generated by electronics as the charge present in the pixels
+            max_n:
+                detector electron well capacity (e-); the default 100 million
+                initializes to a large number so that, in the absence of better
+                information, it doesn't affect outcomes
+            bit_depth:
+                resolution of the detector ADC in bits (unitless); default of 100 is a
+                sufficiently large number so that in the absence of better information,
+                it doesn't affect outcomes
+            n_tdi:
+                number of TDI stages (unitless)
+            max_well_fill:
+                maximum amount of charge an individual pixel can hold before it
+                becomes saturated
+            s_x:
+                root-mean-squared jitter amplitudes in the x direction (rad)
+            s_y:
+                root-mean-squared jitter amplitudes in the y direction (rad)
+            scenario_name:
+                name of the scenario
+            ihaze:
+                MODTRAN code for visibility, valid options are ihaze = 1 (Rural
+                extinction with 23 km visibility) or ihaze = 2 (Rural extinction
+                with 5 km visibility)
+            altitude:
+                sensor height above ground level in meters; the database includes the
+                following altitude options: 2 32.55 75 150 225 500 meters, 1000 to
+                12000 in 1000 meter steps, and 14000 to 20000 in 2000 meter steps,
+                24500
+            ground_range:
+                projection of line of sight between the camera and target along on the
+                ground in meters; the distance between the target and the camera is
+                given by sqrt(altitude^2 + ground_range^2).
+                The following ground ranges are included in the database at each
+                altitude until the ground range exceeds the distance to the spherical
+                earth horizon: 0 100 500 1000 to 20000 in 1000 meter steps, 22000 to
+                80000 in 2000 m steps, and  85000 to 300000 in 5000 meter steps.
+            aircraft_speed:
+                ground speed of the aircraft (m/s)
+            target_reflectance:
+                object reflectance (unitless); the default 0.15 is the giqe standard
+            target_temperature:
+                object temperature (Kelvin); 282 K is used for GIQE calculation
+            background_reflectance:
+                background reflectance (unitless)
+            background_temperature:
+                background temperature (Kelvin); 280 K used for GIQE calculation
+            ha_wind_speed:
+                the high altitude wind speed (m/s) used to calculate the turbulence
+                profile; the default, 21.0, is the HV 5/7 profile value
+            cn2_at_1m:
+                the refractive index structure parameter "near the ground"
+                (e.g. at h = 1 m) used to calculate the turbulence profile; the
+                default, 1.7e-14, is the HV 5/7 profile value
+            interp:
+                A flag to indicate whether atmospheric interpolation should be used.
+                Defaults to False.
             kwargs: sensor and/or scenario values to modify
         Raises:
             :raises ImportError: pyBSM is not found, install via
@@ -75,40 +257,93 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         if not self.is_usable():
             raise PyBSMImportError
         super().__init__()
-
-        # Store original configurations
-        self._interp = interp
         self._simulator: ImageSimulator
-        sensor = copy.deepcopy(sensor)
-        scenario = copy.deepcopy(scenario)
 
-        if scenario is not None:
-            scenario.interp = self.interp
+        if ihaze not in PybsmOTFPerturber.ihaze_values:
+            raise ValueError(
+                f"Invalid ihaze value ({ihaze}) must be in {PybsmOTFPerturber.ihaze_values}",
+            )
+        if altitude not in PybsmOTFPerturber.altitude_values:
+            raise ValueError(f"Invalid altitude value ({altitude})")
+        if ground_range not in PybsmOTFPerturber.ground_range_values:
+            raise ValueError(f"Invalid ground range value ({ground_range})")
 
-        if sensor and scenario:
-            self._use_default_psf = False
+        self._check_opt_trans_wavelengths(opt_trans_wavelengths)
+
+        self.sensor: Sensor = Sensor(
+            name=sensor_name,
+            D=D,
+            f=f,
+            p_x=p_x,
+            opt_trans_wavelengths=opt_trans_wavelengths,
+        )
+
+        self.sensor.optics_transmission = (
+            np.ones(opt_trans_wavelengths.shape[0]) if optics_transmission is None else optics_transmission
+        )
+        self.sensor.eta = eta
+        self.sensor.p_y = p_x if p_y is None else p_y
+        self.sensor.w_x = p_x if w_x is None else w_x
+        self.sensor.w_y = p_x if w_y is None else w_y
+        self.sensor.s_x = s_x
+        self.sensor.s_y = s_y
+        self.sensor.int_time = int_time
+        self.sensor.n_tdi = n_tdi
+        self.sensor.dark_current = dark_current
+        self.sensor.read_noise = read_noise
+        self.sensor.max_n = max_n
+        self.sensor.max_well_fill = max_well_fill
+        self.sensor.bit_depth = bit_depth
+        self.sensor.qe_wavelengths = opt_trans_wavelengths if qe_wavelengths is None else qe_wavelengths
+
+        if qe is None:
+            _qe = np.ones(opt_trans_wavelengths.shape[0])
         else:
-            self._use_default_psf = True
+            _qe: np.ndarray = qe
+        self.sensor.qe = _qe
 
-        if not sensor:
-            self._sensor: PybsmSensor = self._create_default_sensor()
-        else:
-            self._sensor: PybsmSensor = sensor
-
-        if not scenario:
-            self._scenario: PybsmScenario = self._create_default_scenario()
-        else:
-            self._scenario: PybsmScenario = scenario
-
-        # Apply kwargs to sensor and scenario
-        for k in kwargs:
-            if hasattr(self._sensor, k):
-                setattr(self._sensor, k, kwargs[k])
-            elif hasattr(self._scenario, k):
-                setattr(self._scenario, k, kwargs[k])
+        self.scenario: Scenario = Scenario(
+            name=scenario_name,
+            ihaze=ihaze,
+            altitude=altitude,
+            ground_range=ground_range,
+            interp=interp,
+        )
+        self.scenario.aircraft_speed = aircraft_speed
+        self.scenario.target_reflectance = target_reflectance
+        self.scenario.target_temperature = target_temperature
+        self.scenario.background_reflectance = background_reflectance
+        self.scenario.background_temperature = background_temperature
+        self.scenario.ha_wind_speed = ha_wind_speed
+        self.scenario.cn2_at_1m = cn2_at_1m
 
         # Store kwargs for retrieval
         self.thetas: dict[str, Any] = copy.deepcopy(kwargs)
+        self._use_default_psf = False
+
+        # self._simulator = self._create_simulator()
+
+    def _check_opt_trans_wavelengths(self, opt_trans_wavelengths: np.ndarray) -> None:
+        """Validates the `opt_trans_wavelengths` array to ensure it meets the required criteria.
+
+        This method checks that the `opt_trans_wavelengths` array has at least two elements,
+        representing the start and end wavelengths, and that the wavelengths are in ascending order.
+
+        Args:
+            opt_trans_wavelengths:
+                An array of optical transmission wavelengths.
+                The array must contain at least two elements and must be in ascending order.
+
+        Raises:
+            :raises ValueError: If `opt_trans_wavelengths` contains fewer than two elements.
+            :raises ValueError: If the wavelengths in `opt_trans_wavelengths` are not in ascending order.
+        """
+        if opt_trans_wavelengths.shape[0] < 2:
+            raise ValueError(
+                "At minimum, at least the start and end wavelengths must be specified for opt_trans_wavelengths",
+            )
+        if opt_trans_wavelengths[0] >= opt_trans_wavelengths[-1]:
+            raise ValueError("opt_trans_wavelengths must be ascending")
 
     @abstractmethod
     def _create_simulator(self) -> ImageSimulator:
@@ -146,11 +381,9 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         Raises:
             :raises ValueError: If 'img_gsd' is None.
         """
-        if not self._use_default_psf and img_gsd is None:
+        if img_gsd is None:
             raise ValueError("'img_gsd' must be provided for this perturber")
 
-        # When sensor/scenario are not provided, the default psf is calculated
-        # which does not use the gsd
         if self._use_default_psf:
             img_gsd = None
 
@@ -164,39 +397,153 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         # Handle formatting and box rescaling
         return self._handle_boxes_and_format(out_img, boxes, image.shape)
 
-    @classmethod
-    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
-        """Instantiate from configuration dictionary."""
-        config_dict = dict(config_dict)
-
-        # Handle sensor configuration
-        sensor = config_dict.get("sensor", None)
-        if sensor is not None:
-            config_dict["sensor"] = from_config_dict(sensor, [PybsmSensor])
-
-        # Handle scenario configuration
-        scenario = config_dict.get("scenario", None)
-        if scenario is not None:
-            config_dict["scenario"] = from_config_dict(scenario, [PybsmScenario])
-
-        return super().from_config(config_dict, merge_default=merge_default)
-
-    @classmethod
-    def get_default_config(cls) -> dict[str, Any]:
-        """Retrieves the default configuration.
+    @override
+    def get_config(self) -> dict[str, Any]:
+        """Generates a serializable config that can be used to rehydrate object.
 
         Returns:
-            :return dict[str, Any]: A dictionary with the default configuration values.
+            :return dict[str, Any]: serializable config containing all instance parameters
         """
-        cfg = super().get_default_config()
-        cfg["sensor"] = make_default_config([PybsmSensor])
-        cfg["scenario"] = make_default_config([PybsmScenario])
-        return cfg
+        return {
+            "sensor_name": self.sensor_name,
+            "D": self.D,
+            "f": self.f,
+            "p_x": self.p_x,
+            "p_y": self.p_y,
+            "opt_trans_wavelengths": self.opt_trans_wavelengths.tolist(),
+            "optics_transmission": self.optics_transmission.tolist(),
+            "eta": self.eta,
+            "w_x": self.w_x,
+            "w_y": self.w_y,
+            "int_time": self.int_time,
+            "n_tdi": self.n_tdi,
+            "dark_current": self.dark_current,
+            "read_noise": self.read_noise,
+            "max_n": self.max_n,
+            "bit_depth": self.bit_depth,
+            "max_well_fill": self.max_well_fill,
+            "s_x": self.s_x,
+            "s_y": self.s_y,
+            "qe_wavelengths": self.qe_wavelengths.tolist(),
+            "qe": self.qe.tolist(),
+            "scenario_name": self.scenario_name,
+            "ihaze": self.ihaze,
+            "altitude": self.altitude,
+            "ground_range": self.ground_range,
+            "aircraft_speed": self.aircraft_speed,
+            "target_reflectance": self.target_reflectance,
+            "target_temperature": self.target_temperature,
+            "background_reflectance": self.background_reflectance,
+            "background_temperature": self.background_temperature,
+            "ha_wind_speed": self.ha_wind_speed,
+            "cn2_at_1m": self.cn2_at_1m,
+            "interp": self.interp,
+        }
 
     @classmethod
     def is_usable(cls) -> bool:
         """Check if dependencies are available."""
         return pybsm_available
+
+    @property
+    def scenario_name(self) -> str:
+        """Getter for scenario_name."""
+        return self.scenario.name
+
+    @property
+    def ihaze(self) -> float:
+        """Getter for ihaze."""
+        return self.scenario.ihaze
+
+    @property
+    def altitude(self) -> float:
+        """Getter for altitude."""
+        return self.scenario.altitude
+
+    @property
+    def ground_range(self) -> float:
+        """Getter for ground_range."""
+        return self.scenario.ground_range
+
+    @property
+    def target_reflectance(self) -> float:
+        """Getter for target_reflectance."""
+        return self.scenario.target_reflectance
+
+    @property
+    def target_temperature(self) -> float:
+        """Getter for target_temperature."""
+        return self.scenario.target_temperature
+
+    @property
+    def background_reflectance(self) -> float:
+        """Getter for background_reflectance."""
+        return self.scenario.background_reflectance
+
+    @property
+    def background_temperature(self) -> float:
+        """Getter for background_temperature."""
+        return self.scenario.background_temperature
+
+    @property
+    def sensor_name(self) -> str:
+        """Getter for sensor_name."""
+        return self.sensor.name
+
+    @property
+    def p_x(self) -> float:
+        """Getter for p_x."""
+        return self.sensor.p_x
+
+    @property
+    def p_y(self) -> float:
+        """Getter for p_y."""
+        return self.sensor.p_y
+
+    @property
+    def dark_current(self) -> float:
+        """Getter for dark_current."""
+        return self.sensor.dark_current
+
+    @property
+    def read_noise(self) -> float:
+        """Getter for read_noise."""
+        return self.sensor.read_noise
+
+    @property
+    def max_n(self) -> int:
+        """Getter for max_n."""
+        return self.sensor.max_n
+
+    @property
+    def bit_depth(self) -> float:
+        """Getter for bit_depth."""
+        return self.sensor.bit_depth
+
+    @property
+    def max_well_fill(self) -> float:
+        """Getter for max_well_fill."""
+        return self.sensor.max_well_fill
+
+    @property
+    def qe_wavelengths(self) -> NDArray[np.float64]:
+        """Getter for qe_wavelengths."""
+        return self.sensor.qe_wavelengths
+
+    @property
+    def qe(self) -> NDArray[np.float64]:
+        """Getter for qe."""
+        return self.sensor.qe
+
+    @property
+    def opt_trans_wavelengths(self) -> NDArray[np.float64]:
+        """Getter for opt_trans_wavelengths."""
+        return self.sensor.opt_trans_wavelengths
+
+    @property
+    def optics_transmission(self) -> NDArray[np.float64]:
+        """Getter for optics_transmission."""
+        return self.sensor.optics_transmission
 
     @property
     def mtf_wavelengths(self) -> NDArray[np.float64]:
@@ -211,47 +558,47 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     @property
     def w_x(self) -> float:
         """Getter for w_x."""
-        return self._simulator.sensor.w_x
+        return self.sensor.w_x
 
     @property
     def w_y(self) -> float:
         """Getter for w_y."""
-        return self._simulator.sensor.w_y
+        return self.sensor.w_y
 
     @property
     def s_x(self) -> float:
         """Getter for s_x."""
-        return self._simulator.sensor.s_x
+        return self.sensor.s_x
 
     @property
     def s_y(self) -> float:
         """Getter for s_y."""
-        return self._simulator.sensor.s_y
+        return self.sensor.s_y
 
     @property
     def f(self) -> float:
         """Getter for f."""
-        return self._simulator.sensor.f
+        return self.sensor.f
 
     @property
     def D(self) -> float:  # noqa N802
         """Getter for D."""
-        return self._simulator.sensor.D
+        return self.sensor.D
 
     @property
     def eta(self) -> float:
         """Getter for eta."""
-        return self._simulator.sensor.eta
+        return self.sensor.eta
 
     @property
     def int_time(self) -> float:
         """Getter for int_time."""
-        return self._simulator.sensor.int_time
+        return self.sensor.int_time
 
     @property
     def n_tdi(self) -> float:
         """Getter for n_tdi."""
-        return self._simulator.sensor.n_tdi
+        return self.sensor.n_tdi
 
     @property
     def slant_range(self) -> float:
@@ -261,32 +608,22 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     @property
     def ha_wind_speed(self) -> float:
         """Getter for ha_wind_speed."""
-        return self._simulator.scenario.ha_wind_speed
+        return self.scenario.ha_wind_speed
 
     @property
     def cn2_at_1m(self) -> float:
         """Getter for cn2_at_1m."""
-        return self._simulator.scenario.cn2_at_1m
+        return self.scenario.cn2_at_1m
 
     @property
     def aircraft_speed(self) -> float:
         """Getter for aircraft_speed."""
-        return self._simulator.scenario.aircraft_speed
+        return self.scenario.aircraft_speed
 
     @property
-    def interp(self) -> bool:
+    def interp(self) -> bool | None:
         """Getter for interp."""
-        return self._interp
-
-    @property
-    def sensor(self) -> PybsmSensor:
-        """Getter for sensor."""
-        return self._sensor
-
-    @property
-    def scenario(self) -> PybsmScenario:
-        """Getter for scenario."""
-        return self._scenario
+        return self.scenario._interp  # noqa:SLF001
 
     @property
     def params(self) -> dict[str, Any]:
@@ -300,26 +637,6 @@ class PybsmOTFPerturber(PerturbImage, ABC):
             :return dict[str, Any]: A dictionary containing additional perturbation parameters.
         """
         return self.thetas
-
-    def _create_default_sensor(self) -> PybsmSensor:
-        """Create a default sensor when none is provided."""
-        return PybsmSensor(
-            name="Sensor",
-            D=275e-3,
-            f=4,
-            p_x=0.008e-3,
-            opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
-        )
-
-    def _create_default_scenario(self) -> PybsmScenario:
-        """Create a default scenario when none is provided."""
-        return PybsmScenario(
-            name="Scenario",
-            ihaze=1,
-            altitude=9000,
-            ground_range=0,
-            interp=self.interp,
-        )
 
     def _handle_boxes_and_format(
         self,
