@@ -210,47 +210,6 @@ files = [
 ]
 
 [[package]]
-name = "albucore"
-version = "0.0.23"
-description = "High-performance image processing functions for deep learning and computer vision."
-optional = true
-python-versions = ">=3.9"
-files = [
-    {file = "albucore-0.0.23-py3-none-any.whl", hash = "sha256:99274ac0c15a1a7d9a726df9d54d5ab70d9d0c189e2a935399dba3d4bafad415"},
-    {file = "albucore-0.0.23.tar.gz", hash = "sha256:57823982b954913b84a9e2cf71058c4577b02397a62c41885be2d9b295efa8ab"},
-]
-
-[package.dependencies]
-numpy = ">=1.24.4"
-opencv-python-headless = ">=4.9.0.80"
-simsimd = ">=5.9.2"
-stringzilla = ">=3.10.4"
-
-[[package]]
-name = "albumentations"
-version = "2.0.5"
-description = "Fast, flexible, and advanced augmentation library for deep learning, computer vision, and medical imaging. Albumentations offers a wide range of transformations for both 2D (images, masks, bboxes, keypoints) and 3D (volumes, volumetric masks, keypoints) data, with optimized performance and seamless integration into ML workflows."
-optional = true
-python-versions = ">=3.9"
-files = [
-    {file = "albumentations-2.0.5-py3-none-any.whl", hash = "sha256:1fc253942d34dd7c07652bf6511049c8bb7d522baec7f1fe355df16293c3c7b6"},
-    {file = "albumentations-2.0.5.tar.gz", hash = "sha256:e19e1c0f14c903c3c230f3d83f14814b84f1180393189bf96779f653031f3278"},
-]
-
-[package.dependencies]
-albucore = "0.0.23"
-numpy = ">=1.24.4"
-opencv-python-headless = ">=4.9.0.80"
-pydantic = ">=2.9.2"
-PyYAML = "*"
-scipy = ">=1.10.0"
-
-[package.extras]
-hub = ["huggingface-hub"]
-pytorch = ["torch"]
-text = ["pillow"]
-
-[[package]]
 name = "annotated-doc"
 version = "0.0.3"
 description = "Document parameters, class attributes, return types, and variables inline, with Annotated."
@@ -1191,6 +1150,20 @@ files = [
     {file = "entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f"},
     {file = "entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4"},
 ]
+
+[[package]]
+name = "eval-type-backport"
+version = "0.3.0"
+description = "Like `typing._eval_type`, but lets older Python versions use newer typing features."
+optional = true
+python-versions = ">=3.8"
+files = [
+    {file = "eval_type_backport-0.3.0-py3-none-any.whl", hash = "sha256:975a10a0fe333c8b6260d7fdb637698c9a16c3a9e3b6eb943fee6a6f67a37fe8"},
+    {file = "eval_type_backport-0.3.0.tar.gz", hash = "sha256:1638210401e184ff17f877e9a2fa076b60b5838790f4532a21761cc2be67aea1"},
+]
+
+[package.extras]
+tests = ["pytest"]
 
 [[package]]
 name = "exceptiongroup"
@@ -3286,6 +3259,30 @@ jupyter-server = ">=1.8,<3"
 
 [package.extras]
 test = ["pytest", "pytest-console-scripts", "pytest-jupyter", "pytest-tornasync"]
+
+[[package]]
+name = "nrtk-albumentations"
+version = "2.2.0"
+description = "Fork of Albumentations in direct support of NRTK (Natural Robustness Toolkit). Fast, flexible, and advanced augmentation library for deep learning, computer vision, and medical imaging. Offers a wide range of transformations for both 2D (images, masks, bboxes, keypoints) and 3D (volumes, volumetric masks, keypoints) data, with optimized performance and seamless integration into ML workflows."
+optional = true
+python-versions = "<4.0,>=3.10"
+files = [
+    {file = "nrtk_albumentations-2.2.0-py3-none-any.whl", hash = "sha256:2f9d8eff8bb6005d214fb102a23af995e2a5117b2283cce06fd307dc597d2bdb"},
+    {file = "nrtk_albumentations-2.2.0.tar.gz", hash = "sha256:e639767cb71359b33c5d4cad914bbc059b48a2cd2800118695dcb907c7bfde6d"},
+]
+
+[package.dependencies]
+eval-type-backport = "*"
+numpy = [
+    {version = ">=1.26,<2.0", markers = "python_version < \"3.13\""},
+    {version = ">=2.1", markers = "python_version >= \"3.13\""},
+]
+pydantic = ">=2.9.2"
+PyYAML = "*"
+scipy = ">=1.14.1"
+simsimd = ">=5.9.2"
+stringzilla = ">=3.10.4"
+typing-extensions = ">=4.9.0"
 
 [[package]]
 name = "numba"
@@ -7474,12 +7471,12 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 type = ["pytest-mypy"]
 
 [extras]
-albumentations = ["albumentations"]
+albumentations = ["nrtk-albumentations"]
 diffusion = ["Pillow", "accelerate", "diffusers", "protobuf", "torch", "transformers"]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
 maite = ["fastapi", "maite", "pydantic", "pydantic_settings", "uvicorn"]
-notebook-testing = ["albumentations", "datasets", "jupytext", "matplotlib", "numba", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics"]
+notebook-testing = ["datasets", "jupytext", "matplotlib", "nrtk-albumentations", "numba", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics"]
 pillow = ["Pillow"]
 pybsm = ["pybsm"]
 scikit-image = ["scikit-image", "scikit-image"]
@@ -7489,4 +7486,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.14"
-content-hash = "4ff9b90810b4e6ac783523fcfd5c27b3b6189642c918ceada27cb04936177d84"
+content-hash = "8271ff5c70ca589444716da4c83a211308620169c47679c698f107828a73d551"
