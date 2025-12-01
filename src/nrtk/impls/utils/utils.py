@@ -11,26 +11,18 @@ Example usage:
 
     # Load UAV configuration
     sensor, scenario = default_sensor_scenario("uav")
-
-    # Use in perturbation factory
-    perturber_factory = CustomPybsmPerturbImageFactory(
-        sensor=sensor,
-        scenario=scenario,
-        theta_keys=["ground_range"],
-        thetas=[ground_range_values]
-    )
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
+import numpy as np
 
 
-def default_sensor_scenario(config_type: str, data_dir: str | None = None) -> tuple[PybsmSensor, PybsmScenario]:  # noqa C901
+def default_sensor_scenario(config_type: str, data_dir: str | None = None) -> dict[str, Any]:  # noqa C901
     """Load default sensor and scenario configurations for a given configuration type.
 
     This function loads pre-defined sensor and scenario configurations from JSON files
@@ -138,14 +130,16 @@ def default_sensor_scenario(config_type: str, data_dir: str | None = None) -> tu
 
     # Extract sensor and scenario configurations
     sensor_config = config_data["sensor"]
+    if "opt_trans_wavelengths" in sensor_config:
+        sensor_config["opt_trans_wavelengths"] = np.array(sensor_config["opt_trans_wavelengths"])
+    if "optics_transmission" in sensor_config:
+        sensor_config["optics_transmission"] = np.array(sensor_config["optics_transmission"])
+    if "qe_wavelengths" in sensor_config:
+        sensor_config["qe_wavelengths"] = np.array(sensor_config["qe_wavelengths"])
+    if "qe" in sensor_config:
+        sensor_config["qe"] = np.array(sensor_config["qe"])
+
     scenario_config = config_data["scenario"]
 
     # Create and return sensor and scenario objects
-    try:
-        sensor = PybsmSensor.from_config(sensor_config)
-        scenario = PybsmScenario.from_config(scenario_config)
-    except Exception as e:
-        raise RuntimeError(
-            f"Error creating sensor or scenario objects from configuration: {e}",
-        ) from e
-    return sensor, scenario
+    return sensor_config | scenario_config

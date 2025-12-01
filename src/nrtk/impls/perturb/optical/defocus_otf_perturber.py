@@ -15,14 +15,9 @@ __all__ = ["DefocusOTFPerturber"]
 from typing import Any
 
 import numpy as np
-from smqtk_core.configuration import (
-    to_config_dict,
-)
 from typing_extensions import override
 
 from nrtk.impls.perturb.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -42,10 +37,6 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
     Attributes:
-        sensor (PybsmSensor | None):
-            The sensor configuration for the simulation.
-        scenario (PybsmScenario | None):
-            The scenario configuration, such as altitude and ground range.
         w_x (float | None):
             Defocus parameter in the x-direction.
         w_y (float | None):
@@ -76,8 +67,6 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
 
     def __init__(
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
         w_x: float | None = None,
         w_y: float | None = None,
         interp: bool = True,
@@ -86,10 +75,6 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
         """Initializes a DefocusOTFPerturber instance with the specified parameters.
 
         Args:
-            sensor:
-                Sensor configuration for the simulation.
-            scenario:
-                Scenario configuration (altitude, ground range, etc.).
             w_x:
                 the 1/e blur spot radii in the x direction. Defaults to the sensor's value if provided.
             w_y:
@@ -114,7 +99,8 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
             :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
+        super().__init__(interp=interp, **kwargs)
+        self._use_default_psf = not kwargs
 
         # Store perturber-specific overrides
         self._override_w_x = w_x
@@ -136,21 +122,17 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
         if self._override_w_y:
             self.sensor.w_y = self._override_w_y
 
-        pybsm_sensor = self.sensor.create_sensor()
-        pybsm_scenario = self.scenario.create_scenario()
         return DefocusSimulator(
-            sensor=pybsm_sensor,
-            scenario=pybsm_scenario,
+            sensor=self.sensor,
+            scenario=self.scenario,
         )
 
     @override
     def get_config(self) -> dict[str, Any]:
         """Get current configuration including perturber-specific parameters."""
-        cfg = super().get_config()
-        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
-        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg = {}
         cfg["w_x"] = self.w_x
         cfg["w_y"] = self.w_y
-        cfg["interp"] = self._interp
+        cfg["interp"] = self.interp
 
         return cfg

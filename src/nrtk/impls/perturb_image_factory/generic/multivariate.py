@@ -9,7 +9,8 @@ __all__ = ["MultivariatePerturbImageFactory"]
 from collections.abc import Iterable, Iterator, Sequence
 from typing import Any
 
-from typing_extensions import override
+import numpy as np
+from typing_extensions import Self, override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -52,12 +53,14 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         perturber: type[PerturbImage],
         theta_keys: Iterable[str],
         thetas: Sequence[Any],
+        perturber_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Initializes the MultivariatePerturbImageFactory.
 
         :param perturber: type[PerturbImage]: Python implementation type of the PerturbImage interface to produce.
         :param theta_keys: (Sequence[str]): Names of perturbation parameters to vary.
         :param thetas: (Sequence[Any]): Values to use for each perturbation parameter.
+        :param perturber_kwargs: (dict[str, Any]): Default kwargs to be used by the perturber. Defaults to {}.
         """
         self.perturber = perturber
         self.theta_keys = theta_keys
@@ -66,6 +69,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         top = [len(entry) for entry in self.thetas]
         self.sets: Sequence[list[int]] = MultivariatePerturbImageFactory._build_set_list(0, top)
         self.n: int = 0
+        self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
     def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
         """Initialize PerturberImage implementation.
@@ -73,7 +77,8 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         Returns:
             PerturbImage: PerturbImage with specified kwargs
         """
-        return self.perturber(**kwargs)
+        input_kwargs = self.perturber_kwargs | kwargs
+        return self.perturber(**input_kwargs)
 
     @override
     def __len__(self) -> int:
@@ -128,7 +133,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
             raise IndexError("Index out of range")
         kwargs = {k: self.thetas[i][self.sets[idx][i]] for i, k in enumerate(self.theta_keys)}
 
-        return self._create_perturber(kwargs)
+        return self._create_perturber(kwargs=kwargs)
 
     @property
     @override
@@ -150,6 +155,47 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         """
         return "params"
 
+    @classmethod
+    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
+        """Rehydrates an object instance from a serializable config dictionary.
+
+        Args:
+            cls:
+                The class of the object which will be instantiated.
+            config_dict:
+                Dictionary of serializable values that will be included in the object instance.
+            merge_default:
+                Indicator variable describing whether or not to use default config values. Defaults to True.
+
+        Returns:
+            :return PybsmSensor: Instantiation of class of type PybsmSensor.
+        """
+        config_dict = dict(config_dict)
+
+        # Convert input data to expected constructor types
+        opt_trans_wavelengths = config_dict["perturber_kwargs"].get("opt_trans_wavelengths", None)
+        if opt_trans_wavelengths is not None:
+            config_dict["perturber_kwargs"]["opt_trans_wavelengths"] = np.array(
+                config_dict["perturber_kwargs"]["opt_trans_wavelengths"],
+            )
+
+        # Non-JSON type arguments with defaults (so they might not be there)
+        optics_transmission = config_dict["perturber_kwargs"].get("optics_transmission", None)
+        if optics_transmission is not None:
+            config_dict["perturber_kwargs"]["optics_transmission"] = np.array(
+                config_dict["perturber_kwargs"]["optics_transmission"],
+            )
+        qe_wavelengths = config_dict["perturber_kwargs"].get("qe_wavelengths", None)
+        if qe_wavelengths is not None:
+            config_dict["perturber_kwargs"]["qe_wavelengths"] = np.array(
+                config_dict["perturber_kwargs"]["qe_wavelengths"],
+            )
+        qe = config_dict["perturber_kwargs"].get("qe", None)
+        if qe is not None:
+            config_dict["perturber_kwargs"]["qe"] = np.array(config_dict["perturber_kwargs"]["qe"])
+
+        return super().from_config(config_dict, merge_default=merge_default)
+
     @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the `MultivariatePerturbImageFactory` instance.
@@ -161,4 +207,5 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
             "perturber": self.perturber.get_type_string(),
             "theta_keys": self.theta_keys,
             "thetas": self.thetas,
+            "perturber_kwargs": self.perturber_kwargs,
         }

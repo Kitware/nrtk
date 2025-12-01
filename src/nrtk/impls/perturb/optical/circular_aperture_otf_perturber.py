@@ -9,9 +9,9 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
 Example usage:
-    sensor = PybsmSensor(...)
-    scenario = PybsmScenario(...)
-    perturber = CircularApertureOTFPerturber(sensor=sensor, scenario=scenario)
+    sensor = {...}
+    scenario = {...}
+    perturber = CircularApertureOTFPerturber(**sensor, **scenario)
     perturbed_image, boxes = perturber.perturb(image, boxes)
 
 Notes:
@@ -26,14 +26,9 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
-from smqtk_core.configuration import (
-    to_config_dict,
-)
 from typing_extensions import override
 
 from nrtk.impls.perturb.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -53,10 +48,6 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
 
     Attributes:
-        sensor (PybsmSensor | None):
-            The sensor configuration for the perturbation.
-        scenario (PybsmScenario | None):
-            The scenario configuration used for perturbation.
         mtf_wavelengths (Sequence[float]):
             Sequence of wavelengths used in MTF calculations.
         mtf_weights (Sequence[float]):
@@ -75,8 +66,6 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
 
     def __init__(  # noqa: C901
         self,
-        sensor: PybsmSensor | None = None,
-        scenario: PybsmScenario | None = None,
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
         D: float | None = None,  # noqa N802
@@ -87,10 +76,6 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         """Initializes the CircularApertureOTFPerturber.
 
         Args:
-            sensor:
-                pyBSM sensor object
-            scenario:
-                pyBSM scenario object
             mtf_wavelengths:
                 a numpy array of wavelengths (m)
             mtf_weights:
@@ -132,7 +117,8 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             raise ValueError("mtf_wavelengths and mtf_weights are not the same length")
 
         # Initialize base class (which handles kwargs application to sensor/scenario)
-        super().__init__(sensor=sensor, scenario=scenario, interp=interp, **kwargs)
+        super().__init__(interp=interp, **kwargs)
+        self._use_default_psf = not kwargs
 
         # Store perturber-specific overrides
         if mtf_wavelengths is not None:
@@ -167,12 +153,9 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         if self._override_eta is not None:
             self.sensor.eta = self._override_eta
 
-        pybsm_sensor = self.sensor.create_sensor()
-        pybsm_scenario = self.scenario.create_scenario()
-
         return CircularApertureSimulator(
-            sensor=pybsm_sensor,
-            scenario=pybsm_scenario,
+            sensor=self.sensor,
+            scenario=self.scenario,
             mtf_wavelengths=self._override_mtf_wavelengths,
             mtf_weights=self._override_mtf_weights,
         )
@@ -180,9 +163,7 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
     @override
     def get_config(self) -> dict[str, Any]:
         """Get current configuration including perturber-specific parameters."""
-        cfg = super().get_config()
-        cfg["sensor"] = to_config_dict(self.sensor) if self.sensor else None
-        cfg["scenario"] = to_config_dict(self.scenario) if self.scenario else None
+        cfg = {}
         cfg["mtf_wavelengths"] = self.mtf_wavelengths
         cfg["mtf_weights"] = self.mtf_weights
         cfg["D"] = self.D

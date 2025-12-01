@@ -31,6 +31,7 @@ from smqtk_detection.interfaces.detect_image_objects import DetectImageObjects
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
+from nrtk.impls.perturb_image_factory.generic.multivariate import MultivariatePerturbImageFactory
 from nrtk.interfaces.gen_object_detector_blackbox_response import (
     GenerateObjectDetectorBlackboxResponse,
 )
@@ -157,8 +158,18 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
                 - Sequence of tuples with metadata and score for each perturbation.
                 - Sequence of scores for each perturbation level.
         """
-        master_key = blackbox_perturber_factories[0].theta_key
-        new_curve = [(entry[0][master_key], entry[1]) for entry in inter[0]]
+        new_curve = []
+        curve_idx = 0
+        factory: MultivariatePerturbImageFactory
+        for factory in blackbox_perturber_factories:  # pyright: ignore [reportAssignmentType]
+            theta_keys = factory.theta_keys
+            thetas = factory.thetas
+            for factory_set in factory.sets:
+                new_metadata = {}
+                for theta_idx, theta_key in enumerate(theta_keys):
+                    new_metadata[theta_key] = thetas[theta_idx][factory_set[theta_idx]]
+                new_curve.append((new_metadata, inter[0][curve_idx][1]))
+                curve_idx += 1
 
         return new_curve, inter[1]
 

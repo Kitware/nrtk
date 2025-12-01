@@ -1,7 +1,7 @@
+from typing import Any
+
 import numpy as np
 
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -9,7 +9,7 @@ is_usable: bool = import_guard("pybsm", PyBSMImportError, ["otf"])
 from pybsm.otf import dark_current_from_density  # noqa: E402
 
 
-def create_sample_sensor() -> PybsmSensor:
+def create_sample_sensor() -> dict[str, Any]:
     if not is_usable:
         raise PyBSMImportError
 
@@ -63,43 +63,37 @@ def create_sample_sensor() -> PybsmSensor:
     s_x = 0.25 * p_x / f
     s_y = s_x
 
-    # drift (radians/s) - again, we'll guess that it's really good
-    da_x = 100e-6
-    da_y = da_x
-
     # etector quantum efficiency as a function of wavelength (microns)
     # for a generic high quality back-illuminated silicon array
     # https://www.photometrics.com/resources/learningzone/quantumefficiency.php
     qe_wavelengths = np.array([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1]) * 1.0e-6
     qe = np.array([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0])
 
-    return PybsmSensor(
-        name=name,
-        D=D,
-        f=f,
-        p_x=p_x,
-        opt_trans_wavelengths=opt_trans_wavelengths,
-        optics_transmission=optics_transmission,
-        eta=eta,
-        w_x=w_x,
-        w_y=w_y,
-        int_time=int_time,
-        n_tdi=n_tdi,
-        dark_current=dark_current,
-        read_noise=read_noise,
-        max_n=max_n,
-        bit_depth=bit_depth,
-        max_well_fill=max_well_fill,
-        s_x=s_x,
-        s_y=s_y,
-        da_x=da_x,
-        da_y=da_y,
-        qe_wavelengths=qe_wavelengths,
-        qe=qe,
-    )
+    return {
+        "sensor_name": name,
+        "D": D,
+        "f": f,
+        "p_x": p_x,
+        "opt_trans_wavelengths": opt_trans_wavelengths,
+        "optics_transmission": optics_transmission,
+        "eta": eta,
+        "w_x": w_x,
+        "w_y": w_y,
+        "int_time": int_time,
+        "n_tdi": n_tdi,
+        "dark_current": dark_current,
+        "read_noise": read_noise,
+        "max_n": max_n,
+        "bit_depth": bit_depth,
+        "max_well_fill": max_well_fill,
+        "s_x": s_x,
+        "s_y": s_y,
+        "qe_wavelengths": qe_wavelengths,
+        "qe": qe,
+    }
 
 
-def create_sample_scenario() -> PybsmScenario:
+def create_sample_scenario() -> dict[str, Any]:
     if not is_usable:
         raise PyBSMImportError
 
@@ -113,14 +107,14 @@ def create_sample_scenario() -> PybsmScenario:
 
     aircraft_speed = 100.0
 
-    return PybsmScenario(
-        scenario_name,
-        ihaze,
-        altitude,
-        ground_range,
-        aircraft_speed,
-    )
+    return {
+        "scenario_name": scenario_name,
+        "ihaze": ihaze,
+        "altitude": altitude,
+        "ground_range": ground_range,
+        "aircraft_speed": aircraft_speed,
+    }
 
 
-def create_sample_sensor_and_scenario() -> tuple[PybsmSensor, PybsmScenario]:
-    return create_sample_sensor(), create_sample_scenario()
+def create_sample_sensor_and_scenario() -> dict[str, Any]:
+    return create_sample_sensor() | create_sample_scenario()

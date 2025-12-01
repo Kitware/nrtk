@@ -4,10 +4,8 @@ from typing import Any
 
 import numpy as np
 import pytest
-from smqtk_core.configuration import to_config_dict
 
-from nrtk.impls.utils.scenario import PybsmScenario
-from nrtk.impls.utils.sensor import PybsmSensor
+from nrtk.impls.perturb.optical.pybsm_perturber import PybsmPerturber
 from nrtk.interop.maite.api.converters import build_factory
 from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
@@ -27,7 +25,7 @@ from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset  # noqa: E4
 
 
 @pytest.mark.skipif(
-    not PybsmScenario.is_usable() or not PybsmSensor.is_usable(),
+    not PybsmPerturber.is_usable(),
     reason="pybsm not found. Please install `nrtk[pybsm]`.",
 )
 class TestAPIConversionFunctions:
@@ -45,52 +43,41 @@ class TestAPIConversionFunctions:
                     "config_file": str(NRTK_PYBSM_CONFIG),
                 },
                 {
+                    "perturber": PybsmPerturber.get_type_string(),
                     "theta_keys": ["f", "D", "p_x"],
                     "thetas": [[0.014, 0.012], [0.001, 0.003], [0.00002]],
-                    "sensor": to_config_dict(
-                        PybsmSensor(
-                            name="L32511x",
-                            D=0.004,
-                            f=0.014285714285714287,
-                            p_x=0.00002,
-                            opt_trans_wavelengths=np.asarray([3.8e-7, 7.0e-7]),
-                            eta=0.4,
-                            int_time=0.03,
-                            read_noise=25.0,
-                            max_n=96000,
-                            bit_depth=11.9,
-                            max_well_fill=0.005,
-                            da_x=0.0001,
-                            da_y=0.0001,
-                            qe_wavelengths=np.asarray(
-                                [
-                                    3.0e-7,
-                                    4.0e-7,
-                                    5.0e-7,
-                                    6.0e-7,
-                                    7.0e-7,
-                                    8.0e-7,
-                                    9.0e-7,
-                                    1.0e-6,
-                                    1.1e-6,
-                                ],
-                            ),
-                            qe=np.asarray([0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0]),
-                        ),
-                    )
-                    if PybsmSensor.is_usable()
-                    else dict(),
-                    "scenario": to_config_dict(
-                        PybsmScenario(
-                            name="niceday",
-                            ihaze=2,
-                            altitude=75,
-                            ground_range=0,
-                            cn2_at_1m=0,
-                        ),
-                    )
-                    if PybsmScenario.is_usable()
-                    else dict(),
+                    "perturber_kwargs": {
+                        "sensor_name": "L32511x",
+                        "D": 0.004,
+                        "f": 0.014285714285714287,
+                        "p_x": 2e-05,
+                        "opt_trans_wavelengths": [3.8e-07, 7e-07],
+                        "optics_transmission": None,
+                        "eta": 0.4,
+                        "w_x": None,
+                        "w_y": None,
+                        "int_time": 0.03,
+                        "dark_current": 0.0,
+                        "read_noise": 25.0,
+                        "max_n": 96000.0,
+                        "bit_depth": 11.9,
+                        "max_well_fill": 0.005,
+                        "s_x": 0.0,
+                        "s_y": 0.0,
+                        "qe_wavelengths": [3e-07, 4e-07, 5e-07, 6e-07, 7e-07, 8e-07, 9e-07, 1e-06, 1.1e-06],
+                        "qe": [0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0.0],
+                        "scenario_name": "niceday",
+                        "ihaze": 2,
+                        "altitude": 75,
+                        "ground_range": 0,
+                        "aircraft_speed": 0.0,
+                        "target_reflectance": 0.15,
+                        "target_temperature": 295.0,
+                        "background_reflectance": 0.07,
+                        "background_temperature": 293.0,
+                        "ha_wind_speed": 21.0,
+                        "cn2_at_1m": 0,
+                    },
                 },
             ),
         ],

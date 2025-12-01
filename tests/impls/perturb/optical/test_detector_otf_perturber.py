@@ -27,10 +27,10 @@ class TestDetectorOTFPerturber:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor, scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, interp=True)
-        inst2 = DetectorOTFPerturber(sensor=sensor, scenario=scenario, interp=False)
+        inst = DetectorOTFPerturber(interp=True, **sensor_and_scenario)
+        inst2 = DetectorOTFPerturber(interp=True, **sensor_and_scenario)
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -61,12 +61,18 @@ class TestDetectorOTFPerturber:
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_md = {"img_gsd": 3.19 / 160.0}
 
-        sensor = None
-        scenario = None
+        sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = create_sample_sensor_and_scenario()
 
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
+        if w_x is not None:
+            sensor_and_scenario["w_x"] = w_x
+        if w_y is not None:
+            sensor_and_scenario["w_y"] = w_y
+        if f is not None:
+            sensor_and_scenario["f"] = f
+
+        inst = DetectorOTFPerturber(interp=interp, **sensor_and_scenario)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
 
@@ -91,11 +97,10 @@ class TestDetectorOTFPerturber:
         expectation: AbstractContextManager,
     ) -> None:
         """Test that exceptions are appropriately raised based on available metadata."""
-        sensor = None
-        scenario = None
+        sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
-        perturber = DetectorOTFPerturber(sensor=sensor, scenario=scenario)
+            sensor_and_scenario = create_sample_sensor_and_scenario()
+        perturber = DetectorOTFPerturber(**sensor_and_scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber.perturb(img, **additional_params)
@@ -118,76 +123,39 @@ class TestDetectorOTFPerturber:
         interp: bool,
     ) -> None:
         """Test configuration stability."""
-        sensor = None
-        scenario = None
+        sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = create_sample_sensor_and_scenario()
 
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
+        if w_x is not None:
+            sensor_and_scenario["w_x"] = w_x
+        if w_y is not None:
+            sensor_and_scenario["w_y"] = w_y
+        if f is not None:
+            sensor_and_scenario["f"] = f
+
+        inst = DetectorOTFPerturber(interp=interp, **sensor_and_scenario)
         for i in configuration_test_helper(inst):
             if w_x is not None:
                 assert i.w_x == w_x
-            elif sensor is not None and scenario is not None:
-                assert i.w_x == sensor.w_x
+            elif use_sensor_scenario:
+                assert i.w_x == sensor_and_scenario["w_x"]
             else:  # Default value
                 assert i.w_x == 4e-6
 
             if w_y is not None:
                 assert i.w_y == w_y
-            elif sensor is not None and scenario is not None:
-                assert i.w_y == sensor.w_y
+            elif use_sensor_scenario:
+                assert i.w_y == sensor_and_scenario["w_y"]
             else:  # Default value
                 assert i.w_y == 4e-6
 
             if f is not None:
                 assert i.f == f
-            elif sensor is not None and scenario is not None:
-                assert i.f == sensor.f
+            elif use_sensor_scenario:
+                assert i.f == sensor_and_scenario["f"]
             else:  # Default value
                 assert i.f == 50e-3
-
-            if i.sensor is not None and sensor is not None:
-                assert i.sensor.name == sensor.name
-                assert i.sensor.D == sensor.D
-                if f is None:
-                    assert i.sensor.f == sensor.f
-                assert i.sensor.p_x == sensor.p_x
-                assert np.array_equal(i.sensor.opt_trans_wavelengths, sensor.opt_trans_wavelengths)
-                assert np.array_equal(i.sensor.optics_transmission, sensor.optics_transmission)
-                assert i.sensor.eta == sensor.eta
-                if w_x is None:
-                    assert i.sensor.w_x == sensor.w_x
-                if w_y is None:
-                    assert i.sensor.w_y == sensor.w_y
-                assert i.sensor.int_time == sensor.int_time
-                assert i.sensor.dark_current == sensor.dark_current
-                assert i.sensor.read_noise == sensor.read_noise
-                assert i.sensor.max_n == sensor.max_n
-                assert i.sensor.bit_depth == sensor.bit_depth
-                assert i.sensor.max_well_fill == sensor.max_well_fill
-                assert i.sensor.s_x == sensor.s_x
-                assert i.sensor.s_y == sensor.s_y
-                assert i.sensor.da_x == sensor.da_x
-                assert i.sensor.da_y == sensor.da_y
-                assert np.array_equal(i.sensor.qe_wavelengths, sensor.qe_wavelengths)
-                assert np.array_equal(i.sensor.qe, sensor.qe)
-            else:
-                assert sensor is None
-
-            if i.scenario is not None and scenario is not None:
-                assert i.scenario.name == scenario.name
-                assert i.scenario.ihaze == scenario.ihaze
-                assert i.scenario.altitude == scenario.altitude
-                assert i.scenario.ground_range == scenario.ground_range
-                assert i.scenario.aircraft_speed == scenario.aircraft_speed
-                assert i.scenario.target_reflectance == scenario.target_reflectance
-                assert i.scenario.target_temperature == scenario.target_temperature
-                assert i.scenario.background_reflectance == scenario.background_reflectance
-                assert i.scenario.background_temperature == scenario.background_temperature
-                assert i.scenario.ha_wind_speed == scenario.ha_wind_speed
-                assert i.scenario.cn2_at_1m == scenario.cn2_at_1m
-            else:
-                assert scenario is None
 
     @pytest.mark.parametrize(
         ("use_sensor_scenario", "w_x", "w_y", "f", "interp", "is_rgb"),
@@ -202,7 +170,7 @@ class TestDetectorOTFPerturber:
             (False, 3e-6, 20e-6, 30e-3, True, True),
         ],
     )
-    def test_regression(
+    def test_regression(  # noqa: C901
         self,
         ssim_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
@@ -218,17 +186,23 @@ class TestDetectorOTFPerturber:
             img = np.stack((img,) * 3, axis=-1)
         img_md = {"img_gsd": 3.19 / 160.0}
 
-        sensor = None
-        scenario = None
+        sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor, scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = create_sample_sensor_and_scenario()
             # For the small f override, set scenario to a shorter altiude/range
             # to avoid downsampling image to a single pixel
             if f is not None:
-                scenario.altitude = 500
-                scenario.ground_range = 100
+                sensor_and_scenario["altitude"] = 500
+                sensor_and_scenario["ground_range"] = 100
 
-        inst = DetectorOTFPerturber(sensor=sensor, scenario=scenario, w_x=w_x, w_y=w_y, f=f, interp=interp)
+        if w_x is not None:
+            sensor_and_scenario["w_x"] = w_x
+        if w_y is not None:
+            sensor_and_scenario["w_y"] = w_y
+        if f is not None:
+            sensor_and_scenario["f"] = f
+
+        inst = DetectorOTFPerturber(interp=interp, **sensor_and_scenario)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         ssim_tiff_snapshot.assert_match(out_img)
