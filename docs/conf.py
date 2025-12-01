@@ -4,6 +4,9 @@ For the full list of built-in configuration values, see the documentation:
 https://www.sphinx-doc.org/en/master/usage/configuration.html
 """
 
+import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -26,6 +29,40 @@ project = "nrtk"
 copyright = "2023, Kitware, Inc."  # noqa: A001
 author = "Kitware, Inc."
 release = nrtk.__version__
+
+# -- Version switcher configuration ------------------------------------------
+# Determine version for switcher matching based on ReadTheDocs or git branch
+rtd_version = os.environ.get("READTHEDOCS_VERSION")
+
+if rtd_version:
+    # Building on ReadTheDocs - use their version identifier
+    # "latest" -> main branch builds
+    # "stable" -> latest release
+    # "v0.26.0" -> specific tagged version
+    switcher_version = rtd_version
+    if rtd_version.startswith("v"):
+        # Remove 'v' prefix for version matching (e.g., "v0.26.0" -> "0.26.0")
+        switcher_version = rtd_version[1:]
+else:
+    try:
+        git_path = shutil.which("git")
+        if not git_path:
+            raise FileNotFoundError("git executable not found in PATH")
+        result = subprocess.run(  # noqa: S603
+            [git_path, "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=Path(__file__).parent,
+        )
+        branch = result.stdout.strip()
+
+        # Map branches to switcher versions
+        # main branch -> "latest", other branches -> package release version
+        switcher_version = "latest" if branch == "main" else release
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        # Git not available or not in a repo - use release version
+        switcher_version = release
 
 
 # -- General configuration ---------------------------------------------------
@@ -61,7 +98,61 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
+
+# -- PyData Sphinx Theme configuration ---------------------------------------
+html_theme_options = {
+    "logo": {
+        "image_light": "figures/nrtk-wordmark.png",
+        "image_dark": "figures/nrtk-wordmark.png",
+        "alt_text": "NRTK Documentation",
+    },
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["search-button", "theme-switcher", "version-switcher", "navbar-icon-links"],
+    "navbar_align": "left",
+    "switcher": {
+        "json_url": "_static/switcher.json",
+        "version_match": switcher_version,
+    },
+    "show_nav_level": 1,  # Show only top-level navigation initially
+    "navigation_depth": 4,  # Allow deeper navigation hierarchy in sidebar
+    "collapse_navigation": True,  # Enable collapse/expand functionality
+    "navigation_with_keys": True,
+    "header_links_before_dropdown": 3,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/Kitware/nrtk",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/nrtk/",
+            "icon": "fa-brands fa-python",
+            "type": "fontawesome",
+        },
+        {
+            "name": "conda-forge",
+            "url": "https://github.com/conda-forge/nrtk-feedstock",
+            "icon": "fa-solid fa-box-open",
+            "type": "fontawesome",
+        },
+    ],
+    "footer_start": ["copyright"],
+    "footer_end": ["sphinx-version", "theme-version"],
+    "secondary_sidebar_items": ["page-toc", "edit-this-page"],
+    "use_edit_page_button": False,
+}
+
+# Configure sidebar templates
+# NOTE: Intentionally NOT including "search-field.html" to avoid duplicate search UI
+# The search-button in navbar_end provides search functionality
+html_sidebars = {
+    "**": ["sidebar-nav-bs"],  # Show navigation tree in sidebar
+}
+
 html_static_path = ["_static"]
 html_css_files = [
     "https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css",

@@ -211,3 +211,74 @@ document.addEventListener("DOMContentLoaded", function () {
       if (addButtonsWhenReady()) clearInterval(interval);
     }, 200);
   });
+
+// ============================================
+// Resizable Sidebar Functionality
+// ============================================
+document.addEventListener("DOMContentLoaded", function () {
+  const sidebar = document.querySelector('.bd-sidebar-primary');
+
+  if (!sidebar) return;
+
+  // Create resize handle and append to sidebar
+  const resizeHandle = document.createElement('div');
+  resizeHandle.className = 'sidebar-resize-handle';
+  sidebar.appendChild(resizeHandle);
+
+  let isResizing = false;
+  let startX = 0;
+  let startWidth = 0;
+
+  // Load saved width from localStorage (only on desktop >= 1200px)
+  function applySavedWidth() {
+    if (window.innerWidth >= 1200) {
+      const savedWidth = localStorage.getItem('sidebarWidth');
+      if (savedWidth) {
+        sidebar.style.width = savedWidth + 'px';
+      }
+    } else {
+      // Remove inline width on smaller screens to let CSS media queries and theme handle it
+      sidebar.style.width = '';
+    }
+  }
+
+  applySavedWidth();
+
+  // Update on window resize
+  window.addEventListener('resize', applySavedWidth);
+
+  resizeHandle.addEventListener('mousedown', function(e) {
+    isResizing = true;
+    startX = e.clientX;
+    startWidth = parseInt(getComputedStyle(sidebar).width, 10);
+    resizeHandle.classList.add('resizing');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isResizing) return;
+
+    const width = startWidth + (e.clientX - startX);
+    const minWidth = 150;
+    const maxWidth = 500;
+
+    if (width >= minWidth && width <= maxWidth) {
+      sidebar.style.width = width + 'px';
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (isResizing) {
+      isResizing = false;
+      resizeHandle.classList.remove('resizing');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+
+      // Save width to localStorage
+      const currentWidth = parseInt(getComputedStyle(sidebar).width, 10);
+      localStorage.setItem('sidebarWidth', currentWidth);
+    }
+  });
+});
