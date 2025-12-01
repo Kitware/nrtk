@@ -1,17 +1,79 @@
 ###############################################################################
-# Stage -- Quality
+# Stage -- Quality Assurance
 ###############################################################################
-#
-# Overrides:
-#
-# 1) Poetry install for optional dependencies for pyright jobs
-#
-###############################################################################
+
+.quality-setup:
+  extends: .shared-setup
+  stage: quality
+  before_script:
+    - !reference [.shared-setup, before_script]
+    # Install dependencies: if EXTRAS equals "extras", install additional optional deps.
+    - |
+      if [ -n "$EXTRAS" ]; then
+        poetry install --sync --only main,linting,tests --extras "$EXTRAS"
+      else
+        poetry install --sync --only main,linting,tests
+      fi
+
 pyright-internal:
+  extends: .quality-setup
   variables:
     EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+  script:
+    - poetry run pyright
 
 pyright-external:
+  extends: .quality-setup
   variables:
     EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
-  allow_failure: false
+  before_script:
+    - !reference [.quality-setup, before_script]
+    - apt-get update && apt-get install bc
+  script:
+    - COMPLETENESS_STRING=$(echo "$(poetry run pyright --verifytypes ${CI_PROJECT_NAME/-/_} --ignoreexternal src/${CI_PROJECT_NAME/-/_})" | tee outfile.txt | grep completeness)
+    - cat outfile.txt
+    - NUM_SYMBOLS_STRING=$(cat outfile.txt | grep "Symbols exported by \"${CI_PROJECT_NAME/-/_}\"")
+    - NUM_SYMBOLS=$(echo "${NUM_SYMBOLS_STRING}" | grep -o '[0-9]\+')
+    # Pyright external job executes only if the number of symbols exported by the package is greater than 0.
+    # With the previous condition being true, the job runs to success only if correctness score is equal
+    # to 100%.
+    - |
+      if [[ "${NUM_SYMBOLS}" -gt 0 ]]
+      then
+          echo "${COMPLETENESS_STRING}" > pyright-completeness-metric.txt
+          COMPLETENESS_SCORE=$(echo "${COMPLETENESS_STRING}" | grep -o '[0-9.]\+%' | sed 's/%//')
+          if [[ $(echo "$COMPLETENESS_SCORE < 100" | bc) -eq 1 ]]
+          then
+              echo "[ERROR] Pyright completeness score is ${COMPLETENESS_SCORE}%"
+              exit 1
+          else
+              echo "[SUCCESS] Pyright completeness score is a 100%"
+          fi
+      else
+          echo "${NUM_SYMBOLS_STRING}" > pyright-completeness-metric.txt
+          echo "[SKIPPED] Symbols exported by ${CI_PROJECT_NAME/-/_} = 0"
+      fi
+  artifacts:
+    when: always
+    paths:
+    - pyright-completeness-metric.txt
+    reports:
+      metrics: pyright-completeness-metric.txt
+
+ruff-lint:
+  extends: .quality-setup
+  script:
+    - poetry run ruff check --config pyproject.toml
+
+ruff-format:
+  extends: .quality-setup
+  script:
+    - poetry run ruff format --config pyproject.toml --check
+
+# Job to lint sphinx docs
+sphinx-lint:
+  extends: .quality-setup
+  script:
+    # Only looks at the docs directory, ignoring docs/_implementations
+    # sphinx-lint does not currently support configuration via pyproject.toml
+    - poetry run sphinx-lint --enable all --disable leaked-markup --max-line-length 120 -i docs/_implementations docs
