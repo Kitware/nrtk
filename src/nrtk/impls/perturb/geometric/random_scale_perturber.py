@@ -39,8 +39,8 @@ class RandomScalePerturber(AlbumentationsPerturber):
             OpenCV flag indicating the interpolation algorithm.
         probability (float):
             Probability of applying the scale transformation.
-        seed (int):
-            An optional seed for reproducible results.
+        seed (int | None):
+            Random seed for reproducibility. Defaults to 1.
 
     Methods:
         perturb:
@@ -56,7 +56,7 @@ class RandomScalePerturber(AlbumentationsPerturber):
         limit: float | tuple[float, float] = 0.0,
         interpolation: int = cv2.INTER_LINEAR,
         probability: float = 1.0,
-        seed: int | None = None,
+        seed: int | None = 1,
     ) -> None:
         """RandomScalePerturber applies a random scale perturbation to an input image.
 
@@ -74,7 +74,7 @@ class RandomScalePerturber(AlbumentationsPerturber):
             probability:
                 Probability of applying the scale transformation.
             seed:
-                An optional seed for reproducible results.
+                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
         """
         if not self.is_usable():
             raise AlbumentationsImportError

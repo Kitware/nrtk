@@ -110,9 +110,20 @@ class TestSaltNoisePerturber:
                 expected=image,
             )
 
-    @pytest.mark.parametrize("rng", [42, 12345])
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = SaltNoisePerturber()
+        out_1, _ = inst_1(dummy_image)
+        inst_2 = SaltNoisePerturber()
+        out_2, _ = inst_2(dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
     def test_rng(self, rng: int) -> None:
-        """Ensure results are reproducible."""
+        """Ensure results are reproducible when explicit rng is provided."""
         rng_assertions(perturber=SaltNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
@@ -224,9 +235,20 @@ class TestPepperNoisePerturber:
                 expected=image,
             )
 
-    @pytest.mark.parametrize("rng", [42, 12345])
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = PepperNoisePerturber()
+        out_1, _ = inst_1(dummy_image)
+        inst_2 = PepperNoisePerturber()
+        out_2, _ = inst_2(dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
     def test_rng(self, rng: int) -> None:
-        """Ensure results are reproducible."""
+        """Ensure results are reproducible when explicit rng is provided."""
         rng_assertions(perturber=PepperNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
@@ -343,9 +365,20 @@ class TestSaltAndPepperNoisePerturber:
                 expected=image,
             )
 
-    @pytest.mark.parametrize("rng", [42, 12345])
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = SaltAndPepperNoisePerturber()
+        out_1, _ = inst_1(dummy_image)
+        inst_2 = SaltAndPepperNoisePerturber()
+        out_2, _ = inst_2(dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
     def test_rng(self, rng: int) -> None:
-        """Ensure results are reproducible."""
+        """Ensure results are reproducible when explicit rng is provided."""
         rng_assertions(perturber=SaltAndPepperNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
@@ -488,9 +521,20 @@ class TestGaussianNoisePerturber:
                 expected=image,
             )
 
-    @pytest.mark.parametrize("rng", [42, 12345])
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = GaussianNoisePerturber()
+        out_1, _ = inst_1(dummy_image)
+        inst_2 = GaussianNoisePerturber()
+        out_2, _ = inst_2(dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
     def test_rng(self, rng: int) -> None:
-        """Ensure results are reproducible."""
+        """Ensure results are reproducible when explicit rng is provided."""
         rng_assertions(perturber=GaussianNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(
@@ -600,9 +644,20 @@ class TestSpeckleNoisePerturber:
                 expected=image,
             )
 
-    @pytest.mark.parametrize("rng", [42, 12345])
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = SpeckleNoisePerturber()
+        out_1, _ = inst_1(dummy_image)
+        inst_2 = SpeckleNoisePerturber()
+        out_2, _ = inst_2(dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
     def test_rng(self, rng: int) -> None:
-        """Ensure results are reproducible."""
+        """Ensure results are reproducible when explicit rng is provided."""
         rng_assertions(perturber=SpeckleNoisePerturber, rng=rng)
 
     @pytest.mark.parametrize(

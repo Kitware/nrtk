@@ -17,6 +17,8 @@ from nrtk.utils._exceptions import AlbumentationsImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb.test_perturber_utils import perturber_assertions
 
+rng = np.random.default_rng()
+
 
 @pytest.mark.skipif(not RandomRotationPerturber.is_usable(), reason=str(AlbumentationsImportError()))
 class TestRandomRotationPerturber:
@@ -143,6 +145,86 @@ class TestRandomRotationPerturber:
                 probability=probability,
                 seed=seed,
             ),
+            image=image,
+            expected=out_image,
+        )
+
+    def test_default_seed_reproducibility(self) -> None:
+        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+        image = rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        limit = 0.1
+        probability = 1.0
+
+        # Test perturb interface directly without providing seed (uses default=1)
+        inst = RandomRotationPerturber(
+            limit=limit,
+            probability=probability,
+        )
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
+        inst = RandomRotationPerturber(  # Create new instance without seed
+            limit=limit,
+            probability=probability,
+        )
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
+        # Test callable
+        inst = RandomRotationPerturber(
+            limit=limit,
+            probability=probability,
+        )
+        perturber_assertions(
+            perturb=inst,
+            image=image,
+            expected=out_image,
+        )
+
+    @pytest.mark.parametrize(
+        ("image", "seed"),
+        [
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+        ],
+    )
+    def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
+        """Ensure results are reproducible when explicit seed is provided."""
+        limit = 0.1
+        probability = 1.0
+
+        # Test perturb interface directly
+        inst = RandomRotationPerturber(
+            limit=limit,
+            probability=probability,
+            seed=seed,
+        )
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
+        inst = RandomRotationPerturber(  # Create new instance with same seed
+            limit=limit,
+            probability=probability,
+            seed=seed,
+        )
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
+        inst = RandomRotationPerturber(
+            limit=limit,
+            probability=probability,
+            seed=seed,
+        )
+        # Test callable
+        perturber_assertions(
+            perturb=inst,
             image=image,
             expected=out_image,
         )

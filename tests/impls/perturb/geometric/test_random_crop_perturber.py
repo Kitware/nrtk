@@ -63,17 +63,11 @@ class TestRandomCropPerturber:
                 assert box_1 == box_2
                 assert meta_1 == meta_2
 
-    @pytest.mark.parametrize(
-        ("image"),
-        [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)),
-            (np.ones((256, 256, 3), dtype=np.float32)),
-            (np.ones((256, 256, 3), dtype=np.float64)),
-        ],
-    )
-    def test_reproducibility(self, image: np.ndarray) -> None:
-        """Ensure results are reproducible."""
-        # Test perturb interface directly
+    def test_default_seed_reproducibility(self) -> None:
+        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+        image = rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Test perturb interface directly without providing seed (uses default=1)
         inst = RandomCropPerturber(crop_size=(20, 20))
         out_image, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
@@ -81,14 +75,48 @@ class TestRandomCropPerturber:
             boxes=None,
             expected=None,
         )
-        inst = RandomCropPerturber(crop_size=(20, 20))  # Create new instances to reset random seed
+        inst = RandomCropPerturber(crop_size=(20, 20))  # Create new instance without seed
         bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=(out_image, []),
         )
+        # Test callable
         inst = RandomCropPerturber(crop_size=(20, 20))
+        bbox_perturber_assertions(
+            perturb=inst,
+            image=image,
+            boxes=None,
+            expected=(out_image, []),
+        )
+
+    @pytest.mark.parametrize(
+        ("image", "seed"),
+        [
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+            (np.ones((256, 256, 3), dtype=np.float32), 2),
+            (np.ones((256, 256, 3), dtype=np.float64), 2),
+        ],
+    )
+    def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
+        """Ensure results are reproducible when explicit seed is provided."""
+        # Test perturb interface directly
+        inst = RandomCropPerturber(crop_size=(20, 20), seed=seed)
+        out_image, _ = bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=None,
+        )
+        inst = RandomCropPerturber(crop_size=(20, 20), seed=seed)  # Create new instances with same seed
+        bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=(out_image, []),
+        )
+        inst = RandomCropPerturber(crop_size=(20, 20), seed=seed)
         # Test callable
         bbox_perturber_assertions(
             perturb=inst,

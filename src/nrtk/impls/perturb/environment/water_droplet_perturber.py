@@ -166,8 +166,8 @@ class WaterDropletPerturber(PerturbImage):
             Camera focal length in x direction (cm).
         f_y (int):
             Camera focal length in y direction (cm).
-        seed (int):
-            Random seed for reproducibility.
+        seed (int | None):
+            Random seed for reproducibility. Defaults to 1.
     """
 
     def __init__(
@@ -202,7 +202,7 @@ class WaterDropletPerturber(PerturbImage):
             f_y:
                 Camera focal length in y direction (cm).
             seed:
-                Random seed for reproducibility.
+                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
 
             If any of the parameters are absent, the following values will be set
             as defaults:
@@ -215,7 +215,7 @@ class WaterDropletPerturber(PerturbImage):
             n_water = 1.33
             f_x = 400
             f_y = 400
-            seed = None
+            seed = 1
 
         Raises:
             :raises ImportError: If Scipy, Shapely or GeoPandas is not found,

@@ -72,7 +72,7 @@ class DiffusionPerturber(PerturbImage):
         model_name: Name of the pre-trained diffusion model from Hugging Face.
                    Default is "timbrooks/instruct-pix2pix".
         prompt: Text prompt describing the desired perturbation or transformation.
-        seed: Random seed for reproducible perturbations. If None, perturbations will be non-deterministic.
+        seed: Random seed for reproducible results. Defaults to 1 for deterministic behavior.
         num_inference_steps: Number of denoising steps. Default is 50.
         text_guidance_scale: Guidance scale for text prompt. Default is 8.0.
         image_guidance_scale: Guidance scale for image conditioning. Default is 2.0.
@@ -91,7 +91,7 @@ class DiffusionPerturber(PerturbImage):
         self,
         model_name: str = "timbrooks/instruct-pix2pix",
         prompt: str = "do not change the image",
-        seed: int = 1,
+        seed: int | None = 1,
         num_inference_steps: int = 50,
         text_guidance_scale: float = 8.0,
         image_guidance_scale: float = 2.0,
@@ -104,7 +104,7 @@ class DiffusionPerturber(PerturbImage):
             prompt: Text prompt describing the desired perturbation. Examples include
                 "add rain to the image", "make it foggy", "add snow", "darken the scene", etc.
                 To apply a no-op, use "do not change the image". Default is "do not change the image".
-            seed: Random seed for reproducible perturbations. Default is 1.
+            seed: Random seed for reproducible results. Defaults to 1 for deterministic behavior.
             num_inference_steps: Number of denoising steps. Default is 50.
             text_guidance_scale: Guidance scale for text prompt. Default is 8.0.
             image_guidance_scale: Guidance scale for image conditioning. Default is 2.0.
@@ -259,9 +259,12 @@ class DiffusionPerturber(PerturbImage):
         # Lancoz is more computationally expensive
         return image.resize((new_w, new_h), Resampling.LANCZOS)
 
-    def _set_seed(self) -> torch.Generator | None:
-        """Set random seed for reproducible results."""
+    def _get_generator(self) -> torch.Generator | None:
+        """Return torch generator. If seed provided this ensures reproducible results."""
         device = self._get_device()
+        if self.seed is None:
+            return torch.Generator(device=device)
+
         return torch.Generator(device=device).manual_seed(self.seed)
 
     @override
@@ -302,7 +305,7 @@ class DiffusionPerturber(PerturbImage):
             resized_image = self._resize_image(pil_image)
 
             pipeline = self._get_pipeline()
-            generator = self._set_seed()
+            generator = self._get_generator()
 
             pipeline_result = pipeline(
                 self.prompt,

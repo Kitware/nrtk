@@ -27,7 +27,7 @@ class RandomCropPerturber(PerturbImage):
 
     Attributes:
         crop_size (tuple[int, int]): Target crop dimensions for the input image.
-        seed (int | numpy.random.Generator): Random seed or number generator for deterministic behavior.
+        seed (int | numpy.random.Generator | None): Random seed or Generator instance for reproducibility.
 
     Methods:
         perturb:
@@ -52,7 +52,8 @@ class RandomCropPerturber(PerturbImage):
                 Target crop size as (crop_height, crop_width). If crop_size is None, it defaults
                 to the size of the input image.
             seed:
-                Seed for rng. Defaults to 1.
+                Random seed or Generator instance for reproducible results. Defaults to 1 for
+                deterministic behavior.
         """
         super().__init__()
         self.crop_size = crop_size

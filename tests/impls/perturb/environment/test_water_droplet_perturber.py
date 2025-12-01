@@ -17,21 +17,70 @@ from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb.test_perturber_utils import perturber_assertions
 
 rng = np.random.default_rng(2345)
+reproduce_rng = np.random.default_rng(23456)
 
 
 @pytest.mark.skipif(not WaterDropletPerturber.is_usable(), reason=str(WaterDropletImportError()))
 class TestWaterDropletPerturber:
-    def test_default_consistency(
-        self,
-    ) -> None:
-        """Run on a dummy image to ensure multiple calls produce the same result."""
-        img = np.ones((3, 3, 3)).astype(np.uint8)
+    def test_default_seed_reproducibility(self) -> None:
+        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+        image = reproduce_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
 
+        # Test perturb interface directly without providing seed (uses default=1)
         inst = WaterDropletPerturber()
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
 
-        out_img = perturber_assertions(perturb=inst, image=img, expected=None)
+        # Create new instance without seed
+        inst = WaterDropletPerturber()
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
 
-        perturber_assertions(perturb=inst, image=img, expected=out_img)
+        # Test callable
+        inst = WaterDropletPerturber()
+        perturber_assertions(
+            perturb=inst,
+            image=image,
+            expected=out_image,
+        )
+
+    @pytest.mark.parametrize(
+        ("image", "seed"),
+        [
+            (reproduce_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+        ],
+    )
+    def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
+        """Ensure results are reproducible when explicit seed is provided."""
+        # Test perturb interface directly
+        inst = WaterDropletPerturber(seed=seed)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
+
+        # Create new instance with same seed
+        inst = WaterDropletPerturber(seed=seed)
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
+
+        # Test callable
+        inst = WaterDropletPerturber(seed=seed)
+        perturber_assertions(
+            perturb=inst,
+            image=image,
+            expected=out_image,
+        )
 
     @pytest.mark.parametrize(
         (

@@ -43,17 +43,47 @@ class TestPyBSMPerturber:
         psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
+        ("param_name", "param_value"),
+        [
+            ("ground_range", 10000),
+            ("ground_range", 20000),
+            ("altitude", 10000),
+        ],
+    )
+    def test_default_seed_reproducibility(self, param_name: str, param_value: int) -> None:
+        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+        # Test perturb interface directly without providing rng_seed (uses default=1)
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario[param_name] = param_value
+        # For type: ignore below, see https://github.com/microsoft/pyright/issues/5545#issuecomment-1644027877
+        inst = PybsmPerturber(**sensor_and_scenario)
+        img_gsd = 3.19 / 160.0
+        out_image = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            img_gsd=img_gsd,
+        )
+        # Create another instance without seed and ensure perturbed image is the same
+        inst2 = PybsmPerturber(**sensor_and_scenario)
+        pybsm_perturber_assertions(
+            perturb=inst2.perturb,
+            image=image,
+            expected=out_image,
+            img_gsd=img_gsd,
+        )
+
+    @pytest.mark.parametrize(
         ("param_name", "param_value", "rng_seed"),
         [
-            ("ground_range", 10000, 1),
-            ("ground_range", 20000, 1),
             ("ground_range", 30000, 2),
             ("altitude", 10000, 2),
             ("ihaze", 2, 2),
         ],
     )
     def test_reproducibility(self, param_name: str, param_value: int, rng_seed: int) -> None:
-        """Ensure results are reproducible."""
+        """Ensure results are reproducible when explicit seed is provided."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor_and_scenario = create_sample_sensor_and_scenario()
