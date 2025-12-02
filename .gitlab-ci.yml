@@ -5,6 +5,7 @@ stages:
 
   # Our CI/CD Jobs
   - test
+  - vcrm
   - quality
   - docs
 
@@ -32,6 +33,7 @@ include:
   - local: .gitlab-ci/.gitlab-shared.yml
 
   - local: .gitlab-ci/.gitlab-test.yml
+  - local: .gitlab-ci/.gitlab-vcrm.yml
   - local: .gitlab-ci/.gitlab-quality.yml
   - local: .gitlab-ci/.gitlab-docs.yml
     <<: *unschedulable
