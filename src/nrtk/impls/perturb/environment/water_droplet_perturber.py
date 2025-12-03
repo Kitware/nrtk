@@ -257,7 +257,7 @@ class WaterDropletPerturber(PerturbImage):
         """Sorts points in counterclockwise order around a center point."""
         # Subtract original point from center point (position obtained
         # by calculating the mean)
-        points128 = points.astype(np.float128)
+        points128 = points.astype(np.longdouble)
         d = points128 - np.mean(points128, axis=0)
         # Use atan2 to determine the angle taking into account the correct quadrant
         s = np.arctan2(d[:, 0], d[:, 1])
