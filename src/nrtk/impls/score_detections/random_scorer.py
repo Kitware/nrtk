@@ -41,6 +41,9 @@ class RandomScorer(ScoreDetections):
     of ground truth and predicted detections.
 
     This class, in particular, implements a random scorer that returns random float values.
+
+    Attributes:
+        seed (int | None): Optional seed to ensure reproducibility
     """
 
     def __init__(self, seed: int | None = None) -> None:
@@ -49,7 +52,6 @@ class RandomScorer(ScoreDetections):
         Args:
             seed (int | None, optional): An optional seed to ensure reproducibility of random
                 scores. Defaults to None.
-
         """
         self.seed = seed
         self._rng = np.random.default_rng(self.seed)
@@ -72,9 +74,5 @@ class RandomScorer(ScoreDetections):
         return [self._rng.random() for actual_det in actual]
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the RandomScorer instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the RandomScorer instance."""
         return {"seed": self.seed}

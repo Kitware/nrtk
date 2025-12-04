@@ -9,6 +9,17 @@ Dependencies:
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
     - nrtk.impls.perturb_image.generic.albumentations_perturber: Base implementation for Albumentations perturbers.
+
+Example usage:
+    >>> if not RandomScalePerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("RandomScalePerturber is not usable")
+    >>> import numpy as np
+    >>> limit = 0.5
+    >>> perturber = RandomScalePerturber(limit=limit)
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -41,14 +52,6 @@ class RandomScalePerturber(AlbumentationsPerturber):
             Probability of applying the scale transformation.
         seed (int | None):
             Random seed for reproducibility. Defaults to 1.
-
-    Methods:
-        perturb:
-            Applies the specified perturbation to an input image.
-        __call__:
-            Calls the perturb method with the given input image.
-        get_config:
-            Returns the current configuration of the RandomRotationPerturber instance.
     """
 
     def __init__(  # noqa: C901
@@ -116,11 +119,7 @@ class RandomScalePerturber(AlbumentationsPerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the RandomRotationPerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the RandomRotationPerturber instance."""
         cfg = dict()
         cfg["limit"] = self.limit
         cfg["interpolation"] = self.interpolation

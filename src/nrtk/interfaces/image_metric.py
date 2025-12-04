@@ -40,9 +40,13 @@ class ImageMetric(Plugfigurable):
     ) -> float:
         """Given up to two images, and additional parameters, return some given metric about the image(s).
 
-        :param img_1: An input image in the shape (height, width, channels).
-        :param img_2: An optional input image in the shape (height, width, channels)
-        :param additional_params: A dictionary containing implementation-specific input param-values pairs.
+        Args:
+            img_1:
+                An input image in the shape (height, width, channels).
+            img_2:
+                An optional input image in the shape (height, width, channels)
+            additional_params:
+                A dictionary containing implementation-specific input param-values pairs.
 
         Returns:
             Returns a single scalar value representing an implementation's computed metric. Implementations
@@ -57,9 +61,13 @@ class ImageMetric(Plugfigurable):
     ) -> float:
         """Calls compute() with the given input image(s) and additional parameters.
 
-        :param img_1: An input image in the shape (height, width, channels).
-        :param img_2: An optional input image in the shape (height, width, channels)
-        :param additional_params: A dictionary containing implementation-specific input param-values pairs.
+        Args:
+            img_1:
+                An input image in the shape (height, width, channels).
+            img_2:
+                An optional input image in the shape (height, width, channels)
+            additional_params:
+                A dictionary containing implementation-specific input param-values pairs.
 
         Returns:
             A single scalar value representing an implementation's computed metric. Implementations
@@ -73,9 +81,6 @@ class ImageMetric(Plugfigurable):
 
         This property retrieves the name of the class instance, which can
         be useful for logging, debugging, or display purposes.
-
-        Returns:
-            str: The name of the ImageMetric instance.
         """
         return self.__class__.__name__
 

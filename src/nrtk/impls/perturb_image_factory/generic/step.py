@@ -14,15 +14,10 @@ Usage:
     used to generate perturbed image instances with controlled variations.
 
 Example:
-    factory = StepPerturbImageFactory(
-        perturber=SomePerturbImageClass,
-        theta_key="parameter",
-        start=0.0,
-        stop=10.0,
-        step=1.0,
-        to_int=False
-    )
-    theta_values = factory.thetas  # Access generated range of parameter values
+    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> factory = StepPerturbImageFactory(
+    ...     perturber=BrightnessPerturber, theta_key="factor", start=0.0, stop=1.0, step=0.1, to_int=False
+    ... )
 """
 
 from __future__ import annotations
@@ -40,7 +35,21 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
 class StepPerturbImageFactory(PerturbImageFactory):
-    """Simple PerturbImageFactory implementation to step through the given range of values."""
+    """Simple PerturbImageFactory implementation to step through the given range of values.
+
+    perturber (type[PerturbImage]):
+        perturber type to produce
+    theta_key (str):
+        peturber parameter to modify
+    start (float):
+        initial value of range (inclusive)
+    end (float):
+        end value of range (exclusive)
+    step (float):
+        step value between instances
+    to_int (bool):
+        determines wheter to cast theta_value to a int or float
+    """
 
     def __init__(
         self,
@@ -56,21 +65,22 @@ class StepPerturbImageFactory(PerturbImageFactory):
         Initialize the factory to produce PerturbImage instances of the given type,
         varying the given ``theta_key`` parameter from start to stop with given step.
 
-        :param perturber: Python implementation type of the PerturbImage interface
-            to produce.
+        Args:
+            perturber:
+                Python implementation type of the PerturbImage interface to produce.
+            theta_key:
+                Perturber parameter to vary between instances.
+            start:
+                Initial value of desired range (inclusive).
+            stop:
+                Final value of desired range (exclusive).
+            step:
+                Step value between instances.
+            to_int:
+                Boolean variable determining whether the thetas are cast as ints or floats. Defaults to False.
 
-        :param theta_key: Perturber parameter to vary between instances.
-
-        :param start: Initial value of desired range (inclusive).
-
-        :param stop: Final value of desired range (exclusive).
-
-        :param step: Step value between instances.
-
-        :param to_int: Boolean variable determining whether the thetas are cast as
-                       ints or floats. Defaults to False.
-
-        :raises TypeError: Given a perturber instance instead of type.
+        Raises:
+            TypeError: Given a perturber instance instead of type.
         """
         super().__init__(perturber=perturber, theta_key=theta_key)
 

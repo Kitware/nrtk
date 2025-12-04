@@ -46,9 +46,7 @@ def default_sensor_scenario(config_type: str, data_dir: str | None = None) -> di
                  Can be a string path or pathlib.Path object.
 
     Returns:
-        A tuple containing:
-            - PybsmSensor: Configured sensor object with loaded parameters
-            - PybsmScenario: Configured scenario object with loaded parameters
+        A dictionary containing sensor and scenario parameters
 
     Raises:
         ValueError: If the configuration type is not supported or the

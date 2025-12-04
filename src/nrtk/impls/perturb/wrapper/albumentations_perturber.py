@@ -8,6 +8,17 @@ Dependencies:
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
     - albumentations: For the underlying perturbations
+
+Example usage:
+    >>> if not AlbumentationsPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("AlbumentationsPerturber is not usable")
+    >>> perturber = "RandomRain"
+    >>> parameters = {"drop_length": 40, "drop_width": 10}
+    >>> image = np.ones((256, 256, 3))
+    >>> perturber = AlbumentationsPerturber(perturber=perturber, parameters=parameters)
+    >>> perturbed_image, _ = perturber.perturb(image)
 """
 
 from __future__ import annotations
@@ -42,14 +53,8 @@ class AlbumentationsPerturber(PerturbImage):
             Keyword arguments that should be passed to the given perturber.
         seed (int):
             An optional seed for reproducible results.
-
-    Methods:
-        perturb:
-            Applies the specified to an input image.
-        __call__:
-            Calls the perturb method with the given input image.
-        get_config:
-            Returns the current configuration of the AlbumentationsPerturber instance.
+        transform (albumentations.Compose):
+            albumentations pipeline for the transformation
     """
 
     def __init__(
@@ -71,8 +76,8 @@ class AlbumentationsPerturber(PerturbImage):
 
 
         Raises:
-            :raises ValueError: Given perturber is not available in Albumentations.
-            :raises ValueError: Given perturber does not inherit BasicTransform.
+            ValueError: Given perturber is not available in Albumentations.
+            ValueError: Given perturber does not inherit BasicTransform.
         """
         if not self.is_usable():
             raise AlbumentationsImportError
@@ -136,8 +141,7 @@ class AlbumentationsPerturber(PerturbImage):
                 Additional perturbation keyword arguments.
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                Image with transform applied and bounding boxes with their coordinates adjusted by the transform.
+            Image with transform applied and bounding boxes with their coordinates adjusted by the transform.
         """
         # Create bboxes and labels in a format usable by Albumentations
         bboxes = list()
@@ -165,11 +169,7 @@ class AlbumentationsPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the AlbumentationsPerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the AlbumentationsPerturber instance."""
         cfg = super().get_config()
         cfg["perturber"] = self.perturber
         cfg["parameters"] = self.parameters
@@ -179,10 +179,6 @@ class AlbumentationsPerturber(PerturbImage):
     @classmethod
     @override
     def is_usable(cls) -> bool:
-        """Checks if the required albumentations module is available.
-
-        Returns:
-            :return bool: True if albumentations is installed; False otherwise.
-        """
+        """Returns true if the required albumentations module is available."""
         # Requires opencv to be installed
         return albumentations_available and cv2_available

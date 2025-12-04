@@ -48,15 +48,11 @@ class ScoreClassifications(Plugfigurable):
     ) -> Sequence[float]:
         """Generate a sequence of scores corresponding to a specific metric.
 
-        :param actual:
-            Ground truth classifications.
-        :param predicted:
-            Output classifications from a classifier with class-wise confidence
-            scores.
-
-        Returns:
-            Metric score values as a float-type sequence with the length matching
-            the number of samples in the ground truth input.
+        Args:
+            actual:
+                Ground truth classifications.
+            predicted:
+                Output classifications from a classifier with class-wise confidence scores.
         """
 
     def __call__(

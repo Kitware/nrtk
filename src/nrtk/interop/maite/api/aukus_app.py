@@ -72,7 +72,20 @@ def _check_input(data: AukusDatasetSchema) -> None:
 
 @AUKUS_app.post("/")
 def handle_aukus_post(data: AukusDatasetSchema) -> list[AukusDatasetSchema]:
-    """Format AUKUS request data to NRTK API format and return NRTK API data in AUKUS format."""
+    """Format AUKUS request data to NRTK API format and return NRTK API data in AUKUS format.
+
+    Args:
+        data:
+            AukusDatasetSchema from schema.py
+
+    Returns:
+        AukusDatasetSchema from schema.py
+
+    Raises:
+        HTTPException upon failure
+        FastApiImportError: FastAPI is not available
+        PydanticSettingsImportError: PydanticSettings is not available
+    """
     if not fastapi_available:
         raise FastApiImportError
 

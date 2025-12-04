@@ -29,7 +29,12 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class PerturbImageFactory(Plugfigurable):
-    """Factory class for producing PerturbImage instances of a specified type and configuration."""
+    """Factory class for producing PerturbImage instances of a specified type and configuration.
+
+    Attributes:
+        perturber (type[PerturbImage]): python implementation type of the PerturbImage interface to produce
+        theta_key (str): perturber parameter to vary between instances
+    """
 
     def __init__(self, perturber: type[PerturbImage], theta_key: str) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
@@ -37,12 +42,14 @@ class PerturbImageFactory(Plugfigurable):
         Initialize the factory to produce PerturbImage instances of the given type,
         varying the given `theta_key` parameter.
 
-        :param perturber: Python implementation type of the PerturbImage interface
-            to produce.
+        Args:
+            perturber:
+                Python implementation type of the PerturbImage interface to produce.
+            theta_key:
+                Perturber parameter to vary between instances.
 
-        :param theta_key: Perturber parameter to vary between instances.
-
-        :raises TypeError: Given a perturber instance instead of type.
+        Raises:
+            TypeError: Given a perturber instance instead of type.
         """
         self._theta_key = theta_key
 
@@ -62,19 +69,19 @@ class PerturbImageFactory(Plugfigurable):
         return self._theta_key
 
     def __len__(self) -> int:
-        """Number of perturber instances this factory will generate."""
+        """Return the number of perturber instances this factory will generate."""
         return len(self.thetas)
 
     def __iter__(self) -> Iterator[PerturbImage]:
-        """Iterator for this factory."""
+        """Return an iterator for this factory."""
         self.n = 0
         return self
 
     def __next__(self) -> PerturbImage:
-        """:raises StopIteration: Iterator exhausted.
+        """Return the next perturber instance.
 
-        Returns:
-            Next perturber instance.
+        Raises:
+            StopIteration: Iterator exhausted.
         """
         if self.n < len(self.thetas):
             kwargs = {self.theta_key: self.thetas[self.n]}
@@ -86,12 +93,12 @@ class PerturbImageFactory(Plugfigurable):
     def __getitem__(self, idx: int) -> PerturbImage:
         """Get the perturber for a specific index.
 
-        :param idx: Index of desired perturber.
+        Args:
+            idx:
+                Index of desired perturber.
 
-        :raises IndexError: The given index does not exist.
-
-        Returns:
-            Perturber corresponding to the given index.
+        Raises:
+            IndexError: The given index does not exist.
         """
         if idx < 0 or idx >= len(self.thetas):
             raise IndexError
@@ -108,8 +115,8 @@ class PerturbImageFactory(Plugfigurable):
         """Instantiates a PerturbImageFactory from a configuration dictionary.
 
         Args:
-            config_dict (dict[str, Any]): Configuration dictionary with parameters for instantiation.
-            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+            config_dict: Configuration dictionary with parameters for instantiation.
+            merge_default: Whether to merge with default configuration. Defaults to True.
 
         Returns:
             An instance of the PerturbImageFactory class.
@@ -148,11 +155,7 @@ class PerturbImageFactory(Plugfigurable):
         return cfg
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the configuration of the factory instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing the perturber type and theta_key.
-        """
+        """Returns the configuration of the factory instance."""
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_key": self.theta_key,

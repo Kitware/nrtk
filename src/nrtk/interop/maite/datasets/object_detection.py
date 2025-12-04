@@ -59,9 +59,8 @@ class COCOMetadata(DatumMetadata):  # pyright: ignore [reportGeneralTypeIssues]
 class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]
     """Dataset class to convert a COCO dataset to a dataset compliant with JATIC's Object Detection protocol.
 
-    Parameters
-    ----------
-    metadata: DatasetMetadata
+    Attributes:
+        metadata: DatasetMetadata
             Metadata of this dataset.
     """
 
@@ -75,14 +74,18 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
         """Initialize MAITE-compliant dataset from a COCO dataset.
 
         Args:
-            kwcoco_dataset (kwcoco.CocoDataset): The COCO dataset object.
-            image_metadata (Sequence[DatumMetadataType]): Metadata for each image.
-            skip_no_anns (bool): Whether to skip images without annotations. Defaults to False.
-            dataset_id (str): Dataset ID, defaults to filepath.
+            kwcoco_dataset:
+                The COCO dataset object.
+            image_metadata:
+                Metadata for each image.
+            skip_no_anns:
+                Whether to skip images without annotations. Defaults to False.
+            dataset_id:
+                Dataset ID, defaults to filepath.
 
         Raises:
-            ImportError: If required dependencies are not installed.
-            ValueError: If metadata is missing for any image in the dataset.
+            ImportError: required dependencies are not installed.
+            ValueError: metadata is missing for any image in the dataset.
         """
         if not kwcoco_available:
             raise KWCocoImportError
@@ -191,29 +194,24 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required kwcoco and MAITE modules are available.
-
-        Returns:
-            bool: True if kwcoco and MAITE are installed; False otherwise.
-        """
+        """Returns True if the required kwcoco and MAITE modules are available."""
         return kwcoco_available and maite_available
 
 
 class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]
     """Implementation of the JATIC Object Detection dataset wrapper for dataset images of varying sizes.
 
-    Parameters
-    ----------
-    imgs : Sequence[np.ndarray]
-        Sequence of images.
-    dets : Sequence[ObjectDetectionTarget]
-        Sequence of detections for each image.
-    datum_metadata : Sequence[DatumMetadataType]
-        Sequence of metadata for each image.
-    dataset_id: str
-        Dataset ID.
-    index2label: dict[int, str] | None
-        Mapping from class index to label.
+    Attributes:
+        imgs: Sequence[np.ndarray]
+            Sequence of images.
+        dets: Sequence[ObjectDetectionTarget]
+            Sequence of detections for each image.
+        datum_metadata: Sequence[DatumMetadataType]
+            Sequence of metadata for each image.
+        dataset_id: str
+            Dataset ID.
+        index2label: dict[int, str] | None
+            Mapping from class index to label.
     """
 
     def __init__(
@@ -227,11 +225,16 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
         """Initialize MAITE-compliant dataset.
 
         Args:
-            imgs (Sequence[np.ndarray]): Sequence of images in the dataset.
-            dets (Sequence[TargetType]): Sequence of detection targets for the images.
-            datum_metadata (Sequence[DatumMetadataType]): Sequence of metadata dictionaries.
-            dataset_id (str): Dataset ID.
-            index2label (dict[int, str] | None): Mapping from class index to label.
+            imgs:
+                Sequence of images in the dataset.
+            dets:
+                Sequence of detection targets for the images.
+            datum_metadata:
+                Sequence of metadata dictionaries.
+            dataset_id:
+                Dataset ID.
+            index2label:
+                Mapping from class index to label.
         """
         if not self.is_usable():
             raise MaiteImportError
@@ -258,9 +261,5 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required MAITE module is available.
-
-        Returns:
-            bool: True if MAITE is installed; False otherwise.
-        """
+        """Returns True if the required MAITE module is available."""
         return maite_available

@@ -54,10 +54,14 @@ class PerturbImage(Plugfigurable):
         Note perturbers that resize, rotate, or similarly affect the dimensions of an image may impact
         scoring if bounding boxes are not similarly transformed.
 
-        :param image: Input image as a numpy array.
-        :param boxes: Input bounding boxes as a Iterable of tuples containing bounding boxes. This is the single
-            image output from DetectImageObjects.detect_objects
-        :param additional_params: Implementation-specific keyword arguments.
+        Args:
+            image:
+                Input image as a numpy array.
+            boxes:
+                Input bounding boxes as a Iterable of tuples containing bounding boxes.
+                This is the single image output from DetectImageObjects.detect_objects
+            additional_params:
+                Implementation-specific keyword arguments.
 
         Returns:
             Perturbed image as numpy array, including matching dtype. Implementations should impart no side
@@ -75,11 +79,15 @@ class PerturbImage(Plugfigurable):
     ) -> Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]:
         """Utility function to rescale set of bounding boxes based on provided old and new image sizes.
 
-        :param boxes: Bounding boxes as input to the ``perturb()`` method.
-        :param orig_shape: Original shape of the image that the provided bounding boxes belong to. It is assumed that
-            first two members of this represent the height and width respectively.
-        :param new_shape: New image shape to scale boxes to. It is assumed that first two members of this represent the
-            height and width respectively.
+        Args:
+            boxes:
+                Bounding boxes as input to the ``perturb()`` method.
+            orig_shape:
+                Original shape of the image that the provided bounding boxes belong to. It is assumed
+                that first two members of this represent the height and width respectively.
+            new_shape:
+                New image shape to scale boxes to. It is assumed that first two members of this represent
+                the height and width respectively.
 
         Returns:
             Rescaled bounding boxes in the same format as input.
@@ -107,10 +115,12 @@ class PerturbImage(Plugfigurable):
     ) -> AxisAlignedBoundingBox:
         """Utility function to align a misaligned bounding box given a set of vertices.
 
-        :param vertices: A sequence of vertices representing a misaligned bounding box.
+        Args:
+            vertices:
+                A sequence of vertices representing a misaligned bounding box.
 
         Returns:
-            AxisAlignedBoundingBox: Resulting axis-aligned bounding box.
+            Resulting axis-aligned bounding box.
         """
         vertices = np.asarray(vertices)
         return AxisAlignedBoundingBox(
@@ -129,18 +139,9 @@ class PerturbImage(Plugfigurable):
 
     @classmethod
     def get_type_string(cls) -> str:
-        """Returns the fully qualified type string of the `PerturbImage` class or its subclass.
-
-        Returns:
-            A string representing the fully qualified type, in the format `<module>.<class_name>`.
-            For example, "my_module.CustomPerturbImage".
-        """
+        """Returns the fully qualified type string of the `PerturbImage` class or its subclass."""
         return f"{cls.__module__}.{cls.__name__}"
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the PerturbImage instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the PerturbImage instance."""
         return {}

@@ -20,6 +20,12 @@ Dependencies:
     - numpy: For numerical operations and array manipulation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for image perturbation algorithms.
+
+Example usage:
+    >>> k = [0.5, 0.3, 0.1]
+    >>> perturber = RadialDistortionPerturber(k=k)
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -43,14 +49,6 @@ class RadialDistortionPerturber(PerturbImage):
             should have exactly 3 values. Positive values represent a fisheye or barrel distortion,
             negative values represent a pincushion distortion.
         color_fill (Sequence[int]): Background color fill for RGB image.
-
-    Methods:
-        perturb:
-            Applies the configured radial distortion to the input image and updates bounding boxes.
-        __call__:
-            Invokes the perturb method with the given input image and annotations.
-        get_config:
-            Returns the current configuration of the RadialDistortionPerturber instance.
     """
 
     def __init__(
@@ -91,8 +89,7 @@ class RadialDistortionPerturber(PerturbImage):
             k (Sequence[float]): Radial distortion coefficients
 
         Returns:
-            np.ndarray[Any, Any]: Distorted x coordinate mesh
-            np.ndarray[Any, Any]: Distorted y coordinate mesh
+            tuple of distorted x coordinate mesh and distorted y coordinate mesh
         """
         # Short-circuit when all k=0 to avoid calculation
         if all(ki == 0 for ki in k):
@@ -135,8 +132,7 @@ class RadialDistortionPerturber(PerturbImage):
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:
-            np.ndarray[Any, Any]: Distorted image as numpy array
-            Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]: Updated bounding boxes
+            Distorted image as numpy array and updated bounding boxes
         """
         super().perturb(image=image)
 
@@ -175,11 +171,7 @@ class RadialDistortionPerturber(PerturbImage):
         return out.astype(np.uint8), boxes
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the RadialDistortionPerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the RadialDistortionPerturber instance."""
         cfg = super().get_config()
         cfg["k"] = self.k
         cfg["color_fill"] = self.color_fill

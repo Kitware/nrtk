@@ -60,12 +60,21 @@ def nrtk_perturber_cli(
 
     The perturbed images are stored in subfolders named after the chosen perturbation parameter keys and values.
 
-    :param dataset_dir: Root directory of dataset.
-    :param output_dir: Directory to write the perturbed images to.
-    :param config_file: Configuration file specifying the PerturbImageFactory configuration.
-    :param generate_config_file: File to write default config file, only written
-        if specified.
-    :param verbose: Display progress messages. Default is false.
+    Args:
+        dataset_dir:
+            Root directory of dataset.
+        output_dir:
+            Directory to write the perturbed images to.
+        config_file:
+            Configuration file specifying the PerturbImageFactory configuration.
+        generate_config_file:
+            File to write default config file, only written if specified.
+        verbose:
+            Display progress messages. Default is false.
+
+    Raises:
+        ValueError: COCO annotations file is not found
+        KWCocoImportError: KWCOCO is not available
     """
     if generate_config_file:
         config: dict[str, Any] = dict()

@@ -52,11 +52,12 @@ class ScoreDetections(Plugfigurable):
     ) -> Sequence[float]:
         """Generate a sequence of scores corresponding to a specific metric.
 
-        :param actual:
-            Ground truth bbox and class label pairs.
-        :param predicted:
-            Output detections from a detector with bbox and
-            class-wise confidence scores.
+        Args:
+            actual:
+                Ground truth bbox and class label pairs.
+            predicted:
+                Output detections from a detector with bbox and
+                class-wise confidence scores.
 
         Returns:
             Metric score values as a float-type sequence with the length matching

@@ -25,7 +25,13 @@ LOG = logging.getLogger(__name__)
 def build_factory(data: NrtkPerturbInputSchema) -> PerturbImageFactory:
     """Returns a PerturbImageFactory based on scenario and sensor parameters in data.
 
-    :param data: dictionary of Schema from schema.py
+    Args:
+        data:
+            dictionary of Schema from schema.py
+
+    Raises:
+        FileNotFoundError if data.config_file does not exists
+        ValueError if data.config_file does not have PerturberFactory key
     """
     if not os.path.isfile(data.config_file):
         raise FileNotFoundError(f"Config file at {data.config_file} was not found")
@@ -41,7 +47,13 @@ def load_COCOJATIC_dataset(  # noqa: N802
 ) -> COCOJATICObjectDetectionDataset:
     """Returns a COCOJATICObjectDetectionDataset based on dataset parameters in data.
 
-    :param data: dictionary of Schema from schema.py
+    Args:
+        data:
+            dictionary of Schema from schema.py
+
+    Raises:
+        KWCocoImportError: KWCoco is not available
+        ValueError: data.image_metadata does not have "id" key
     """
     if not is_usable:
         raise KWCocoImportError

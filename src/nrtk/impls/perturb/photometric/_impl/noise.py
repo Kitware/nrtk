@@ -21,8 +21,13 @@ Usage:
     of each class to apply the chosen noise effect.
 
 Example:
-    gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
-    noisy_image, boxes = gaussian_perturber.perturb(image_data, boxes)
+    >>> if not GaussianNoisePerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("skimage perturbers are not usable")
+    >>> image = np.ones((256, 256, 3))
+    >>> gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
+    >>> noisy_image, _ = gaussian_perturber.perturb(image)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
@@ -57,8 +62,11 @@ class _SKImageNoisePerturber(PerturbImage):
     def __init__(self, rng: np.random.Generator | int | None = 1, clip: bool = True) -> None:
         """Base class for skimage perturbers.
 
-        :param rng: Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
-        :param clip: Decide if output is clipped between the range of [-1, 1].
+        Args:
+            rng:
+                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            clip:
+                Decide if output is clipped between the range of [-1, 1].
         """
         if not self.is_usable():
             raise ScikitImageImportError
@@ -69,9 +77,11 @@ class _SKImageNoisePerturber(PerturbImage):
     def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
         """Call skimage.util.random_noise with appropriate arguments and convert back to input dtype.
 
-        :param image: Input image as a numpy array.
-        :param kwargs: Keyword arguments for random_noise call. ``rng`` will be
-            specified separately.
+        Args:
+            image:
+                Input image as a numpy array.
+            kwargs:
+                Keyword arguments for random_noise call. ``rng`` will be specified separately.
 
         Returns:
             Peturbed image as numpy array, including matching shape and dtype.
@@ -102,11 +112,7 @@ class _SKImageNoisePerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the _SKImageNoisePerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the _SKImageNoisePerturber instance."""
         cfg = super().get_config()
         cfg["rng"] = self.rng
         cfg["clip"] = self.clip
@@ -114,11 +120,7 @@ class _SKImageNoisePerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required skimage module is available.
-
-        Returns:
-            bool: True if scikit-image is installed; False otherwise.
-        """
+        """Returns true if the required skimage module is available."""
         # Requires scikit-image to be installed
         return skimage_available
 
@@ -132,9 +134,13 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
     ) -> None:
         """Initializes the SPNoisePerturber.
 
-        :param rng: Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
-        :param amount: Proportion of image pixels to replace with noise on range [0, 1].
-        :param clip: Decide if output is clipped between the range of [-1, 1].
+        Args:
+            rng:
+                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            amount:
+                Proportion of image pixels to replace with noise on range [0, 1].
+            clip:
+                Decide if output is clipped between the range of [-1, 1].
         """
         super().__init__(rng=rng, clip=clip)
 
@@ -147,18 +153,23 @@ class _SPNoisePerturber(_SKImageNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the _SPNoisePerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the _SPNoisePerturber instance."""
         cfg = super().get_config()
         cfg["amount"] = self.amount
         return cfg
 
 
 class SaltNoisePerturber(_SPNoisePerturber):
-    """Adds salt noise to image stimulus."""
+    """Adds salt noise to image stimulus.
+
+    Attributes:
+        rng (np.random.Generator | int | None):
+            Pseudo-random number generator or seed
+        clip (bool):
+            Decide if output is clipped between the range of [-1, 1].
+        amount (float):
+            Proportion of image pixels to replace with salt noise on range [0, 1]
+    """
 
     @override
     def perturb(
@@ -173,7 +184,16 @@ class SaltNoisePerturber(_SPNoisePerturber):
 
 
 class PepperNoisePerturber(_SPNoisePerturber):
-    """Adds pepper noise to image stimulus."""
+    """Adds pepper noise to image stimulus.
+
+    Attributes:
+        rng (np.random.Generator | int | None):
+            Pseudo-random number generator or seed
+        clip (bool):
+            Decide if output is clipped between the range of [-1, 1].
+        amount (float):
+            Proportion of image pixels to replace with pepper noise on range [0, 1]
+    """
 
     @override
     def perturb(
@@ -188,7 +208,18 @@ class PepperNoisePerturber(_SPNoisePerturber):
 
 
 class SaltAndPepperNoisePerturber(_SPNoisePerturber):
-    """Adds salt & pepper noise to image stimulus."""
+    """Adds salt & pepper noise to image stimulus.
+
+    Attributes:
+        rng (np.random.Generator | int | None):
+            Pseudo-random number generator or seed
+        clip (bool):
+            Decide if output is clipped between the range of [-1, 1].
+        amount (float):
+            Proportion of image pixels to replace with noise on range [0, 1]
+        salt_vs_pepper (float):
+            Proportion of salt vs. pepper noise. Higher values represent more salt.
+    """
 
     def __init__(
         self,
@@ -199,10 +230,16 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     ) -> None:
         """Initializes the SaltAndPepperNoisePerturber.
 
-        :param rng: Pseudo-random number generator or seed.
-        :param amount: Proportion of image pixels to replace with noise on range [0, 1].
-        :param salt_vs_pepper: Proportion of salt vs. pepper noise on range [0, 1].
-            Higher values represent more salt.
+        Args:
+            rng:
+                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            amount:
+                Proportion of image pixels to replace with noise on range [0, 1].
+            salt_vs_pepper:
+                Proportion of salt vs. pepper noise on range [0, 1].
+                Higher values represent more salt.
+            clip:
+                Decide if output is clipped between the range of [-1, 1].
         """
         super().__init__(amount=amount, rng=rng, clip=clip)
 
@@ -232,11 +269,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the SaltAndPepperNoisePerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the SaltAndPepperNoisePerturber instance."""
         cfg = super().get_config()
         cfg["salt_vs_pepper"] = self.salt_vs_pepper
         return cfg
@@ -252,10 +285,15 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
     ) -> None:
         """Initializes the GSNoisePerturber.
 
-        :param rng: Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
-        :param mean: Mean of random distribution.
-        :param var: Variance of random distribution.
-        :param clip: Decide if output is clipped between the range of [-1, 1].
+        Args:
+            rng:
+                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            mean:
+                Mean of random distribution
+            var:
+                Variance of random distribution.
+            clip:
+                Decide if output is clipped between the range of [-1, 1].
         """
         super().__init__(rng=rng, clip=clip)
 
@@ -269,11 +307,7 @@ class _GSNoisePerturber(_SKImageNoisePerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the _GSNoisePerturber instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the _GSNoisePerturber instance."""
         cfg = super().get_config()
         cfg["mean"] = self.mean
         cfg["var"] = self.var

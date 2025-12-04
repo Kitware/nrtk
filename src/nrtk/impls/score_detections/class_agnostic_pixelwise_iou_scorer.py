@@ -42,7 +42,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
-        """Computes pixelwise IoU scores and returns sequence of float values equal to the length of the input data."""
+        """Returns pixelwise IoU scores and returns sequence of float values equal to the length of the input data."""
         if len(actual) != len(predicted):
             raise ValueError("Size mismatch between actual and predicted data")
         for actual_det in actual:
@@ -93,9 +93,5 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
         return ious
 
     def get_config(self) -> dict[str, Any]:
-        """Generates a serializable config that can be used to rehydrate object.
-
-        Returns:
-            dict[str, Any]: serializable config containing all instance parameters
-        """
+        """Generates a serializable config that can be used to rehydrate object."""
         return {}

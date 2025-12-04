@@ -41,11 +41,15 @@ else:
 def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
     """Returns a collection of augmented datasets based parameters in data.
 
-    :param data: NrtkPybsmPerturbInputSchema from schema.py
+    Args:
+        data:
+            NrtkPybsmPerturbInputSchema from schema.py
 
-    :returns: NrtkPybsmPerturberOutputSchema from schema.py
+    Returns:
+        NrtkPybsmPerturberOutputSchema from schema.py
 
-    :raises: HTTPException upon failure
+    Raises:
+        HTTPException upon failure
     """
     if not fastapi_available:
         raise HTTPException(status_code=400, detail=str(FastApiImportError()))

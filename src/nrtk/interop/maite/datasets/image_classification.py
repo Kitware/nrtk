@@ -28,16 +28,15 @@ IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGeneralTypeIssues]
     """Implementation of the JATIC Image Classification dataset wrapper for dataset images of varying sizes.
 
-    Parameters
-    ----------
-    imgs : Sequence[np.ndarray]
-        Sequence of images.
-    labels : Sequence[ArrayLike]
-        Sequence of labels for each image.
-    datum_metadata : Sequence[DatumMetadataType]
-        Sequence of custom metadata for each image.
-    metadata : DatasetMetadata
-        Metadata for this dataset.
+    Attributes:
+        imgs : Sequence[np.ndarray]
+            Sequence of images.
+        labels : Sequence[ArrayLike]
+            Sequence of labels for each image.
+        datum_metadata : Sequence[DatumMetadataType]
+            Sequence of custom metadata for each image.
+        metadata : DatasetMetadata
+            Metadata for this dataset.
     """
 
     def __init__(
@@ -51,11 +50,16 @@ class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGenera
         """Initialize MAITE-compliant dataset.
 
         Args:
-            imgs (Sequence[np.ndarray]): Sequence of images in the dataset.
-            labels (Sequence[TargetType]): Sequence of labels for the images.
-            datum_metadata (Sequence[DatumMetadataType]): Sequence of metadata dictionaries.
-            dataset_id (str): Dataset ID.
-            index2label (dict[int, str] | None): Mapping from class index to label.
+            imgs:
+                Sequence of images in the dataset.
+            labels:
+                Sequence of labels for the images.
+            datum_metadata:
+                Sequence of metadata dictionaries.
+            dataset_id:
+                Dataset ID.
+            index2label:
+                Mapping from class index to label.
         """
         self.imgs = imgs
         self.labels = labels

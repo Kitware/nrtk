@@ -4,14 +4,19 @@ Classes:
     JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM.
 
 Dependencies:
-    - pyBSM for OTF and radiance calculations.
-    - nrtk.interfaces.perturb_image.PerturbImage for base functionality.
+    - pyBSM for OTF-related functionalities.
+    - nrtk.impls.perturb.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
 
 Example usage:
-    sensor = {...}
-    scenario = {...}
-    perturber = JitterOTFPerturber(**sensor, **scenario)
-    perturbed_image = perturber.perturb(image)
+    >>> if not JitterOTFPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("JitterOTFPerturber is not usable")
+    >>> s_x = 0.01
+    >>> perturber = JitterOTFPerturber(s_x=s_x)
+    >>> image = np.ones((256, 256, 3))
+    >>> img_gsd = 3.19 / 160
+    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)
 """
 
 from __future__ import annotations
@@ -42,14 +47,6 @@ class JitterOTFPerturber(PybsmOTFPerturber):
     jitter effects that simulate real-world distortions in optical imaging systems.
 
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
-
-    Methods:
-        perturb(image):
-            Applies the jitter-based OTF perturbation to the provided image.
-        get_config():
-            Returns the configuration for the current instance.
-        from_config(config_dict):
-            Instantiates from a configuration dictionary.
     """
 
     def __init__(
@@ -84,7 +81,7 @@ class JitterOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            :raises ImportError: If pyBSM is not found
+            ImportError: If pyBSM is not found
         """
         super().__init__(interp=interp, **kwargs)
         self._use_default_psf = not kwargs

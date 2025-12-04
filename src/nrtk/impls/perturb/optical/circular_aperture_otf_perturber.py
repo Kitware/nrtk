@@ -5,14 +5,20 @@ Classes:
     model, allowing for detailed wavelength and aperture-based image modifications.
 
 Dependencies:
-    - pyBSM for radiance and OTF calculations.
-    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+    - pyBSM for OTF-related functionalities.
+    - nrtk.impls.perturb.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
 
 Example usage:
-    sensor = {...}
-    scenario = {...}
-    perturber = CircularApertureOTFPerturber(**sensor, **scenario)
-    perturbed_image, boxes = perturber.perturb(image, boxes)
+    >>> if not CircularApertureOTFPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("CircularApertureOTFPerturber is not usable")
+    >>> D = 0.004
+    >>> eta = 0.1
+    >>> perturber = CircularApertureOTFPerturber(D=D, eta=eta)
+    >>> image = np.ones((256, 256, 3))
+    >>> img_gsd = 3.19 / 160
+    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
@@ -46,22 +52,6 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
     based on the sensor and scenario configurations.
 
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
-
-    Attributes:
-        mtf_wavelengths (Sequence[float]):
-            Sequence of wavelengths used in MTF calculations.
-        mtf_weights (Sequence[float]):
-            Sequence of weights associated with each wavelength.
-        D (float):
-            Effective aperture diameter.
-        eta (float):
-            Relative linear obscuration.
-        slant_range (float):
-            Line-of-sight distance between platform and target.
-        ifov (float):
-            Instantaneous field of view of the sensor.
-        interp (bool):
-            Specifies whether to use interpolated atmospheric data.
     """
 
     def __init__(  # noqa: C901
@@ -87,7 +77,7 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
-            kwargs:
+            **kwargs:
                 sensor and/or scenario values to modify
 
             If both sensor and scenario parameters are absent, then default values
@@ -103,9 +93,9 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            :raises ValueError: If mtf_wavelengths and mtf_weights are not equal length
-            :raises ValueError: If mtf_wavelengths is empty or mtf_weights is empty
+            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ValueError: If mtf_wavelengths and mtf_weights are not equal length
+            ValueError: If mtf_wavelengths is empty or mtf_weights is empty
         """
         if mtf_wavelengths is not None and len(mtf_wavelengths) == 0:
             raise ValueError("mtf_wavelengths is empty")
