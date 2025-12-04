@@ -58,7 +58,7 @@ class PybsmPerturber(PybsmOTFPerturber):
     def __init__(
         self,
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_PARAMETERS["reflectance_range"],
-        rng_seed: int = 1,
+        rng_seed: int | None = 1,
         sensor_name: str = "Sensor",
         D: float = 275e-3,  # noqa:N803
         f: float = 4,
@@ -102,7 +102,7 @@ class PybsmPerturber(PybsmOTFPerturber):
             reflectance_range:
                 Array of reflectances that correspond to pixel values.
             rng_seed:
-                integer seed value that will be used for the random number generator.
+                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
             sensor_name:
                 name of the sensor
             D:

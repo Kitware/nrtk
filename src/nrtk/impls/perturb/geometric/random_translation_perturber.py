@@ -54,7 +54,8 @@ class RandomTranslationPerturber(PerturbImage):
 
         Args:
             seed:
-                Numpy random number generator.
+                Random seed or Generator instance for reproducible results. Defaults to 1 for
+                deterministic behavior.
             color_fill:
                 Background color fill for RGB image.
 

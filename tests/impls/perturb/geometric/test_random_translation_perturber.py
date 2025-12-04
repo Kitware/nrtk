@@ -70,9 +70,9 @@ class TestRandomTranslationPerturber:
             (np.ones((256, 256, 3), dtype=np.float64)),
         ],
     )
-    def test_reproducibility(self, image: np.ndarray) -> None:
-        """Ensure results are reproducible."""
-        # Test perturb interface directly
+    def test_default_seed_reproducibility(self, image: np.ndarray) -> None:
+        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+        # Test perturb interface directly without providing seed (uses default=1)
         inst = RandomTranslationPerturber()
         out_image, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
@@ -80,15 +80,49 @@ class TestRandomTranslationPerturber:
             boxes=None,
             expected=None,
         )
-        inst = RandomTranslationPerturber()  # Create new instances to reset random seed
+        inst = RandomTranslationPerturber()  # Create new instance without seed
         bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=(out_image, []),
         )
-        inst = RandomTranslationPerturber()
         # Test callable
+        inst = RandomTranslationPerturber()
+        bbox_perturber_assertions(
+            perturb=inst,
+            image=image,
+            boxes=None,
+            expected=(out_image, []),
+        )
+
+    @pytest.mark.parametrize(
+        ("image", "seed"),
+        [
+            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+            (np.ones((256, 256, 3), dtype=np.float32), 2),
+            (np.ones((256, 256, 3), dtype=np.float64), 2),
+        ],
+    )
+    def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
+        """Ensure results are reproducible when explicit seed is provided."""
+        # Test perturb interface directly
+        inst = RandomTranslationPerturber(seed=seed)
+        out_image, _ = bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=None,
+        )
+        inst = RandomTranslationPerturber(seed=seed)  # Create new instances with same seed
+        bbox_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            boxes=None,
+            expected=(out_image, []),
+        )
+        # Test callable
+        inst = RandomTranslationPerturber(seed=seed)
         bbox_perturber_assertions(
             perturb=inst,
             image=image,

@@ -57,7 +57,7 @@ class _SKImageNoisePerturber(PerturbImage):
     def __init__(self, rng: np.random.Generator | int | None = 1, clip: bool = True) -> None:
         """Base class for skimage perturbers.
 
-        :param rng: Pseudo-random number generator or seed.
+        :param rng: Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
         :param clip: Decide if output is clipped between the range of [-1, 1].
         """
         if not self.is_usable():
@@ -126,13 +126,13 @@ class _SKImageNoisePerturber(PerturbImage):
 class _SPNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
-        rng: np.random.Generator | int | None = None,
+        rng: np.random.Generator | int | None = 1,
         amount: float = 0.05,
         clip: bool = True,
     ) -> None:
         """Initializes the SPNoisePerturber.
 
-        :param rng: Pseudo-random number generator or seed.
+        :param rng: Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
         :param amount: Proportion of image pixels to replace with noise on range [0, 1].
         :param clip: Decide if output is clipped between the range of [-1, 1].
         """
@@ -192,7 +192,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     def __init__(
         self,
-        rng: np.random.Generator | int | None = None,
+        rng: np.random.Generator | int | None = 1,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
         clip: bool = True,
@@ -245,14 +245,14 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 class _GSNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
-        rng: np.random.Generator | int | None = None,
+        rng: np.random.Generator | int | None = 1,
         mean: float = 0.0,
         var: float = 0.05,
         clip: bool = True,
     ) -> None:
         """Initializes the GSNoisePerturber.
 
-        :param rng: Pseudo-random number generator or seed.
+        :param rng: Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
         :param mean: Mean of random distribution.
         :param var: Variance of random distribution.
         :param clip: Decide if output is clipped between the range of [-1, 1].

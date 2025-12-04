@@ -19,6 +19,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb.generative.diffusion_perturber import DiffusionPerturber
 from nrtk.utils._exceptions import DiffusionImportError
+from tests.impls.perturb.test_perturber_utils import perturber_assertions
 
 
 def internet_available() -> bool:
@@ -107,6 +108,104 @@ class TestDiffusionPerturber:
 
         assert perturbed_image.shape == (256, 256, 3)
         assert output_boxes == boxes
+
+    @patch("nrtk.impls.perturb.generative.diffusion_perturber.torch")
+    @patch("nrtk.impls.perturb.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb.generative.diffusion_perturber.EulerAncestralDiscreteScheduler")
+    def test_default_seed_reproducibility(
+        self,
+        mock_scheduler_class: MagicMock,
+        mock_pipeline_class: MagicMock,
+        mock_torch: MagicMock,
+    ) -> None:
+        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+        image = np.random.default_rng(1).integers(0, 255, (256, 256, 3), dtype=np.uint8)
+
+        # Setup mocks
+        mock_pipeline = MagicMock()
+        mock_result_image = np.random.default_rng(1).integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        mock_pipeline.return_value = ([mock_result_image], False)
+        mock_pipeline_class.from_pretrained.return_value = mock_pipeline
+        mock_pipeline.to.return_value = mock_pipeline
+        mock_pipeline.scheduler.config = {}
+        mock_scheduler_class.from_config.return_value = MagicMock()
+        mock_torch.cuda.is_available.return_value = True
+
+        # Test perturb interface directly without providing seed (uses default=1)
+        inst = DiffusionPerturber(model_name="test/model", prompt="test")
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
+
+        # Create new instance without seed
+        inst = DiffusionPerturber(model_name="test/model", prompt="test")
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
+
+        # Test callable
+        inst = DiffusionPerturber(model_name="test/model", prompt="test")
+        perturber_assertions(
+            perturb=inst,
+            image=image,
+            expected=out_image,
+        )
+
+    @pytest.mark.parametrize(
+        ("image", "seed"),
+        [
+            (np.random.default_rng(2).integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+        ],
+    )
+    @patch("nrtk.impls.perturb.generative.diffusion_perturber.torch")
+    @patch("nrtk.impls.perturb.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb.generative.diffusion_perturber.EulerAncestralDiscreteScheduler")
+    def test_reproducibility(
+        self,
+        mock_scheduler_class: MagicMock,
+        mock_pipeline_class: MagicMock,
+        mock_torch: MagicMock,
+        image: np.ndarray,
+        seed: int,
+    ) -> None:
+        """Ensure results are reproducible when explicit seed is provided."""
+        # Setup mocks
+        mock_pipeline = MagicMock()
+        mock_result_image = np.random.default_rng(seed).integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        mock_pipeline.return_value = ([mock_result_image], False)
+        mock_pipeline_class.from_pretrained.return_value = mock_pipeline
+        mock_pipeline.to.return_value = mock_pipeline
+        mock_pipeline.scheduler.config = {}
+        mock_scheduler_class.from_config.return_value = MagicMock()
+        mock_torch.cuda.is_available.return_value = True
+
+        # Test perturb interface directly
+        inst = DiffusionPerturber(model_name="test/model", prompt="test", seed=seed)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+        )
+
+        # Create new instance with same seed
+        inst = DiffusionPerturber(model_name="test/model", prompt="test", seed=seed)
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
+
+        # Test callable
+        inst = DiffusionPerturber(model_name="test/model", prompt="test", seed=seed)
+        perturber_assertions(
+            perturb=inst,
+            image=image,
+            expected=out_image,
+        )
 
     @pytest.mark.parametrize(
         (

@@ -32,7 +32,7 @@ class RandomRotationPerturber(AlbumentationsPerturber):
             Maximum rotation angle in degrees.
         probability (float):
             Probability of applying the rotation transformation.
-        seed (int):
+        seed (int | None):
             An optional seed for reproducible results.
         fill (numpy.array):
             Background color fill for RGB image.
@@ -51,7 +51,7 @@ class RandomRotationPerturber(AlbumentationsPerturber):
         limit: float | tuple[float, float] = 0.0,
         probability: float = 1.0,
         fill: Sequence[int] | None = None,
-        seed: int | None = None,
+        seed: int | None = 1,
     ) -> None:
         """RandomRotationPerturber applies a Rotation transformation from Albumentations.
 
@@ -68,8 +68,7 @@ class RandomRotationPerturber(AlbumentationsPerturber):
                 Background color fill for RGB image. (0 to 255 for each channel).
                 Default value is a black background ([0, 0, 0]).
             seed (int | None):
-                An optional seed for reproducible results. Defaults to None, which means the results are
-                non-deterministic.
+                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
 
         Raises:
             :raises ValueError: Rotation probability must be between 0.0 and 1.0 inclusive.
