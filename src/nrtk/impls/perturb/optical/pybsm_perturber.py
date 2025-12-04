@@ -62,7 +62,7 @@ class PybsmPerturber(PybsmOTFPerturber):
         sensor_name: str = "Sensor",
         D: float = 275e-3,  # noqa:N803
         f: float = 4,
-        p_x: float = 275e-3,
+        p_x: float = 0.008e-3,
         p_y: float | None = None,  # Defaults to None since the default value is dependent on p_x
         opt_trans_wavelengths: np.ndarray[Any, Any] = DEFAULT_PARAMETERS["opt_trans_wavelengths"],
         optics_transmission: np.ndarray[Any, Any]

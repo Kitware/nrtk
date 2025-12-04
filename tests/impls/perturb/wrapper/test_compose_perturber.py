@@ -18,8 +18,8 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from nrtk.impls.perturb.geometric.random_crop_perturber import RandomCropPerturber
 from nrtk.impls.perturb.wrapper.compose_perturber import ComposePerturber
 from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.utils._nop_perturber import _NOPPerturber
 from tests.impls.perturb.test_perturber_utils import perturber_assertions
-from tests.utils.impls.perturb.nop_perturber import NOPPerturber
 
 
 def _perturb(
@@ -67,7 +67,7 @@ class TestComposePerturber:
         # Test callable
         perturber_assertions(perturb=inst, image=image, expected=out_image)
 
-    @pytest.mark.parametrize("perturbers", [[NOPPerturber()], [NOPPerturber(), NOPPerturber()]])
+    @pytest.mark.parametrize("perturbers", [[_NOPPerturber()], [_NOPPerturber(), _NOPPerturber()]])
     def test_configuration(self, perturbers: list[PerturbImage]) -> None:
         """Test configuration stability."""
         inst = ComposePerturber(perturbers=perturbers)
@@ -77,7 +77,7 @@ class TestComposePerturber:
 
     @pytest.mark.parametrize(
         "perturbers",
-        [[NOPPerturber()], [NOPPerturber(), NOPPerturber()]],
+        [[_NOPPerturber()], [_NOPPerturber(), _NOPPerturber()]],
     )
     def test_hydration(
         self,
@@ -113,7 +113,7 @@ class TestComposePerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = ComposePerturber(perturbers=[NOPPerturber(), NOPPerturber()])
+        inst = ComposePerturber(perturbers=[_NOPPerturber(), _NOPPerturber()])
         _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
