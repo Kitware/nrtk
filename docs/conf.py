@@ -116,10 +116,11 @@ html_theme_options = {
         "version_match": switcher_version,
     },
     "show_nav_level": 1,  # Show only top-level navigation initially
-    "navigation_depth": 4,  # Allow deeper navigation hierarchy in sidebar
+    "navigation_depth": 3,  # Navigation hierarchy depth in sidebar
     "collapse_navigation": True,  # Enable collapse/expand functionality
+    "show_toc_level": 1,  # Table of contents depth on page
     "navigation_with_keys": True,
-    "header_links_before_dropdown": 3,
+    "header_links_before_dropdown": 5,
     "icon_links": [
         {
             "name": "GitHub",
@@ -149,8 +150,17 @@ html_theme_options = {
 # Configure sidebar templates
 # NOTE: Intentionally NOT including "search-field.html" to avoid duplicate search UI
 # The search-button in navbar_end provides search functionality
+# Use sidebar-nav-bs.html for section-isolated navigation (like pandas docs)
 html_sidebars = {
-    "**": ["sidebar-nav-bs"],  # Show navigation tree in sidebar
+    "index": [],  # No sidebar on main landing page
+    "getting_started/**": ["sidebar-nav-bs"],
+    "tutorials/**": ["sidebar-nav-bs"],
+    "how_to_guides/**": ["sidebar-nav-bs"],
+    "explanations/**": ["sidebar-nav-bs"],
+    "reference/**": ["sidebar-nav-bs"],
+    "interoperability/**": ["sidebar-nav-bs"],
+    "development/**": ["sidebar-nav-bs"],
+    "release_notes/**": ["sidebar-nav-bs"],
 }
 
 html_static_path = ["_static"]

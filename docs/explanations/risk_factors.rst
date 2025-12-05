@@ -6,7 +6,7 @@ the performance of vision algorithms once deployed.
 These risks can stem from environmental conditions, sensor limitations, data mismatches, or system integration
 challenges.
 
-.. image:: images/risks/root_causes.png
+.. image:: /images/risks/root_causes.png
   :width: 800px
   :alt: Root Causes of Operational Risks
 
@@ -14,8 +14,8 @@ The following table provides a summary of risk factors. Where applicable, a T&E 
 listed as well as functionality from NRTK that can be used to simulate the operational risk.
 
 Some of these perturbation functions are not implemented in NRTK directly but can be simulated using the
-:doc:`Albumentations perturber <_implementations/nrtk.impls.perturb.wrapper.albumentations_perturber>` which
-provides a wrapper around functionality of the `Albumentations <https://albumentations.ai/>`__ library.
+:doc:`Albumentations perturber </reference/api/_implementations/nrtk.impls.perturb.wrapper.albumentations_perturber>`
+which provides a wrapper around functionality of the `Albumentations <https://albumentations.ai/>`__ library.
 Some of the risk factors listed don't have any associated functionality or documentation in NRTK but may be covered in
 the future.
 
@@ -52,7 +52,7 @@ Vibrations, such as wind, in the sensor platform induce jitter and blurring.
 | **Affected Domains**    | Ground, Sea                                                                  |
 +-------------------------+------------------------------------------------------------------------------+
 
-.. figure:: images/risks/jitter.png
+.. figure:: /images/risks/jitter.png
   :width: 500px
 
   mevadata.org
@@ -72,7 +72,7 @@ Target is out of focus (due to sensor optics settings, rather than atmospheric /
 | **Affected Domains**    | Ground, Sea                                                                      |
 +-------------------------+----------------------------------------------------------------------------------+
 
-.. figure:: images/risks/out-of-focus.png
+.. figure:: /images/risks/out-of-focus.png
   :width: 250px
 
   mevadata.org
@@ -109,7 +109,7 @@ Obscurations on lens cover; IR may cause reflections or highlight imperfections 
 | **Affected Domains**    | Ground, Sea                                                                                      |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/droplets.png
+.. figure:: /images/risks/droplets.png
   :width: 500px
 
   mevadata.org
@@ -140,7 +140,7 @@ environments where lens contamination is common.
 | **Learn More**            | :doc:`operational_risk_modules/water_droplets`                                                   |
 +---------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/droplets-2.png
+.. figure:: /images/risks/droplets-2.png
   :width: 500px
 
   *Source: mevadata.org*
@@ -160,12 +160,12 @@ Lighting conditions and camera settings result in excessive or insufficient illu
 | **Affected Domains**    | All                                                                                              |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/illumination-1.jpg
+.. figure:: /images/risks/illumination-1.jpg
   :width: 500px
 
   doers-brc@kitware.com
 
-.. figure:: images/risks/illumination-2.jpg
+.. figure:: /images/risks/illumination-2.jpg
   :width: 500px
 
   doers-brc@kitware.com
@@ -202,7 +202,7 @@ Strong shadows are cast in the target area due to direct illumination.
 | **Affected Domains**    | All                                                                                              |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/shadow-1.png
+.. figure:: /images/risks/shadow-1.png
   :width: 500px
 
   mevadata.org
@@ -232,7 +232,7 @@ distinguish from the background.
 | **Learn More**            | :doc:`operational_risk_modules/haze`                                                             |
 +---------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/mist.png
+.. figure:: /images/risks/mist.png
   :width: 500px
 
   *Source: mevadata.org*
@@ -252,7 +252,7 @@ Clouds obscure targets, and may be transient or unpredictable.
 | **Affected Domains**    | UAV, WAMI, Satellite                                                                             |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/clouds.gif
+.. figure:: /images/risks/clouds.gif
   :width: 500px
 
   viratdata.org
@@ -289,7 +289,7 @@ Metadata is overlaid directly on pixels instead of provided separately.
 | **Affected Domains**    | All                                                                                              |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/metadata-burn.png
+.. figure:: /images/risks/metadata-burn.png
   :width: 500px
 
   Example UAV frame from FFMPEG project
@@ -309,7 +309,7 @@ Compression errors from overloaded camera processors or poor settings.
 | **Affected Domains**    | Ground, Sea, UAV                                                                                 |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/video-artifacts.gif
+.. figure:: /images/risks/video-artifacts.gif
   :width: 500px
 
   mevadata.org
@@ -329,7 +329,7 @@ Hardware or transmission issues interrupt video feed.
 | **Affected Domains**    | Ground, Sea, UAV                                                                                 |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/overheat.jpg
+.. figure:: /images/risks/overheat.jpg
   :width: 500px
 
   Camera overheating, doers-brc@kitware.com
@@ -349,7 +349,7 @@ Feed is encoded at inconsistent rates, often due to overload.
 | **Affected Domains**    | Ground, Sea, UAV                                                                                 |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/frame-rate.gif
+.. figure:: /images/risks/frame-rate.gif
   :width: 500px
 
   mevadata.org
@@ -369,7 +369,7 @@ Bright reflections due to lighting, target materials, or angles.
 | **Affected Domains**    | All                                                                                              |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/glare.png
+.. figure:: /images/risks/glare.png
   :width: 500px
 
   "A data set for airborne maritime surveillance environments",
@@ -390,12 +390,12 @@ In low light, camera may switch to monochrome or different capture mode.
 | **Affected Domains**    | Ground, Sea                                                                                      |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/night-mode-1.jpg
+.. figure:: /images/risks/night-mode-1.jpg
   :width: 500px
 
   mevadata.org
 
-.. figure:: images/risks/night-mode-2.jpg
+.. figure:: /images/risks/night-mode-2.jpg
   :width: 500px
 
   mevadata.org
@@ -415,7 +415,7 @@ Localized distortion due to atmospheric conditions.
 | **Affected Domains**    | Ground, Sea, UAV                                                                                 |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/turbulence.gif
+.. figure:: /images/risks/turbulence.gif
   :width: 500px
 
   doers-brc@kitware.com
@@ -435,7 +435,7 @@ Sudden camera motion creates a new view, invalidating prior context.
 | **Affected Domains**    | Ground, Sea                                                                                      |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/shot-boundary.gif
+.. figure:: /images/risks/shot-boundary.gif
   :width: 500px
 
   mevadata.org
@@ -455,7 +455,7 @@ Wide-angle lenses cause distortion at the image periphery.
 | **Affected Domains**    | Ground, Sea                                                                                      |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
-.. figure:: images/risks/radio-distortion.png
+.. figure:: /images/risks/radio-distortion.png
   :width: 500px
 
   mevadata.org

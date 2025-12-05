@@ -170,7 +170,7 @@ description of the extra.
     :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
-    :ref:`PyBSMPerturber`, :ref:`PyBSMOTFPerturber`
+    :ref:`PybsmPerturber`, :ref:`PybsmOTFPerturber`,
     :ref:`TurbulenceApertureOTFPerturber`, :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`,
     :ref:`CircularApertureOTFPerturber`, :ref:`DefocusOTFPerturber`, :ref:`SimplePybsmGenerator`, and
     :ref:`NIIRSImageMetric`.
@@ -207,7 +207,7 @@ Installing with OpenCV
 ^^^^^^^^^^^^^^^^^^^^^^
 One of the optional packages for nrtk is OpenCV, which is required for
 :py:mod:`~nrtk.impls.perturb.photometric.blur` perturbers and
-:ref:`Optical Transfer Functions <Optical Transfer Function Examples>`.
+:doc:`Optical Transfer Function perturbations </examples/otf_visualization>`.
 
 OpenCV receives dedicated installation guidance due to its unique dual-installation options.
 Unlike other optional dependencies that have single-path installations,

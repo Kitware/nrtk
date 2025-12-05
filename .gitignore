@@ -72,8 +72,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/_implementations
-docs/maite/_implementations
+docs/**/_implementations
 
 # PyBuilder
 .pybuilder/

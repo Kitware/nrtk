@@ -2,8 +2,11 @@
 Glossary
 ========
 
+.. glossary::
+   :sorted:
+
    augmentation
-     See perturbation.
+     See :term:`perturbation`.
 
    COCO
      Common Objects in Context (COCO) — A large-scale dataset that is a widely used benchmark for object detection and
@@ -24,7 +27,7 @@ Glossary
      :ref:`NRTK integration <Interoperability>`.
 
    natural robustness
-     A model’s ability to maintain performance despite variations or changes in the environment or inputs that are
+     A model's ability to maintain performance despite variations or changes in the environment or inputs that are
      naturally occurring, not specifically designed for testing or manipulation.
 
    Optical Transfer Function (OTF)
@@ -33,7 +36,8 @@ Glossary
      various sensor and environmental effects.
 
    perturber
-     A reusable component that defines and applies a specific type of perturbation (e.g. haze or blur) to image data.
+     A reusable component that defines and applies a specific type of :term:`perturbation` (e.g. haze or blur) to
+     image data.
 
    perturber factory
      A factory method implementation for creating perturbers. Perturbers can be customized by changing thetas and
@@ -47,16 +51,16 @@ Glossary
      sensor noise, and environmental conditions. View on `GitHub <https://github.com/Kitware/pybsm>`_.
 
    saliency
-     A measure of how much influence a part of an input has on a model’s output.
+     A measure of how much influence a part of an input has on a model's output.
 
    sensor transformation
      A change applied to image data to simulate different sensor behaviors (e.g. wavelength response, resolution,
      distortion).
 
-   theta key(s):
+   theta key(s)
      A string (or list of strings) that is the name of the pertubrer parameter to modify. A single string is used
      for generic factories and a list of strings is used for the pyBSM factory.
 
-   thetas:
+   thetas
      A list of values (or list of lists) containing the values for the perturber parameter. A single list is used
      for generic factories and a list of lists is used for the pyBSM factory.

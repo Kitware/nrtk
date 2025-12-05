@@ -38,7 +38,7 @@ assessment — providing a way to generate expanded datasets that reflect realis
 datasets enable more meaningful and interpretable robustness evaluation by simulating variations in sensor parameters
 and environmental conditions that are complex or expensive to capture in real-world data.
 
-.. figure:: figures/intro-fig-01.png
+.. figure:: /figures/intro-fig-01.png
 
    Figure 1: Extending Robustness Testing with NRTK.
 

@@ -61,6 +61,7 @@ Optical perturbers simulate physics-based sensor and optical effects.
    :recursive:
 
    nrtk.impls.perturb.optical.pybsm_perturber
+   nrtk.impls.perturb.optical.pybsm_otf_perturber
    nrtk.impls.perturb.optical.circular_aperture_otf_perturber
    nrtk.impls.perturb.optical.defocus_otf_perturber
    nrtk.impls.perturb.optical.detector_otf_perturber
@@ -114,7 +115,6 @@ Perturbation Factory
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb_image_factory.pybsm
    nrtk.impls.perturb_image_factory.generic.linspace
    nrtk.impls.perturb_image_factory.generic.one_step
    nrtk.impls.perturb_image_factory.generic.step

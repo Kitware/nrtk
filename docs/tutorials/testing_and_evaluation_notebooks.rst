@@ -16,64 +16,64 @@ Demonstrating Extreme Illumination Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate brightness changes and evaluate model responses under lighting variability.
-`View notebook <examples/maite/nrtk_brightness_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_brightness_perturber_demo>`.
 
 Demonstrating Visual Focus Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Apply blur and focus distortions to test performance degradation from defocus.
-`View notebook <examples/maite/nrtk_focus_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_focus_perturber_demo>`.
 
 Demonstrating Fog or Haze Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Evaluate model robustness under haze-like visibility conditions using synthetic perturbations.
-`View notebook <examples/maite/nrtk_haze_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_haze_perturber_demo>`.
 
 Demonstrating Lens Flare Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate a lens flare effect on an image and analyze its average and worst case effects on model precision.
-`View notebook <examples/maite/nrtk_lens_flare_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_lens_flare_demo>`.
 
 Demonstrating Resolution and Noise Transformations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Explore how camera-specific transformations affect model inputs and predictions.
-`View notebook <examples/maite/nrtk_sensor_transformation_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_sensor_transformation_demo>`.
 
 Demonstrating Affine Transformations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Explore how affine transformations affect model inputs and predictions.
-`View notebook <examples/maite/nrtk_affine_perturbers_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_affine_perturbers_demo>`.
 
 Demonstrating Motion Jitter Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate camera motion jitter and assess its impact on image quality and model inference.
-`View notebook <examples/maite/nrtk_jitter_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_jitter_perturber_demo>`.
 
 Demonstrating Atmospheric Turbulence Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate atmospheric distortion effects and assess its impact on image quality and model inference.
-`View notebook <examples/maite/nrtk_turbulence_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_turbulence_perturber_demo>`.
 
 Demonstrating Rain/Water Droplet Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate a rain/water droplet effect and analyze its impact on model inputs and predictions.
-`View notebook <examples/maite/nrtk_water_droplet_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_water_droplet_perturber_demo>`.
 
 Demonstrating Radial Distortion Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate a radial distortion effect and analyze its impact on model inputs and predictions.
-`View notebook <examples/maite/nrtk_radial_distortion_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_radial_distortion_perturber_demo>`.
 
 Combining Perturbations with Saliency Maps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Integrate NRTK perturbations with saliency map generation to visualize how image changes affect model interpretation.
-`View notebook <examples/maite/jatic-perturbations-saliency.html>`__.
+:doc:`View notebook </examples/maite/jatic-perturbations-saliency>`.
