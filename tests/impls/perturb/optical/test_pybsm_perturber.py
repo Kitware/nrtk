@@ -39,6 +39,7 @@ class TestPyBSMPerturber:
             expected=None,
             img_gsd=img_gsd,
         )
+        Image.fromarray(out_img).save("test.tiff")
 
         psnr_tiff_snapshot.assert_match(out_img)
 
@@ -150,6 +151,22 @@ class TestPyBSMPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
             PybsmPerturber(reflectance_range=reflectance_range)
+
+    @pytest.mark.parametrize(
+        ("altitude", "expectation"),
+        [
+            (24500, does_not_raise()),
+            (25000, does_not_raise()),
+            (
+                24499,
+                pytest.raises(ValueError, match=r"Invalid altitude value"),
+            ),
+        ],
+    )
+    def test_altitude_bounds(self, altitude: float, expectation: AbstractContextManager) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            PybsmPerturber(altitude=altitude)
 
     @pytest.mark.parametrize(
         ("additional_params", "expectation"),
