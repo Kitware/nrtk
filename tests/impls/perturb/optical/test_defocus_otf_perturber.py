@@ -206,6 +206,7 @@ class TestDefocusOTFPerturber:
     def test_regression(
         self,
         psnr_tiff_snapshot: SnapshotAssertion,
+        ssim_tiff_snapshot: SnapshotAssertion,
         use_sensor_scenario: bool,
         w_x: float | None,
         w_y: float | None,
@@ -231,6 +232,7 @@ class TestDefocusOTFPerturber:
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         psnr_tiff_snapshot.assert_match(out_img)
+        ssim_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         "boxes",

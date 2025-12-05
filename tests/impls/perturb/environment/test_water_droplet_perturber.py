@@ -156,6 +156,7 @@ class TestWaterDropletPerturber:
     def test_regression(
         self,
         psnr_tiff_snapshot: SnapshotAssertion,
+        ssim_tiff_snapshot: SnapshotAssertion,
         size_range: Sequence[float],
         num_drops: int,
         blur_strength: float,
@@ -184,6 +185,7 @@ class TestWaterDropletPerturber:
             image=image,
         )
         psnr_tiff_snapshot.assert_match(out_img)
+        ssim_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
         (
