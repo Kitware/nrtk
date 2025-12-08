@@ -119,20 +119,31 @@ Obscurations on lens cover; IR may cause reflections or highlight imperfections 
 Water Droplets on Lens
 ----------------------
 
-Droplets on the lens caused by rain or other factors can obscure or blur parts of the image.
+.. toctree::
+   :hidden:
+   :maxdepth: 3
 
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **Impact**              | Obscured or out-of-focus image regions; specularities may confuse algorithms.                    |
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **Root Cause**          | Sensor                                                                                           |
-+-------------------------+--------------------------------------------------------------------------------------------------+
-| **Affected Domains**    | Ground, Sea                                                                                      |
-+-------------------------+--------------------------------------------------------------------------------------------------+
+   operational_risk_modules/water_droplets
+
+Droplets on the lens caused by rain or other factors can obscure or blur parts of the image.
+Water droplets create localized refraction patterns that distort image regions, making targets
+harder to detect and track. These effects are particularly problematic in outdoor and maritime
+environments where lens contamination is common.
+
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Impact of Risk Factor** | Localized refraction, occlusion, and distortion of image regions.                                |
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Root Cause**            | Sensor                                                                                           |
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Affected Domains**      | Ground, Sea                                                                                      |
++---------------------------+--------------------------------------------------------------------------------------------------+
+| **Learn More**            | :doc:`operational_risk_modules/water_droplets`                                                   |
++---------------------------+--------------------------------------------------------------------------------------------------+
 
 .. figure:: images/risks/droplets-2.png
   :width: 500px
 
-  mevadata.org
+  *Source: mevadata.org*
 
 .. _extreme-illumination:
 
