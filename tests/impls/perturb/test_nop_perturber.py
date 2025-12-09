@@ -5,8 +5,8 @@ import pytest
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
+from nrtk.utils._nop_perturber import _NOPPerturber
 from tests.impls.perturb.test_perturber_utils import perturber_assertions
-from tests.utils.impls.perturb.nop_perturber import NOPPerturber
 
 rng = np.random.default_rng()
 
@@ -20,7 +20,7 @@ rng = np.random.default_rng()
 )
 def test_perturber_assertions(image: np.ndarray) -> None:
     """Run on a dummy image to ensure output matches expectations."""
-    inst = NOPPerturber()
+    inst = _NOPPerturber()
 
     # Test perturb interface directly
     perturber_assertions(perturb=inst.perturb, image=image, expected=image)
@@ -31,7 +31,7 @@ def test_perturber_assertions(image: np.ndarray) -> None:
 
 def test_config() -> None:
     """Test configuration stability."""
-    inst = NOPPerturber()
+    inst = _NOPPerturber()
     configuration_test_helper(inst)
 
 
@@ -48,6 +48,6 @@ def test_config() -> None:
 )
 def test_perturb_with_boxes(boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
     """Test that bounding boxes do not change during perturb."""
-    inst = NOPPerturber()
+    inst = _NOPPerturber()
     _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
     assert boxes == out_boxes

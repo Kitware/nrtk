@@ -9,17 +9,15 @@ Dependencies:
     - nrtk.interfaces for the `PerturbImage` interface.
 
 Usage:
-    Instantiate `NOPPerturber` and call `perturb` with an input image to obtain a copy of
+    Instantiate `_NOPPerturber` and call `perturb` with an input image to obtain a copy of
     the original image.
 
 Example:
-    nop_perturber = NOPPerturber()
+    nop_perturber = _NOPPerturber()
     output_image = nop_perturber.perturb(input_image)
 """
 
 from __future__ import annotations
-
-__all__ = ["NOPPerturber"]
 
 from collections.abc import Hashable, Iterable
 from copy import deepcopy
@@ -32,7 +30,7 @@ from typing_extensions import override
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
-class NOPPerturber(PerturbImage):
+class _NOPPerturber(PerturbImage):
     """Example implementation of the ``PerturbImage`` interface.
 
     An instance of this class acts as a functor to generate a perturbed image for the given

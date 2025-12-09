@@ -18,8 +18,8 @@ from nrtk.interop.maite.augmentations.object_detection import (
 from nrtk.interop.maite.datasets.object_detection import JATICDetectionTarget
 from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._nop_perturber import _NOPPerturber
 from tests.interop.maite.utils.test_utils import ResizePerturber
-from tests.utils.impls.perturb.nop_perturber import NOPPerturber
 
 random = np.random.default_rng()
 
@@ -30,7 +30,7 @@ class TestJATICDetectionAugmentation:
         ("perturber", "targets_in", "expected_targets_out"),
         [
             (
-                NOPPerturber(),
+                _NOPPerturber(),
                 [
                     JATICDetectionTarget(
                         boxes=np.asarray([[1.0, 2.0, 3.0, 4.0], [2.0, 4.0, 6.0, 8.0]]),
@@ -119,7 +119,7 @@ class TestJATICDetectionAugmentation:
         ("perturbers", "targets_in"),
         [
             (
-                [NOPPerturber(), ResizePerturber(w=64, h=512)],
+                [_NOPPerturber(), ResizePerturber(w=64, h=512)],
                 [
                     JATICDetectionTarget(
                         boxes=np.asarray([[1.0, 2.0, 3.0, 4.0], [2.0, 4.0, 6.0, 8.0]]),
@@ -181,7 +181,7 @@ class TestJATICDetectionAugmentationWithMetric:
                 does_not_raise(),
             ),
             (
-                [(NOPPerturber(), "no op augment")],
+                [(_NOPPerturber(), "no op augment")],
                 [
                     JATICDetectionTarget(
                         boxes=np.asarray([[1.0, 2.0, 3.0, 4.0], [2.0, 4.0, 6.0, 8.0]]),
@@ -218,7 +218,7 @@ class TestJATICDetectionAugmentationWithMetric:
         inputs and returns the corresponding outputs in a detection augmentation
         workflow.
         """
-        perturber = NOPPerturber()
+        perturber = _NOPPerturber()
         metric_patch = MagicMock(spec=ImageMetric, return_value=1.0)
         metric_augmentation = JATICDetectionAugmentationWithMetric(
             augmentations=[
@@ -270,7 +270,7 @@ class TestJATICDetectionAugmentationWithMetric:
         ("augmentations", "targets_in"),
         [
             (
-                [(NOPPerturber(), "no op augment")],
+                [(_NOPPerturber(), "no op augment")],
                 [
                     JATICDetectionTarget(
                         boxes=np.asarray([[1.0, 2.0, 3.0, 4.0], [2.0, 4.0, 6.0, 8.0]]),
