@@ -17,7 +17,7 @@ dependency_scanning:
   needs: []
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,linting,tests,docs
+    - poetry sync --only main,linting,tests,docs
 
 secret_detection:
   stage: security

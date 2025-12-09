@@ -174,7 +174,7 @@ To build the Sphinx-based documentation locally for the latest reference:
 
 ```bash
 # Install dependencies
-poetry install --sync --with main,linting,tests,docs
+poetry sync --with main,linting,tests,docs
 # Navigate to the documentation root
 cd docs
 # Build the documentation
@@ -214,7 +214,7 @@ Ensure the source tree is acquired locally before proceeding.
 
 You can install using [Poetry](https://python-poetry.org/):
 
-> [!IMPORTANT] NRTK currently requires `poetry<2.0`
+> [!IMPORTANT] NRTK requires Poetry 2.2 or higher.
 
 > [!WARNING] Users unfamiliar with Poetry should use caution. See
 > [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html#from-source)
@@ -234,7 +234,7 @@ To install and use pre-commit hooks:
 
 ```bash
 # Install required dependencies
-poetry install --sync --with main,linting,tests,docs
+poetry sync --with main,linting,tests,docs
 # Initialize pre-commit hooks for the repository
 poetry run pre-commit install
 # Run pre-commit checks on all files

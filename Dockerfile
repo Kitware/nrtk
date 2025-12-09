@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     # poetry
-    POETRY_VERSION=1.8.2 \
+    POETRY_VERSION=2.2.1 \
     # change default poetry install location to make it easier to copy to different stages
     POETRY_HOME="/opt/poetry" \
     # install at system level, since in a docker container
