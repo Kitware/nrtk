@@ -41,7 +41,7 @@ From Source
 The following assumes `Poetry`_ (`installation`_ and `usage`_) is already installed.
 
 .. note::
-  nrtk currently requires ``poetry<2.0``
+  nrtk requires Poetry 2.2 or higher.
 
 `Poetry`_ acts as a comprehensive tool for dependency management, virtual environment handling,
 and package building. It streamlines development by automating tasks like dependency resolution,
@@ -94,7 +94,7 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
 .. prompt:: bash
 
-    poetry install --sync --with linting,tests,docs
+    poetry sync --with linting,tests,docs
 
 .. note::
   Developers should also ensure their enviroment has Git LFS installed
@@ -241,7 +241,7 @@ For `Poetry`_:
 
 .. prompt:: bash
 
-    poetry install --sync --extras graphics
+    poetry sync --extras graphics
 
 
 To install the ``opencv-python-headless`` version, replace ``graphics`` with ``headless`` in the above

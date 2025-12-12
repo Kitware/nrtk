@@ -10,9 +10,9 @@
     # Install dependencies: if EXTRAS equals "extras", install additional optional deps.
     - |
       if [ -n "$EXTRAS" ]; then
-        poetry install --sync --only main,linting,tests --extras "$EXTRAS"
+        poetry sync --only main,linting,tests --extras "$EXTRAS"
       else
-        poetry install --sync --only main,linting,tests
+        poetry sync --only main,linting,tests
       fi
 
 pyright-internal:

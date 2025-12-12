@@ -1,44 +1,45 @@
 Pillow:
-- Pillow
+- Pillow>=10.3.0
 albumentations:
-- nrtk-albumentations
+- nrtk-albumentations>=2.2.0
 diffusion:
-- torch
-- diffusers
-- accelerate
-- Pillow
-- transformers
-- protobuf
+- torch>=2.2.0
+- diffusers>=0.21.0
+- accelerate>=0.20.0
+- Pillow>=10.3.0
+- transformers>=4.52.1
+- protobuf>=3.2
 graphics:
-- opencv-python
+- opencv-python>=4.6
 headless:
-- opencv-python-headless
+- opencv-python-headless>=4.6
 maite:
-- maite
-- fastapi
-- pydantic
-- pydantic_settings
-- uvicorn
+- maite>=0.9.0,<0.10.0
+- fastapi>=0.110.0
+- uvicorn>=0.29.0
+- pydantic>=2.6.4
+- pydantic-settings>=2.2.1
 notebook-testing:
-- datasets
-- matplotlib
-- numba
-- tabulate
-- torch
-- torchmetrics
-- torchvision
-- transformers
-- ultralytics
-- jupytext
-- nrtk-albumentations
+- datasets>=3.3.2
+- matplotlib>=3.7.1
+- numba>=0.56.4
+- tabulate>=0.9.0
+- torch>=2.2.0
+- torchmetrics>=1.0.0
+- torchvision>=0.21.0
+- transformers>=4.52.1
+- ultralytics>=8.3.85
+- jupytext>=1.16.7
+- nrtk-albumentations>=2.2.0
 pybsm:
-- pybsm
+- pybsm>=0.14.0
 scikit-image:
-- scikit-image
+- scikit-image>=0.20; python_version < '3.12'
+- scikit-image>=0.22; python_version >= '3.12'
 tools:
-- kwcoco
-- Pillow
+- kwcoco>=0.2.18
+- Pillow>=10.3.0
 waterdroplet:
-- scipy
-- shapely
-- geopandas
+- scipy>=1.10.0
+- shapely>=2.0.7
+- geopandas>=0.14,<0.15
