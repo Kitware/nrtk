@@ -9,13 +9,13 @@ build:
     post_create_environment:
       # Install poetry
       # https://python-poetry.org/docs/#installing-manually
-      - pip install "poetry==1.8.5"
+      - pip install "poetry>=2.2.0"
     post_install:
       # Install dependencies with 'docs' dependency group
       # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
       # VIRTUAL_ENV needs to be set manually for now.
       # See https://github.com/readthedocs/readthedocs.org/pull/11152/
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with main,docs,tests --extras "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs,tests --extras "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet notebook-testing"
 
 sphinx:
   builder: html
