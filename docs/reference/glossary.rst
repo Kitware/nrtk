@@ -13,9 +13,20 @@ Glossary
      segmentation. In NRTK, the COCO Scorer is a tool that evaluates object detection results using metrics from that
      benchmark. The COCO format is also used in the :ref:`Interoperability` module.
 
+   environment perturber
+     Environment perturbers simulate atmospheric and weather-related effects that occur in real-world imaging
+     conditions.
+
+   generative pertubrer
+     Generative perturbers use AI models to transform images through learned representations.
+
    generator
      A customizable component that takes a perturber factory, a scorer, and an object detector to generate item
      response curves.
+
+   geometric perturber
+     Geometric perturbers alter the spatial positioning and orientation of images through transformations such as
+     rotation, scaling, cropping, and translation.
 
    item response curve
      A graphical representation of how mean image scores change based on perturber values.
@@ -29,6 +40,9 @@ Glossary
    natural robustness
      A model's ability to maintain performance despite variations or changes in the environment or inputs that are
      naturally occurring, not specifically designed for testing or manipulation.
+
+   optical perturber
+     Optical perturbers simulate physics-based sensor and optical effects.
 
    Optical Transfer Function (OTF)
      A mathematical model that describes how an imaging system reduces detail and sharpness in an image due to physical
@@ -45,6 +59,10 @@ Glossary
 
    perturbation
      A modification applied to input data to simulate noise, environmental degradation, or sensor artifacts.
+
+   photometric perturber
+     Photometric perturbers modify the visual appearance of images by adjusting color, brightness, contrast, sharpness,
+     blur, and noise properties.
 
    pyBSM
      Python Based Sensor Model (pyBSM) — A toolset for modeling and simulating physical sensor effects such as blur,
@@ -64,3 +82,7 @@ Glossary
    thetas
      A list of values (or list of lists) containing the values for the perturber parameter. A single list is used
      for generic factories and a list of lists is used for the pyBSM factory.
+
+   wrapper perturber
+     Wrapper perturbers enable composition of multiple perturbations or provide integration with third-party
+     augmentation libraries.
