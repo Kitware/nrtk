@@ -88,6 +88,12 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     - Dependency checking
 
     Attributes:
+        sensor (Sensor):
+            pyBSM sensor object
+        scenario (Scenario):
+            pyBSM scenario object
+        thetas (dict[str, Any]):
+            theta parameters related to the perturbation configuration
         interp (bool):
             Specifies whether to use interpolated atmospheric data.
     """
@@ -251,8 +257,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
                 Defaults to False.
             kwargs: sensor and/or scenario values to modify
         Raises:
-            :raises ImportError: pyBSM is not found, install via
-                `pip install nrtk[pybsm]`.
+            ImportError: pyBSM is not found
         """
         if not self.is_usable():
             raise PyBSMImportError
@@ -335,8 +340,8 @@ class PybsmOTFPerturber(PerturbImage, ABC):
                 The array must contain at least two elements and must be in ascending order.
 
         Raises:
-            :raises ValueError: If `opt_trans_wavelengths` contains fewer than two elements.
-            :raises ValueError: If the wavelengths in `opt_trans_wavelengths` are not in ascending order.
+            ValueError: If `opt_trans_wavelengths` contains fewer than two elements.
+            ValueError: If the wavelengths in `opt_trans_wavelengths` are not in ascending order.
         """
         if opt_trans_wavelengths.shape[0] < 2:
             raise ValueError(
@@ -347,11 +352,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
 
     @abstractmethod
     def _create_simulator(self) -> ImageSimulator:
-        """Create the specific ImageSimulator for this perturber.
-
-        Returns:
-            The configured ImageSimulator instance
-        """
+        """Create the specific ImageSimulator for this perturber."""
         pass
 
     @override
@@ -375,11 +376,10 @@ class PybsmOTFPerturber(PerturbImage, ABC):
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                The perturbed image and bounding boxes scaled to perturbed image shape.
+            The perturbed image and bounding boxes scaled to perturbed image shape.
 
         Raises:
-            :raises ValueError: If 'img_gsd' is None.
+            ValueError: If 'img_gsd' is None.
         """
         if img_gsd is None:
             raise ValueError("'img_gsd' must be provided for this perturber")
@@ -399,11 +399,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Generates a serializable config that can be used to rehydrate object.
-
-        Returns:
-            :return dict[str, Any]: serializable config containing all instance parameters
-        """
+        """Generates a serializable config that can be used to rehydrate object."""
         return {
             "sensor_name": self.sensor_name,
             "D": self.D,
@@ -634,7 +630,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         additional customizations applied during initialization.
 
         Returns:
-            :return dict[str, Any]: A dictionary containing additional perturbation parameters.
+            A dictionary containing additional perturbation parameters.
         """
         return self.thetas
 

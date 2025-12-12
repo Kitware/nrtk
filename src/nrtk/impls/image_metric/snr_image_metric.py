@@ -52,9 +52,13 @@ class SNRImageMetric(ImageMetric):
     ) -> float:
         """Given one image, compute the Signal to Noise ratio.
 
-        :param img_1: Original input image in the shape (height, width, channels).
-        :param img_2: (Optional) Second input image in the shape (height, width, channels). Not allowed for SNR
-        :param additional_params: (Optional) A dictionary containing implementation-specific input param-values pairs.
+        Args:
+            img_1:
+                Original input image in the shape (height, width, channels).
+            img_2:
+                (Optional) Second input image in the shape (height, width, channels). Not allowed for SNR
+            additional_params:
+                (Optional) A dictionary containing implementation-specific input param-values pairs.
 
         SNR has the following optional parameters:
         - axis: valid values are None, 0, 1, (0,1). Default is 0. The axis over which to calculate the standard
@@ -132,9 +136,13 @@ def _signal_to_noise(
 ) -> float:
     """Computes the signal to noise ratio of an input image.
 
-    :param img: Input image in the shape (height, width, channels).
-    :param axis: The axis upon which the mean and standard deviation are computed.
-    :param ddof: Delta degrees of freedom
+    Args:
+        img:
+            Input image in the shape (height, width, channels).
+        axis:
+            The axis upon which the mean and standard deviation are computed.
+        ddof:
+            Delta degrees of freedom
     """
     mean = img.mean(axis)
     standard_deviation = img.std(axis=axis, ddof=ddof)

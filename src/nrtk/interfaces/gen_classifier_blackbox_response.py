@@ -81,11 +81,17 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
     ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         """Generate item-response curves for given parameters.
 
-        :param blackbox_perturber_factories: Sequence of factories to perturb stimuli.
-        :param blackbox_classifier: Classifier to generate calssifications for perturbed stimuli.
-        :param blackbox_scorer: Scorer to score classifications.
-        :param img_batch_size: The number of images to predict and score upon at once.
-        :param verbose: Increases the verbosity of progress updates.
+        Args:
+            blackbox_perturber_factories:
+                Sequence of factories to perturb stimuli.
+            blackbox_classifier:
+                Classifier to generate calssifications for perturbed stimuli.
+            blackbox_scorer:
+                Scorer to score classifications.
+            img_batch_size:
+                The number of images to predict and score upon at once.
+            verbose:
+                Increases the verbosity of progress updates.
 
         Returns:
             Item-response curve and scores for each input stimuli
@@ -153,7 +159,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
         img_batch_size: int,
         verbose: bool = False,
     ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
-        """Alias for :meth: ``.GenerateClassifierBlackboxResponse.generate``."""
+        """Generate item-response curves for given parameters."""
         return self.generate(
             blackbox_perturber_factories=blackbox_perturber_factories,
             blackbox_classifier=blackbox_classifier,

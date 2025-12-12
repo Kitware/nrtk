@@ -10,8 +10,8 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage as the interface for the perturber.
 
 Example usage:
-    factory = OneStepPerturbImageFactory(perturber=SomePerturbImageClass, theta_key="blur", theta_value=0.5)
-    perturbed_image = factory.create()
+    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> factory = OneStepPerturbImageFactory(perturber=BrightnessPerturber, theta_key="factor", theta_value=0.5)
 """
 
 __all__ = ["OneStepPerturbImageFactory"]
@@ -23,7 +23,18 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class OneStepPerturbImageFactory(StepPerturbImageFactory):
-    """Simple PerturbImageFactory implementation to return a factory with one perturber."""
+    """Simple PerturbImageFactory implementation to return a factory with one perturber.
+
+    Attributes:
+        perturber (type[PerturbImage]):
+            perturber type to produce
+        theta_key (str):
+            peturber parameter to modify
+        theta_value (float):
+            value to set theta_key to
+        to_int (bool):
+            determines wheter to cast theta_value to a int or float
+    """
 
     def __init__(
         self,
@@ -37,17 +48,18 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         Initialize the factory to produce an instance of PerturbImage for the given type,
         given the ``theta_key`` and the ``theta_value`` parameters.
 
-        :param perturber: Python implementation type of the PerturbImage interface
-            to produce.
+        Args:
+            perturber:
+                Python implementation type of the PerturbImage interface to produce.
+            theta_key:
+                Perturber parameter to vary between instances.
+            theta_value:
+                Initial and only value of ``theta_key``.
+            to_int:
+                Boolean variable determining whether the theta is cast as int or float. Defaults to False.
 
-        :param theta_key: Perturber parameter to set for the instance.
-
-        :param theta_value: Initial and only value of ``theta_key``.
-
-        :param to_int: Boolean variable determining whether the theta is cast as
-                       int or float. Defaults to False.
-
-        :raises TypeError: Given a perturber instance instead of type.
+        Raises:
+            TypeError: Given a perturber instance instead of type.
         """
         super().__init__(
             perturber=perturber,
@@ -61,11 +73,7 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         self.theta_value = theta_value
 
     def get_config(self) -> dict[str, Any]:
-        """Generates a configuration dictionary for the OneStepPerturbImageFactory instance.
-
-        Returns:
-            dict[str, Any]: Configuration data representing the sensor and scenario.
-        """
+        """Returns a configuration dictionary for the OneStepPerturbImageFactory instance."""
         cfg = super().get_config()
         cfg["theta_value"] = self.theta_value
         return {k: cfg[k] for k in ("perturber", "theta_key", "theta_value", "to_int")}

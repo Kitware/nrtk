@@ -5,14 +5,20 @@ Classes:
     sensor and scenario configurations.
 
 Dependencies:
-    - pyBSM for radiance and OTF-related functionalities.
-    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+    - pyBSM for OTF-related functionalities.
+    - nrtk.impls.perturb.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
 
 Example usage:
-    sensor = {...}
-    scenario = {...}
-    perturber = DetectorOTFPerturber(**sensor, **scenario)
-    perturbed_image, boxes = perturber.perturb(image, boxes)
+    >>> if not DetectorOTFPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("DetectorOTFPerturber is not usable")
+    >>> w_x = 4.0e-6
+    >>> w_y = 4.5e-6
+    >>> perturber = DetectorOTFPerturber(w_x=w_x, w_y=w_y)
+    >>> image = np.ones((256, 256, 3))
+    >>> img_gsd = 3.19 / 160
+    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
@@ -45,16 +51,6 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
     conditions using pyBSM functionalities.
 
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
-
-    Attributes:
-        w_x (float | None):
-            Detector width in the x direction (meters).
-        w_y (float | None):
-            Detector width in the y direction (meters).
-        f (float | None):
-            Focal length of the detector (meters).
-        interp (bool):
-            Indicates whether atmospheric database should use interpolation.
     """
 
     def __init__(
@@ -93,7 +89,7 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
             the absent value(s) will default to 4um for w_x/w_y and 50mm for f.
 
         Raises:
-            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
         super().__init__(interp=interp, **kwargs)

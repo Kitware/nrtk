@@ -66,7 +66,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         dict[str, Any],
     ]:
-        """Get the image and ground_truth pair at a particular ``idx``."""
+        """Return the image and ground_truth pair at a particular ``idx``."""
 
     def generate(  # noqa: C901
         self,
@@ -78,11 +78,17 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
     ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
         """Generate item-response curves for given parameters.
 
-        :param blackbox_perturber_factories: Sequence of factories to perturb stimuli.
-        :param blackbox_detector: Detector to generate detections for perturbed stimuli.
-        :param blackbox_scorer: Scorer to score detections.
-        :param img_batch_size: The number of images to predict and score upon at once.
-        :param verbose: Increases the verbosity of progress updates.
+        Args:
+            blackbox_perturber_factories:
+                Sequence of factories to perturb stimuli.
+            blackbox_detector:
+                Detector to generate detections for perturbed stimuli.
+            blackbox_scorer:
+                Scorer to score detections.
+            img_batch_size:
+                The number of images to predict and score upon at once.
+            verbose:
+                Increases the verbosity of progress updates.
 
         Returns:
             Item-response curve and scores for each input stimuli
@@ -150,7 +156,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
         img_batch_size: int,
         verbose: bool = False,
     ) -> tuple[Sequence[tuple[dict[str, Any], float]], Sequence[Sequence[float]]]:
-        """Alias for :meth: ``.GenerateObjectDetectorBlackboxResponse.generate``."""
+        """Generate item-response curves for given parameters."""
         return self.generate(
             blackbox_perturber_factories=blackbox_perturber_factories,
             blackbox_detector=blackbox_detector,

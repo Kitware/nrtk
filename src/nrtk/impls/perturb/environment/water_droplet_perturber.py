@@ -16,8 +16,11 @@ For additional research regarding Water Droplet modeling, please refer to this p
 https://www.cvlibs.net/publications/Roser2010ACCVWORK.pdf
 
 Classes:
-    WaterDropletPerturber: Implements the physics-based, photorealistic
-    water/rain droplet model, utilizing Scipy, Shapely, and GeoPandas functionalities.
+    WaterDropletPerturber:
+        Implements the physics-based, photorealistic water/rain droplet model, utilizing
+        Scipy, Shapely, and GeoPandas functionalities.
+    Bezier:
+        Implements a class to compute Bezier curve based on the segment information
 
 Dependencies:
     - Scipy for image processing.
@@ -25,10 +28,15 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
 Example usage:
-    size_range = (0.0, 1.0)
-    num_drops = 20
-    perturber = WaterDropletPerturber(size_range=size_range, num_drops=num_drops)
-    perturbed_image, boxes = perturber.perturb(image, boxes)
+    >>> if not WaterDropletPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("WaterDropletPerturber is not usable")
+    >>> size_range = (0.0, 1.0)
+    >>> num_drops = 20
+    >>> perturber = WaterDropletPerturber(size_range=size_range, num_drops=num_drops)
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
@@ -77,7 +85,16 @@ class Bezier:
         r: float = 0.3,
         num_points: int = 100,
     ) -> None:
-        """Define segment parameters - points, angles, radius."""
+        """Define segment parameters - points, angles, radius.
+
+        Attributes:
+            p1 (np.array): Start point of Bezier curve.
+            p2 (np.array): End point of Bezier curve.
+            angle1 (float): Direction angle (in radians) of tangent angle from p1
+            angle2 (float): Direction angle (in radians) of tangent angle from p2
+            r (float): scaling factor of curve
+            num_points (int): number of points in curve
+        """
         self.p1 = p1
         self.p2 = p2
         self.angle1 = angle1
@@ -218,8 +235,7 @@ class WaterDropletPerturber(PerturbImage):
             seed = 1
 
         Raises:
-            :raises ImportError: If Scipy, Shapely or GeoPandas is not found,
-            install via `pip install nrtk[waterdroplet]`.
+            ImportError: If Scipy, Shapely or GeoPandas is not found.
         """
         if not self.is_usable():
             raise WaterDropletImportError
@@ -254,7 +270,7 @@ class WaterDropletPerturber(PerturbImage):
 
     @staticmethod
     def ccw_sort(points: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
-        """Sorts points in counterclockwise order around a center point."""
+        """Returns sorted points in counterclockwise order around a center point."""
         # Subtract original point from center point (position obtained
         # by calculating the mean)
         points128 = points.astype(np.longdouble)
@@ -273,12 +289,18 @@ class WaterDropletPerturber(PerturbImage):
     ) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         """Given an array of *points*, create a curve through those points.
 
-        *rad* is a number between 0 and 1 to steer the distance of
-            control points.
-        *edgy* is a parameter which controls how "edgy" the curve is,
-            edgy=0 is smoothest.
-        *tol* is a parameter which controls the tolerance used when
-            comparing angles. Default is 1e-8.
+        Args:
+            points:
+                arrays of points to create curve through
+            rad:
+                a number between 0 and 1 to steer the distance of control points.
+            edgy:
+                controls how "edgy" the curve is, edgy=0 is smoothest.
+            tol:
+                controls the tolerance used when comparing angles. Default is 1e-8.
+
+        Returns:
+            a tuple of point arrays that represent a Bezier curve
         """
         p = np.arctan(edgy) / np.pi + 0.5
         points = WaterDropletPerturber.ccw_sort(points)
@@ -323,7 +345,23 @@ class WaterDropletPerturber(PerturbImage):
         min_dst: float | None = None,
         recursive: int = 0,
     ) -> np.ndarray[Any, Any]:
-        """Function to create *n* random points in the unit square, which are *min_dst* apart, then scale them."""
+        """Function to create *n* random points in the unit square, which are *min_dst* apart, then scale them.
+
+        Args:
+            rng:
+                numpy random generator to use
+            n:
+                number of random points to create
+            scale:
+                how much to scale points once recursion is finished
+            min_dst:
+                minimum distance between the random points
+            recursive:
+                current number of recursive loops
+
+        Returns:
+            a random array of points within a minimum distance
+        """
         min_dst = min_dst or 0.7 / n
         points = rng.random((n, 2))
         d = np.sqrt(np.sum(np.diff(WaterDropletPerturber.ccw_sort(points), axis=0), axis=1) ** 2)
@@ -360,7 +398,7 @@ class WaterDropletPerturber(PerturbImage):
                 Intrinsic (Camera) parameters matrix.
 
         Returns:
-            :return np.ndarray: Glass plane (3D) coordinate system matrix.
+            Glass plane (3D) coordinate system matrix.
         """
         xx, yy = np.meshgrid(np.arange(x), np.arange(y), indexing="ij")
         w = M * np.tan(psi) / (np.tan(psi) - (yy - intrinsic[1, 2]) / intrinsic[1, 1])
@@ -465,7 +503,7 @@ class WaterDropletPerturber(PerturbImage):
             gls: Glass (3D) coordinate system mapping matrix.
 
         Returns:
-            :return np.ndarray: Truth mask of valid pixels.
+            Truth mask of valid pixels.
         """
         p = gls
         q = np.ones(p.shape[:2]) * -1
@@ -564,7 +602,7 @@ class WaterDropletPerturber(PerturbImage):
                 Glass (3D) coordinate system mapping matrix.
 
         Returns:
-            :return np.ndarray: 3D point coordinates of water droplet (spherical model).
+            3D point coordinates of water droplet (spherical model).
         """
         p_g = gls[x, y]
 
@@ -610,8 +648,7 @@ class WaterDropletPerturber(PerturbImage):
             image: Input Image.
 
         Returns:
-            :return np.ndarray: Image rendered with Water Droplet effect.
-            :return np.ndarray: Image mask.
+            Image rendered with Water Droplet effect and an image mask.
         """
         h, w = image.shape[:2]
 
@@ -687,7 +724,7 @@ class WaterDropletPerturber(PerturbImage):
                 Image mask.
 
         Returns:
-            np.ndarray: Output of blur operation applied on the `rain_image`.
+            Output of blur operation applied on the `rain_image`.
         """
         blur_image = copy.deepcopy(rain_image)
         _, w = image.shape[:2]
@@ -749,8 +786,7 @@ class WaterDropletPerturber(PerturbImage):
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                The perturbed image and bounding boxes scaled to perturbed image shape.
+            The perturbed image and bounding boxes scaled to perturbed image shape.
         """
         image, boxes = super().perturb(image=image, boxes=boxes)
 
@@ -776,11 +812,7 @@ class WaterDropletPerturber(PerturbImage):
         return perturbed_image.astype(np.uint8), boxes
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the WaterDropletPerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the WaterDropletPerturber instance."""
         cfg = super().get_config()
 
         cfg["size_range"] = self.size_range
@@ -797,9 +829,5 @@ class WaterDropletPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (Scipy, Shapely and GeoPandas) are available.
-
-        Returns:
-            :return bool: True if Scipy, Shapely and GeoPandas are available.
-        """
+        """Returns true if the necessary dependencies (Scipy, Shapely and GeoPandas) are available."""
         return scipy_available and shapely_available and geopandas_available

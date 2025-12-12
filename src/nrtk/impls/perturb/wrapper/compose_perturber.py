@@ -1,4 +1,21 @@
-"""Defines ComposePerturber to apply multiple PerturbImage instances sequentially for combined image perturbations."""
+"""Defines ComposePerturber to apply multiple PerturbImage instances sequentially for combined image perturbations.
+
+Classes:
+    ComposePerturber: A perturbation class for applying perturbations from Albumentations
+
+Dependencies:
+    - numpy: For numerical operations and random number generation.
+    - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
+    - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
+
+Example usage:
+    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> from nrtk.impls.perturb.geometric.random_crop_perturber import RandomCropPerturber
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbers = [RandomCropPerturber(), BrightnessPerturber(factor=0.5)]
+    >>> perturber = ComposePerturber(perturbers=perturbers)
+    >>> perturbed_image, _ = perturber.perturb(image)
+"""
 
 from __future__ import annotations
 
@@ -64,8 +81,7 @@ class ComposePerturber(PerturbImage):
                 Additional perturbation keyword arguments.
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                The perturbed image and the source bounding boxes.
+            The perturbed image and the source bounding boxes.
         """
         out_img = image
         out_boxes = boxes
@@ -80,11 +96,7 @@ class ComposePerturber(PerturbImage):
         return out_img, out_boxes
 
     def get_config(self) -> dict[str, Any]:
-        """Get the configuration dictionary of the ComposePerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary containing perturber configurations.
-        """
+        """Returns the configuration dictionary of the ComposePerturber instance."""
         cfg = super().get_config()
         cfg["perturbers"] = [to_config_dict(perturber) for perturber in self.perturbers]
         return cfg
@@ -104,7 +116,7 @@ class ComposePerturber(PerturbImage):
                 Whether to merge with the default configuration.
 
         Returns:
-            :return ComposePerturber: An instance of ComposePerturber.
+            An instance of ComposePerturber.
         """
         config_dict = dict(config_dict)
 

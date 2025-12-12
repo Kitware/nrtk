@@ -9,6 +9,16 @@ Dependencies:
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
     - nrtk.impls.perturb_image.generic.albumentations_perturber: Base implementation for Albumentations perturbers.
+
+Example usage:
+    >>> if not RandomRotationPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("RandomRotationPerturber is not usable")
+    >>> limit = 90.0
+    >>> perturber = RandomRotationPerturber(limit=limit)
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -36,14 +46,6 @@ class RandomRotationPerturber(AlbumentationsPerturber):
             An optional seed for reproducible results.
         fill (numpy.array):
             Background color fill for RGB image.
-
-    Methods:
-        perturb:
-            Applies the specified to an input image.
-        __call__:
-            Calls the perturb method with the given input image.
-        get_config:
-            Returns the current configuration of the RandomRotationPerturber instance.
     """
 
     def __init__(
@@ -71,8 +73,8 @@ class RandomRotationPerturber(AlbumentationsPerturber):
                 Random seed for reproducible results. Defaults to 1 for deterministic behavior.
 
         Raises:
-            :raises ValueError: Rotation probability must be between 0.0 and 1.0 inclusive.
-            :raises ValueError: Color fill values must be integers between 0 and 255 inclusive.
+            ValueError: Rotation probability must be between 0.0 and 1.0 inclusive.
+            ValueError: Color fill values must be integers between 0 and 255 inclusive.
         """
         if not 0.0 <= probability <= 1.0:
             raise ValueError("Rotation probability must be between 0.0 and 1.0 inclusive.")
@@ -95,11 +97,7 @@ class RandomRotationPerturber(AlbumentationsPerturber):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the RandomRotationPerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the RandomRotationPerturber instance."""
         cfg = dict()
         cfg["limit"] = self.limit
         cfg["probability"] = self.probability

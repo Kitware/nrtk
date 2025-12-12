@@ -54,9 +54,6 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         img_gsds (Sequence[float]): Ground sample distances for each image.
         ground_truth (Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]):
             Ground truth bounding boxes with associated labels and scores.
-
-    Methods:
-        generate_response(): Generates a response for each image based on ground truth and scoring.
     """
 
     def __init__(
@@ -68,9 +65,11 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         """Initializes the SimplePybsmGenerator with input images, ground sample distances, and ground truth.
 
         Args:
-            images (Sequence[np.ndarray]): Sequence of images for detection.
-            img_gsds (Sequence[float]): Ground sample distances (GSD) for each image.
-            ground_truth (Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]):
+            images:
+                Sequence of images for detection.
+            img_gsds:
+                Ground sample distances (GSD) for each image.
+            ground_truth:
                 Ground truth data, containing bounding boxes and associated labels and scores.
 
         Raises:
@@ -89,7 +88,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @override
     def __len__(self) -> int:
-        """Number of image/ground_truth pairs this generator holds."""
+        """Return the number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
     def __getitem__(
@@ -103,24 +102,18 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         """Get the image and ground truth pair for a specific index.
 
         Args:
-            idx (int): Index of the desired data pair.
+            idx:
+                Index of the desired data pair.
 
         Raises:
             IndexError: If the given index is out of range.
-
-        Returns:
-            tuple: A tuple containing the image, ground truth data, and metadata for the specified index.
         """
         if idx < 0 or idx >= len(self):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {"img_gsd": self.img_gsds[idx]}
 
     def get_config(self) -> dict[str, Any]:
-        """Generates a serializable configuration for the instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing instance parameters.
-        """
+        """Generates a serializable configuration for the instance."""
         return {
             "images": self.images,
             "img_gsds": self.img_gsds,
@@ -147,11 +140,16 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
         Generates detection responses for the sequence of images using perturbation and scoring.
 
         Args:
-            blackbox_perturber_factories (Sequence[PerturbImageFactory]): Factories to perturb images.
-            blackbox_detector (DetectImageObjects): Object detection model.
-            blackbox_scorer (ScoreDetections): Scoring function for detection evaluation.
-            img_batch_size (int): Number of images to process in each batch.
-            verbose (bool, optional): If True, prints verbose output.
+            blackbox_perturber_factories:
+                Factories to perturb images.
+            blackbox_detector:
+                Object detection model.
+            blackbox_scorer:
+                Scoring function for detection evaluation.
+            img_batch_size:
+                Number of images to process in each batch.
+            verbose:
+                If True, prints verbose output.
 
         Returns:
             tuple: Contains two elements:
@@ -175,9 +173,5 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required pybsm module is available.
-
-        Returns:
-            bool: True if pybsm is installed; False otherwise.
-        """
+        """Checks if the required pybsm module is available."""
         return is_available("pybsm")

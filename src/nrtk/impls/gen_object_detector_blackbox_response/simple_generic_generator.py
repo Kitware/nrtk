@@ -34,7 +34,14 @@ from nrtk.interfaces.gen_object_detector_blackbox_response import (
 
 
 class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
-    """Example implementation of the ``GenerateObjectDetectorBlackboxResponse`` interface."""
+    """Example implementation of the ``GenerateObjectDetectorBlackboxResponse`` interface.
+
+    Attributes:
+        images (Sequence[np.ndarray[Any, Any]]):
+            Sequence of images to generate responses for.
+        ground_truth (Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]):
+            Sequence of sequences of detections corresponsing to each image.
+    """
 
     def __init__(
         self,
@@ -43,10 +50,14 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
     ) -> None:
         """Generate response curve for given images and ground_truth.
 
-        :param images: Sequence of images to generate responses for.
-        :param ground_truth: Sequence of sequences of detections corresponsing to each image.
+        Args:
+            images:
+                Sequence of images to generate responses for.
+            ground_truth:
+                Sequence of sequences of detections corresponsing to each image.
 
-        :raises ValueError: Images and ground_truth data have a size mismatch.
+        Raise:
+            ValueError: Images and ground_truth data have a size mismatch.
         """
         if len(images) != len(ground_truth):
             raise ValueError(
@@ -57,7 +68,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
     @override
     def __len__(self) -> int:
-        """Number of image/ground_truth pairs this generator holds."""
+        """Return the number of image/ground_truth pairs this generator holds."""
         return len(self.images)
 
     @override
@@ -71,20 +82,17 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
     ]:
         """Get the image and ground_truth pair for a specific index.
 
-        :param idx: Index of desired data pair.
+        Args:
+            idx:
+                Index of desired data pair.
 
-        :raises IndexError: The given index does not exist.
-
-        Data pair corresponding to the given index.
+        Raises:
+            IndexError: The given index does not exist.
         """
         if idx < 0 or idx >= len(self):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {}
 
     def get_config(self) -> dict[str, Any]:
-        """Generates a serializable configuration for the instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing instance parameters.
-        """
+        """Generates a serializable configuration for the instance."""
         return {"images": self.images, "ground_truth": self.ground_truth}

@@ -39,11 +39,16 @@ def gen_perturber_combinations(  # noqa: C901
 ) -> list[list[int]]:
     """Generates list of perturber combinations, including one perturber from each factory.
 
-    :param factories: Sequence of factories from which to generate combinations.
+    Args:
+        factories:
+            Sequence of factories from which to generate combinations.
 
     Returns:
         list of perturber combinations. For each combination, the value, ``x``,
         at index ``y`` corresponds to the ``x``th perturber of the ``y``th factory.
+
+    Raises:
+        ValueError if no factories are passed or a factory is empty
     """
     # make sure at least one factory is passed in
     if len(factories) == 0:
@@ -57,8 +62,8 @@ def gen_perturber_combinations(  # noqa: C901
     def _gen(factory_id: int, factory_sizes: list[int]) -> list[list[int]]:
         """Recursive method to build up list of lists of perturber combinations.
 
-        :param factory_id: Index of the factory to add to the combinations.
-        :param factory_sizes: list of the number of perturbers per factory.
+        factory_id: Index of the factory to add to the combinations.
+        factory_sizes: list of the number of perturbers per factory.
 
         Returns:
             a list of combinations.
@@ -88,7 +93,7 @@ class GenerateBlackboxResponse(Plugfigurable):
 
     @abc.abstractmethod
     def __len__(self) -> int:
-        """Number of images for which responses will be generated."""
+        """Return the number of images for which responses will be generated."""
 
     @abc.abstractmethod
     def __getitem__(
@@ -102,4 +107,4 @@ class GenerateBlackboxResponse(Plugfigurable):
         ]
         | tuple[np.ndarray[Any, Any], CLASSIFICATION_DICT_T, dict[str, Any]]
     ):
-        """Get the ``idx``th image and ground_truth pair."""
+        """Return the ``idx``th image and ground_truth pair."""

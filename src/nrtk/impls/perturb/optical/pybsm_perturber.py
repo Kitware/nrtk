@@ -5,14 +5,19 @@ Classes:
     scenario configurations.
 
 Dependencies:
-    - pybsm for simulation and reference image functionality.
-    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+    - pyBSM for OTF-related functionalities.
+    - nrtk.impls.perturb.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
 
 Example usage:
-    sensor = {...}
-    scenario = {...}
-    perturber = PybsmPerturber(**sensor, **scenario)
-    perturbed_image = perturber.perturb(image)
+    >>> if not PybsmPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("PybsmPerturber is not usable")
+    >>> sensor_and_scenario = {"f": 4, "altitude": 9000}
+    >>> perturber = PybsmPerturber(**sensor_and_scenario)
+    >>> image = np.ones((256, 256, 3))
+    >>> img_gsd = 3.19 / 160
+    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)  # doctest: +SKIP
 """
 
 from __future__ import annotations
@@ -207,9 +212,9 @@ class PybsmPerturber(PybsmOTFPerturber):
 
 
         Raises:
-            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            :raises ValueError: If reflectance_range length != 2
-            :raises ValueError: If reflectance_range not strictly ascending
+            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ValueError: If reflectance_range length != 2
+            ValueError: If reflectance_range not strictly ascending
         """
         if reflectance_range.shape[0] != 2:
             raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
@@ -272,19 +277,11 @@ class PybsmPerturber(PybsmOTFPerturber):
         )
 
     def __str__(self) -> str:
-        """Returns a string representation combining sensor and scenario names.
-
-        Returns:
-            :return str: Concatenated sensor and scenario names.
-        """
+        """Returns a string representation combining sensor and scenario names."""
         return self.sensor.name + " " + self.scenario.name
 
     def __repr__(self) -> str:
-        """Returns a representation of the perturber including sensor and scenario names.
-
-        Returns:
-            :return str: Representation showing sensor and scenario names.
-        """
+        """Returns a representation of the perturber including sensor and scenario names."""
         return self.__str__()
 
     @classmethod
@@ -298,7 +295,7 @@ class PybsmPerturber(PybsmOTFPerturber):
                 Whether to merge with default configuration. Defaults to True.
 
         Returns:
-            :return PybsmPerturber: An instance of PybsmPerturber.
+            An instance of PybsmPerturber.
         """
         config_dict = dict(config_dict)
 
@@ -322,11 +319,7 @@ class PybsmPerturber(PybsmOTFPerturber):
 
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
-        """Retrieves the default configuration for PybsmPerturber instances.
-
-        Returns:
-            :return dict[str, Any]: A dictionary with the default configuration values.
-        """
+        """Retrieves the default configuration for PybsmPerturber instances."""
         cfg = super().get_default_config()
         cfg["opt_trans_wavelengths"] = cfg["opt_trans_wavelengths"].tolist()
         cfg["reflectance_range"] = cfg["reflectance_range"].tolist()

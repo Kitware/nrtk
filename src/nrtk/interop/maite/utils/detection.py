@@ -43,11 +43,16 @@ def dataset_to_coco(  # noqa: C901
 ) -> None:
     """Save dataset object to file as a COCO formatted dataset.
 
-    :param dataset: MAITE-compliant object detection dataset
-    :param output_dir: The location where data will be saved.
-    :param img_filenames: Filenames of images to be saved.
-    :param dataset_categories: A list of the categories related to this dataset.
-        Each dictionary should contain the following keys: id, name, supercategory.
+    Args:
+        dataset:
+            datasetMAITE-compliant object detection dataset
+        output_dir:
+            The location where data will be saved.
+        img_filenames:
+            Filenames of images to be saved.
+        dataset_categories:
+            A list of the categories related to this dataset.
+            Each dictionary should contain the following keys: id, name, supercategory.
     """
     if not kwcoco_available:
         raise KWCocoImportError

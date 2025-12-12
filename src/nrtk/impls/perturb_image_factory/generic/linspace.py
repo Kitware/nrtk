@@ -14,14 +14,10 @@ Usage:
     generate perturbed image instances with linearly spaced parameter variations.
 
 Example:
-    factory = LinspacePerturbImageFactory(
-        perturber=SomePerturbImageClass,
-        theta_key="parameter",
-        start=0.0,
-        stop=10.0,
-        num=5
-    )
-    theta_values = factory.thetas  # Access generated linearly spaced values
+    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> factory = LinspacePerturbImageFactory(
+    ...     perturber=BrightnessPerturber, theta_key="factor", start=0.0, stop=1.0, num=5
+    ... )
 """
 
 from __future__ import annotations
@@ -39,7 +35,22 @@ from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
 class LinspacePerturbImageFactory(PerturbImageFactory):
-    """Simple PerturbImageFactory implementation to step through the given range of values."""
+    """Simple PerturbImageFactory implementation to step through the given range of values.
+
+    Attributes:
+        perturber (type[PerturbImage]):
+            perturber type to produce
+        theta_key (str):
+            peturber parameter to modify
+        start (float):
+            initial value of range (inclusive)
+        end (float):
+            end value of range (exclusive)
+        num (int):
+            number of values between start and end
+        endpoint (bool):
+                Decides if stop is included.
+    """
 
     def __init__(
         self,
@@ -55,18 +66,22 @@ class LinspacePerturbImageFactory(PerturbImageFactory):
         Initialize the factory to produce PerturbImage instances of the given type,
         varying the given ``theta_key`` parameter from start to stop with given num.
 
-        :param perturber: Python implementation type of the PerturbImage interface
-            to produce.
+        Args:
+            perturber:
+                Python implementation type of the PerturbImage interface to produce.
+            theta_key:
+                Perturber parameter to vary between instances.
+            start:
+                Initial value of desired range (inclusive).
+            stop:
+                Final value of desired range (inclusive).
+            num:
+                Number of instances to generate.
+            endpoint:
+                Decides if stop is included.
 
-        :param theta_key: Perturber parameter to vary between instances.
-
-        :param start: Initial value of desired range (inclusive).
-
-        :param stop: Final value of desired range (exclusive).
-
-        :param num: Number of instances to generate.
-
-        :raises TypeError: Given a perturber instance instead of type.
+        Raises:
+            TypeError: Given a perturber instance instead of type.
         """
         super().__init__(perturber=perturber, theta_key=theta_key)
 

@@ -16,11 +16,16 @@ Usage:
     `perturb` to apply the desired enhancement to an input image.
 
 Example:
-    brightness_perturber = BrightnessPerturber(factor=1.5)
-    brighter_image, boxes = brightness_perturber(input_image, boxes)
+    >>> if not BrightnessPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("Pillow perturbers are not usable")
+    >>> image = np.ones((256, 256, 3))
+    >>> brightness_perturber = BrightnessPerturber(factor=1.5)
+    >>> brighter_image, _ = brightness_perturber(image=image)
 
-    contrast_perturber = ContrastPerturber(factor=0.8)
-    contrasted_image, boxes = contrast_perturber(input_image, boxes)
+    >>> contrast_perturber = ContrastPerturber(factor=0.8)
+    >>> contrasted_image, _ = contrast_perturber(image=image)
 
 Notes:
     - Each enhancement class has a default factor of 1.0, which applies no change to the image.
@@ -62,7 +67,12 @@ class _Enhancement(Protocol):  # Used for type checking only  # pragma: no cover
 
 class _PerturbImage(PerturbImage):
     def __init__(self, factor: float = 1.0) -> None:
-        """:param factor: Enhancement factor."""
+        """Private class to handle general Enhancement functions.
+
+        Args:
+            factor:
+                Enhancement factor.
+        """
         if not self.is_usable():
             raise PillowImportError
         super().__init__()
@@ -80,8 +90,11 @@ class _PerturbImage(PerturbImage):
     ) -> NDArray[Any]:
         """Call appropriate enhancement interface and perform any necessary data type conversion.
 
-        :param enhancement: Ehancement to apply.
-        :param image: Input image as a numpy array.
+        Args:
+            enhancement:
+                Ehancement to apply.
+            image:
+                Input image as a numpy array.
 
         Returns:
             Peturbed image as numpy array, including matching shape and dtype.
@@ -104,23 +117,14 @@ class _PerturbImage(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the _PerturbImage instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the _PerturbImage instance."""
         cfg = super().get_config()
         cfg["factor"] = self.factor
         return cfg
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required PIL module is available.
-
-        Returns:
-            bool: True if pillow is installed; False otherwise.
-        """
-        # Requires opencv to be installed
+        """Returns true if the required PIL module is available."""
         return pillow_available
 
 
@@ -194,7 +198,7 @@ class SharpnessPerturber(_PerturbImage):
     """Adjusts image stimulus sharpness."""
 
     def __init__(self, factor: float = 1.0) -> None:
-        """:param rng: Enhancement factor."""
+        """Override parent init since factor is capped at 2.0."""
         if factor < 0.0 or factor > 2.0:
             raise ValueError(
                 f"{type(self).__name__} invalid sharpness factor ({factor}). Must be in [0.0, 2.0]",

@@ -13,11 +13,15 @@ Dependencies:
     - smqtk_image_io for bounding box handling
 
 Example:
-    diffusion_perturber = DiffusionPerturber(
-        model_name="timbrooks/instruct-pix2pix",
-        prompt="add rain to the image"
-    )
-    perturbed_image, perturbed_boxes = diffusion_perturber.perturb(input_image, boxes)
+    >>> if not DiffusionPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("DiffusionPerturber is not usable")
+    >>> diffusion_perturber = DiffusionPerturber(
+    ...     model_name="timbrooks/instruct-pix2pix", prompt="add rain to the image"
+    ... )
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbed_image, _ = diffusion_perturber.perturb(image=image)  # doctest: +SKIP
 
 Note:
     This implementation uses the Instruct Pix2Pix model for prompt-based image transformations.
@@ -100,15 +104,22 @@ class DiffusionPerturber(PerturbImage):
         """Initialize the DiffusionPerturber with configuration parameters.
 
         Args:
-            model_name: Name of the pre-trained diffusion model. Default is "timbrooks/instruct-pix2pix".
-            prompt: Text prompt describing the desired perturbation. Examples include
+            model_name:
+                Name of the pre-trained diffusion model. Default is "timbrooks/instruct-pix2pix".
+            prompt:
+                Text prompt describing the desired perturbation. Examples include
                 "add rain to the image", "make it foggy", "add snow", "darken the scene", etc.
                 To apply a no-op, use "do not change the image". Default is "do not change the image".
-            seed: Random seed for reproducible results. Defaults to 1 for deterministic behavior.
-            num_inference_steps: Number of denoising steps. Default is 50.
-            text_guidance_scale: Guidance scale for text prompt. Default is 8.0.
-            image_guidance_scale: Guidance scale for image conditioning. Default is 2.0.
-            device: Device for computation, e.g., "cpu" or "cuda". If None, selects
+            seed:
+                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+            num_inference_steps:
+                Number of denoising steps. Default is 50.
+            text_guidance_scale:
+                Guidance scale for text prompt. Default is 8.0.
+            image_guidance_scale:
+                Guidance scale for image conditioning. Default is 2.0.
+            device:
+                Device for computation, e.g., "cpu" or "cuda". If None, selects
                 CUDA if available, otherwise CPU. Default is None.
         """
         if not self.is_usable():
@@ -332,13 +343,7 @@ class DiffusionPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Get the current configuration of the DiffusionPerturber.
-
-        Returns:
-            Dictionary containing the current configuration parameters including
-            model_name, prompt, seed, and other parameters. The device field shows
-            the currently selected device based on CUDA availability.
-        """
+        """Return the current configuration of the DiffusionPerturber."""
         return {
             "model_name": self.model_name,
             "prompt": self.prompt,
@@ -351,9 +356,5 @@ class DiffusionPerturber(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependencies (torch, diffusers, and PIL) are available.
-
-        Returns:
-            True if torch, diffusers, and PIL are all available; False otherwise.
-        """
+        """Returns true if the necessary dependencies (torch, diffusers, and PIL) are available."""
         return torch_available and diffusion_available and pillow_available

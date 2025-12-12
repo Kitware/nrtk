@@ -7,6 +7,12 @@ Dependencies:
     - numpy: For numerical operations and random number generation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
+
+Example usage:
+    >>> image = np.ones((256, 256, 3))
+    >>> crop_size = (image.shape[0] // 2, image.shape[1] // 2)
+    >>> perturber = RandomCropPerturber(crop_size=crop_size)
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -28,14 +34,7 @@ class RandomCropPerturber(PerturbImage):
     Attributes:
         crop_size (tuple[int, int]): Target crop dimensions for the input image.
         seed (int | numpy.random.Generator | None): Random seed or Generator instance for reproducibility.
-
-    Methods:
-        perturb:
-            Applies a random crop to an input image and adjusts bounding boxes.
-        __call__:
-            Calls the perturb method with the given input image.
-        get_config:
-            Returns the current configuration of the RandomCropPerturber instance.
+        rng (np.random.Generator): Numpy random generator based on seed.
     """
 
     def __init__(
@@ -101,12 +100,9 @@ class RandomCropPerturber(PerturbImage):
                 Input image as a numpy array of shape (H, W, C).
             boxes:
                 List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-            additional_params:
-                Additional perturbation keyword arguments (currently unused).
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                Cropped image with the modified bounding boxes.
+            Cropped image with the modified bounding boxes.
         """
         image, boxes = super().perturb(image=image, boxes=boxes)
 
@@ -144,11 +140,7 @@ class RandomCropPerturber(PerturbImage):
         return cropped_image, adjusted_bboxes
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the RandomCropPerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the RandomCropPerturber instance."""
         cfg = super().get_config()
         cfg["seed"] = self.seed
         cfg["crop_size"] = self.crop_size

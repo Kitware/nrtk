@@ -17,14 +17,19 @@ Usage:
     an input image, returning the processed result.
 
 Example:
-    avg_blur = AverageBlurPerturber(ksize=3)
-    blurred_image, boxes = avg_blur.perturb(input_image, boxes)
+    >>> if not AverageBlurPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("OpenCV perturbers are not usable")
+    >>> image = np.ones((256, 256, 3), dtype=np.float32)
+    >>> avg_blur = AverageBlurPerturber(ksize=3)
+    >>> blurred_image, _ = avg_blur.perturb(image=image)
 
-    gauss_blur = GaussianBlurPerturber(ksize=5)
-    blurred_image, boxes = gauss_blur.perturb(input_image, boxes)
+    >>> gauss_blur = GaussianBlurPerturber(ksize=5)
+    >>> blurred_image, _ = gauss_blur.perturb(image=image)
 
-    median_blur = MedianBlurPerturber(ksize=3)
-    blurred_image, boxes = median_blur.perturb(input_image, boxes)
+    >>> median_blur = MedianBlurPerturber(ksize=3)
+    >>> blurred_image, _ = median_blur.perturb(image=image)
 
 Note:
     Each class requires OpenCV for functionality. An ImportError will be raised if OpenCV is
@@ -87,20 +92,26 @@ class _PerturbImage(PerturbImage):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required cv2 module is available.
-
-        Returns:
-            bool: True if opencv is installed; False otherwise.
-        """
+        """Returns true if the required cv2 module is available."""
         # Requires opencv to be installed
         return cv2_available
 
 
 class AverageBlurPerturber(_PerturbImage):
-    """Applies average blurring to the image stimulus."""
+    """Applies average blurring to the image stimulus.
+
+    Attributes:
+        ksize (int):
+            blur kernal size
+    """
 
     def __init__(self, ksize: int = 1) -> None:
-        """:param ksize: Blurring kernel size."""
+        """AverageBlurPerturber applies average blurring to an image.
+
+        Args:
+            ksize:
+                Blurring kernel size.
+        """
         super().__init__(ksize=ksize)
         min_k_size = 1
         if ksize < min_k_size:
@@ -120,10 +131,20 @@ class AverageBlurPerturber(_PerturbImage):
 
 
 class GaussianBlurPerturber(_PerturbImage):
-    """Applies Gaussian blurring to the image stimulus."""
+    """Applies Gaussian blurring to the image stimulus.
+
+    Attributes:
+        ksize (int):
+            blur kernal size
+    """
 
     def __init__(self, ksize: int = 1) -> None:
-        """:param ksize: Blurring kernel size."""
+        """GaussianBlurPerturber applies gaussian blurring to an image.
+
+        Args:
+            ksize:
+                Blurring kernel size.
+        """
         super().__init__(ksize=ksize)
         min_k_size = 1
         if ksize < min_k_size or ksize % 2 == 0:
@@ -143,10 +164,20 @@ class GaussianBlurPerturber(_PerturbImage):
 
 
 class MedianBlurPerturber(_PerturbImage):
-    """Applies median blurring to the image stimulus."""
+    """Applies median blurring to the image stimulus.
+
+    Attributes:
+        ksize (int):
+            blur kernal size
+    """
 
     def __init__(self, ksize: int = 3) -> None:
-        """:param ksize: Blurring kernel size."""
+        """MedianBlurPerturber applies gaussian blurring to an image.
+
+        Args:
+            ksize:
+                Blurring kernel size.
+        """
         super().__init__(ksize=ksize)
         min_k_size = 3
         if ksize < min_k_size or ksize % 2 == 0:

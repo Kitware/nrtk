@@ -44,16 +44,22 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
     not support any other augmentation to the labels such as cropping,
     translation, or rotation.
 
-    Parameters
-    ----------
-    augment : PerturbImage
-        Augmentations to apply to an image.
-    metadata: AugmentationMetadata
-        Metadata for this augmentation.
+    Attributes:
+        augmentations : Sequence[Augmentation] | None
+            Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
+        metadata: AugmentationMetadata
+            Metadata for this augmentation.
     """
 
     def __init__(self, augment: PerturbImage, augment_id: str) -> None:
-        """Initialize augmentation wrapper."""
+        """Initialize augmentation wrapper.
+
+        Args:
+            augment:
+                PerturbImage implementation to perform.
+            augment_id:
+                Metadata ID for this augmentation.
+        """
         if not self.is_usable():
             raise MaiteImportError
         self.augment = augment
@@ -63,7 +69,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
         self,
         batch: OBJ_DETECTION_BATCH_T,
     ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
-        """Apply augmentations to the given data batch."""
+        """Return a batch of augmented images and metadata."""
         imgs, anns, metadata = batch
 
         # iterate over (parallel) elements in batch
@@ -130,11 +136,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependency (MAITE) is available.
-
-        Returns:
-            bool: True MAITE is available; False otherwise.
-        """
+        """Returns True if the necessary dependency (MAITE) is available."""
         return maite_available
 
 
@@ -144,14 +146,13 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
     Implementation of JATIC augmentation for NRTK metrics operating on a MAITE-protocol
     compliant object detection dataset.
 
-    Parameters
-    ----------
-    augmentations : Sequence[Augmentation] | None
-        Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
-    metric : ImageMetric
-        Image metric to be applied for a given image.
-    metadata: AugmentationMetadata
-        Metadata for this augmentation.
+    Attributes:
+        augmentations : Sequence[Augmentation] | None
+            Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
+        metric : ImageMetric
+            Image metric to be applied for a given image.
+        metadata: AugmentationMetadata
+            Metadata for this augmentation.
     """
 
     def __init__(
@@ -160,7 +161,16 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
         metric: ImageMetric,
         augment_id: str,
     ) -> None:
-        """Initialize augmentation with metric wrapper."""
+        """Initialize augmentation with metric wrapper.
+
+        Args:
+            augmentations:
+                Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
+            metric:
+                Image metric to be applied for a given image.
+            augment_id:
+                Metadata ID for this augmentation.
+        """
         if not self.is_usable():
             raise MaiteImportError
         self.augmentations = augmentations
@@ -186,7 +196,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
         self,
         batch: OBJ_DETECTION_BATCH_T,
     ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
-        """Compute a specified image metric on the given batch."""
+        """Returns a batch of augmented images and a specific metric."""
         imgs, _, _ = batch
         metric_aug_metadata = list()  # list of individual image-level metric metadata
 
@@ -223,9 +233,5 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the necessary dependency (MAITE) is available.
-
-        Returns:
-            bool: True MAITE is available; False otherwise.
-        """
+        """Returns true if the necessary dependency (MAITE) is available."""
         return maite_available

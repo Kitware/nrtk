@@ -1,11 +1,24 @@
-"""Implements DefocusOTFPerturber for optical defocus simulation via OTF using pybsm and OpenCV.
+"""Implements DefocusOTFPerturber for optical defocus simulation via OTF using pybsm.
 
 Classes:
     DefocusOTFPerturber: Simulates defocus effects in images using OTF and PSF calculations.
 
 Dependencies:
-    - pybsm: Required for radiance calculations, OTF/PSF handling, and atmosphere loading.
-    - numpy: For numerical computations.
+    - pyBSM for OTF-related functionalities.
+    - nrtk.impls.perturb.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+
+Example usage:
+    >>> if not DefocusOTFPerturber.is_usable():
+    ...     import pytest
+    ...
+    ...     pytest.skip("DefocusOTFPerturber is not usable")
+    >>> w_x = 4.0e-6
+    >>> w_y = 4.5e-6
+    >>> perturber = DefocusOTFPerturber(w_x=w_x, w_y=w_y)
+    >>> image = np.ones((256, 256, 3))
+    >>> img_gsd = 3.19 / 160
+    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)
+
 """
 
 from __future__ import annotations
@@ -35,34 +48,6 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
     Transfer Function (OTF) and Point Spread Function (PSF) for simulation.
 
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
-
-    Attributes:
-        w_x (float | None):
-            Defocus parameter in the x-direction.
-        w_y (float | None):
-            Defocus parameter in the y-direction.
-        interp (bool):
-            Whether to interpolate atmosphere data.
-        mtf_wavelengths (np.ndarray):
-            Array of wavelengths used for Modulation Transfer Function (MTF).
-        D (float):
-            Lens diameter in meters.
-        slant_range (float):
-            Slant range in meters, calculated from altitude and ground range.
-        ifov (float):
-            Instantaneous Field of View (IFOV).
-
-    Methods:
-        perturb:
-            Applies the defocus effect to the input image.
-        __call__:
-            Alias for the perturb method.
-        get_default_config:
-            Provides the default configuration for the perturber.
-        from_config:
-            Instantiates the perturber from a configuration dictionary.
-        get_config:
-            Retrieves the current configuration of the perturber instance.
     """
 
     def __init__(
@@ -96,7 +81,7 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
             the absent value(s) will default to 0.0 for both.
 
         Raises:
-            :raises ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
         super().__init__(interp=interp, **kwargs)

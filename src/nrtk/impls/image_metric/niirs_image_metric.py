@@ -57,8 +57,7 @@ class NIIRSImageMetric(ImageMetric):
             scenario (PybsmScenario): A pyBSM scenario object for environmental and context settings.
 
         Raises:
-            ImportError: If the pyBSM library is not available.
-            installed via 'nrtk[pybsm]'.
+            PyBSMImportError: If the pyBSM library is not available.
         """
         if not self.is_usable():
             raise PyBSMImportError
@@ -73,6 +72,11 @@ class NIIRSImageMetric(ImageMetric):
         additional_params: dict[str, Any] | None = None,
     ) -> float:
         """Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
+
+        Args:
+            img_1: unused
+            img_2: unused
+            additional_params: unused
 
         While this implementation of compute() takes the expected input paramerters, none
         of the values are used during calculation. pyBSM's NIIRS calculation only uses
@@ -97,6 +101,11 @@ class NIIRSImageMetric(ImageMetric):
     ) -> float:
         """Given the pyBSMSensor and the pyBSMScenario, compute the NIIRS metric.
 
+        Args:
+            img_1: unused
+            img_2: unused
+            additional_params: unused
+
         While this implementation of compute() takes the expected input paramerters, none
         of the values are used during calculation. pyBSM's NIIRS calculation only uses
         the Sensor and Scenario objects to calculate NIIRS and is image independent.
@@ -111,11 +120,7 @@ class NIIRSImageMetric(ImageMetric):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Generates a configuration dictionary for the NIIRSImageMetric instance.
-
-        Returns:
-            dict[str, Any]: Configuration data representing the sensor and scenario.
-        """
+        """Generates a configuration dictionary for the NIIRSImageMetric instance."""
         return {
             "sensor": to_config_dict(self.sensor),
             "scenario": to_config_dict(self.scenario),
@@ -123,9 +128,5 @@ class NIIRSImageMetric(ImageMetric):
 
     @classmethod
     def is_usable(cls) -> bool:
-        """Checks if the required pybsm module is available.
-
-        Returns:
-            bool: True if pybsm is installed; False otherwise.
-        """
+        """Returns True if the required pybsm module is available."""
         return pybsm_available

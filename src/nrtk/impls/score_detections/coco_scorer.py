@@ -43,6 +43,16 @@ class COCOScorer(ScoreDetections):
     path to the ground truth data and specifies a particular statistic index.
     Finally, the call to the scorer method returns a set of float metric values
     for the specified statistic index.
+
+    Attributes:
+        gt_path (str):
+            Path to the COCO-formatted ground truth JSON file.
+        stat_index (int):
+            Index of the statistic to retrieve from the COCO evaluation. Defaults to 0.
+        coco_gt (COCO):
+            COCO ground truth.
+        cat_ids (dict[str, Any]):
+            Category ids for the data.
     """
 
     def __init__(self, gt_path: str, stat_index: int = 0) -> None:
@@ -66,7 +76,7 @@ class COCOScorer(ScoreDetections):
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
-        """Computes scores for a particular statistic index.
+        """Returns scores for a particular statistic index.
 
         Computes scores for a particular statistic index and returns sequences of float values
         equal to the length of the input data.
@@ -150,9 +160,5 @@ class COCOScorer(ScoreDetections):
         return final_scores
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the configuration dictionary for the `COCOScorer` instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing the ground truth path and statistic index.
-        """
+        """Returns the configuration dictionary for the `COCOScorer` instance."""
         return {"gt_path": self.gt_path, "stat_index": self.stat_index}

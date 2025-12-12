@@ -7,6 +7,12 @@ Dependencies:
     - numpy: For numerical operations and random number generation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
+
+Example usage:
+    >>> factor = 0.75
+    >>> perturber = HazePerturber(factor=factor)
+    >>> image = np.ones((256, 256, 3))
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -28,14 +34,6 @@ class HazePerturber(PerturbImage):
 
     Attributes:
         factor (float): Strength of haze applied to an image.
-
-    Methods:
-        perturb:
-            Applies haze to an input image.
-        __call__:
-            Calls the perturb method with the given input image.
-        get_config:
-            Returns the current configuration of the HazePerturber instance.
     """
 
     def __init__(self, factor: float = 1.0) -> None:
@@ -73,8 +71,7 @@ class HazePerturber(PerturbImage):
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:
-            :return tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
-                Image with haze applied and source bounding boxes.
+            Image with haze applied and source bounding boxes.
         """
         # Use either the provided depth map or a map containing all values = 1
         if depth_map is None:
@@ -105,11 +102,7 @@ class HazePerturber(PerturbImage):
         return sky_color
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the HazePerturber instance.
-
-        Returns:
-            :return dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the HazePerturber instance."""
         cfg = super().get_config()
         cfg["factor"] = self.factor
         return cfg

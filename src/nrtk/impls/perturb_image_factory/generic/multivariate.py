@@ -2,6 +2,15 @@
 
 MultivariatePerturbImageFactory: A base factory class that generates multiple `PerturbImage` instances
 with specified perturbation parameters.
+
+Dependencies:
+    - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
+
+Example:
+    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> factory = MultivariatePerturbImageFactory(
+    ...     perturber=BrightnessPerturber, theta_keys=["factor"], thetas=[[0.1, 0.5]]
+    ... )
 """
 
 __all__ = ["MultivariatePerturbImageFactory"]
@@ -57,10 +66,15 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
     ) -> None:
         """Initializes the MultivariatePerturbImageFactory.
 
-        :param perturber: type[PerturbImage]: Python implementation type of the PerturbImage interface to produce.
-        :param theta_keys: (Sequence[str]): Names of perturbation parameters to vary.
-        :param thetas: (Sequence[Any]): Values to use for each perturbation parameter.
-        :param perturber_kwargs: (dict[str, Any]): Default kwargs to be used by the perturber. Defaults to {}.
+        Args:
+            perturber:
+                Python implementation type of the PerturbImage interface to produce.
+            theta_keys:
+                Names of perturbation parameters to vary
+            thetas:
+                Values to use for each perturbation parameter.
+            perturber_kwargs:
+                Default kwargs to be used by the perturber. Defaults to {}.
         """
         self.perturber = perturber
         self.theta_keys = theta_keys
@@ -72,39 +86,24 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
     def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
-        """Initialize PerturberImage implementation.
-
-        Returns:
-            PerturbImage: PerturbImage with specified kwargs
-        """
+        """Returns PerturberImage implementation with given input args."""
         input_kwargs = self.perturber_kwargs | kwargs
         return self.perturber(**input_kwargs)
 
     @override
     def __len__(self) -> int:
-        """Returns the number of possible perturbation instances.
-
-        Returns:
-            int: The total number of perturbation configurations.
-        """
+        """Returns the number of possible perturbation instances."""
         return len(self.sets)
 
     @override
     def __iter__(self) -> Iterator[PerturbImage]:
-        """Resets the iterator and returns itself for use in for-loops.
-
-        Returns:
-            Iterator[PerturbImage]: An iterator over `PerturbImage` instances.
-        """
+        """Resets the iterator and returns itself for use in for-loops."""
         self.n = 0
         return self
 
     @override
     def __next__(self) -> PerturbImage:
         """Returns the next `PerturbImage` instance with a unique parameter configuration.
-
-        Returns:
-            PerturbImage: A configured `PerturbImage` instance.
 
         Raises:
             StopIteration: When all configurations have been iterated over.
@@ -138,11 +137,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
     @property
     @override
     def thetas(self) -> Sequence[Sequence[Any]]:
-        """Retrieves the current values for each parameter to be varied.
-
-        Returns:
-            Sequence[Sequence[Any]]: A sequence of parameter values for perturbation.
-        """
+        """Returns the current values for each parameter to be varied."""
         return self._thetas
 
     @property
@@ -168,7 +163,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
                 Indicator variable describing whether or not to use default config values. Defaults to True.
 
         Returns:
-            :return PybsmSensor: Instantiation of class of type PybsmSensor.
+            Instantiation of MultivariatePerturbImageFactory.
         """
         config_dict = dict(config_dict)
 
@@ -198,11 +193,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the `MultivariatePerturbImageFactory` instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary with current settings.
-        """
+        """Returns the current configuration of the `MultivariatePerturbImageFactory` instance."""
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_keys": self.theta_keys,

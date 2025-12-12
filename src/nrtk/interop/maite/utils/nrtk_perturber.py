@@ -26,8 +26,17 @@ def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactor
     implementation. Each perturber dcombination will result in a newly
     generated dataset.
 
-    :param maite_dataset: A dataset object of type maite.protocols.object_detection.Dataset
-    :param perturber_factory: PerturbImageFactory implementation.
+    Args:
+        maite_dataset:
+            A dataset object of type maite.protocols.object_detection.Dataset
+        perturber_factory:
+            PerturbImageFactory implementation.
+
+    Returns:
+        A list of tuples containing perturber configurations and augmented datasets
+
+    Raises:
+        MaiteImportError: maite is not available
     """
     if not maite_available:
         raise MaiteImportError
