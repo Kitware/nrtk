@@ -38,7 +38,7 @@ your scenario to the right tools.
          from nrtk.impls.perturb.environment.haze_perturber import HazePerturber
          img_out = HazePerturber(img_in)
 
-      See example outputs in our :doc:`Visual Perturbation Gallery <examples/perturbers>`.
+      See example outputs in our :doc:`Visual Perturbation Gallery </examples/perturbers>`.
 
    .. grid-item-card:: 🗺️ Map Your Risk to the Right Tool
       :columns: 12 12 4 4
@@ -50,7 +50,7 @@ your scenario to the right tools.
 
       +++
 
-      .. button-ref:: risk_factors
+      .. button-ref:: /explanations/risk_factors
          :color: primary
          :expand:
 
@@ -67,35 +67,35 @@ your scenario to the right tools.
       :gutter: 2
 
       .. grid-item-card:: 🚀 Getting Started
-         :link: getting_started
+         :link: first_perturbation
          :link-type: doc
 
       .. grid-item-card:: 📚 NRTK Concepts
-         :link: nrtk_explanation
+         :link: /explanations/nrtk_explanation
          :link-type: doc
 
       .. grid-item-card:: 🔌 Core API Interfaces
-         :link: interfaces
+         :link: /reference/api/interfaces
          :link-type: doc
 
       .. grid-item-card:: ⚙️ NRTK Implementations
-         :link: implementations
+         :link: /reference/api/implementations
          :link-type: doc
 
       .. grid-item-card:: 📋 User Input Requirements
-         :link: user_input_requirements
+         :link: /reference/perturber_reference/index
          :link-type: doc
 
       .. grid-item-card:: ✅ Validation and Trust
-         :link: maite/jatic_interoperability
+         :link: /interoperability/maite/jatic_interoperability
          :link-type: doc
 
       .. grid-item-card:: 📊 Testing & Evaluation Guides
-         :link: testing_and_evaluation_notebooks
+         :link: /tutorials/testing_and_evaluation_notebooks
          :link-type: doc
 
       .. grid-item-card:: 📟 NRTK CLI Tool
-         :link: generating_perturbed_datasets
+         :link: /reference/containers
          :link-type: doc
 
 ----

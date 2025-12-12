@@ -14,7 +14,7 @@ to evaluate the natural robustness of computer vision algorithms.**
 
 .. container:: nrtk-quickstart-button-container
 
-   .. button-ref:: quickstart
+   .. button-ref:: getting_started/quickstart
       :color: primary
       :class: nrtk-quickstart-button
 
@@ -34,6 +34,59 @@ vision solutions are resilient and reliable under diverse conditions.
 This documentation is structured to provide you with straightforward and practical instructions and
 examples, so that you can effectively leverage the toolkit to enhance the robustness and
 reliability of your computer vision applications in facing real-world challenges.
+
+.. grid:: 1 2 2 2
+   :gutter: 4
+   :padding: 2 2 0 0
+   :class-container: sd-text-center
+
+   .. grid-item-card:: Getting Started
+      :link: getting_started/index
+      :link-type: doc
+
+      New to NRTK? Installation, quick start, and introductory tutorials.
+
+   .. grid-item-card:: Tutorials
+      :link: tutorials/index
+      :link-type: doc
+
+      Learn NRTK through guided end-to-end examples.
+
+   .. grid-item-card:: How-To Guides
+      :link: how_to_guides/index
+      :link-type: doc
+
+      Task-based instructions and workflow recipes.
+
+   .. grid-item-card:: Explanations
+      :link: explanations/index
+      :link-type: doc
+
+      Robustness concepts and operational risk factors in computer vision.
+
+   .. grid-item-card:: Reference
+      :link: reference/index
+      :link-type: doc
+
+      Perturbers, APIs, schemas, and implementation details.
+
+   .. grid-item-card:: Interoperability
+      :link: interoperability/index
+      :link-type: doc
+
+      MAITE Adapters for T&E workflows
+
+   .. grid-item-card:: Development
+      :link: development/index
+      :link-type: doc
+
+      Contributing guidelines and development resources.
+
+   .. grid-item-card:: Release Notes
+      :link: release_notes/index
+      :link-type: doc
+
+      Version history and changelog.
 
 Why NRTK?
 ---------
@@ -77,59 +130,18 @@ necessarily representing the official policies or endorsements, either expressed
 
 .. :auto acknowledgment:
 
-Documentation Contents:
-=======================
-
 .. toctree::
-   :maxdepth: 1
-   :caption: Quick Start
+   :maxdepth: 2
+   :hidden:
 
-   quickstart
-   installation
-   getting_started
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Explanation
-
-   nrtk_explanation
-   risk_factors
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Tutorials
-
-   examples/nrtk_tutorial.ipynb
-   testing_and_evaluation_notebooks
-   examples/coco_scorer.ipynb
-
-.. toctree::
-   :maxdepth: 1
-   :caption: How-To
-
-   examples/perturbers.ipynb
-   examples/otf_visualization.ipynb
-   examples/albumentations_perturber.ipynb
-   examples/diffusion_perturber.ipynb
-   examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency.ipynb
-   examples/nrtk_xaitk_workflow/object_detection_perturbation_saliency.ipynb
-   examples/pybsm/pybsm_default_config.ipynb
-   generating_perturbed_datasets
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Reference
-
-   interfaces
-   user_input_requirements
-   implementations
-   maite/jatic_interoperability
-   glossary
-   containers
-   release_notes
-   for_nrtk_developers
-
-
+   getting_started/index
+   tutorials/index
+   how_to_guides/index
+   explanations/index
+   reference/index
+   interoperability/index
+   development/index
+   release_notes/index
 
 Indices and Tables
 ------------------

@@ -5,7 +5,7 @@ NRTK-as-a-Service (NRTKaaS)
 Dependencies
 ============
 
-In addition to `NRTK installation <../installation.html>`_, the ``uvicorn`` package is required.
+In addition to :doc:`NRTK installation </getting_started/installation>`, the ``uvicorn`` package is required.
 
 Usage
 =====

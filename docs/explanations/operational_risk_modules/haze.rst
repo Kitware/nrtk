@@ -18,7 +18,7 @@ scattering-like effects guided by a depth map and estimated sky color. This does
 attempt full atmospheric physics, but it provides an efficient way to probe model
 sensitivity to visibility loss during early-stage robustness screening.
 
-.. figure:: ../images/risks/mist.png
+.. figure:: /images/risks/mist.png
   :width: 300px
 
 Haze Perturbation
@@ -34,7 +34,7 @@ Use This When...
 * You need a **basic-install perturbation** (no pyBSM / optical dependencies).
 * You're doing early **screening of robustness** to visibility loss before running heavier
   T&E analysis (see the full T&E Simulation Guide →
-  `HazePerturber T&E guide <../examples/maite/nrtk_haze_perturber_demo.html>`__).
+  :doc:`HazePerturber T&E guide </examples/maite/nrtk_haze_perturber_demo>`).
 
 Minimal Code Example
 --------------------
@@ -58,11 +58,11 @@ Key Parameters
      * - Light (0.5)
        - Medium (1.0)
        - Heavy (1.5)
-     * - .. image:: ../images/operational_risk_modules/haze_light.png
+     * - .. image:: /images/operational_risk_modules/haze_light.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/haze_medium.png
+       - .. image:: /images/operational_risk_modules/haze_medium.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/haze_heavy.png
+       - .. image:: /images/operational_risk_modules/haze_heavy.png
             :width: 200px
 
 * ``depth_map`` - Optional 2D array describing distance from camera - Default: uniform
@@ -77,6 +77,6 @@ Limitations and Next Steps
 * Approximates **atmospheric scattering** only; it does not model full physics or
   wavelength-dependent effects. For more detailed analysis, validation details, datasets,
   and recommended parameter sweeps, see the
-  `HazePerturber T&E guide <../examples/maite/nrtk_haze_perturber_demo.html>`__.
+  :doc:`HazePerturber T&E guide </examples/maite/nrtk_haze_perturber_demo>`.
 * See *Validation & Trust* for cross-perturber validation status.
 * Related Risks: :ref:`extreme-illumination`, :ref:`lens-water-droplet`

@@ -19,7 +19,7 @@ realistic refraction and blur effects. The perturbation accounts for droplet siz
 and optical properties to generate operationally representative test conditions for robustness
 screening.
 
-.. figure:: ../images/risks/droplets-2.png
+.. figure:: /images/risks/droplets-2.png
   :width: 300px
 
 Water Droplet Perturbation
@@ -35,7 +35,7 @@ Use This When...
 * You need a **physics-based perturbation** that models realistic optical refraction effects.
 * You're doing early **screening of robustness** to lens contamination before running heavier
   T&E analysis (see the full T&E Simulation Guide →
-  `WaterDropletPerturber T&E guide <../examples/maite/nrtk_water_droplet_perturber_demo.html>`__).
+  :doc:`WaterDropletPerturber T&E guide </examples/maite/nrtk_water_droplet_perturber_demo>`).
 * You want to test model performance under **localized distortions** rather than global blur.
 
 Minimal Code Example
@@ -64,11 +64,11 @@ Key Parameters
      * - Light (20)
        - Medium (50)
        - Heavy (200)
-     * - .. image:: ../images/operational_risk_modules/waterdroplet_num_drops_light.png
+     * - .. image:: /images/operational_risk_modules/waterdroplet_num_drops_light.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/waterdroplet_num_drops_medium.png
+       - .. image:: /images/operational_risk_modules/waterdroplet_num_drops_medium.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/waterdroplet_num_drops_heavy.png
+       - .. image:: /images/operational_risk_modules/waterdroplet_num_drops_heavy.png
             :width: 200px
 
 * ``size_range`` - Range of size multiplier values [min, max] used for computing droplet sizes.
@@ -80,11 +80,11 @@ Key Parameters
      * - Light ([0.0, 0.5])
        - Medium ([0.5, 1.0])
        - Heavy ([1.0, 1.5])
-     * - .. image:: ../images/operational_risk_modules/waterdroplet_size_range_light.png
+     * - .. image:: /images/operational_risk_modules/waterdroplet_size_range_light.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/waterdroplet_size_range_medium.png
+       - .. image:: /images/operational_risk_modules/waterdroplet_size_range_medium.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/waterdroplet_size_range_heavy.png
+       - .. image:: /images/operational_risk_modules/waterdroplet_size_range_heavy.png
             :width: 200px
 
 * ``blur_strength`` - Strength of Gaussian blur applied to simulate depth-of-field effects.
@@ -96,11 +96,11 @@ Key Parameters
      * - Light (0.05)
        - Medium (0.5)
        - Heavy (1.0)
-     * - .. image:: ../images/operational_risk_modules/waterdroplet_blur_strength_light.png
+     * - .. image:: /images/operational_risk_modules/waterdroplet_blur_strength_light.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/waterdroplet_blur_strength_medium.png
+       - .. image:: /images/operational_risk_modules/waterdroplet_blur_strength_medium.png
             :width: 200px
-       - .. image:: ../images/operational_risk_modules/waterdroplet_blur_strength_heavy.png
+       - .. image:: /images/operational_risk_modules/waterdroplet_blur_strength_heavy.png
             :width: 200px
 
 **Advanced Parameters** (defaults work for most cases):

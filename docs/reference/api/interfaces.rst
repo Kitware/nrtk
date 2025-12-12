@@ -27,7 +27,7 @@ and factory generation from runtime configuration. This allows for both opaque d
 from a class-method on the interface class object, as well as instantiation of a concrete instance via a JSON-like
 configuration fed in from an outside resource.
 
-.. figure:: figures/api-docs-fig-01.svg
+.. figure:: /figures/api-docs-fig-01.svg
 
    Figure 1: Abstract Interface Inheritance.
 

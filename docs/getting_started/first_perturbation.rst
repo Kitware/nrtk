@@ -1,0 +1,69 @@
+First Perturbation
+==================
+
+In this example, we'll generate your first perturbation. Afterwards, :doc:`the NRTK tutorial </examples/nrtk_tutorial>`
+provides a deeper look at perturbation and the other main components of NRTK.
+
+Example: A First Look at NRTK Perturbations
+-------------------------------------------
+
+Via the pyBSM package, NRTK exposes a large set of Optical Transfer Functions (OTFs). These OTFs can simulate different
+environmental and sensor-based effects. For example, the :ref:`JitterOTFPerturber <JitterOTFPerturber>` simulates
+different levels of sensor jitter. By modifying its input parameters, you can observe how sensor jitter affects image
+quality.
+
+
+Input Image
+^^^^^^^^^^^
+
+Below is an example of an input image that will undergo a Jitter OTF perturbation. This image represents the initial
+state before any transformation.
+
+.. figure:: ../images/input.jpg
+
+   Figure 1: Input image.
+
+
+Code Sample
+^^^^^^^^^^^
+
+Below is some example code that applies a Jitter OTF transformation:
+
+.. code-block:: python
+
+    from nrtk.impls.perturb.optical.jitter_otf_perturber import JitterOTFPerturber
+    import numpy as np
+    from PIL import Image
+
+    INPUT_IMG_FILE = 'docs/images/input.jpg'
+    image = np.array(Image.open(INPUT_IMG_FILE))
+
+    otf = JitterOTFPerturber(s_x=8e-6, s_y=8e-6)
+    out_image = otf.perturb(image)
+
+This code uses default values and provides a sample input image. However, you can adjust the parameters and use your
+own image to visualize the perturbation. The ``s_x`` and ``s_y`` parameters (the root-mean-squared jitter amplitudes in
+radians, in the x and y directions) are the primary way to customize a jitter perturber. Larger jitter amplitudes
+generate a larger Gaussian blur kernel. The
+:doc:`how-to guide on OTF perturbations </examples/otf_visualization>` will provide more detail on selecting
+specific values for these parameters.
+
+Resulting Image
+^^^^^^^^^^^^^^^
+
+The output image below shows the effects of the Jitter OTF on the original input. This result illustrates the Gaussian
+blur introduced due to simulated sensor jitter.
+
+.. figure:: ../images/output-jitter.jpg
+
+   Figure 2: Output image.
+
+Next Steps
+----------
+
+For broader context or foundational theory, see:
+
+- :doc:`NRTK Tutorial </examples/nrtk_tutorial>` - Step-by-step tutorial to get started
+- :doc:`/explanations/nrtk_explanation` - Conceptual guide to NRTK's architecture and approach
+- :doc:`/explanations/risk_factors` - Conceptual guide to understand how NRTK's perturbations map to
+  real-world risk factors

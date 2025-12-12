@@ -209,3 +209,39 @@ header form.bd-search:not(#pst-search-dialog form.bd-search) {
     overflow-x: auto;
     max-width: 100%;
 }
+
+/* Section-isolated sidebar navigation
+ * Show only the current section's navigation tree in the sidebar
+ * When on a child page, show siblings by targeting the parent's current state
+ */
+
+/* Hide all top-level sections by default */
+nav.bd-links ul.bd-sidenav > li.toctree-l1 {
+    display: none !important;
+}
+
+/* Show the current section (has .current class when active or contains active child) */
+nav.bd-links ul.bd-sidenav > li.toctree-l1.current {
+    display: block !important;
+}
+
+/* Ensure all children within the current section are visible */
+nav.bd-links ul.bd-sidenav > li.toctree-l1.current ul {
+    display: block !important;
+}
+
+nav.bd-links ul.bd-sidenav > li.toctree-l1.current li {
+    display: list-item !important;
+}
+
+/* Sticky left sidebar - stays fixed while scrolling
+ * Similar behavior to the right sidebar (table of contents)
+ */
+@media (min-width: 992px) {
+    .bd-sidebar-primary {
+        position: sticky !important;
+        top: 4rem;  /* Account for navbar height */
+        height: calc(100vh - 4rem);
+        overflow-y: auto;
+    }
+}
