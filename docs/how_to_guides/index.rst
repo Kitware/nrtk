@@ -9,9 +9,9 @@ revisiting background concepts.
 .. toctree::
    :maxdepth: 1
 
-   /examples/perturbers
-   /examples/otf_visualization
-   /examples/albumentations_perturber
-   /examples/diffusion_perturber
+   /examples/photometric_perturbers.ipynb
+   /examples/optical_perturbers.ipynb
+   /examples/generative_perturbers.ipynb
+   /examples/albumentations_perturber.ipynb
    /examples/coco_scorer
    /examples/pybsm/pybsm_default_config
