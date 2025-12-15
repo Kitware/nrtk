@@ -86,12 +86,12 @@ notebooks:
         NOTEBOOK_FILE: [
           "albumentations_perturber.ipynb",
           "coco_scorer.ipynb",
-          "perturbers.ipynb",
+          "photometric_perturbers.ipynb",
           "nrtk_tutorial.ipynb",
           "simple_generic_generator.ipynb",
           "simple_pybsm_generator.ipynb",
-          "otf_visualization.ipynb",
-          "diffusion_perturber.ipynb"
+          "optical_perturbers.ipynb",
+          "generative_perturbers.ipynb"
         ]
       - NOTEBOOK_DIR: "docs/examples/pybsm"
         NOTEBOOK_FILE: [
