@@ -26,26 +26,26 @@ class TestJATICImageClassificationDataset:
         [
             (
                 JATICImageClassificationDataset(
-                    [
+                    imgs=[
                         random.integers(0, 255, (3, 256, 256), dtype=np.uint8),
                         random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
                     ],
-                    [np.asarray([0]), np.asarray([1])],
-                    [{"id": 0}, {"id": 1}],
-                    "dummy_dataset",
-                    {0: "cat0", 1: "cat1"},
+                    labels=[np.asarray([0]), np.asarray([1])],
+                    datum_metadata=[{"id": 0}, {"id": 1}],
+                    dataset_id="dummy_dataset",
+                    index2label={0: "cat0", 1: "cat1"},
                 ),
                 [np.asarray([0]), np.asarray([1])],
             ),
             (
                 JATICImageClassificationDataset(
-                    [
+                    imgs=[
                         random.integers(0, 255, (3, 256, 256), dtype=np.uint8),
                         random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
                     ],
-                    [np.asarray([0]), np.asarray([1])],
-                    [{"id": 0}, {"id": 1}],
-                    "dummy_dataset",
+                    labels=[np.asarray([0]), np.asarray([1])],
+                    datum_metadata=[{"id": 0}, {"id": 1}],
+                    dataset_id="dummy_dataset",
                 ),
                 [np.asarray([0]), np.asarray([1])],
             ),
@@ -69,7 +69,7 @@ class TestJATICImageClassificationDataset:
             md_in = dataset[idx][2]
 
             # Get expected image and metadata from "normal" perturber
-            input_image, _ = perturber(np.transpose(np.asarray(img_in), (1, 2, 0)))
+            input_image, _ = perturber(image=np.transpose(np.asarray(img_in), (1, 2, 0)))
             expected_img_out = np.transpose(input_image, (2, 0, 1))
             expected_md_out = dict(md_in)
             expected_md_out["nrtk_perturber_config"] = [perturber.get_config()]

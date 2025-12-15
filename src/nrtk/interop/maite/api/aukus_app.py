@@ -16,10 +16,10 @@ from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import FastApiImportError, PydanticSettingsImportError
 from nrtk.utils._import_guard import import_guard
 
-fastapi_available: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
+fastapi_available: bool = import_guard(module_name="fastapi", exception=FastApiImportError, submodules=["encoders"])
 pydantic_settings_available: bool = import_guard(
-    "pydantic_settings",
-    PydanticSettingsImportError,
+    module_name="pydantic_settings",
+    exception=PydanticSettingsImportError,
     objects=["BaseSettings"],
 )
 from fastapi import FastAPI, HTTPException  # noqa: E402

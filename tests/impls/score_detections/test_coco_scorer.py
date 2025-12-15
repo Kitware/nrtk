@@ -17,9 +17,9 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 class TestCOCOScorer:
     dummy_actual = [
-        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})],
+        [(AxisAlignedBoundingBox(min_vertex=[1, 1], max_vertex=[2, 2]), {"category_id": 1, "image_id": 1})],
     ]
-    dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
+    dummy_pred_box = AxisAlignedBoundingBox(min_vertex=[1, 1], max_vertex=[2, 2])
     dummy_pred_class = _class_map(
         classes=("dummy_class_1", "dummy_class_2"),
         scores=[0.9, 0.1],
@@ -27,8 +27,8 @@ class TestCOCOScorer:
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
     dummy_actual_test_len_mismatch = [
-        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category_id": 1, "image_id": 1})],
-        [(AxisAlignedBoundingBox([2, 2], [3, 3]), {"category_id": 2, "image_id": 1})],
+        [(AxisAlignedBoundingBox(min_vertex=[1, 1], max_vertex=[2, 2]), {"category_id": 1, "image_id": 1})],
+        [(AxisAlignedBoundingBox(min_vertex=[2, 2], max_vertex=[3, 3]), {"category_id": 2, "image_id": 1})],
     ]
 
     dummy_empty = [[]]  # type: ignore

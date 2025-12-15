@@ -14,6 +14,7 @@ rng = np.random.default_rng()
 
 
 def generator_assertions(
+    *,
     generator: GenerateObjectDetectorBlackboxResponse,
     perturber_factories: Sequence[PerturbImageFactory],
     detector: DetectImageObjects,
@@ -53,6 +54,7 @@ def generator_assertions(
 
 
 def gen_rand_dets(
+    *,
     im_shape: tuple[int, int],
     n_dets: int,
 ) -> Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]:
@@ -71,8 +73,8 @@ def gen_rand_dets(
 
         :return: The generated bounding box.
         """
-        x_vals = list(rng.integers(0, im_shape[0], size=(2,)))
-        y_vals = list(rng.integers(0, im_shape[1], size=(2,)))
+        x_vals = list(rng.integers(low=0, high=im_shape[0], size=(2,)))
+        y_vals = list(rng.integers(low=0, high=im_shape[1], size=(2,)))
         return AxisAlignedBoundingBox(
             min_vertex=(min(x_vals), min(y_vals)),
             max_vertex=(max(x_vals), max(y_vals)),

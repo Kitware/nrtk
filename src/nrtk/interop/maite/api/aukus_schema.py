@@ -9,7 +9,7 @@ from typing import Any
 from nrtk.utils._exceptions import PydanticImportError
 from nrtk.utils._import_guard import import_guard
 
-pydantic_available: bool = import_guard("pydantic", PydanticImportError)
+pydantic_available: bool = import_guard(module_name="pydantic", exception=PydanticImportError)
 from pydantic import BaseModel  # noqa: E402
 
 

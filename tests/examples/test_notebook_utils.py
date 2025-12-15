@@ -85,7 +85,7 @@ class PyrightOutput(TypedDict):
 def notebook_to_py_text(path_to_nb: Path) -> str:
     from nrtk.utils._import_guard import import_guard
 
-    import_guard("jupytext", NotebookTestingImportError)
+    import_guard(module_name="jupytext", exception=NotebookTestingImportError)
     import jupytext
 
     ntbk = jupytext.read(path_to_nb, fmt="ipynb")
@@ -152,6 +152,7 @@ def _format_outputs(scan: PyrightOutput) -> PyrightOutput:
 
 
 def pyright_analyze(
+    *,
     notebook_path_str: str,
     path_to_pyright: Path | None = PYRIGHT_PATH,
 ) -> PyrightOutput:

@@ -17,11 +17,11 @@ from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError
 from nrtk.utils._import_guard import import_guard
 
-is_usable: bool = import_guard("kwcoco", KWCocoImportError)
+is_usable: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 from kwcoco import CocoDataset  # type: ignore  # noqa: E402
 
 
-def _load_metadata(dataset_dir: str, kwcoco_dataset: "CocoDataset") -> list[dict[str, Any]]:
+def _load_metadata(*, dataset_dir: str, kwcoco_dataset: "CocoDataset") -> list[dict[str, Any]]:
     metadata_file = Path(dataset_dir) / "image_metadata.json"
     if not metadata_file.is_file():
         logging.warn(
@@ -50,6 +50,7 @@ def _set_logging(verbose: bool) -> None:
 )
 @click.option("--verbose", "-v", count=True, help="print progress messages")
 def nrtk_perturber_cli(
+    *,
     dataset_dir: str,
     output_dir: str,
     config_file: TextIO,
@@ -97,11 +98,11 @@ def nrtk_perturber_cli(
     kwcoco_dataset = CocoDataset(coco_file)
 
     # Load metadata, if it exists
-    metadata = _load_metadata(dataset_dir, kwcoco_dataset)
+    metadata = _load_metadata(dataset_dir=dataset_dir, kwcoco_dataset=kwcoco_dataset)
 
     # Load config
     config = json.load(config_file)
-    perturber_factory = from_config_dict(config["PerturberFactory"], PerturbImageFactory.get_impls())
+    perturber_factory = from_config_dict(config=config["PerturberFactory"], type_iter=PerturbImageFactory.get_impls())
 
     # Initialize dataset object
     input_dataset = COCOJATICObjectDetectionDataset(
@@ -122,7 +123,3 @@ def nrtk_perturber_cli(
             img_filenames=img_filenames,
             dataset_categories=input_dataset.get_categories(),
         )
-
-
-if __name__ == "__main__":
-    nrtk_perturber_cli()

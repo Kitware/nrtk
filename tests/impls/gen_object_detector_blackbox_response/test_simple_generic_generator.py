@@ -29,13 +29,13 @@ class TestSimpleGenericGenerator:
         ("images", "ground_truth", "expectation"),
         [
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(4)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(4)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(4)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(4)],
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11))],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11))],
                 pytest.raises(ValueError, match=r"Size mismatch."),
             ),
         ],
@@ -58,32 +58,32 @@ class TestSimpleGenericGenerator:
         ("images", "ground_truth", "idx", "expectation"),
         [
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 0,
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 1,
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 2,
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 -1,
                 pytest.raises(IndexError),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 5,
                 pytest.raises(IndexError),
             ),
@@ -109,8 +109,8 @@ class TestSimpleGenericGenerator:
         ("images", "ground_truth", "perturber_factories", "verbose"),
         [
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(2)],
                 [
                     StepPerturbImageFactory(
                         perturber=BrightnessPerturber,
@@ -131,8 +131,8 @@ class TestSimpleGenericGenerator:
                 False,
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(2)],
                 [
                     StepPerturbImageFactory(
                         perturber=BrightnessPerturber,

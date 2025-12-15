@@ -17,10 +17,10 @@ from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
 maite_available: bool = import_guard(
-    "maite",
-    MaiteImportError,
-    ["protocols", "protocols.image_classification"],
-    ["Augmentation"],
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols", "protocols.image_classification"],
+    objects=["Augmentation"],
 )
 from maite.protocols import AugmentationMetadata  # noqa: E402
 from maite.protocols.image_classification import (  # noqa: E402
@@ -46,7 +46,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
             Name of the augmentation. Will appear in metadata key.
     """
 
-    def __init__(self, augment: PerturbImage, augment_id: str) -> None:
+    def __init__(self, *, augment: PerturbImage, augment_id: str) -> None:
         """Initialize augmentation wrapper.
 
         Args:
@@ -75,7 +75,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
         for img, ann, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
             aug_img = np.transpose(np.asarray(copy.deepcopy(img)), (1, 2, 0))  # Convert to channels-last
-            aug_img, _ = self.augment(aug_img, boxes=None, **dict(md))
+            aug_img, _ = self.augment(image=aug_img, boxes=None, **dict(md))
             if aug_img.ndim > 2:
                 # Convert back to channels first
                 aug_img = np.transpose(aug_img, (2, 0, 1))
@@ -96,7 +96,7 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
                 nrtk_perturber_config=perturber_configs,
             )
 
-            aug_metadata.append(_forward_md_keys(md, aug_md, forwarded_keys=["id", "nrtk_perturber_config"]))
+            aug_metadata.append(_forward_md_keys(md=md, aug_md=aug_md, forwarded_keys=["id", "nrtk_perturber_config"]))
 
         # return batch of augmented inputs, class labels and updated metadata
         return aug_imgs, aug_anns, aug_metadata
@@ -124,6 +124,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
 
     def __init__(
         self,
+        *,
         augmentations: Sequence[Augmentation] | None,  # pyright: ignore [reportInvalidTypeForm]
         metric: ImageMetric,
         augment_id: str,
@@ -186,7 +187,7 @@ class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  igno
             )
 
             metric_aug_metadata.append(
-                _forward_md_keys(aug_md, metric_aug_md, forwarded_keys=["id", "nrtk_metric"]),
+                _forward_md_keys(md=aug_md, aug_md=metric_aug_md, forwarded_keys=["id", "nrtk_metric"]),
             )
 
         # return batch of augmented/original images, annotations and metric-updated metadata

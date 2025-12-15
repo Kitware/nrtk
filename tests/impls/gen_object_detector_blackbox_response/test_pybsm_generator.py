@@ -32,21 +32,21 @@ class TestPybsmGenerator:
         ("images", "img_gsds", "ground_truth", "expectation"),
         [
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(4)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(4)],
                 rng.random((4, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(4)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(4)],
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(2)],
                 rng.random((2, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11))],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11))],
                 pytest.raises(ValueError, match=r"Size mismatch."),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(2)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(2)],
                 rng.random((4, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(2)],
                 pytest.raises(ValueError, match=r"Size mismatch."),
             ),
         ],
@@ -71,37 +71,37 @@ class TestPybsmGenerator:
         ("images", "img_gsds", "ground_truth", "idx", "expectation"),
         [
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
                 rng.random((3, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 0,
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
                 rng.random((3, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 1,
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
                 rng.random((3, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 2,
                 does_not_raise(),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
                 rng.random((3, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 -1,
                 pytest.raises(IndexError),
             ),
             (
-                [rng.integers(0, 255, (256, 256, 3), dtype=np.uint8) for _ in range(3)],
+                [rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8) for _ in range(3)],
                 rng.random((3, 1)),
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(3)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(3)],
                 5,
                 pytest.raises(IndexError),
             ),
@@ -131,7 +131,7 @@ class TestPybsmGenerator:
             (
                 [np.array(Image.open(INPUT_IMG_FILE)) for _ in range(2)],
                 [3.19 / 160.0 for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(2)],
                 [
                     {
                         "perturber": PybsmPerturber,
@@ -149,7 +149,7 @@ class TestPybsmGenerator:
             (
                 [np.array(Image.open(INPUT_IMG_FILE)) for _ in range(2)],
                 [3.19 / 160.0 for _ in range(2)],
-                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(1, 11)) for _ in range(2)],
+                [gen_rand_dets(im_shape=(256, 256), n_dets=rng.integers(low=1, high=11)) for _ in range(2)],
                 [
                     {
                         "perturber": PybsmPerturber,
@@ -198,4 +198,4 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     assert not SimplePybsmGenerator.is_usable()
 
     with pytest.raises(PyBSMImportError):
-        SimplePybsmGenerator(None, None, None)  # type: ignore
+        SimplePybsmGenerator(images=None, img_gsds=None, ground_truth=None)  # type: ignore

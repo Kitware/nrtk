@@ -59,7 +59,7 @@ def gen_perturber_combinations(  # noqa: C901
         if len(factory) == 0:
             raise ValueError("Factory passed in with invald length of 0")
 
-    def _gen(factory_id: int, factory_sizes: list[int]) -> list[list[int]]:
+    def _gen(*, factory_id: int, factory_sizes: list[int]) -> list[list[int]]:
         """Recursive method to build up list of lists of perturber combinations.
 
         factory_id: Index of the factory to add to the combinations.

@@ -22,7 +22,7 @@ from typing import Any
 import numpy as np
 
 
-def default_sensor_scenario(config_type: str, data_dir: str | None = None) -> dict[str, Any]:  # noqa C901
+def default_sensor_scenario(*, config_type: str, data_dir: str | None = None) -> dict[str, Any]:  # noqa C901
     """Load default sensor and scenario configurations for a given configuration type.
 
     This function loads pre-defined sensor and scenario configurations from JSON files

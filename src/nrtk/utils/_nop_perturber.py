@@ -14,7 +14,7 @@ Usage:
 
 Example:
     nop_perturber = _NOPPerturber()
-    output_image = nop_perturber.perturb(input_image)
+    output_image = nop_perturber.perturb(image=input_image)
 """
 
 from __future__ import annotations
@@ -56,6 +56,7 @@ class _NOPPerturber(PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,

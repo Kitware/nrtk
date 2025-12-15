@@ -11,21 +11,21 @@ from nrtk.utils._exceptions import NRTKXAITKHelperImportError
 from nrtk.utils._import_guard import import_guard
 
 maite_available: bool = import_guard(
-    "maite",
-    NRTKXAITKHelperImportError,
-    ["protocols.object_detection"],
-    ["Model", "InputType"],
+    module_name="maite",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["protocols.object_detection"],
+    objects=["Model", "InputType"],
 ) and import_guard(
-    "maite",
-    NRTKXAITKHelperImportError,
-    ["protocols"],
-    ["ModelMetadata"],
+    module_name="maite",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["protocols"],
+    objects=["ModelMetadata"],
 )
-torch_available: bool = import_guard("torch", NRTKXAITKHelperImportError, fake_spec=True)
+torch_available: bool = import_guard(module_name="torch", exception=NRTKXAITKHelperImportError, fake_spec=True)
 ultralytics_available: bool = import_guard(
-    "ultralytics",
-    NRTKXAITKHelperImportError,
-    ["models"],
+    module_name="ultralytics",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["models"],
 )
 nrtk_xaitk_helpers_available: bool = maite_available and torch_available and ultralytics_available
 import torch  # noqa: E402
@@ -86,7 +86,7 @@ class MaiteYOLODetector(Model):
             Sequence[YOLODetectionTarget]: A list of YOLODetectionTarget instances containing the predictions for each
             image in the batch.
         """
-        imgs = [img.transpose(1, 2, 0) if img.shape[-1] != 3 else img for img in batch]  # pyright: ignore [reportAttributeAccessIssue]
+        imgs = [img.transpose(axes=(1, 2, 0)) if img.shape[-1] != 3 else img for img in batch]  # pyright: ignore [reportAttributeAccessIssue]
 
         with torch.no_grad():
             yolo_predictions = self._model(imgs, stream=True, verbose=False)  # Run inference
@@ -95,9 +95,9 @@ class MaiteYOLODetector(Model):
 
         return [
             YOLODetectionTarget(
-                p.boxes.xyxy.cpu(),  # Bounding boxes in (x_min, y_min, x_max, y_max) format
-                p.boxes.cls.cpu(),  # Class indices for the detected objects
-                p.boxes.conf.cpu(),  # Confidence scores for the detections
+                boxes=p.boxes.xyxy.cpu(),  # Bounding boxes in (x_min, y_min, x_max, y_max) format
+                labels=p.boxes.cls.cpu(),  # Class indices for the detected objects
+                scores=p.boxes.conf.cpu(),  # Confidence scores for the detections
             )
             for p in yolo_predictions
         ]
@@ -122,7 +122,10 @@ class MaiteYOLODetector(Model):
                 for bbox, label, score in zip(det.boxes, det.labels, det.scores, strict=False):
                     score_dict = dict.fromkeys(range(10), 0.0)  # Ensure all class labels exist
                     score_dict[int(label.item())] = float(score.item())
-                    bbox = AxisAlignedBoundingBox((bbox[0].item(), bbox[1].item()), (bbox[2].item(), bbox[3].item()))
+                    bbox = AxisAlignedBoundingBox(
+                        min_vertex=(bbox[0].item(), bbox[1].item()),
+                        max_vertex=(bbox[2].item(), bbox[3].item()),
+                    )
                     results.append(
                         (bbox, score_dict),
                     )

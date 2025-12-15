@@ -37,6 +37,7 @@ from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -53,6 +54,7 @@ class RadialDistortionPerturber(PerturbImage):
 
     def __init__(
         self,
+        *,
         k: Sequence[float] = [0, 0, 0],
         color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
@@ -73,6 +75,7 @@ class RadialDistortionPerturber(PerturbImage):
 
     def _radial_transform(
         self,
+        *,
         x0: np.ndarray[Any, Any],
         y0: np.ndarray[Any, Any],
         w: float,
@@ -115,8 +118,10 @@ class RadialDistortionPerturber(PerturbImage):
 
         return x1, y1
 
+    @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **_: Any,
@@ -142,7 +147,7 @@ class RadialDistortionPerturber(PerturbImage):
 
         # Get distorted coordinates
         x0, y0 = np.meshgrid(np.arange(image.shape[1]), np.arange(image.shape[0]))
-        x1, y1 = self._radial_transform(x0, y0, w, h, self.k)
+        x1, y1 = self._radial_transform(x0=x0, y0=y0, w=w, h=h, k=self.k)
 
         # Valid index mask
         valid_mask = (x1 >= 0) & (x1 < image.shape[1]) & (y1 >= 0) & (y1 < image.shape[0])
@@ -163,13 +168,14 @@ class RadialDistortionPerturber(PerturbImage):
                 y0 = np.array([min_y, min_y, max_y, max_y])
 
                 # Transform corners
-                x1, y1 = self._radial_transform(x0, y0, w, h, [-k for k in self.k])
+                x1, y1 = self._radial_transform(x0=x0, y0=y0, w=w, h=h, k=[-k for k in self.k])
 
                 # New axis-aligned bounding box from distorted corners
                 boxes[i] = (self._align_box(np.transpose([x1, y1])), label)
 
         return out.astype(np.uint8), boxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RadialDistortionPerturber instance."""
         cfg = super().get_config()

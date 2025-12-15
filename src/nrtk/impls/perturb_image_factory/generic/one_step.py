@@ -38,6 +38,7 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
 
     def __init__(
         self,
+        *,
         perturber: type[PerturbImage],
         theta_key: str,
         theta_value: float,

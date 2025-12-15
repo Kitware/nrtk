@@ -95,7 +95,7 @@ class TestComposePerturber:
 
         with open(str(config_file_path)) as config_file:
             config = json.load(config_file)
-            hydrated_perturber = from_config_dict(config, PerturbImage.get_impls())
+            hydrated_perturber = from_config_dict(config=config, type_iter=PerturbImage.get_impls())
             hydrated_perturber_config = hydrated_perturber.get_config()
 
             assert original_perturber_config == hydrated_perturber_config
@@ -104,22 +104,22 @@ class TestComposePerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = ComposePerturber(perturbers=[_NOPPerturber(), _NOPPerturber()])
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
     def test_bounding_box_threading(self) -> None:
         """Test that bounding boxes are properly threaded through sequential perturbers."""
-        image = np.arange(64, dtype=np.uint8).reshape(8, 8, 1)
+        image = np.arange(64, dtype=np.uint8).reshape(8, 8, 1)  # noqa: FKA100, RUF100
 
         # Use one box that covers the entire image to ensure it survives both crops
         initial_box: list[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] = [
@@ -133,14 +133,14 @@ class TestComposePerturber:
                 RandomCropPerturber(seed=78),
             ],
         )
-        compose_image, compose_box = compose_perturb.perturb(image, initial_box)
+        compose_image, compose_box = compose_perturb.perturb(image=image, boxes=initial_box)
 
         # Method 2: Manual sequential application
         crop1 = RandomCropPerturber(seed=77)
         crop2 = RandomCropPerturber(seed=78)
 
-        intermediate_image, intermediate_box = crop1.perturb(image, initial_box)
-        manual_image, manual_box = crop2.perturb(intermediate_image, intermediate_box)
+        intermediate_image, intermediate_box = crop1.perturb(image=image, boxes=initial_box)
+        manual_image, manual_box = crop2.perturb(image=intermediate_image, boxes=intermediate_box)
 
         # Both approaches must produce identical results
         assert np.array_equal(compose_image, manual_image)

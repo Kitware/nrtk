@@ -18,7 +18,7 @@ Usage:
 
 Example:
     snr_metric = SNRImageMetric()
-    snr_value = snr_metric.compute(image_data, additional_params={"axis": 0, "ddof": 0})
+    snr_value = snr_metric.compute(img_1=image_data, additional_params={"axis": 0, "ddof": 0})
 
 Notes:
     - SNR calculations are only supported for single images; attempting to pass a second
@@ -46,6 +46,7 @@ class SNRImageMetric(ImageMetric):
     @override
     def compute(  # noqa: C901
         self,
+        *,
         img_1: np.ndarray[Any, Any],
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
@@ -83,7 +84,7 @@ class SNRImageMetric(ImageMetric):
         if img_2 is not None:
             raise ValueError("Incorrect number of arguments. Computing SNR can only be done on a single image.")
 
-        if not additional_params:
+        if additional_params is None:
             additional_params = dict()
 
         # There are two optional params for SNR, axis and ddof, which both have default values of 0
@@ -130,6 +131,7 @@ class SNRImageMetric(ImageMetric):
 
 
 def _signal_to_noise(
+    *,
     img: np.ndarray,
     axis: int | tuple[int, ...] | None = None,
     ddof: int = 0,

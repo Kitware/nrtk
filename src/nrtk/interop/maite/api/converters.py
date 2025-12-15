@@ -16,7 +16,7 @@ from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectio
 from nrtk.utils._exceptions import KWCocoImportError
 from nrtk.utils._import_guard import import_guard
 
-is_usable: bool = import_guard("kwcoco", KWCocoImportError)
+is_usable: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 from kwcoco import CocoDataset  # type: ignore  # noqa: E402
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ def build_factory(data: NrtkPerturbInputSchema) -> PerturbImageFactory:
         config = json.load(config_file)
         if "PerturberFactory" not in config:
             raise ValueError(f'Config file at {data.config_file} does not have "PerturberFactory" key')
-        return from_config_dict(config["PerturberFactory"], PerturbImageFactory.get_impls())
+        return from_config_dict(config=config["PerturberFactory"], type_iter=PerturbImageFactory.get_impls())
 
 
 def load_COCOJATIC_dataset(  # noqa: N802

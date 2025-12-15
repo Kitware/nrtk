@@ -45,17 +45,17 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import DiffusionImportError
 from nrtk.utils._import_guard import import_guard
 
-torch_available: bool = import_guard("torch", DiffusionImportError, fake_spec=True)
-transformers_available: bool = import_guard("transformers", DiffusionImportError)
+torch_available: bool = import_guard(module_name="torch", exception=DiffusionImportError, fake_spec=True)
+transformers_available: bool = import_guard(module_name="transformers", exception=DiffusionImportError)
 diffusion_available: bool = import_guard(
-    "diffusers",
-    DiffusionImportError,
-    [
+    module_name="diffusers",
+    exception=DiffusionImportError,
+    submodules=[
         "pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix",
         "schedulers.scheduling_euler_ancestral_discrete",
     ],
 )
-pillow_available: bool = import_guard("PIL", DiffusionImportError, ["Image"])
+pillow_available: bool = import_guard(module_name="PIL", exception=DiffusionImportError, submodules=["Image"])
 import torch  # noqa: E402
 from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (  # noqa: E402
     StableDiffusionInstructPix2PixPipeline,
@@ -93,6 +93,7 @@ class DiffusionPerturber(PerturbImage):
 
     def __init__(
         self,
+        *,
         model_name: str = "timbrooks/instruct-pix2pix",
         prompt: str = "do not change the image",
         seed: int | None = 1,
@@ -268,7 +269,7 @@ class DiffusionPerturber(PerturbImage):
 
         # Lanczos resampling improves image quality: https://mazzo.li/posts/lanczos.html
         # Lancoz is more computationally expensive
-        return image.resize((new_w, new_h), Resampling.LANCZOS)
+        return image.resize(size=(new_w, new_h), resample=Resampling.LANCZOS)
 
     def _get_generator(self) -> torch.Generator | None:
         """Return torch generator. If seed provided this ensures reproducible results."""
@@ -281,6 +282,7 @@ class DiffusionPerturber(PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -355,6 +357,7 @@ class DiffusionPerturber(PerturbImage):
         }
 
     @classmethod
+    @override
     def is_usable(cls) -> bool:
         """Returns true if the necessary dependencies (torch, diffusers, and PIL) are available."""
         return torch_available and diffusion_available and pillow_available

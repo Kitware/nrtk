@@ -1,17 +1,24 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Callable
-from typing import Any
+from typing import Any, Protocol
 
 import numpy as np
 
 
+class ImageMetricProtocol(Protocol):
+    def __call__(
+        self,
+        *,
+        img_1: np.ndarray[Any, Any],
+        img_2: np.ndarray[Any, Any] | None = None,
+        additional_params: dict[str, Any] | None = None,
+    ) -> float: ...
+
+
 def image_metric_assertions(
-    computation: Callable[
-        [np.ndarray, np.ndarray | None, dict[str, Any] | None],
-        float,
-    ],
+    *,
+    computation: ImageMetricProtocol,
     img_1: np.ndarray,
     img_2: np.ndarray | None = None,
     additional_params: dict[str, Any] | None = None,
@@ -27,7 +34,7 @@ def image_metric_assertions(
     original_img_2 = copy.deepcopy(img_2) if img_2 is not None else None
     original_additional_params = copy.deepcopy(additional_params) if additional_params is not None else None
 
-    metric_value = computation(img_1, img_2, additional_params)
+    metric_value = computation(img_1=img_1, img_2=img_2, additional_params=additional_params)
 
     assert np.array_equal(original_img_1, img_1), "img_1 modified, data changed"
 

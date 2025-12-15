@@ -37,26 +37,26 @@ def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
     :param perturber: SKImage random_noise perturber class of interest.
     :param rng: Seed value.
     """
-    dummy_image_a = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
-    dummy_image_b = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+    dummy_image_a = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+    dummy_image_b = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
     # Test as seed value
     inst_1 = perturber(rng=rng)
-    out_1a, _ = inst_1(dummy_image_a)
-    out_1b, _ = inst_1(dummy_image_b)
+    out_1a, _ = inst_1(image=dummy_image_a)
+    out_1b, _ = inst_1(image=dummy_image_b)
     inst_2 = perturber(rng=rng)
-    out_2a, _ = inst_2(dummy_image_a)
-    out_2b, _ = inst_2(dummy_image_b)
+    out_2a, _ = inst_2(image=dummy_image_a)
+    out_2b, _ = inst_2(image=dummy_image_b)
     assert np.array_equal(out_1a, out_2a)
     assert np.array_equal(out_1b, out_2b)
 
     # Test generator
     inst_3 = perturber(rng=np.random.default_rng(rng))
-    out_3a, _ = inst_3(dummy_image_a)
-    out_3b, _ = inst_3(dummy_image_b)
+    out_3a, _ = inst_3(image=dummy_image_a)
+    out_3b, _ = inst_3(image=dummy_image_b)
     inst_4 = perturber(rng=np.random.default_rng(rng))
-    out_4a, _ = inst_4(dummy_image_a)
-    out_4b, _ = inst_4(dummy_image_b)
+    out_4a, _ = inst_4(image=dummy_image_a)
+    out_4b, _ = inst_4(image=dummy_image_b)
     assert np.array_equal(out_3a, out_4a)
     assert np.array_equal(out_3b, out_4b)
 
@@ -112,13 +112,13 @@ class TestSaltNoisePerturber:
 
     def test_default_rng_reproducibility(self) -> None:
         """Ensure results are reproducible with default rng (no rng parameter provided)."""
-        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Test without providing rng (uses default=1)
         inst_1 = SaltNoisePerturber()
-        out_1, _ = inst_1(dummy_image)
+        out_1, _ = inst_1(image=dummy_image)
         inst_2 = SaltNoisePerturber()
-        out_2, _ = inst_2(dummy_image)
+        out_2, _ = inst_2(image=dummy_image)
         assert np.array_equal(out_1, out_2)
 
     @pytest.mark.parametrize("rng", [2])
@@ -172,17 +172,17 @@ class TestSaltNoisePerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = SaltNoisePerturber(rng=42, amount=0.3)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -237,13 +237,13 @@ class TestPepperNoisePerturber:
 
     def test_default_rng_reproducibility(self) -> None:
         """Ensure results are reproducible with default rng (no rng parameter provided)."""
-        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Test without providing rng (uses default=1)
         inst_1 = PepperNoisePerturber()
-        out_1, _ = inst_1(dummy_image)
+        out_1, _ = inst_1(image=dummy_image)
         inst_2 = PepperNoisePerturber()
-        out_2, _ = inst_2(dummy_image)
+        out_2, _ = inst_2(image=dummy_image)
         assert np.array_equal(out_1, out_2)
 
     @pytest.mark.parametrize("rng", [2])
@@ -297,17 +297,17 @@ class TestPepperNoisePerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = PepperNoisePerturber(rng=42, amount=0.3)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -367,13 +367,13 @@ class TestSaltAndPepperNoisePerturber:
 
     def test_default_rng_reproducibility(self) -> None:
         """Ensure results are reproducible with default rng (no rng parameter provided)."""
-        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Test without providing rng (uses default=1)
         inst_1 = SaltAndPepperNoisePerturber()
-        out_1, _ = inst_1(dummy_image)
+        out_1, _ = inst_1(image=dummy_image)
         inst_2 = SaltAndPepperNoisePerturber()
-        out_2, _ = inst_2(dummy_image)
+        out_2, _ = inst_2(image=dummy_image)
         assert np.array_equal(out_1, out_2)
 
     @pytest.mark.parametrize("rng", [2])
@@ -457,17 +457,17 @@ class TestSaltAndPepperNoisePerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = SaltAndPepperNoisePerturber(rng=42, amount=0.3, salt_vs_pepper=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -523,13 +523,13 @@ class TestGaussianNoisePerturber:
 
     def test_default_rng_reproducibility(self) -> None:
         """Ensure results are reproducible with default rng (no rng parameter provided)."""
-        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Test without providing rng (uses default=1)
         inst_1 = GaussianNoisePerturber()
-        out_1, _ = inst_1(dummy_image)
+        out_1, _ = inst_1(image=dummy_image)
         inst_2 = GaussianNoisePerturber()
-        out_2, _ = inst_2(dummy_image)
+        out_2, _ = inst_2(image=dummy_image)
         assert np.array_equal(out_1, out_2)
 
     @pytest.mark.parametrize("rng", [2])
@@ -580,17 +580,17 @@ class TestGaussianNoisePerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = GaussianNoisePerturber(rng=42, mean=0.3, var=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -646,13 +646,13 @@ class TestSpeckleNoisePerturber:
 
     def test_default_rng_reproducibility(self) -> None:
         """Ensure results are reproducible with default rng (no rng parameter provided)."""
-        dummy_image = test_rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Test without providing rng (uses default=1)
         inst_1 = SpeckleNoisePerturber()
-        out_1, _ = inst_1(dummy_image)
+        out_1, _ = inst_1(image=dummy_image)
         inst_2 = SpeckleNoisePerturber()
-        out_2, _ = inst_2(dummy_image)
+        out_2, _ = inst_2(image=dummy_image)
         assert np.array_equal(out_1, out_2)
 
     @pytest.mark.parametrize("rng", [2])
@@ -703,17 +703,17 @@ class TestSpeckleNoisePerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = SpeckleNoisePerturber(rng=42, mean=0.3, var=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 

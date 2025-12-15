@@ -12,8 +12,13 @@ import numpy as np
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
-maite_available: bool = import_guard("maite", MaiteImportError, ["protocols.image_classification"], ["Dataset"])
-import_guard("maite.protocols", MaiteImportError)
+maite_available: bool = import_guard(
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols.image_classification"],
+    objects=["Dataset"],
+)
+import_guard(module_name="maite.protocols", exception=MaiteImportError)
 from maite.protocols import DatasetMetadata  # noqa: E402
 from maite.protocols.image_classification import (  # noqa: E402
     Dataset,
@@ -41,6 +46,7 @@ class JATICImageClassificationDataset(Dataset):  # pyright: ignore [reportGenera
 
     def __init__(
         self,
+        *,
         imgs: Sequence[np.ndarray[Any, Any]],
         labels: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
         datum_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]

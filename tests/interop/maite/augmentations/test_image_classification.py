@@ -88,7 +88,7 @@ class TestJATICDetectionAugmentation:
         md_copy = copy.deepcopy(md_in)
 
         # Get expected image and metadata from "normal" perturber
-        expected_img_out, _ = perturber(np.transpose(img_in, (1, 2, 0)))
+        expected_img_out, _ = perturber(image=np.transpose(img_in, (1, 2, 0)))
         # switch from channel last to channel first
         expected_img_out = np.transpose(expected_img_out, (2, 0, 1))
         expected_md_out = dict(md_in[0])
@@ -236,7 +236,7 @@ class TestJATICDetectionAugmentationWithMetric:
         md_copy = copy.deepcopy(self.md_in)
 
         # Get expected image and metadata from "normal" perturber
-        expected_img_out, _ = perturber(self.img_in)
+        expected_img_out, _ = perturber(image=self.img_in)
 
         with expectation:
             # Apply augmentation via adapter

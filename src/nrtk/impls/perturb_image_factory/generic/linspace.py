@@ -54,6 +54,7 @@ class LinspacePerturbImageFactory(PerturbImageFactory):
 
     def __init__(
         self,
+        *,
         perturber: type[PerturbImage],
         theta_key: str,
         start: float,

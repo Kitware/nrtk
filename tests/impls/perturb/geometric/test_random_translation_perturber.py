@@ -65,7 +65,7 @@ class TestRandomTranslationPerturber:
     @pytest.mark.parametrize(
         ("image"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)),
             (np.ones((256, 256, 3), dtype=np.float32)),
             (np.ones((256, 256, 3), dtype=np.float64)),
         ],
@@ -99,7 +99,7 @@ class TestRandomTranslationPerturber:
     @pytest.mark.parametrize(
         ("image", "seed"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
             (np.ones((256, 256, 3), dtype=np.float32), 2),
             (np.ones((256, 256, 3), dtype=np.float64), 2),
         ],

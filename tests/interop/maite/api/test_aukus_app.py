@@ -13,7 +13,7 @@ from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG
 
-is_usable: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
+is_usable: bool = import_guard(module_name="fastapi", exception=FastApiImportError, submodules=["encoders"])
 from fastapi.encoders import jsonable_encoder  # noqa: E402
 
 

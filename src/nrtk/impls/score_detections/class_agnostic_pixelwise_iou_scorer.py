@@ -11,7 +11,7 @@ Dependencies:
 
 Example usage:
     scorer = ClassAgnosticPixelwiseIoUScorer()
-    scores = scorer.score(actual_detections, predicted_detections)
+    scores = scorer.score(actual=actual_detections, predicted=predicted_detections)
 """
 
 __all__ = ["ClassAgnosticPixelwiseIoUScorer"]
@@ -39,6 +39,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
     @override
     def score(  # noqa: C901
         self,
+        *,
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
@@ -92,6 +93,7 @@ class ClassAgnosticPixelwiseIoUScorer(ScoreDetections):
 
         return ious
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Generates a serializable config that can be used to rehydrate object."""
         return {}

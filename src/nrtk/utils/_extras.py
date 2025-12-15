@@ -166,7 +166,7 @@ if __name__ == "__main__":
     with args.pyproject.open("rb") as f:
         pyproject: dict[str, Any] = tomllib.load(f)
 
-    extras: dict[str, list[str]] = pyproject.get("project", {}).get("optional-dependencies", {})
+    extras: dict[str, list[str]] = pyproject.get("project", dict()).get("optional-dependencies", dict())  # noqa: FKA100, RUF100
 
     with args.output.open("w") as f:
         yaml.dump(extras, f, sort_keys=True)

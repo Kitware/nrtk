@@ -16,14 +16,14 @@ import numpy as np
 from nrtk.utils._exceptions import NRTKXAITKHelperImportError
 from nrtk.utils._import_guard import import_guard
 
-PIL_available: bool = import_guard("PIL", NRTKXAITKHelperImportError)
+PIL_available: bool = import_guard(module_name="PIL", exception=NRTKXAITKHelperImportError)
 maite_available: bool = import_guard(
-    "maite",
-    NRTKXAITKHelperImportError,
-    ["protocols.image_classification"],
-    ["Dataset", "DatumMetadataType", "InputType", "TargetType"],
+    module_name="maite",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["protocols.image_classification"],
+    objects=["Dataset", "DatumMetadataType", "InputType", "TargetType"],
 )
-datasets_available: bool = import_guard("datasets", NRTKXAITKHelperImportError)
+datasets_available: bool = import_guard(module_name="datasets", exception=NRTKXAITKHelperImportError)
 nrtk_xaitk_helpers_available: bool = maite_available and PIL_available and datasets_available
 from datasets import Dataset as HFDataset  # noqa: E402
 from datasets import load_dataset  # noqa: E402
@@ -33,6 +33,7 @@ from PIL import Image  # noqa: E402
 
 
 def create_data_subset(
+    *,
     dataset_name: str,
     split: str = "test",
     fraction: float = 1.0,
@@ -97,7 +98,7 @@ def create_data_subset(
 class HuggingFaceMaiteDataset(Dataset):  # pyright:  ignore [reportGeneralTypeIssues]
     """Hugging Face dataset wrapper for MAITE image classification protocol."""
 
-    def __init__(self, hf_dataset: HFDataset, dataset_name: str) -> None:
+    def __init__(self, *, hf_dataset: HFDataset, dataset_name: str) -> None:
         """Wraps a Hugging Face dataset to comply with MAITE Dataset protocol.
 
         Args:

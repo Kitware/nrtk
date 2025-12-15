@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 from PIL import Image
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -15,8 +16,10 @@ class ResizePerturber(PerturbImage):
         self.w = w
         self.h = h
 
+    @override
     def perturb(
         self,
+        *,
         image: np.ndarray,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **_: Any,
@@ -27,10 +30,11 @@ class ResizePerturber(PerturbImage):
         img = np.array(img)
 
         if boxes:
-            scaled_boxes = self._rescale_boxes(boxes, image.shape, img.shape)
+            scaled_boxes = self._rescale_boxes(boxes=boxes, orig_shape=image.shape, new_shape=img.shape)
             return img, scaled_boxes
 
         return img, boxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         return {"w": self.w, "h": self.h}

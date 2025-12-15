@@ -95,7 +95,7 @@ class TestJATICObjectDetectionDataset:
             md_in = dataset[idx][2]
 
             # Get expected image and metadata from "normal" perturber
-            expected_img_out, _ = perturber(np.transpose(np.asarray(img_in), (1, 2, 0)))
+            expected_img_out, _ = perturber(image=np.transpose(np.asarray(img_in), (1, 2, 0)))
             # Channel last to channel first
             expected_img_out = np.transpose(expected_img_out, (2, 0, 1))
             expected_md_out = dict(md_in)

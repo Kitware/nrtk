@@ -18,7 +18,7 @@ Usage:
 
 Example:
     scorer = COCOScorer(gt_path="path/to/ground_truth.json", stat_index=0)
-    scores = scorer.score(actual_detections, predicted_detections)
+    scores = scorer.score(actual=actual_detections, predicted=predicted_detections)
 """
 
 __all__ = ["COCOScorer"]
@@ -55,7 +55,7 @@ class COCOScorer(ScoreDetections):
             Category ids for the data.
     """
 
-    def __init__(self, gt_path: str, stat_index: int = 0) -> None:
+    def __init__(self, *, gt_path: str, stat_index: int = 0) -> None:
         """Initializes the `COCOScorer` with a path to the ground truth data and a statistic index.
 
         Args:
@@ -73,6 +73,7 @@ class COCOScorer(ScoreDetections):
     @override
     def score(  # noqa: C901
         self,
+        *,
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
@@ -144,7 +145,7 @@ class COCOScorer(ScoreDetections):
             actual_coco_dt = self.coco_gt.loadRes(actual_entries)  # type: ignore
             predicted_coco_dt = self.coco_gt.loadRes(predicted_entries)  # type: ignore
 
-        coco_eval = COCOeval(actual_coco_dt, predicted_coco_dt, "bbox")
+        coco_eval = COCOeval(cocoGt=actual_coco_dt, cocoDt=predicted_coco_dt, iouType="bbox")
 
         final_scores = list()
         for img_id in list(set(batch_ids)):
@@ -159,6 +160,7 @@ class COCOScorer(ScoreDetections):
 
         return final_scores
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the configuration dictionary for the `COCOScorer` instance."""
         return {"gt_path": self.gt_path, "stat_index": self.stat_index}

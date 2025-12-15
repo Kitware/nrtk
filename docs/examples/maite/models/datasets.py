@@ -16,9 +16,13 @@ from PIL import Image
 from nrtk.utils._exceptions import MaiteImportError, TorchImportError
 from nrtk.utils._import_guard import import_guard
 
-import_guard("maite", MaiteImportError, ["protocols"])
-import_guard("torchvision", TorchImportError, ["torchvision.ops.boxes", "torchvision.transforms.functional"])
-import_guard("torch", TorchImportError)
+import_guard(module_name="maite", exception=MaiteImportError, submodules=["protocols"])
+import_guard(
+    module_name="torchvision",
+    exception=TorchImportError,
+    submodules=["torchvision.ops.boxes", "torchvision.transforms.functional"],
+)
+import_guard(module_name="torch", exception=TorchImportError)
 import maite.protocols as pr  # noqa: E402
 import torch  # noqa: E402
 from torch import Tensor  # noqa: E402
@@ -69,7 +73,7 @@ def _load_annotations(annotation_path: Path) -> pr.HasDataBoxesLabels:  # pyrigh
 
             # convert box from xywh in xyxy format
             box = torch.tensor(list(map(int, row[:4])))
-            box = box_convert(box, "xywh", "xyxy")
+            box = box_convert(boxes=box, in_fmt="xywh", out_fmt="xyxy")
             boxes.append(box)
 
             # change class label from 1...10 to 0...9
@@ -116,7 +120,7 @@ class VisDroneDataset:
         "motor",
     )
 
-    def __init__(self, root: Path | str, subset_ids: Sequence[str] | None = None) -> None:
+    def __init__(self, *, root: Path | str, subset_ids: Sequence[str] | None = None) -> None:
         """Load and initialize VisDroneDataset."""
         self._root: Path = Path(root)
 
@@ -129,7 +133,7 @@ class VisDroneDataset:
         image_dir = self._root / "images"
         annotation_dir = self._root / "annotations"
 
-        self._check_dirs(image_dir, annotation_dir)
+        self._check_dirs(image_dir=image_dir, annotation_dir=annotation_dir)
 
         all_image_paths = list(image_dir.glob("**/*.jpg"))
         all_image_ids = {p.stem for p in all_image_paths}
@@ -142,7 +146,7 @@ class VisDroneDataset:
         if subset_ids is not None:
             keep_ids = set(subset_ids)
 
-        self._check_ids(keep_ids, all_image_ids, all_annotation_ids)
+        self._check_ids(keep_ids=keep_ids, all_image_ids=all_image_ids, all_annotation_ids=all_annotation_ids)
 
         # store sorted image paths
         self._images = sorted([p for p in all_image_paths if p.stem in keep_ids])
@@ -164,7 +168,7 @@ class VisDroneDataset:
             self.brisque_scores = {rows[0]: rows[1] for rows in reader}
 
     @staticmethod
-    def _check_dirs(image_dir: Path, annotation_dir: Path) -> None:
+    def _check_dirs(*, image_dir: Path, annotation_dir: Path) -> None:
         """Validate existence of image_dir and annotation_dir."""
         if not image_dir.is_dir():
             raise IndexError("Subdirectory `image` doesn't exist")
@@ -172,7 +176,7 @@ class VisDroneDataset:
             raise IndexError("Subdirectory `annotation` doesn't exist")
 
     @staticmethod
-    def _check_ids(keep_ids: set, all_image_ids: set, all_annotation_ids: set) -> None:
+    def _check_ids(*, keep_ids: set, all_image_ids: set, all_annotation_ids: set) -> None:
         """Verify that all ids have image and annotation files."""
         for image_id in keep_ids:
             if image_id not in all_image_ids:

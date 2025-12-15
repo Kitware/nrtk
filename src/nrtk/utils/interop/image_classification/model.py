@@ -14,14 +14,14 @@ from nrtk.utils._exceptions import NRTKXAITKHelperImportError
 from nrtk.utils._import_guard import import_guard
 
 maite_available: bool = import_guard(
-    "maite",
-    NRTKXAITKHelperImportError,
-    ["protocols.image_classification"],
-    ["Model", "InputType", "TargetType"],
+    module_name="maite",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["protocols.image_classification"],
+    objects=["Model", "InputType", "TargetType"],
 )
-torch_available: bool = import_guard("torch", NRTKXAITKHelperImportError, fake_spec=True)
-PIL_available: bool = import_guard("PIL", NRTKXAITKHelperImportError)
-transformers_available: bool = import_guard("transformers", NRTKXAITKHelperImportError)
+torch_available: bool = import_guard(module_name="torch", exception=NRTKXAITKHelperImportError, fake_spec=True)
+PIL_available: bool = import_guard(module_name="PIL", exception=NRTKXAITKHelperImportError)
+transformers_available: bool = import_guard(module_name="transformers", exception=NRTKXAITKHelperImportError)
 import torch  # noqa: E402
 from maite.protocols import ModelMetadata  # noqa: E402
 from maite.protocols.image_classification import (  # noqa: E402
@@ -38,7 +38,7 @@ nrtk_xaitk_helpers_available: bool = maite_available and torch_available and PIL
 class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
     """Hugging Face model wrapper that conforms to the MAITE ic.Model protocol."""
 
-    def __init__(self, model_name: str, device: str) -> None:
+    def __init__(self, *, model_name: str, device: str) -> None:
         """Initialize a Hugging Face model wrapper that conforms to the MAITE Model protocol.
 
         Args:
@@ -97,6 +97,7 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
 
     @staticmethod
     def _remap_model_output(
+        *,
         model_probs: Sequence[np.ndarray],
         model_to_dataset_mapping: dict[int, int],
     ) -> Sequence[TargetType]:  # pyright: ignore [reportInvalidTypeForm]
@@ -136,7 +137,7 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
             Sequence[np.ndarray]: A sequence of arrays containing class probabilities.
         """
         # Convert batch to PIL images (assuming input format is ArrayLike)
-        pil_images = [Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0)) for img in batch]
+        pil_images = [Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0)) for img in batch]  # noqa: FKA100, RUF100
 
         # Preprocess images
         inputs = self.processor(images=pil_images, return_tensors="pt")
@@ -151,9 +152,9 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
         probabilities = torch.nn.functional.softmax(logits, dim=-1).cpu().numpy()
 
         return self._remap_model_output(
-            [probs for probs in probabilities],
-            self.model2dataset_mapping,
-        )  # Returning probabilities for each image
+            model_probs=[probs for probs in probabilities],
+            model_to_dataset_mapping=self.model2dataset_mapping,
+        )  # Returning probabilities for each imageg140
 
     def extract_features(
         self,
@@ -168,7 +169,7 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
             torch.Tensor: Feature vector as a torch tensor
         """
         # Convert batch to PIL images (assuming input format is ArrayLike)
-        pil_images = [Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0)) for img in batch]
+        pil_images = [Image.fromarray(np.asarray(img).astype(np.uint8).transpose(1, 2, 0)) for img in batch]  # noqa: FKA100, RUF100
         # Preprocess image
         inputs = self.processor(images=pil_images, return_tensors="pt").to(self.device)
 
@@ -178,8 +179,8 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
         return torch.tensor(
             np.array(
                 self._remap_model_output(
-                    [logit for logit in logits.cpu().numpy()],
-                    self.model2dataset_mapping,
+                    model_probs=[logit for logit in logits.cpu().numpy()],
+                    model_to_dataset_mapping=self.model2dataset_mapping,
                 ),
             ),
         )

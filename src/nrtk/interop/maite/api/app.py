@@ -18,7 +18,7 @@ from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard
 
-fastapi_available: bool = import_guard("fastapi", FastApiImportError)
+fastapi_available: bool = import_guard(module_name="fastapi", exception=FastApiImportError)
 from fastapi import FastAPI, HTTPException  # noqa: E402
 
 

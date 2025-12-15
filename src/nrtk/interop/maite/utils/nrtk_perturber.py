@@ -14,11 +14,15 @@ from nrtk.interop.maite.datasets.object_detection import JATICObjectDetectionDat
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
-maite_available: bool = import_guard("maite", MaiteImportError, ["protocols.object_detection"])
+maite_available: bool = import_guard(
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols.object_detection"],
+)
 from maite.protocols.object_detection import Dataset  # noqa: E402
 
 
-def nrtk_perturber(maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportInvalidTypeForm]
+def nrtk_perturber(*, maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportInvalidTypeForm]
     """Generate augmented dataset(s) of type maite.protocols.object_detection.Dataset.
 
     Generate augmented dataset(s) of type maite.protocols.object_detection.Dataset

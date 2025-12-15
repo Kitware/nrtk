@@ -12,7 +12,7 @@ from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER
 
-kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+kwcoco_available: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 import kwcoco  # type: ignore  # noqa: E402
 from maite.protocols.object_detection import DatumMetadataType  # noqa: E402
 

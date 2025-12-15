@@ -48,6 +48,7 @@ class HazePerturber(PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         depth_map: np.ndarray[Any, Any] | None = None,
@@ -94,13 +95,14 @@ class HazePerturber(PerturbImage):
 
         return output.astype(np.uint8), boxes
 
-    def _check_sky_color(self, image: np.ndarray, sky_color: list[float]) -> list[float]:
+    def _check_sky_color(self, *, image: np.ndarray, sky_color: list[float]) -> list[float]:
         if (len(image.shape) == 3 and len(sky_color) != 3) or (len(image.shape) == 2 and len(sky_color) != 1):
             raise ValueError(
                 f"image bands ({3 if len(image.shape) == 3 else 1}) do not match sky_color bands ({len(sky_color)})",
             )
         return sky_color
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the HazePerturber instance."""
         cfg = super().get_config()

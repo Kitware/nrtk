@@ -42,6 +42,7 @@ class RandomTranslationPerturber(PerturbImage):
 
     def __init__(
         self,
+        *,
         seed: int | np.random.Generator | None = 1,
         color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
@@ -65,6 +66,7 @@ class RandomTranslationPerturber(PerturbImage):
     @override
     def perturb(  # noqa: C901
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         max_translation_limit: tuple[int, int] | None = None,
@@ -99,9 +101,9 @@ class RandomTranslationPerturber(PerturbImage):
         # Randomly select the translation magnitude for each direction
         translate_x, translate_y = (0, 0)
         if translate_w > 0:
-            translate_x = self.rng.integers(-translate_w, translate_w)
+            translate_x = self.rng.integers(low=-translate_w, high=translate_w)
         if translate_h > 0:
-            translate_y = self.rng.integers(-translate_h, translate_h)
+            translate_y = self.rng.integers(low=-translate_h, high=translate_h)
 
         # Apply background color fill based on the number of image dimensions
         if image.ndim == 3:
@@ -161,10 +163,11 @@ class RandomTranslationPerturber(PerturbImage):
                 shifted_max = (shifted_max_x, shifted_max_y)
 
                 # Apply the shifted coordinates to the output bounding box
-                adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
+                adjusted_box = AxisAlignedBoundingBox(min_vertex=shifted_min, max_vertex=shifted_max)
                 adjusted_bboxes.append((adjusted_box, metadata))
         return final_image, adjusted_bboxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomTranslationPerturber instance."""
         cfg = super().get_config()

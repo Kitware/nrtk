@@ -24,6 +24,7 @@ from typing import Any
 
 import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -39,6 +40,7 @@ class RandomCropPerturber(PerturbImage):
 
     def __init__(
         self,
+        *,
         crop_size: tuple[int, int] | None = None,
         seed: int | np.random.Generator | None = 1,
     ) -> None:
@@ -61,6 +63,7 @@ class RandomCropPerturber(PerturbImage):
 
     @staticmethod
     def _compute_bboxes(
+        *,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         crop_x: int,
         crop_y: int,
@@ -70,7 +73,10 @@ class RandomCropPerturber(PerturbImage):
         """Compute the intersect-shifted bbox coordinates."""
         adjusted_bboxes = []
         for bbox, metadata in boxes:
-            crop_box = AxisAlignedBoundingBox((crop_y, crop_x), (crop_y + crop_h, crop_x + crop_w))
+            crop_box = AxisAlignedBoundingBox(
+                min_vertex=(crop_y, crop_x),
+                max_vertex=(crop_y + crop_h, crop_x + crop_w),
+            )
             # Calculate intersection of the bounding box with the crop region
             intersected_box = bbox.intersection(crop_box)
             if intersected_box:
@@ -83,12 +89,13 @@ class RandomCropPerturber(PerturbImage):
                     intersected_box.max_vertex[0] - crop_y,
                     intersected_box.max_vertex[1] - crop_x,
                 )
-                adjusted_box = AxisAlignedBoundingBox(shifted_min, shifted_max)
+                adjusted_box = AxisAlignedBoundingBox(min_vertex=shifted_min, max_vertex=shifted_max)
                 adjusted_bboxes.append((adjusted_box, metadata))
         return adjusted_bboxes
 
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **_: Any,
@@ -120,8 +127,8 @@ class RandomCropPerturber(PerturbImage):
         crop_w = min(crop_w, orig_w)
 
         # Randomly select the top-left corner of the crop
-        crop_x = self.rng.integers(0, orig_w - crop_w)
-        crop_y = self.rng.integers(0, orig_h - crop_h)
+        crop_x = self.rng.integers(low=0, high=(orig_w - crop_w))
+        crop_y = self.rng.integers(low=0, high=(orig_h - crop_h))
 
         # Perform the crop
         cropped_image = image[crop_y : crop_y + crop_h, crop_x : crop_x + crop_w].copy()
@@ -139,6 +146,7 @@ class RandomCropPerturber(PerturbImage):
         )
         return cropped_image, adjusted_bboxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomCropPerturber instance."""
         cfg = super().get_config()

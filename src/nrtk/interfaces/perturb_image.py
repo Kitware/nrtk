@@ -14,12 +14,12 @@ Usage:
 
 Example:
     class CustomPerturbImage(PerturbImage):
-        def perturb(self, image, **additional_params:
+        def perturb(self, *, image, **additional_params:
             # Custom perturbation logic here
             pass
 
     perturber = CustomPerturbImage()
-    perturbed_image = perturber(image_data)
+    perturbed_image = perturber(image=image_data)
 """
 
 from __future__ import annotations
@@ -45,6 +45,7 @@ class PerturbImage(Plugfigurable):
     @abc.abstractmethod
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -69,10 +70,11 @@ class PerturbImage(Plugfigurable):
             Iterable of tuples containing the bounding boxes for detections in the image. If an implementation
                 modifies the size of an image, it is expected to modify the bounding boxes as well.
         """
-        return image, boxes
+        return np.copy(image), boxes
 
     def _rescale_boxes(
         self,
+        *,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
         orig_shape: ArrayLike,
         new_shape: ArrayLike,
@@ -102,8 +104,8 @@ class PerturbImage(Plugfigurable):
             x0, y0 = box.min_vertex
             x1, y1 = box.max_vertex
             scaled_box = AxisAlignedBoundingBox(
-                (x0 * x_factor, y0 * y_factor),
-                (x1 * x_factor, y1 * y_factor),
+                min_vertex=(x0 * x_factor, y0 * y_factor),
+                max_vertex=(x1 * x_factor, y1 * y_factor),
             )
             scaled_boxes.append((scaled_box, score_dict))
 
@@ -124,12 +126,13 @@ class PerturbImage(Plugfigurable):
         """
         vertices = np.asarray(vertices)
         return AxisAlignedBoundingBox(
-            tuple(np.min(vertices, axis=0)),
-            tuple(np.max(vertices, axis=0)),
+            min_vertex=tuple(np.min(vertices, axis=0)),
+            max_vertex=tuple(np.max(vertices, axis=0)),
         )
 
     def __call__(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,

@@ -16,9 +16,9 @@ from .test_scorer_utils import _class_map, scorer_assertions
 
 class TestClassAgnosticPixelwiseIoUScorer:
     dummy_actual = [
-        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category": "dummy_class_1"})],
+        [(AxisAlignedBoundingBox(min_vertex=[1, 1], max_vertex=[2, 2]), {"category": "dummy_class_1"})],
     ]
-    dummy_pred_box = AxisAlignedBoundingBox([1, 1], [2, 2])
+    dummy_pred_box = AxisAlignedBoundingBox(min_vertex=[1, 1], max_vertex=[2, 2])
     dummy_pred_class = _class_map(
         classes=("dummy_class_1", "dummy_class_2"),
         scores=[0.9, 0.1],
@@ -26,8 +26,8 @@ class TestClassAgnosticPixelwiseIoUScorer:
     dummy_predicted = [[(dummy_pred_box, dummy_pred_class)]]
 
     dummy_actual_test_len_mismatch = [
-        [(AxisAlignedBoundingBox([1, 1], [2, 2]), {"category": "dummy_class_1"})],
-        [(AxisAlignedBoundingBox([2, 2], [3, 3]), {"category": "dummy_class_2"})],
+        [(AxisAlignedBoundingBox(min_vertex=[1, 1], max_vertex=[2, 2]), {"category": "dummy_class_1"})],
+        [(AxisAlignedBoundingBox(min_vertex=[2, 2], max_vertex=[3, 3]), {"category": "dummy_class_2"})],
     ]
 
     dummy_empty = [[]]  # type: ignore

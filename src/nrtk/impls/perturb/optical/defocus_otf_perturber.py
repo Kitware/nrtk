@@ -35,7 +35,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
 # Import checks
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation"])
+pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
 
 from pybsm.simulation import DefocusSimulator, ImageSimulator  # noqa: E402
 
@@ -52,6 +52,7 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
 
     def __init__(
         self,
+        *,
         w_x: float | None = None,
         w_y: float | None = None,
         interp: bool = True,

@@ -50,7 +50,7 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import PillowImportError
 from nrtk.utils._import_guard import import_guard
 
-pillow_available: bool = import_guard("PIL", PillowImportError)
+pillow_available: bool = import_guard(module_name="PIL", exception=PillowImportError)
 from PIL import Image, ImageEnhance  # noqa: E402
 from PIL.Image import Image as PILImage  # noqa: E402
 
@@ -85,6 +85,7 @@ class _PerturbImage(PerturbImage):
 
     def _perturb(
         self,
+        *,
         enhancement: type[_Enhancement],
         image: NDArray[Any],
     ) -> NDArray[Any]:
@@ -123,6 +124,7 @@ class _PerturbImage(PerturbImage):
         return cfg
 
     @classmethod
+    @override
     def is_usable(cls) -> bool:
         """Returns true if the required PIL module is available."""
         return pillow_available
@@ -134,6 +136,7 @@ class BrightnessPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -156,6 +159,7 @@ class ColorPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -178,6 +182,7 @@ class ContrastPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -209,6 +214,7 @@ class SharpnessPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,

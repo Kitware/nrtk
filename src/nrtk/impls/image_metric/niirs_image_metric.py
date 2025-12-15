@@ -10,7 +10,7 @@ Dependencies:
 
 Example usage:
     niirs_metric = NIIRSImageMetric(...)
-    result = niirs_metric.compute_metric(image)
+    result = niirs_metric.compute_metric(img_1=image)
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["metrics"])
+pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["metrics"])
 from pybsm.metrics import niirs5  # noqa: E402
 from pybsm.simulation.scenario import Scenario  # noqa: E402
 from pybsm.simulation.sensor import Sensor  # noqa: E402
@@ -50,6 +50,7 @@ class NIIRSImageMetric(ImageMetric):
 
     def __init__(
         self,
+        *,
         sensor_name: str = "Sensor",
         D: float = 275e-3,  # noqa:N803
         f: float = 4,
@@ -234,6 +235,7 @@ class NIIRSImageMetric(ImageMetric):
     @override
     def compute(
         self,
+        *,
         img_1: np.ndarray[Any, Any] | None = None,
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
@@ -262,6 +264,7 @@ class NIIRSImageMetric(ImageMetric):
     @override
     def __call__(
         self,
+        *,
         img_1: np.ndarray[Any, Any] | None = None,
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
@@ -283,7 +286,7 @@ class NIIRSImageMetric(ImageMetric):
         Returns:
             The NIIRS metric for the given Sensor and Scenario.
         """
-        return self.compute()
+        return self.compute(img_1=img_1, img_2=img_2, additional_params=additional_params)
 
     @override
     def get_config(self) -> dict[str, Any]:
@@ -326,6 +329,7 @@ class NIIRSImageMetric(ImageMetric):
         }
 
     @classmethod
+    @override
     def is_usable(cls) -> bool:
         """Returns True if the required pybsm module is available."""
         return pybsm_available

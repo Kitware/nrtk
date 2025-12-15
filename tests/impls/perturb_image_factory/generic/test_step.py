@@ -149,7 +149,7 @@ class TestStepPerturbImageFactory:
             ),
             (
                 {
-                    "perturber": DummyPerturber(1, 2),
+                    "perturber": DummyPerturber(param1=1, param2=2),
                     "theta_key": "param2",
                     "start": 1.0,
                     "stop": 2.0,
@@ -193,7 +193,7 @@ class TestStepPerturbImageFactory:
 
         with open(str(config_file_path)) as config_file:
             config = json.load(config_file)
-            hydrated_factory = from_config_dict(config, PerturbImageFactory.get_impls())
+            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
             hydrated_factory_config = hydrated_factory.get_config()
 
             assert original_factory_config == hydrated_factory_config
@@ -215,7 +215,7 @@ class TestStepPerturbImageFactory:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation, open(str(DATA_DIR / config_file_name)) as config_file:
             config = json.load(config_file)
-            from_config_dict(config, PerturbImageFactory.get_impls())
+            from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
 
     @pytest.mark.parametrize(
         ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),

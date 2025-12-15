@@ -1,6 +1,6 @@
 import copy
-from collections.abc import Callable, Hashable, Sequence
-from typing import Any
+from collections.abc import Hashable, Sequence
+from typing import Any, Protocol
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
@@ -14,14 +14,18 @@ def _class_map(classes: Sequence, scores: Sequence) -> dict[Hashable, float]:
     return d
 
 
+class ScorerProtocol(Protocol):
+    def __call__(
+        self,
+        *,
+        actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
+        predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
+    ) -> Sequence[float]: ...
+
+
 def scorer_assertions(
-    scorer: Callable[
-        [
-            Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
-            Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
-        ],
-        Sequence[float],
-    ],
+    *,
+    scorer: ScorerProtocol,
     actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
     predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
 ) -> None:
@@ -36,7 +40,7 @@ def scorer_assertions(
     actual_copy = copy.deepcopy(actual)
     predicted_copy = copy.deepcopy(predicted)
 
-    scores_sequence = scorer(actual, predicted)
+    scores_sequence = scorer(actual=actual, predicted=predicted)
 
     assert actual == actual_copy
     assert predicted == predicted_copy

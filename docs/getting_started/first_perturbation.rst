@@ -39,7 +39,7 @@ Below is some example code that applies a Jitter OTF transformation:
     image = np.array(Image.open(INPUT_IMG_FILE))
 
     otf = JitterOTFPerturber(s_x=8e-6, s_y=8e-6)
-    out_image = otf.perturb(image)
+    out_image = otf.perturb(image=image)
 
 This code uses default values and provides a sample input image. However, you can adjust the parameters and use your
 own image to visualize the perturbation. The ``s_x`` and ``s_y`` parameters (the root-mean-squared jitter amplitudes in

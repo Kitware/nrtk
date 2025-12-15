@@ -40,7 +40,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
     """
 
     @staticmethod
-    def _build_set_list(layer: int, top: Sequence[int]) -> Sequence[list[int]]:
+    def _build_set_list(*, layer: int, top: Sequence[int]) -> Sequence[list[int]]:
         """Recursively builds a list of index sets to access combinations of parameter values.
 
         Args:
@@ -54,11 +54,14 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
             return [[i] for i in range(top[layer])]
 
         return [
-            [i] + e for i in range(top[layer]) for e in MultivariatePerturbImageFactory._build_set_list(layer + 1, top)
+            [i] + e
+            for i in range(top[layer])
+            for e in MultivariatePerturbImageFactory._build_set_list(layer=layer + 1, top=top)
         ]
 
     def __init__(
         self,
+        *,
         perturber: type[PerturbImage],
         theta_keys: Iterable[str],
         thetas: Sequence[Any],
@@ -81,7 +84,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         self._thetas = thetas
 
         top = [len(entry) for entry in self.thetas]
-        self.sets: Sequence[list[int]] = MultivariatePerturbImageFactory._build_set_list(0, top)
+        self.sets: Sequence[list[int]] = MultivariatePerturbImageFactory._build_set_list(layer=0, top=top)
         self.n: int = 0
         self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
@@ -151,6 +154,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         return "params"
 
     @classmethod
+    @override
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
         """Rehydrates an object instance from a serializable config dictionary.
 

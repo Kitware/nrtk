@@ -9,12 +9,12 @@ Dependencies:
 
 Example usage:
     class SpecificMetric(ImageMetric):
-        def compute(self, img_1, img_2=None, additional_params=None):
+        def compute(self, *, img_1, img_2=None, additional_params=None):
             # Define metric calculation logic here.
             pass
 
     metric = SpecificMetric()
-    score = metric(img_1, img_2)
+    score = metric(img_1=img_1, img_2=img_2)
 """
 
 from __future__ import annotations
@@ -26,6 +26,7 @@ from typing import Any
 
 import numpy as np
 from smqtk_core.plugfigurable import Plugfigurable
+from typing_extensions import override
 
 
 class ImageMetric(Plugfigurable):
@@ -34,6 +35,7 @@ class ImageMetric(Plugfigurable):
     @abc.abstractmethod
     def compute(
         self,
+        *,
         img_1: np.ndarray[Any, Any],
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
@@ -55,6 +57,7 @@ class ImageMetric(Plugfigurable):
 
     def __call__(
         self,
+        *,
         img_1: np.ndarray[Any, Any],
         img_2: np.ndarray[Any, Any] | None = None,
         additional_params: dict[str, Any] | None = None,
@@ -73,7 +76,7 @@ class ImageMetric(Plugfigurable):
             A single scalar value representing an implementation's computed metric. Implementations
             should impart no side effects upon either input image or the additional parameters.
         """
-        return self.compute(img_1, img_2, additional_params)
+        return self.compute(img_1=img_1, img_2=img_2, additional_params=additional_params)
 
     @property
     def name(self) -> str:
@@ -84,6 +87,7 @@ class ImageMetric(Plugfigurable):
         """
         return self.__class__.__name__
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the config for the interface."""
         return {}
