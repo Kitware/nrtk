@@ -4,7 +4,7 @@
 .trigger_containers:
   stage: container
   trigger:
-    include: .gitlab-ci/pipelines/.gitlab-container.yml"
+    include: .gitlab-ci/pipelines/.gitlab-container.yml
     strategy: depend
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -18,9 +18,9 @@
     CONTAINER_NAME: ""
     DOCKERFILE_FILE: ""
 
-trigger_aukus:
+trigger_nrtk:
   extends: .trigger_containers
   variables:
-    CONTAINER_NAME: "aukus"
+    CONTAINER_NAME: "nrtk-perturber"
     DOCKERFILE_FILE: "Dockerfile"
     PIPELINE_CONTEXT: "$CI_PIPELINE_SOURCE"

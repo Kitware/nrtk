@@ -3,6 +3,7 @@
 ###############################################################################
 stages:
   - build
+  - sign
   - scan
   - test
 
@@ -22,8 +23,19 @@ include:
       HARBOR_REPO: "$CI_PROJECT_NAME"
     before_script:
       - echo ${KITWARE_HARBOR_TOKEN} | docker login ${HARBOR_URL}:${HARBOR_PORT}/v2 --username 'robot$kitware+robot' --password-stdin || echo "Failed to login to Harbor..."
-      # create the docker image tag
-      - IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+      - NRTK_MAJOR_MINOR=$(awk -F '"' '/^version *=/ {split($2,v,"."); print v[1]"."v[2]; exit}' pyproject.toml)
+
+      - apk update
+      - apk add --no-cache curl jq
+      - |
+        ARTIFACT_API="https://${HARBOR_URL}/api/v2.0/projects/${HARBOR_PROJECT}/repositories/${HARBOR_REPO}%252F${CONTAINER_NAME}/artifacts"
+
+        RESPONSE=$(curl --fail-with-body -X 'GET' ${ARTIFACT_API})
+
+        LATEST_TAG=$(echo "${RESPONSE}" \
+        | jq --arg nrtk_major_minor "$NRTK_MAJOR_MINOR" -r '[.[]|.tags[]?.name | select(startswith("v\($nrtk_major_minor)."))] | sort_by(ltrimstr("v")|split(".") | map(tonumber)) | last')
+
     after_script:
       - echo "Logging out from Harbor..."
       - docker logout ${HARBOR_URL}:${HARBOR_PORT} || echo "Failed to logout from Harbor..."
@@ -36,8 +48,20 @@ include:
 build:
   extends: .container-setup
   stage: build
+  before_script:
+    - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag contains ${NRTK_MAJOR_MINOR}"
+        IMAGE_TAG="v${NRTK_MAJOR_MINOR}.0"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG=$(echo "$LATEST_TAG" | awk -F. '{printf("v%d.%d.%d", $1, $2, $3+1)}')
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
   script:
-    # - echo "Image tag: ${IMAGE_PATH}"
     - |
       echo "Image tag: ${IMAGE_PATH}"
 
@@ -46,12 +70,47 @@ build:
       --build-arg="PYTHON_VERSION=${PYTHON_VERSION}" \
       --build-arg="PROJECT_PATH=${CI_BUILDS_DIR}/${CI_PROJECT_PATH}" \
       --build-arg="CI_JOB_TOKEN=${CI_JOB_TOKEN}" \
+      --platform linux/amd64 \
       --no-cache \
       -f "${DOCKERFILE_FILE}" \
       .
 
     - echo "Pushing image to Harbor..."
     - docker push ${IMAGE_PATH}
+
+# Currently disabled while setting up gitlab keys
+# sign:
+#   extends: .container-setup
+#   stage: sign
+#   needs:
+#     - job: build
+#       artifacts: false
+#   allow_failure: true
+#   variables:
+#     COSIGN_YES: "true"  # Used by Cosign to skip confirmation prompts for non-destructive operations
+#   id_tokens:
+#     SIGSTORE_ID_TOKEN:  # Used by Cosign to get certificate from Fulcio
+#       aud: sigstore
+#   before_script:
+#     - !reference [.container-setup, before_script]
+#     - |
+#       if [ "$LATEST_TAG" == "null" ]; then
+#         echo "No image tag found. Defaulting to  latest."
+#         IMAGE_TAG="latest"
+#       else
+#         echo "Found ${LATEST_TAG} as the latest tag"
+#         IMAGE_TAG="${LATEST_TAG}"
+#       fi
+
+#       echo "Image tag ${IMAGE_TAG}"
+#       IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+
+#     - apk add --no-cache cosign
+#   script:
+#     - echo "Pulling image from Harbor..."
+#     - docker pull "${IMAGE_PATH}"
+#     - IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_PATH")
+#     - cosign sign "$IMAGE_DIGEST"
 
 scan:
   extends: .container-setup
@@ -60,17 +119,31 @@ scan:
     - job: build
       artifacts: false
   allow_failure: true
-  script:
+  before_script:
+    - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag found. Defaulting to  latest."
+        IMAGE_TAG="latest"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG="${LATEST_TAG}"
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+
     - apk add --no-cache curl docker
     - echo "Installing Trivy..."
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
     - curl -sSfL -o junit.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/junit.tpl
-
+  script:
     - echo "Pulling image from Harbor..."
     - docker pull "${IMAGE_PATH}"
+    - IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_PATH")
 
     - echo "Scanning image with Trivy..."
-    - ./bin/trivy image "${IMAGE_PATH}" --scanners vuln --format template --template "@junit.tpl" -o trivy.xml --severity HIGH,CRITICAL --exit-code 1
+    - ./bin/trivy image "${IMAGE_DIGEST}" --scanners vuln --format template --template "@junit.tpl" -o trivy.xml --severity HIGH,CRITICAL --exit-code 1
   artifacts:
     untracked: false
     when: on_failure
@@ -86,9 +159,20 @@ test:
   allow_failure: false
   before_script:
     - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag found. Defaulting to  latest."
+        IMAGE_TAG="latest"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG="${LATEST_TAG}"
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+  script:
     - echo "Pulling image from Harbor..."
     - docker pull "${IMAGE_PATH}"
-  script:
     - docker run --rm "${IMAGE_PATH}"
 
 # ###############################################################################
