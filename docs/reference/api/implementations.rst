@@ -17,9 +17,9 @@ blur, and noise properties.
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb.photometric.blur
-   nrtk.impls.perturb.photometric.enhance
-   nrtk.impls.perturb.photometric.noise
+   ~nrtk.impls.perturb.photometric.blur
+   ~nrtk.impls.perturb.photometric.enhance
+   ~nrtk.impls.perturb.photometric.noise
 
 Geometric Perturbers
 ^^^^^^^^^^^^^^^^^^^^
@@ -32,10 +32,10 @@ scaling, cropping, and translation.
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb.geometric.random_crop_perturber
-   nrtk.impls.perturb.geometric.random_rotation_perturber
-   nrtk.impls.perturb.geometric.random_scale_perturber
-   nrtk.impls.perturb.geometric.random_translation_perturber
+   ~nrtk.impls.perturb.geometric.random_crop_perturber
+   ~nrtk.impls.perturb.geometric.random_rotation_perturber
+   ~nrtk.impls.perturb.geometric.random_scale_perturber
+   ~nrtk.impls.perturb.geometric.random_translation_perturber
 
 Environment Perturbers
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -47,8 +47,8 @@ Environment perturbers simulate atmospheric and weather-related effects that occ
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb.environment.haze_perturber
-   nrtk.impls.perturb.environment.water_droplet_perturber
+   ~nrtk.impls.perturb.environment.haze_perturber
+   ~nrtk.impls.perturb.environment.water_droplet_perturber
 
 Optical Perturbers
 ^^^^^^^^^^^^^^^^^^
@@ -60,14 +60,14 @@ Optical perturbers simulate physics-based sensor and optical effects.
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb.optical.pybsm_perturber
-   nrtk.impls.perturb.optical.pybsm_otf_perturber
-   nrtk.impls.perturb.optical.circular_aperture_otf_perturber
-   nrtk.impls.perturb.optical.defocus_otf_perturber
-   nrtk.impls.perturb.optical.detector_otf_perturber
-   nrtk.impls.perturb.optical.jitter_otf_perturber
-   nrtk.impls.perturb.optical.turbulence_aperture_otf_perturber
-   nrtk.impls.perturb.optical.radial_distortion_perturber
+   ~nrtk.impls.perturb.optical.pybsm_perturber
+   ~nrtk.impls.perturb.optical.pybsm_otf_perturber
+   ~nrtk.impls.perturb.optical.circular_aperture_otf_perturber
+   ~nrtk.impls.perturb.optical.defocus_otf_perturber
+   ~nrtk.impls.perturb.optical.detector_otf_perturber
+   ~nrtk.impls.perturb.optical.jitter_otf_perturber
+   ~nrtk.impls.perturb.optical.turbulence_aperture_otf_perturber
+   ~nrtk.impls.perturb.optical.radial_distortion_perturber
 
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^
@@ -79,7 +79,7 @@ Generative perturbers use AI models to transform images through learned represen
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb.generative.diffusion_perturber
+   ~nrtk.impls.perturb.generative.diffusion_perturber
 
 Wrapper Perturbers
 ^^^^^^^^^^^^^^^^^^
@@ -92,8 +92,8 @@ libraries.
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb.wrapper.albumentations_perturber
-   nrtk.impls.perturb.wrapper.compose_perturber
+   ~nrtk.impls.perturb.wrapper.albumentations_perturber
+   ~nrtk.impls.perturb.wrapper.compose_perturber
 
 Utility Components
 ^^^^^^^^^^^^^^^^^^
@@ -103,8 +103,7 @@ Utility Components
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.utils.sensor
-   nrtk.impls.utils.scenario
+   ~nrtk.impls.utils.utils
 
 ---------------------
 Perturbation Factory
@@ -115,10 +114,10 @@ Perturbation Factory
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.perturb_image_factory.generic.linspace
-   nrtk.impls.perturb_image_factory.generic.one_step
-   nrtk.impls.perturb_image_factory.generic.step
-   nrtk.impls.perturb_image_factory.generic.multivariate
+   ~nrtk.impls.perturb_image_factory.generic.linspace
+   ~nrtk.impls.perturb_image_factory.generic.one_step
+   ~nrtk.impls.perturb_image_factory.generic.step
+   ~nrtk.impls.perturb_image_factory.generic.multivariate
 
 -------------
 Image Metrics
@@ -129,8 +128,8 @@ Image Metrics
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.image_metric.niirs_image_metric
-   nrtk.impls.image_metric.snr_image_metric
+   ~nrtk.impls.image_metric.niirs_image_metric
+   ~nrtk.impls.image_metric.snr_image_metric
 
 -------
 Scoring
@@ -141,10 +140,10 @@ Scoring
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer
-   nrtk.impls.score_detections.coco_scorer
-   nrtk.impls.score_detections.nop_scorer
-   nrtk.impls.score_detections.random_scorer
+   ~nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer
+   ~nrtk.impls.score_detections.coco_scorer
+   ~nrtk.impls.score_detections.nop_scorer
+   ~nrtk.impls.score_detections.random_scorer
 
 ---------------------------------
 End-to-End Generation and Scoring
@@ -155,5 +154,5 @@ End-to-End Generation and Scoring
    :template: custom-module-template.rst
    :recursive:
 
-   nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator
-   nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator
+   ~nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator
+   ~nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator
