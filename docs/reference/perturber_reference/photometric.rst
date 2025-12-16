@@ -1,6 +1,6 @@
-#####################
+######################
 Photometric Perturbers
-#####################
+######################
 
 Photometric perturbers modify the visual appearance of images by adjusting color, brightness, contrast, sharpness,
 blur, and noise properties. These transformations simulate variations in lighting conditions, camera settings, and

@@ -26,7 +26,7 @@ workflows, through interoperability with
 other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use
 NRTK to perturb MAITE-wrapped datasets or evaluate MAITE-wrapped models should
 utilize this module. Explore our
-[T&E guides](https://nrtk.readthedocs.io/en/latest/testing_and_evaluation_notebooks.html)
+[T&E guides](https://nrtk.readthedocs.io/en/latest/tutorials/testing_and_evaluation_notebooks.html)
 which demonstrate how `nrtk` perturbations and `maite` can be applied to assess
 operational risks.
 
@@ -99,13 +99,13 @@ pip install nrtk[pybsm]
 
 More information on extras and related perturbers, including a complete list of
 extras, can be found
-[here](https://nrtk.readthedocs.io/en/latest/installation.html#extras).
+[here](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#extras).
 
 Details on the perturbers and their dependencies can be found
-[here](https://nrtk.readthedocs.io/en/latest/implementations.html).
+[here](https://nrtk.readthedocs.io/en/latest/reference/api/implementations.html).
 
 For more detailed installation instructions, visit the
-[installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html).
+[installation documentation](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html).
 
 <!-- :auto installation: -->
 
@@ -197,7 +197,7 @@ The following points help ensure contributions follow development practices.
   [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
 - Adopt the Git Flow branching strategy.
 - See the
-  [release process documentation](https://nrtk.readthedocs.io/en/latest/release_process.html)
+  [release process documentation](https://nrtk.readthedocs.io/en/latest/development/release_process.html)
   for detailed release information.
 - Additional contribution guidelines and issue reporting steps can be found in
   [CONTRIBUTING.md](./CONTRIBUTING.md).
@@ -217,7 +217,7 @@ You can install using [Poetry](https://python-poetry.org/):
 > [!IMPORTANT] NRTK requires Poetry 2.2 or higher.
 
 > [!WARNING] Users unfamiliar with Poetry should use caution. See
-> [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html#from-source)
+> [installation documentation](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#from-source)
 > for more information.
 
 ```bash

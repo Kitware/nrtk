@@ -1,5 +1,5 @@
 Testing & Evaluation Guides with MAITE
-======================================
+=======================================
 
 Many robustness testing workflows benefit from using NRTK alongside other tools such as the
 `JATIC <https://cdao.pages.jatic.net/public/>`_ program's
@@ -28,7 +28,7 @@ Demonstrating Lens Flare Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate a lens flare effect on an image and analyze its average and worst case effects on model precision.
-`View notebook <examples/maite/nrtk_lens_flare_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_lens_flare_demo>`.
 
 ----
 
@@ -58,7 +58,7 @@ Demonstrating Rain/Water Droplet Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simulate a rain/water droplet effect and analyze its impact on model inputs and predictions.
-`View notebook <examples/maite/nrtk_water_droplet_perturber_demo.html>`__.
+:doc:`View notebook </examples/maite/nrtk_water_droplet_perturber_demo>`.
 
 ----
 
@@ -95,12 +95,6 @@ Demonstrating Atmospheric Turbulence Perturbations
 
 Simulate atmospheric distortion effects and assess its impact on image quality and model inference.
 :doc:`View notebook </examples/maite/nrtk_turbulence_perturber_demo>`.
-
-Demonstrating Radial Distortion Perturbations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Simulate a rain/water droplet effect and analyze its impact on model inputs and predictions.
-:doc:`View notebook </examples/maite/nrtk_water_droplet_perturber_demo>`.
 
 Demonstrating Radial Distortion Perturbations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
