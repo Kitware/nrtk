@@ -57,9 +57,17 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import WaterDropletImportError
 from nrtk.utils._import_guard import import_guard
 
-scipy_available: bool = import_guard("scipy", WaterDropletImportError, ["special", "ndimage"])
-shapely_available: bool = import_guard("shapely", WaterDropletImportError, ["geometry"])
-geopandas_available: bool = import_guard("geopandas", WaterDropletImportError)
+scipy_available: bool = import_guard(
+    module_name="scipy",
+    exception=WaterDropletImportError,
+    submodules=["special", "ndimage"],
+)
+shapely_available: bool = import_guard(
+    module_name="shapely",
+    exception=WaterDropletImportError,
+    submodules=["geometry"],
+)
+geopandas_available: bool = import_guard(module_name="geopandas", exception=WaterDropletImportError)
 import geopandas  # noqa: E402
 import numpy as np  # noqa: E402
 from scipy.ndimage import gaussian_filter  # noqa: E402
@@ -78,6 +86,7 @@ class Bezier:
 
     def __init__(
         self,
+        *,
         p1: np.ndarray[Any, Any],
         p2: np.ndarray[Any, Any],
         angle1: float,
@@ -125,7 +134,7 @@ class Bezier:
             B(t) =  ∑(i=0 to n) B(i, n)(t) * P(i)
         """
 
-        def _bernstein(n: int, k: int, t: np.ndarray) -> np.ndarray:
+        def _bernstein(*, n: int, k: int, t: np.ndarray) -> np.ndarray:
             """Bernstein basis polynomial function.
 
             Defined as: B(k, n)(t) = (n! / (k! * (n-k)!)) * t^k * (1 - t)^(n - k)
@@ -189,6 +198,7 @@ class WaterDropletPerturber(PerturbImage):
 
     def __init__(
         self,
+        *,
         size_range: Sequence[float] = [0.0, 1.0],
         num_drops: int = 20,
         blur_strength: float = 0.25,
@@ -255,11 +265,11 @@ class WaterDropletPerturber(PerturbImage):
         """Derived Parameters."""
         self.rng: np.random.Generator = np.random.default_rng(self.seed)
         # Glass plane at M centimeters ahead of the camera (value range chosen from source paper)
-        self.M = self.rng.integers(20, 40)
+        self.M = self.rng.integers(low=20, high=40)
 
         # Background plane which is B centimeters from the camera
         # and lies beyond the glass plane (value range chosen from source paper)
-        self.B = self.rng.integers(800, 1500)
+        self.B = self.rng.integers(low=800, high=1500)
 
         self.normal: np.ndarray[Any, Any] = np.array([0.0, -1.0 * np.cos(self.psi), np.sin(self.psi)])
 
@@ -282,6 +292,7 @@ class WaterDropletPerturber(PerturbImage):
 
     @staticmethod
     def get_bezier_curve(
+        *,
         points: np.ndarray[Any, Any],
         rad: float = 0.2,
         edgy: float = 0.0,
@@ -318,16 +329,16 @@ class WaterDropletPerturber(PerturbImage):
         ang = np.append(ang, [ang[0]])
         points = np.append(points, np.atleast_2d(ang).T, axis=1)
 
-        def _get_curve(points: np.ndarray, r: float) -> np.ndarray:
+        def _get_curve(*, points: np.ndarray, r: float) -> np.ndarray:
             """Get the segments and curve data."""
             segments = list()
             for i in range(len(points) - 1):
                 seg = Bezier(
-                    points[i, :2],
-                    points[i + 1, :2],
-                    points[i, 2],
-                    points[i + 1, 2],
-                    r,
+                    p1=points[i, :2],
+                    p2=points[i + 1, :2],
+                    angle1=points[i, 2],
+                    angle2=points[i + 1, 2],
+                    r=r,
                 )
                 segments.append(seg.get_curve())
 
@@ -339,6 +350,7 @@ class WaterDropletPerturber(PerturbImage):
 
     @staticmethod
     def get_random_points_within_min_dist(
+        *,
         rng: np.random.Generator,
         n: int = 5,
         scale: float = 0.8,
@@ -368,7 +380,7 @@ class WaterDropletPerturber(PerturbImage):
         if np.all(d >= min_dst) or recursive >= 200:
             return points * scale
         return WaterDropletPerturber.get_random_points_within_min_dist(
-            rng,
+            rng=rng,
             n=n,
             scale=scale,
             min_dst=min_dst,
@@ -377,6 +389,7 @@ class WaterDropletPerturber(PerturbImage):
 
     def _to_glass(
         self,
+        *,
         x: int,
         y: int,
         psi: float,
@@ -406,7 +419,7 @@ class WaterDropletPerturber(PerturbImage):
         v = w * (yy - intrinsic[1, 2]) / intrinsic[1, 1]
         return np.dstack((u, v, w)).reshape((x, y, 3))
 
-    def _get_sphere_raindrop(self, width: int, height: int, gls: np.ndarray[Any, Any]) -> None:  # noqa: C901
+    def _get_sphere_raindrop(self, *, width: int, height: int, gls: np.ndarray[Any, Any]) -> None:  # noqa: C901
         """Simulate and store information about raindrops on the windshield.
 
         How it works:
@@ -433,13 +446,13 @@ class WaterDropletPerturber(PerturbImage):
 
         def __random_tau() -> int:
             """Determines angle between tangent and glass plane."""
-            return math.floor(self.rng.uniform(30, 45))
+            return math.floor(self.rng.uniform(low=30, high=45))
 
         def __random_loc() -> float:
             """Determine random multiplier value that is applied to the water droplet size computation."""
-            return self.rng.uniform(self.size_range[0], self.size_range[1])
+            return self.rng.uniform(low=self.size_range[0], high=self.size_range[1])
 
-        def __w_in_plane(u: int, v: int) -> int:
+        def __w_in_plane(*, u: int, v: int) -> int:
             """Estimate the "depth" value of a pixel in the coordinate system of the glass plane."""
             return (self.normal[2] * self.M - self.normal[0] * u - self.normal[1] * v) / self.normal[2]
 
@@ -471,7 +484,7 @@ class WaterDropletPerturber(PerturbImage):
         for _ in range(self.num_drops):
             u = left_bottom[0] + (right_bottom[0] - left_bottom[0]) * self.rng.random()
             v = left_upper[1] + (right_bottom[1] - left_upper[1]) * self.rng.random()
-            w = __w_in_plane(u, v)
+            w = __w_in_plane(u=u, v=v)
 
             # Convert the angle between tangent and glass plane from degrees to radians
             tau = __random_tau() / 180 * np.pi
@@ -525,6 +538,7 @@ class WaterDropletPerturber(PerturbImage):
             cent = [int(x_cent - 1.5 * cent_rad), int(y_cent - 1.5 * cent_rad)]
 
             def __get_all_points(
+                *,
                 pts_lst_array: list[int],
                 rng: np.random.Generator,
                 n: int = 3,
@@ -538,7 +552,7 @@ class WaterDropletPerturber(PerturbImage):
                 for c in pts_lst:
                     points = (
                         WaterDropletPerturber.get_random_points_within_min_dist(
-                            rng,
+                            rng=rng,
                             n=n,
                             scale=scale,
                         )
@@ -554,7 +568,7 @@ class WaterDropletPerturber(PerturbImage):
                     xmin, ymin, xmax, ymax = polygon.bounds
                     grid_x, grid_y = np.mgrid[xmin:xmax:150j, ymin:ymax:150j]
                     grid_x, grid_y = grid_x.flatten(), grid_y.flatten()
-                    points_gs = geopandas.GeoSeries(geopandas.points_from_xy(grid_x, grid_y))
+                    points_gs = geopandas.GeoSeries(geopandas.points_from_xy(x=grid_x, y=grid_y))
                     enclosed_points = [
                         np.asarray([int(grid_x[i]), int(grid_y[i])])
                         for i, val in enumerate(polygon.contains(points_gs))
@@ -566,8 +580,8 @@ class WaterDropletPerturber(PerturbImage):
             # Draw a Bézier shape centered at the center of the sphere and
             # find all the pixels that fall within the Bézier shape
             all_points = __get_all_points(
-                cent,
-                self.rng,
+                pts_lst_array=cent,
+                rng=self.rng,
                 rad=0.6,
                 scale=2 * cent_rad,
             )
@@ -577,7 +591,7 @@ class WaterDropletPerturber(PerturbImage):
                 q[point[0], point[1]] = i
         return q
 
-    def _to_sphere_section_env(self, x: int, y: int, idx: int, intrinsic: np.ndarray, gls: np.ndarray) -> np.ndarray:
+    def _to_sphere_section_env(self, *, x: int, y: int, idx: int, intrinsic: np.ndarray, gls: np.ndarray) -> np.ndarray:
         """Helper function for rendering.
 
         Calculate where a point (x, y) would map to on a sphere's surface,
@@ -677,7 +691,7 @@ class WaterDropletPerturber(PerturbImage):
         mask = np.zeros((h, w), dtype=np.uint8)
 
         # Create random spherical droplets
-        self._get_sphere_raindrop(w, h, gls)
+        self._get_sphere_raindrop(width=w, height=h, gls=gls)
 
         # Create the matrix that determines what points are in the droplets
         # Also initializes the function that perturbs the spheres
@@ -689,7 +703,7 @@ class WaterDropletPerturber(PerturbImage):
                 idxs = np.where(q == idx)
                 for _, (x, y) in enumerate(zip(idxs[0], idxs[1], strict=False)):
                     # Translate refractive distortions to the "surface" of the droplet
-                    p = self._to_sphere_section_env(x, y, int(idx), intrinsic, gls)
+                    p = self._to_sphere_section_env(x=x, y=y, idx=int(idx), intrinsic=intrinsic, gls=gls)
                     u = p[0]
                     v = p[1]
                     # Conditions to keep the droplets within the bounds of the image
@@ -709,6 +723,7 @@ class WaterDropletPerturber(PerturbImage):
 
     def blur(
         self,
+        *,
         image: np.ndarray[Any, Any],
         rain_image: np.ndarray[Any, Any],
         mask: np.ndarray[Any, Any],
@@ -745,7 +760,7 @@ class WaterDropletPerturber(PerturbImage):
 
         return blur_image
 
-    def _apply_gaussian(self, image: np.ndarray[Any, Any], sigma: float, ksize: int) -> np.ndarray[Any, Any]:
+    def _apply_gaussian(self, *, image: np.ndarray[Any, Any], sigma: float, ksize: int) -> np.ndarray[Any, Any]:
         truncate = (ksize - 1) / 2 / sigma
         if image.ndim == 2:
             # Grayscale
@@ -771,6 +786,7 @@ class WaterDropletPerturber(PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -811,6 +827,7 @@ class WaterDropletPerturber(PerturbImage):
 
         return perturbed_image.astype(np.uint8), boxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the WaterDropletPerturber instance."""
         cfg = super().get_config()
@@ -828,6 +845,7 @@ class WaterDropletPerturber(PerturbImage):
         return cfg
 
     @classmethod
+    @override
     def is_usable(cls) -> bool:
         """Returns true if the necessary dependencies (Scipy, Shapely and GeoPandas) are available."""
         return scipy_available and shapely_available and geopandas_available

@@ -18,8 +18,8 @@ from tests.interop.maite import (
     NRTK_PYBSM_CONFIG,
 )
 
-maite_available: bool = import_guard("maite", MaiteImportError)
-kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+maite_available: bool = import_guard(module_name="maite", exception=MaiteImportError)
+kwcoco_available: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 is_usable = maite_available and kwcoco_available
 from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset  # noqa: E402
 

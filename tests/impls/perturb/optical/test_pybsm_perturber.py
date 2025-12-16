@@ -39,7 +39,6 @@ class TestPyBSMPerturber:
             expected=None,
             img_gsd=img_gsd,
         )
-        Image.fromarray(out_img).save("test.tiff")
 
         psnr_tiff_snapshot.assert_match(out_img)
 
@@ -187,16 +186,16 @@ class TestPyBSMPerturber:
         perturber = PybsmPerturber(reflectance_range=np.array([0.05, 0.5]), **sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
-            _ = perturber(image, **additional_params)
+            _ = perturber(image=image, **additional_params)
 
     @pytest.mark.parametrize(
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (123, 236)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(123, 236)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((132, 222), (444, 352)), {"test": 0.7}),
-                (AxisAlignedBoundingBox((231, 111), (333, 212)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(132, 222), max_vertex=(444, 352)), {"test": 0.7}),
+                (AxisAlignedBoundingBox(min_vertex=(231, 111), max_vertex=(333, 212)), {"test2": 1.0}),
             ],
         ],
     )
@@ -209,7 +208,7 @@ class TestPyBSMPerturber:
         image = np.array(Image.open(INPUT_IMG_FILE))
         sensor_and_scenario = create_sample_sensor_and_scenario()
         inst = PybsmPerturber(**sensor_and_scenario)
-        _, out_boxes = inst.perturb(image, boxes=boxes, img_gsd=(3.19 / 160))
+        _, out_boxes = inst.perturb(image=image, boxes=boxes, img_gsd=(3.19 / 160))
         assert out_boxes == snapshot
 
     @mock.patch.object(PybsmPerturber, "is_usable")

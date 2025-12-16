@@ -39,7 +39,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
 # Import checks
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation"])
+pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
 
 from pybsm.simulation import ImageSimulator, TurbulenceApertureSimulator  # noqa: E402
 
@@ -57,6 +57,7 @@ class TurbulenceApertureOTFPerturber(PybsmOTFPerturber):
 
     def __init__(  # noqa: C901
         self,
+        *,
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
         altitude: float | None = None,

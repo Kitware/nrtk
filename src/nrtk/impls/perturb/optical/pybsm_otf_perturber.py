@@ -28,9 +28,9 @@ from nrtk.utils._import_guard import import_guard
 
 # Import checks
 pybsm_available: bool = import_guard(
-    "pybsm",
-    PyBSMImportError,
-    ["simulation", "simulation.scenario", "simulation.sensor"],
+    module_name="pybsm",
+    exception=PyBSMImportError,
+    submodules=["simulation", "simulation.scenario", "simulation.sensor"],
 )
 
 from pybsm.simulation import ImageSimulator  # noqa: E402
@@ -111,6 +111,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
 
     def __init__(  # noqa: C901
         self,
+        *,
         sensor_name: str = DEFAULT_PARAMS["sensor_name"],
         D: float = DEFAULT_PARAMS["D"],  # noqa:N803
         f: float = DEFAULT_PARAMS["f"],
@@ -358,6 +359,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         img_gsd: float | None = None,
@@ -395,7 +397,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
             out_img = blur_img
 
         # Handle formatting and box rescaling
-        return self._handle_boxes_and_format(out_img, boxes, image.shape)
+        return self._handle_boxes_and_format(sim_img=out_img, boxes=boxes, orig_shape=image.shape)
 
     @override
     def get_config(self) -> dict[str, Any]:
@@ -636,6 +638,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
 
     def _handle_boxes_and_format(
         self,
+        *,
         sim_img: np.ndarray,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
         orig_shape: tuple,
@@ -646,7 +649,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
 
         # Rescale boxes if provided
         if boxes:
-            scaled_boxes = self._rescale_boxes(boxes, orig_shape, sim_img.shape)
+            scaled_boxes = self._rescale_boxes(boxes=boxes, orig_shape=orig_shape, new_shape=sim_img.shape)
             return sim_img_uint8, scaled_boxes
 
         return sim_img_uint8, boxes

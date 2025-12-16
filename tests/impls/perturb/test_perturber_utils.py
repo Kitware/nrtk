@@ -32,7 +32,7 @@ def perturber_assertions(
     dtype = image.dtype
     copy = np.copy(image)
 
-    out_image, _ = perturb(image, None, **additional_params)
+    out_image, _ = perturb(image=image, boxes=None, **additional_params)
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)
     assert out_image.dtype == dtype
@@ -68,7 +68,7 @@ def bbox_perturber_assertions(
     dtype = image.dtype
     copy = np.copy(image)
 
-    out_image, out_boxes = perturb(image, boxes, **additional_params)
+    out_image, out_boxes = perturb(image=image, boxes=boxes, **additional_params)
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)
     assert out_image.dtype == dtype
@@ -106,7 +106,7 @@ def pybsm_perturber_assertions(
     """
     copy = np.copy(image)
 
-    out_image, _ = perturb(image, None, **additional_params)
+    out_image, _ = perturb(image=image, boxes=None, **additional_params)
 
     assert np.array_equal(image, copy)
     assert not np.shares_memory(image, out_image)

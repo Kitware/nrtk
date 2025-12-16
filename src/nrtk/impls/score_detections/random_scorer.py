@@ -13,11 +13,11 @@ Usage:
     Instantiate `RandomScorer` with an optional seed for reproducibility:
 
     scorer = RandomScorer(seed=42)
-    scores = scorer.score(actual_detections, predicted_detections)
+    scores = scorer.score(actual=actual_detections, predicted=predicted_detections)
 
 Example:
     random_scorer = RandomScorer(seed=123)
-    random_scores = random_scorer.score(actual_detections, predicted_detections)
+    random_scores = random_scorer.score(actual=actual_detections, predicted=predicted_detections)
 """
 
 from __future__ import annotations
@@ -59,6 +59,7 @@ class RandomScorer(ScoreDetections):
     @override
     def score(
         self,
+        *,
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
@@ -73,6 +74,7 @@ class RandomScorer(ScoreDetections):
 
         return [self._rng.random() for actual_det in actual]
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomScorer instance."""
         return {"seed": self.seed}

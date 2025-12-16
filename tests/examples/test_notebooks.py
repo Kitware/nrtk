@@ -40,5 +40,5 @@ class TestPyrightNotebook:
         ],
     )
     def test_pyright_nb(self, filepath: str, expected_num_errors: int) -> None:
-        results = pyright_analyze(filepath)  # type: ignore
+        results = pyright_analyze(notebook_path_str=filepath)  # type: ignore
         assert results["summary"]["errorCount"] <= expected_num_errors, list_error_messages(results)  # type: ignore

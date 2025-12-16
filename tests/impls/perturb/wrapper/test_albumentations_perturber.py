@@ -74,8 +74,8 @@ class TestAlbumentationsPerturber:
         bbox: list[int],
     ) -> None:
         image = np.ones((30, 30, 3)).astype(np.uint8)
-        as_aab = AlbumentationsPerturber._bbox_to_aabb(bbox, image)
-        as_list = AlbumentationsPerturber._aabb_to_bbox(as_aab, image)
+        as_aab = AlbumentationsPerturber._bbox_to_aabb(box=bbox, image=image)
+        as_list = AlbumentationsPerturber._aabb_to_bbox(box=as_aab, image=image)
         assert len(bbox) == len(as_list)
         assert [x == y for x, y in zip(bbox, as_list, strict=False)]
 
@@ -83,8 +83,8 @@ class TestAlbumentationsPerturber:
         label_dict_1: dict[Hashable, float] = {"label": 1.0}
         label_dict_2: dict[Hashable, float] = {"label": 2.0}
         bboxes = [
-            AxisAlignedBoundingBox((1, 1), (2, 3)),
-            AxisAlignedBoundingBox((3, 2), (6, 8)),
+            AxisAlignedBoundingBox(min_vertex=(1, 1), max_vertex=(2, 3)),
+            AxisAlignedBoundingBox(min_vertex=(3, 2), max_vertex=(6, 8)),
         ]
         labels = [label_dict_1, label_dict_2]
         image = np.ones((30, 30, 3)).astype(np.uint8)
@@ -135,7 +135,7 @@ class TestAlbumentationsPerturber:
     def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
-        image = Image.new("RGB", grayscale_image.size)
+        image = Image.new(mode="RGB", size=grayscale_image.size)
         image.paste(grayscale_image)
         image = np.array(image)
         inst = AlbumentationsPerturber(
@@ -189,4 +189,4 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     mock_is_usable.return_value = False
     assert not AlbumentationsPerturber.is_usable()
     with pytest.raises(AlbumentationsImportError):
-        AlbumentationsPerturber("RandomRain")
+        AlbumentationsPerturber(perturber="RandomRain")

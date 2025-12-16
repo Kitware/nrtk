@@ -46,7 +46,7 @@ class TestNRTKPerturberOpenCV:
         """Test if the perturber returns the intended number of datasets."""
         num_imgs = 4
         dataset = JATICObjectDetectionDataset(
-            imgs=[np.random.default_rng().integers(0, 255, (3, 256, 256), dtype=np.uint8)] * num_imgs,
+            imgs=[np.random.default_rng().integers(low=0, high=255, size=(3, 256, 256), dtype=np.uint8)] * num_imgs,
             dets=[
                 JATICDetectionTarget(
                     boxes=np.array([[1.0, 2.0, 3.0, 4.0]]),

@@ -11,7 +11,7 @@ Dependencies:
 Example usage:
     factory = PerturbImageFactory(perturber=SomePerturbImageClass, theta_key="altitude")
     for perturber in factory:
-        perturber(perturbed_image)
+        perturber(image=perturbed_image)
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from collections.abc import Iterator, Sequence
 from typing import Any
 
 from smqtk_core.plugfigurable import Plugfigurable
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 
@@ -36,7 +36,7 @@ class PerturbImageFactory(Plugfigurable):
         theta_key (str): perturber parameter to vary between instances
     """
 
-    def __init__(self, perturber: type[PerturbImage], theta_key: str) -> None:
+    def __init__(self, *, perturber: type[PerturbImage], theta_key: str) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
@@ -106,6 +106,7 @@ class PerturbImageFactory(Plugfigurable):
 
         return self.perturber(**kwargs)
 
+    @override
     @classmethod
     def from_config(
         cls,

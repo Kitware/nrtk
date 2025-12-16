@@ -138,7 +138,7 @@ def test_missing_deps_maite() -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     assert not COCOJATICObjectDetectionDataset.is_usable()
     with pytest.raises(MaiteImportError):
-        COCOJATICObjectDetectionDataset(None, list(), False)
+        COCOJATICObjectDetectionDataset(kwcoco_dataset=None, image_metadata=list(), skip_no_anns=False)
 
 
 @pytest.mark.skipif(kwcoco_available, reason="KWCOCO is available")
@@ -146,4 +146,4 @@ def test_missing_deps_kwcoco() -> None:
     """Test that an exception is raised when required dependencies are not installed."""
     assert not COCOJATICObjectDetectionDataset.is_usable()
     with pytest.raises(KWCocoImportError):
-        COCOJATICObjectDetectionDataset(None, list(), False)
+        COCOJATICObjectDetectionDataset(kwcoco_dataset=None, image_metadata=list(), skip_no_anns=False)

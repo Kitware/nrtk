@@ -65,7 +65,7 @@ class TestRandomCropPerturber:
 
     def test_default_seed_reproducibility(self) -> None:
         """Ensure results are reproducible with default seed (no seed parameter provided)."""
-        image = rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        image = rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Test perturb interface directly without providing seed (uses default=1)
         inst = RandomCropPerturber(crop_size=(20, 20))
@@ -94,7 +94,7 @@ class TestRandomCropPerturber:
     @pytest.mark.parametrize(
         ("image", "seed"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
             (np.ones((256, 256, 3), dtype=np.float32), 2),
             (np.ones((256, 256, 3), dtype=np.float64), 2),
         ],

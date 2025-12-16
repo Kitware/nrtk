@@ -14,12 +14,12 @@ Usage:
 
 Example:
     class CustomClassificationScorer(ScoreClassifications):
-        def score(self, actual, predicted):
+        def score(self, *, actual, predicted):
             # Implement custom scoring logic
             pass
 
     scorer = CustomClassificationScorer()
-    scores = scorer(actual_classifications, predicted_classifications)
+    scores = scorer(actual=actual_classifications, predicted=predicted_classifications)
 """
 
 __all__ = []
@@ -43,6 +43,7 @@ class ScoreClassifications(Plugfigurable):
     @abc.abstractmethod
     def score(
         self,
+        *,
         actual: Sequence[CLASSIFICATION_DICT_T],
         predicted: Sequence[CLASSIFICATION_DICT_T],
     ) -> Sequence[float]:
@@ -57,8 +58,9 @@ class ScoreClassifications(Plugfigurable):
 
     def __call__(
         self,
+        *,
         actual: Sequence[CLASSIFICATION_DICT_T],
         predicted: Sequence[CLASSIFICATION_DICT_T],
     ) -> Sequence[float]:
         """Alias for :meth:`.ScoreClassifications.score`."""
-        return self.score(actual, predicted)
+        return self.score(actual=actual, predicted=predicted)

@@ -18,7 +18,12 @@ from nrtk.interop.maite.metadata.datum import NRTKDatumMetadata, _forward_md_key
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
-maite_available: bool = import_guard("maite", MaiteImportError, ["protocols.object_detection"], ["Augmentation"])
+maite_available: bool = import_guard(
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols.object_detection"],
+    objects=["Augmentation"],
+)
 
 from maite.protocols import AugmentationMetadata  # noqa: E402
 from maite.protocols.object_detection import (  # noqa: E402
@@ -51,7 +56,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
             Metadata for this augmentation.
     """
 
-    def __init__(self, augment: PerturbImage, augment_id: str) -> None:
+    def __init__(self, *, augment: PerturbImage, augment_id: str) -> None:
         """Initialize augmentation wrapper.
 
         Args:
@@ -83,15 +88,17 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
             aug_img = np.transpose(aug_img, (1, 2, 0))
 
             # format annotations for passing to perturber
-            img_bboxes = [AxisAlignedBoundingBox(bbox[0:2], bbox[2:4]) for bbox in np.array(img_anns.boxes)]  # pyright: ignore [reportAttributeAccessIssue]
+            img_bboxes = [
+                AxisAlignedBoundingBox(min_vertex=bbox[0:2], max_vertex=bbox[2:4]) for bbox in np.array(img_anns.boxes)
+            ]  # pyright: ignore [reportAttributeAccessIssue]
             img_labels = [
                 {label: score}
                 for label, score in zip(np.array(img_anns.labels), np.array(img_anns.scores), strict=False)  # pyright: ignore [reportAttributeAccessIssue]
             ]
 
             aug_img, aug_img_anns = self.augment(
-                np.asarray(aug_img),
-                zip(img_bboxes, img_labels, strict=False),
+                image=np.asarray(aug_img),
+                boxes=zip(img_bboxes, img_labels, strict=False),
                 **dict(md),
             )
             if TYPE_CHECKING and not aug_img_anns:
@@ -111,9 +118,9 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
             )
             aug_dets.append(
                 JATICDetectionTarget(
-                    aug_img_bboxes_arr,
-                    np.array(aug_img_labels),
-                    np.array(aug_img_scores),
+                    boxes=aug_img_bboxes_arr,
+                    labels=np.array(aug_img_labels),
+                    scores=np.array(aug_img_scores),
                 ),
             )
 
@@ -129,7 +136,7 @@ class JATICDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
                 nrtk_perturber_config=perturber_configs,
             )
 
-            aug_metadata.append(_forward_md_keys(md, aug_md, forwarded_keys=["id", "nrtk_perturber_config"]))
+            aug_metadata.append(_forward_md_keys(md=md, aug_md=aug_md, forwarded_keys=["id", "nrtk_perturber_config"]))
 
         # return batch of augmented inputs, resized bounding boxes and updated metadata
         return aug_imgs, aug_dets, aug_metadata
@@ -157,6 +164,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
 
     def __init__(
         self,
+        *,
         augmentations: Sequence[Augmentation] | None,  # pyright: ignore [reportInvalidTypeForm]
         metric: ImageMetric,
         augment_id: str,
@@ -221,7 +229,7 @@ class JATICDetectionAugmentationWithMetric(Augmentation):  # pyright: ignore [re
             )
 
             metric_aug_metadata.append(
-                _forward_md_keys(aug_md, metric_aug_md, forwarded_keys=["id", "nrtk_metric"]),
+                _forward_md_keys(md=aug_md, aug_md=metric_aug_md, forwarded_keys=["id", "nrtk_metric"]),
             )
 
         # return batch of augmented/original images, detections and metric-updated metadata

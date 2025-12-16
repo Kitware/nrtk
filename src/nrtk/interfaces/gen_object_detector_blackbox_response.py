@@ -20,7 +20,13 @@ Example usage:
     detector = SomeObjectDetector()
     scorer = SomeScorer()
     generator = GenerateObjectDetectorBlackboxResponse()
-    item_response, scores = generator.generate(factories, detector, scorer, img_batch_size=4, verbose=True)
+    item_response, scores = generator.generate(
+        blackbox_perturber_factories=factories,
+        blackbox_detector=detector,
+        blackbox_scorer=scorer,
+        img_batch_size=4,
+        verbose=True
+    )
 """
 
 __all__ = []
@@ -70,6 +76,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
 
     def generate(  # noqa: C901
         self,
+        *,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_detector: DetectImageObjects,
         blackbox_scorer: ScoreDetections,
@@ -113,7 +120,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
                     perturbed = image.copy()
 
                     for perturber in perturbers:
-                        perturbed, _ = perturber(perturbed, **extra)
+                        perturbed, _ = perturber(image=perturbed, **extra)
 
                     batch_images.append(perturbed)
                     batch_gt.append(actual)
@@ -150,6 +157,7 @@ class GenerateObjectDetectorBlackboxResponse(GenerateBlackboxResponse):
 
     def __call__(
         self,
+        *,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_detector: DetectImageObjects,
         blackbox_scorer: ScoreDetections,

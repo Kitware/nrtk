@@ -39,7 +39,7 @@ class TestBrightnessPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -89,17 +89,17 @@ class TestBrightnessPerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = BrightnessPerturber(factor=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -119,7 +119,7 @@ class TestColorPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -169,17 +169,17 @@ class TestColorPerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = ColorPerturber(factor=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -200,7 +200,7 @@ class TestContrastPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -250,17 +250,17 @@ class TestContrastPerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = ContrastPerturber(factor=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -281,7 +281,7 @@ class TestSharpnessPerturber:
     @pytest.mark.parametrize(
         ("image", "factor"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 0.5),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 0.5),
             (np.ones((256, 256, 3), dtype=np.float32), 1.3),
             (np.ones((256, 256, 3), dtype=np.float64), 0.2),
         ],
@@ -342,17 +342,17 @@ class TestSharpnessPerturber:
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = SharpnessPerturber(factor=0.5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 

@@ -64,6 +64,7 @@ def _expand_submodules(submodules: Sequence[str] | None) -> Sequence[str]:
 
 
 def import_guard(  # noqa: C901
+    *,
     module_name: str,
     exception: type[ImportError],
     submodules: Sequence[str] | None = None,
@@ -116,7 +117,10 @@ def import_guard(  # noqa: C901
     if submodules:
         for submodule in submodules:
             submodule_name = module_name + "." + submodule
-            available = import_guard(submodule_name, exception, None, objects) and available
+            available = (
+                import_guard(module_name=submodule_name, exception=exception, submodules=None, objects=objects)
+                and available
+            )
 
     if not available and objects:
         for obj in objects:

@@ -115,8 +115,8 @@ class TestRandomScalePerturber:
         label_dict_1: dict[Hashable, float] = {"label": 1.0}
         label_dict_2: dict[Hashable, float] = {"label": 2.0}
         bboxes = [
-            AxisAlignedBoundingBox((1, 1), (2, 3)),
-            AxisAlignedBoundingBox((3, 2), (6, 8)),
+            AxisAlignedBoundingBox(min_vertex=(1, 1), max_vertex=(2, 3)),
+            AxisAlignedBoundingBox(min_vertex=(3, 2), max_vertex=(6, 8)),
         ]
         labels = [label_dict_1, label_dict_2]
         image = np.ones((30, 30, 3)).astype(np.uint8)
@@ -186,7 +186,7 @@ class TestRandomScalePerturber:
 
     def test_default_seed_reproducibility(self) -> None:
         """Ensure results are reproducible with default seed (no seed parameter provided)."""
-        image = rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        image = rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
         limit = 0.1
         interpolation = cv2.INTER_LINEAR
         probability = 1.0
@@ -227,7 +227,7 @@ class TestRandomScalePerturber:
     @pytest.mark.parametrize(
         ("image", "seed"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
         ],
     )
     def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
@@ -275,7 +275,7 @@ class TestRandomScalePerturber:
     def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
-        image = Image.new("RGB", grayscale_image.size)
+        image = Image.new(mode="RGB", size=grayscale_image.size)
         image.paste(grayscale_image)
         image = np.array(image)
         inst = RandomScalePerturber(

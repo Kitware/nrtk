@@ -50,6 +50,7 @@ class RandomRotationPerturber(AlbumentationsPerturber):
 
     def __init__(
         self,
+        *,
         limit: float | tuple[float, float] = 0.0,
         probability: float = 1.0,
         fill: Sequence[int] | None = None,

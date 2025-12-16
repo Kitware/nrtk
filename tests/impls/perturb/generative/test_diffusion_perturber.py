@@ -49,10 +49,10 @@ class TestDiffusionPerturber:
         ("boxes"),
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (10, 10)), {"class1": 0.8}),
-                (AxisAlignedBoundingBox((50, 50), (100, 100)), {"class2": 0.9}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(10, 10)), {"class1": 0.8}),
+                (AxisAlignedBoundingBox(min_vertex=(50, 50), max_vertex=(100, 100)), {"class2": 0.9}),
             ],
         ],
     )
@@ -83,7 +83,7 @@ class TestDiffusionPerturber:
         perturber = DiffusionPerturber(model_name="test/model", device=device, prompt="test")
         image = np.ones((256, 256, 3), dtype=np.uint8)
 
-        perturbed_image, output_boxes = perturber.perturb(image, boxes=boxes)
+        perturbed_image, output_boxes = perturber.perturb(image=image, boxes=boxes)
 
         expected_device = perturber._get_device()
 
@@ -119,11 +119,11 @@ class TestDiffusionPerturber:
         mock_torch: MagicMock,
     ) -> None:
         """Ensure results are reproducible with default seed (no seed parameter provided)."""
-        image = np.random.default_rng(1).integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        image = np.random.default_rng(1).integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
         # Setup mocks
         mock_pipeline = MagicMock()
-        mock_result_image = np.random.default_rng(1).integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        mock_result_image = np.random.default_rng(1).integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
         mock_pipeline.return_value = ([mock_result_image], False)
         mock_pipeline_class.from_pretrained.return_value = mock_pipeline
         mock_pipeline.to.return_value = mock_pipeline
@@ -158,7 +158,7 @@ class TestDiffusionPerturber:
     @pytest.mark.parametrize(
         ("image", "seed"),
         [
-            (np.random.default_rng(2).integers(0, 255, (256, 256, 3), dtype=np.uint8), 2),
+            (np.random.default_rng(2).integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
         ],
     )
     @patch("nrtk.impls.perturb.generative.diffusion_perturber.torch")
@@ -175,7 +175,7 @@ class TestDiffusionPerturber:
         """Ensure results are reproducible when explicit seed is provided."""
         # Setup mocks
         mock_pipeline = MagicMock()
-        mock_result_image = np.random.default_rng(seed).integers(0, 255, (256, 256, 3), dtype=np.uint8)
+        mock_result_image = np.random.default_rng(seed).integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
         mock_pipeline.return_value = ([mock_result_image], False)
         mock_pipeline_class.from_pretrained.return_value = mock_pipeline
         mock_pipeline.to.return_value = mock_pipeline

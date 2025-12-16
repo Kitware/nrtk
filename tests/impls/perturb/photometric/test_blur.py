@@ -42,7 +42,7 @@ class TestAverageBlurPerturber:
     @pytest.mark.parametrize(
         ("image", "ksize"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 1),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 1),
             (np.ones((256, 256, 3), dtype=np.float32), 3),
             (np.ones((256, 256, 3), dtype=np.float64), 5),
         ],
@@ -96,23 +96,23 @@ class TestAverageBlurPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = AverageBlurPerturber()
         with expectation:
-            inst.perturb(image)
+            inst.perturb(image=image)
 
     @pytest.mark.parametrize(
         ("boxes"),
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = AverageBlurPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -134,7 +134,7 @@ class TestGaussianBlurPerturber:
     @pytest.mark.parametrize(
         ("image", "ksize"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 1),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 1),
             (np.ones((256, 256, 3), dtype=np.float32), 3),
             (np.ones((256, 256, 3), dtype=np.float64), 5),
         ],
@@ -196,23 +196,23 @@ class TestGaussianBlurPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = GaussianBlurPerturber()
         with expectation:
-            inst.perturb(image)
+            inst.perturb(image=image)
 
     @pytest.mark.parametrize(
         "boxes",
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = GaussianBlurPerturber()
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3)), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
 
@@ -234,7 +234,7 @@ class TestMedianBlurPerturber:
     @pytest.mark.parametrize(
         ("image", "ksize"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8), 3),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 3),
             (np.ones((256, 256, 3), dtype=np.float32), 5),
         ],
     )
@@ -295,23 +295,23 @@ class TestMedianBlurPerturber:
         """Test that an exception is properly raised (or not) based on argument value."""
         inst = MedianBlurPerturber(ksize=5)
         with expectation:
-            inst.perturb(image)
+            inst.perturb(image=image)
 
     @pytest.mark.parametrize(
         ("boxes"),
         [
             None,
-            [(AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0})],
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
             [
-                (AxisAlignedBoundingBox((0, 0), (1, 1)), {"test": 0.0}),
-                (AxisAlignedBoundingBox((2, 2), (3, 3)), {"test2": 1.0}),
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
             ],
         ],
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
         inst = MedianBlurPerturber(ksize=5)
-        _, out_boxes = inst.perturb(np.ones((256, 256, 3), dtype=np.float32), boxes=boxes)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3), dtype=np.float32), boxes=boxes)
         assert boxes == out_boxes
 
 

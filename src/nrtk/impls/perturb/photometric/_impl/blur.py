@@ -52,7 +52,7 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import OpenCVImportError
 from nrtk.utils._import_guard import import_guard
 
-cv2_available: bool = import_guard("cv2", OpenCVImportError, fake_spec=True)
+cv2_available: bool = import_guard(module_name="cv2", exception=OpenCVImportError, fake_spec=True)
 import cv2  # noqa: E402
 
 
@@ -67,6 +67,7 @@ class _PerturbImage(PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -80,6 +81,7 @@ class _PerturbImage(PerturbImage):
 
         return _image, _boxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the MedianBlurPerturber instance.
 
@@ -91,6 +93,7 @@ class _PerturbImage(PerturbImage):
         return cfg
 
     @classmethod
+    @override
     def is_usable(cls) -> bool:
         """Returns true if the required cv2 module is available."""
         # Requires opencv to be installed
@@ -120,6 +123,7 @@ class AverageBlurPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -153,6 +157,7 @@ class GaussianBlurPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -186,6 +191,7 @@ class MedianBlurPerturber(_PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,

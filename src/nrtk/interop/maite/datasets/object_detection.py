@@ -19,12 +19,12 @@ from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
 maite_available: bool = import_guard(
-    "maite",
-    MaiteImportError,
-    ["protocols.object_detection"],
-    ["Dataset", "DatumMetadata"],
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols.object_detection"],
+    objects=["Dataset", "DatumMetadata"],
 )
-kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+kwcoco_available: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 from kwcoco import CocoDataset  # type: ignore  # noqa: E402
 from maite.protocols import DatasetMetadata, DatumMetadata  # noqa: E402
 from maite.protocols.object_detection import (  # noqa: E402
@@ -66,6 +66,7 @@ class COCOJATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
 
     def __init__(  # noqa: C901
         self,
+        *,
         kwcoco_dataset: CocoDataset,  # pyright: ignore [reportGeneralTypeIssues]
         image_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]
         skip_no_anns: bool = False,
@@ -216,6 +217,7 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
 
     def __init__(
         self,
+        *,
         imgs: Sequence[np.ndarray[Any, Any]],
         dets: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
         datum_metadata: Sequence[DatumMetadataType],  # pyright: ignore [reportInvalidTypeForm]

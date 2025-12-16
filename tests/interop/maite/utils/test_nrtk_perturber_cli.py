@@ -141,8 +141,9 @@ class TestNRTKPerturberCLI:
         """Check that an exception is appropriately raised if the annotations file is missing."""
         output_dir = tmpdir.join(Path("out"))
 
+        runner = CliRunner()
         with pytest.raises(ValueError, match=r"Could not identify annotations file."):
-            CliRunner().invoke(
+            runner.invoke(
                 nrtk_perturber_cli,
                 [str(DATASET_FOLDER), str(output_dir), str(NRTK_PYBSM_CONFIG), "-v"],
                 catch_exceptions=False,

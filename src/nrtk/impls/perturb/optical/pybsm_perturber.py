@@ -36,7 +36,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
 # Import checks
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation"])
+pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
 
 from pybsm.simulation import ImageSimulator, SystemOTFSimulator  # noqa: E402
 
@@ -62,6 +62,7 @@ class PybsmPerturber(PybsmOTFPerturber):
 
     def __init__(
         self,
+        *,
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_PARAMETERS["reflectance_range"],
         rng_seed: int | None = 1,
         sensor_name: str = "Sensor",
@@ -285,6 +286,7 @@ class PybsmPerturber(PybsmOTFPerturber):
         return self.__str__()
 
     @classmethod
+    @override
     def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> PybsmPerturber:
         """Instantiates a PybsmPerturber from a configuration dictionary.
 
@@ -327,6 +329,7 @@ class PybsmPerturber(PybsmOTFPerturber):
 
     def _handle_boxes_and_format(
         self,
+        *,
         sim_img: np.ndarray,
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
         orig_shape: tuple,
@@ -341,7 +344,7 @@ class PybsmPerturber(PybsmOTFPerturber):
 
         # Rescale boxes if provided
         if boxes:
-            scaled_boxes = self._rescale_boxes(boxes, orig_shape, sim_img.shape)
+            scaled_boxes = self._rescale_boxes(boxes=boxes, orig_shape=orig_shape, new_shape=sim_img.shape)
             return sim_img_uint8, scaled_boxes
 
         return sim_img_uint8, boxes

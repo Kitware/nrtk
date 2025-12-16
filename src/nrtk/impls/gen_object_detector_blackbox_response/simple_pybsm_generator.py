@@ -58,6 +58,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
 
     def __init__(
         self,
+        *,
         images: Sequence[np.ndarray[Any, Any]],
         img_gsds: Sequence[float],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
@@ -123,6 +124,7 @@ class SimplePybsmGenerator(GenerateObjectDetectorBlackboxResponse):
     @override
     def generate(
         self,
+        *,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_detector: DetectImageObjects,
         blackbox_scorer: ScoreDetections,

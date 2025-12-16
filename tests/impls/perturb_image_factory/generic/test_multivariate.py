@@ -168,7 +168,7 @@ class TestMultivariatePerturbImageFactory:
 
         with open(str(config_file_path)) as config_file:
             config = json.load(config_file)
-            hydrated_factory = from_config_dict(config, PerturbImageFactory.get_impls())
+            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
             hydrated_factory_config = hydrated_factory.get_config()
 
             assert original_factory_config == hydrated_factory_config
@@ -346,7 +346,7 @@ class TestStepPerturbImageFactory:
 
         with open(str(config_file_path)) as config_file:
             config = json.load(config_file)
-            hydrated_factory = from_config_dict(config, PerturbImageFactory.get_impls())
+            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
             hydrated_factory_config = hydrated_factory.get_config()
 
             assert original_factory_config == hydrated_factory_config

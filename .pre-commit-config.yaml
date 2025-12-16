@@ -16,7 +16,18 @@ repos:
     args: [--wrap=80, --number]
     types: [markdown]
     additional_dependencies:
-    - mdformat-tables
+      - mdformat-tables
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.3.0
+  hooks:
+  - id: flake8
+    args:
+      - '--select=FKA1'
+      - '--kwargs-max-positional-arguments=2'
+      - --kwargs-ignore-function-pattern-extend
+      - ^np\..*|^pytest\..*|^random\..*|^mock\.patch.*|^patch|^re\..*|^json\..*|^os\.path\..*|^warnings\..*|^math\..*|^open|^click.option|^yaml\..*|^sys\..*|\.get$|\.replace$|\.transpose$|\.reshape$|^runner\.invoke$|^dict\.fromkeys$|^binom$
+    additional_dependencies:
+      - flake8-force-keyword-arguments
 - repo: local
   hooks:
     - id: ruff-lint

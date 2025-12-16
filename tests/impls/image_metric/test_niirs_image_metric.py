@@ -9,7 +9,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 
-is_usable: bool = import_guard("pybsm", PyBSMImportError, ["otf"])
+is_usable: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["otf"])
 
 
 @pytest.mark.skipif(

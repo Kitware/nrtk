@@ -27,7 +27,7 @@ Example:
     ...     pytest.skip("skimage perturbers are not usable")
     >>> image = np.ones((256, 256, 3))
     >>> gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
-    >>> noisy_image, _ = gaussian_perturber.perturb(image)
+    >>> noisy_image, _ = gaussian_perturber.perturb(image=image)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.
@@ -54,12 +54,12 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import ScikitImageImportError
 from nrtk.utils._import_guard import import_guard
 
-skimage_available: bool = import_guard("skimage", ScikitImageImportError, ["util"])
+skimage_available: bool = import_guard(module_name="skimage", exception=ScikitImageImportError, submodules=["util"])
 import skimage.util  # noqa: E402
 
 
 class _SKImageNoisePerturber(PerturbImage):
-    def __init__(self, rng: np.random.Generator | int | None = 1, clip: bool = True) -> None:
+    def __init__(self, *, rng: np.random.Generator | int | None = 1, clip: bool = True) -> None:
         """Base class for skimage perturbers.
 
         Args:
@@ -74,7 +74,7 @@ class _SKImageNoisePerturber(PerturbImage):
         self.rng = rng
         self.clip = clip
 
-    def _perturb(self, image: np.ndarray, **kwargs: Any) -> np.ndarray:
+    def _perturb(self, *, image: np.ndarray, **kwargs: Any) -> np.ndarray:
         """Call skimage.util.random_noise with appropriate arguments and convert back to input dtype.
 
         Args:
@@ -119,6 +119,7 @@ class _SKImageNoisePerturber(PerturbImage):
         return cfg
 
     @classmethod
+    @override
     def is_usable(cls) -> bool:
         """Returns true if the required skimage module is available."""
         # Requires scikit-image to be installed
@@ -128,6 +129,7 @@ class _SKImageNoisePerturber(PerturbImage):
 class _SPNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
+        *,
         rng: np.random.Generator | int | None = 1,
         amount: float = 0.05,
         clip: bool = True,
@@ -174,13 +176,14 @@ class SaltNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with salt noise."""
         super().perturb(image=image, boxes=boxes, **additional_params)
-        return self._perturb(image, mode="salt", amount=self.amount), boxes
+        return self._perturb(image=image, mode="salt", amount=self.amount), boxes
 
 
 class PepperNoisePerturber(_SPNoisePerturber):
@@ -198,13 +201,14 @@ class PepperNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with pepper noise."""
         super().perturb(image=image, boxes=boxes, **additional_params)
-        return self._perturb(image, mode="pepper", amount=self.amount), boxes
+        return self._perturb(image=image, mode="pepper", amount=self.amount), boxes
 
 
 class SaltAndPepperNoisePerturber(_SPNoisePerturber):
@@ -223,6 +227,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 
     def __init__(
         self,
+        *,
         rng: np.random.Generator | int | None = 1,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
@@ -253,6 +258,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -261,7 +267,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         super().perturb(image=image, boxes=boxes, **additional_params)
 
         return self._perturb(
-            image,
+            image=image,
             mode="s&p",
             amount=self.amount,
             salt_vs_pepper=self.salt_vs_pepper,
@@ -278,6 +284,7 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
 class _GSNoisePerturber(_SKImageNoisePerturber):
     def __init__(
         self,
+        *,
         rng: np.random.Generator | int | None = 1,
         mean: float = 0.0,
         var: float = 0.05,
@@ -320,13 +327,14 @@ class GaussianNoisePerturber(_GSNoisePerturber):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with Gaussian noise."""
         super().perturb(image=image, boxes=boxes, **additional_params)
-        return self._perturb(image, mode="gaussian", var=self.var, mean=self.mean), boxes
+        return self._perturb(image=image, mode="gaussian", var=self.var, mean=self.mean), boxes
 
 
 class SpeckleNoisePerturber(_GSNoisePerturber):
@@ -335,10 +343,11 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with multiplicative noise."""
         super().perturb(image=image, boxes=boxes, **additional_params)
-        return self._perturb(image, mode="speckle", var=self.var, mean=self.mean), boxes
+        return self._perturb(image=image, mode="speckle", var=self.var, mean=self.mean), boxes

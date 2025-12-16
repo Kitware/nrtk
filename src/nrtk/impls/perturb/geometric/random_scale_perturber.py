@@ -32,7 +32,7 @@ from nrtk.impls.perturb.wrapper.albumentations_perturber import AlbumentationsPe
 from nrtk.utils._exceptions import AlbumentationsImportError, OpenCVImportError
 from nrtk.utils._import_guard import import_guard
 
-cv2_available: bool = import_guard("cv2", OpenCVImportError)
+cv2_available: bool = import_guard(module_name="cv2", exception=OpenCVImportError)
 
 import cv2  # noqa: E402
 
@@ -56,6 +56,7 @@ class RandomScalePerturber(AlbumentationsPerturber):
 
     def __init__(  # noqa: C901
         self,
+        *,
         limit: float | tuple[float, float] = 0.0,
         interpolation: int = cv2.INTER_LINEAR,
         probability: float = 1.0,

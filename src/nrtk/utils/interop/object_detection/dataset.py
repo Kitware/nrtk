@@ -17,23 +17,23 @@ from typing_extensions import ReadOnly
 from nrtk.utils._exceptions import NRTKXAITKHelperImportError
 from nrtk.utils._import_guard import import_guard
 
-PIL_available: bool = import_guard("PIL", NRTKXAITKHelperImportError)
+PIL_available: bool = import_guard(module_name="PIL", exception=NRTKXAITKHelperImportError)
 maite_available: bool = import_guard(
-    "maite",
-    NRTKXAITKHelperImportError,
-    ["protocols.object_detection"],
-    ["Dataset", "DatumMetadataType", "InputType", "TargetType"],
+    module_name="maite",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["protocols.object_detection"],
+    objects=["Dataset", "DatumMetadataType", "InputType", "TargetType"],
 ) and import_guard(
-    "maite",
-    NRTKXAITKHelperImportError,
-    ["protocols"],
-    ["DatasetMetadata", "DatumMetadata"],
+    module_name="maite",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["protocols"],
+    objects=["DatasetMetadata", "DatumMetadata"],
 )
-torch_available: bool = import_guard("torch", NRTKXAITKHelperImportError) and import_guard(
-    "torch",
-    NRTKXAITKHelperImportError,
-    ["utils.data"],
-    ["Subset"],
+torch_available: bool = import_guard(module_name="torch", exception=NRTKXAITKHelperImportError) and import_guard(
+    module_name="torch",
+    exception=NRTKXAITKHelperImportError,
+    submodules=["utils.data"],
+    objects=["Subset"],
 )
 nrtk_xaitk_helpers_available: bool = maite_available and PIL_available and torch_available
 import torch  # noqa: E402
@@ -86,6 +86,7 @@ class VisDroneObjectDetectionDataset(Dataset):
 
     def __init__(
         self,
+        *,
         images_dir: str,
         annotations_dir: str,
         dataset_id: str = "VisDrone-DET-test",
@@ -216,6 +217,7 @@ class VisDroneObjectDetectionDataset(Dataset):
 
 
 def stratified_sample_dataset(
+    *,
     dataset: VisDroneObjectDetectionDataset,
     subset_size: int,
     seed: int = 42,
@@ -254,6 +256,6 @@ def stratified_sample_dataset(
         selected_indices.extend(random.sample(remaining_indices, additional_samples))
 
     # Create a new dataset object as a subset
-    subset_dataset: VisDroneObjectDetectionDataset = Subset(dataset, selected_indices)  # pyright: ignore [reportAssignmentType, reportArgumentType]
+    subset_dataset: VisDroneObjectDetectionDataset = Subset(dataset=dataset, indices=selected_indices)  # pyright: ignore [reportAssignmentType, reportArgumentType]
 
     return subset_dataset

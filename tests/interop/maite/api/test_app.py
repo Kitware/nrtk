@@ -19,7 +19,7 @@ from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard, is_available
 from tests.interop.maite import BAD_NRTK_CONFIG, DATASET_FOLDER, LABEL_FILE, NRTK_PYBSM_CONFIG
 
-app_deps_available: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
+app_deps_available: bool = import_guard(module_name="fastapi", exception=FastApiImportError, submodules=["encoders"])
 from fastapi.encoders import jsonable_encoder  # noqa: E402
 
 deps = ["kwcoco", "maite"]

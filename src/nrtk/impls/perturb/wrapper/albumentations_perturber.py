@@ -18,7 +18,7 @@ Example usage:
     >>> parameters = {"drop_length": 40, "drop_width": 10}
     >>> image = np.ones((256, 256, 3))
     >>> perturber = AlbumentationsPerturber(perturber=perturber, parameters=parameters)
-    >>> perturbed_image, _ = perturber.perturb(image)
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -36,8 +36,12 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._exceptions import AlbumentationsImportError, OpenCVImportError
 from nrtk.utils._import_guard import import_guard
 
-albumentations_available: bool = import_guard("albumentations", AlbumentationsImportError, ["core.bbox_utils"])
-cv2_available: bool = import_guard("cv2", OpenCVImportError)
+albumentations_available: bool = import_guard(
+    module_name="albumentations",
+    exception=AlbumentationsImportError,
+    submodules=["core.bbox_utils"],
+)
+cv2_available: bool = import_guard(module_name="cv2", exception=OpenCVImportError)
 
 import albumentations as A  # noqa N812, F401
 from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations  # noqa E402
@@ -59,6 +63,7 @@ class AlbumentationsPerturber(PerturbImage):
 
     def __init__(
         self,
+        *,
         perturber: str = "NoOp",
         parameters: dict[str, Any] | None = None,
         seed: int | None = None,
@@ -103,29 +108,30 @@ class AlbumentationsPerturber(PerturbImage):
             self.transform.set_random_seed(seed)
 
     @staticmethod
-    def _aabb_to_bbox(box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
+    def _aabb_to_bbox(*, box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
         """Convert AxisAlignedBoundingBox to albumentations format bbox."""
         flat = np.array([[box.min_vertex[0], box.min_vertex[1], box.max_vertex[0], box.max_vertex[1]]])
         return convert_bboxes_to_albumentations(
-            flat,
-            "pascal_voc",
-            {"height": image.shape[0], "width": image.shape[1]},
+            bboxes=flat,
+            source_format="pascal_voc",
+            shape={"height": image.shape[0], "width": image.shape[1]},
         )[0]
 
     @staticmethod
-    def _bbox_to_aabb(box: list[int], image: np.ndarray[Any, Any]) -> AxisAlignedBoundingBox:
+    def _bbox_to_aabb(*, box: list[int], image: np.ndarray[Any, Any]) -> AxisAlignedBoundingBox:
         """Convert albumentations format bbox to AxisAlignedBoundingBox."""
         flat = np.array([[box[0], box[1], box[2], box[3]]])
         as_aabb = convert_bboxes_from_albumentations(
-            flat,
-            "pascal_voc",
-            {"height": image.shape[0], "width": image.shape[1]},
+            bboxes=flat,
+            target_format="pascal_voc",
+            shape={"height": image.shape[0], "width": image.shape[1]},
         )[0]
-        return AxisAlignedBoundingBox((as_aabb[0], as_aabb[1]), (as_aabb[2], as_aabb[3]))
+        return AxisAlignedBoundingBox(min_vertex=(as_aabb[0], as_aabb[1]), max_vertex=(as_aabb[2], as_aabb[3]))
 
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -148,7 +154,7 @@ class AlbumentationsPerturber(PerturbImage):
         labels = list()
         if boxes:
             for box in boxes:
-                bboxes.append(AlbumentationsPerturber._aabb_to_bbox(box[0], image))
+                bboxes.append(AlbumentationsPerturber._aabb_to_bbox(box=box[0], image=image))
                 labels.append(box[1])
 
         # Run transform
@@ -162,7 +168,7 @@ class AlbumentationsPerturber(PerturbImage):
         output_boxes = None
         if boxes:
             output_boxes = [
-                (AlbumentationsPerturber._bbox_to_aabb(bbox, output_image), label)
+                (AlbumentationsPerturber._bbox_to_aabb(box=bbox, image=output_image), label)
                 for bbox, label in zip(output["bboxes"], labels, strict=False)
             ]
         return output_image, output_boxes

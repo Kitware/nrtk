@@ -45,6 +45,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
 
     def __init__(
         self,
+        *,
         images: Sequence[np.ndarray[Any, Any]],
         ground_truth: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> None:
@@ -93,6 +94,7 @@ class SimpleGenericGenerator(GenerateObjectDetectorBlackboxResponse):
             raise IndexError
         return self.images[idx], self.ground_truth[idx], {}
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Generates a serializable configuration for the instance."""
         return {"images": self.images, "ground_truth": self.ground_truth}

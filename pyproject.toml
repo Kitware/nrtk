@@ -195,7 +195,7 @@ extend-include = ["*.ipynb"]
 [tool.ruff.lint]
 select = [
     "F", "E", "W", "C90", "I", "N", "D", "UP",
-    "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PYI", "PT", "Q",
+    "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PLR0917", "PYI", "PT", "Q",
     "RSE", "RET", "SLF", "SIM", "TID252", "ARG", "FIX", "PD", "FLY", "NPY", "RUF027",
     "RUF100", "PERF", "UP045", "RUF013"
 ]
@@ -216,7 +216,11 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "tests/*.py" = [
   "S101",  # Allow asserts in tests
   "SLF001",  # Allow private member access for introspection in tests
-  "D100", "D101", "D102", "D103", "D104", "D105", "D107"  # Allow missing docstring in test dir
+  "D100", "D101", "D102", "D103", "D104", "D105", "D107",  # Allow missing docstring in test dir
+  "PLR0917"  # Allow more than one positional arg in tests
+]
+"docs/examples/*.ipynb" = [
+   "PLR0917"  # Allow more than one positional arg in notebooks
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -234,6 +238,9 @@ convention = "google"
 
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 120
+
+[tool.ruff.lint.pylint]
+max-positional-args = 1
 
 [tool.ruff.format]
 quote-style = "double"

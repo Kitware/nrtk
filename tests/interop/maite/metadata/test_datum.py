@@ -32,7 +32,7 @@ class TestGenericInteropUtilities:
         expectation: AbstractContextManager,
     ) -> None:
         with expectation:
-            md_out = _forward_md_keys(md, aug_md, forwarded_keys)
+            md_out = _forward_md_keys(md=md, aug_md=aug_md, forwarded_keys=forwarded_keys)
 
             for key in md_out:
                 assert key in md or aug_md

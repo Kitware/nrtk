@@ -13,11 +13,11 @@ Usage:
     ground truth and predicted detections:
 
     scorer = NOPScorer()
-    scores = scorer.score(actual_detections, predicted_detections)
+    scores = scorer.score(actual=actual_detections, predicted=predicted_detections)
 
 Example:
     nop_scorer = NOPScorer()
-    zero_scores = nop_scorer.score(actual_detections, predicted_detections)
+    zero_scores = nop_scorer.score(actual=actual_detections, predicted=predicted_detections)
 """
 
 __all__ = ["NOPScorer"]
@@ -44,6 +44,7 @@ class NOPScorer(ScoreDetections):
     @override
     def score(
         self,
+        *,
         actual: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, Any]]]],
         predicted: Sequence[Sequence[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]],
     ) -> Sequence[float]:
@@ -58,6 +59,7 @@ class NOPScorer(ScoreDetections):
 
         return [0 for actual_det in actual]
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the NOPScorer instance."""
         return {}

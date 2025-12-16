@@ -73,6 +73,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
 
     def generate(  # noqa C901:
         self,
+        *,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_classifier: ClassifyImage,
         blackbox_scorer: ScoreClassifications,
@@ -116,7 +117,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
                     perturbed = image.copy()
 
                     for perturber in perturbers:
-                        perturbed, _ = perturber(perturbed, **extra)
+                        perturbed, _ = perturber(image=perturbed, **extra)
 
                     batch_images.append(perturbed)
                     batch_gt.append(actual)
@@ -153,6 +154,7 @@ class GenerateClassifierBlackboxResponse(GenerateBlackboxResponse):
 
     def __call__(
         self,
+        *,
         blackbox_perturber_factories: Sequence[PerturbImageFactory],
         blackbox_classifier: ClassifyImage,
         blackbox_scorer: ScoreClassifications,

@@ -16,7 +16,7 @@ class TestRadialDistortionPerturber:
     @pytest.mark.parametrize(
         ("image"),
         [
-            (rng.integers(0, 255, (256, 256, 3), dtype=np.uint8)),
+            (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)),
             (np.ones((3, 3, 3)).astype(np.uint8)),
         ],
     )
@@ -50,7 +50,7 @@ class TestRadialDistortionPerturber:
     def test_regression(self, k: Sequence[float], psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
-        image = Image.new("RGB", grayscale_image.size)
+        image = Image.new(mode="RGB", size=grayscale_image.size)
         image.paste(grayscale_image)
         image = np.array(image)
         inst = RadialDistortionPerturber(k=k)
@@ -71,7 +71,7 @@ class TestRadialDistortionPerturber:
         image = np.ones((255, 255, 3)).astype(np.uint8)
         k = [0.5, 0.5, 0.5]
         inst = RadialDistortionPerturber(color_fill=color, k=k)
-        out_img = inst.perturb(image)
+        out_img = inst.perturb(image=image)
 
         assert (out_img[0][0] == color).all()
 

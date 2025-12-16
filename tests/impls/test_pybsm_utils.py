@@ -5,7 +5,7 @@ import numpy as np
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
-is_usable: bool = import_guard("pybsm", PyBSMImportError, ["otf"])
+is_usable: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["otf"])
 from pybsm.otf import dark_current_from_density  # noqa: E402
 
 

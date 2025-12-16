@@ -34,7 +34,7 @@ from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
 # Import checks
-pybsm_available: bool = import_guard("pybsm", PyBSMImportError, ["simulation"])
+pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
 
 from pybsm.simulation import ImageSimulator, JitterSimulator  # noqa: E402
 
@@ -51,6 +51,7 @@ class JitterOTFPerturber(PybsmOTFPerturber):
 
     def __init__(
         self,
+        *,
         s_x: float | None = None,
         s_y: float | None = None,
         interp: bool = True,

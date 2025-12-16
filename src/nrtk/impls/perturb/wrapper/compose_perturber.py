@@ -14,7 +14,7 @@ Example usage:
     >>> image = np.ones((256, 256, 3))
     >>> perturbers = [RandomCropPerturber(), BrightnessPerturber(factor=0.5)]
     >>> perturber = ComposePerturber(perturbers=perturbers)
-    >>> perturbed_image, _ = perturber.perturb(image)
+    >>> perturbed_image, _ = perturber.perturb(image=image)
 """
 
 from __future__ import annotations
@@ -65,6 +65,7 @@ class ComposePerturber(PerturbImage):
     @override
     def perturb(
         self,
+        *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         **additional_params: Any,
@@ -95,6 +96,7 @@ class ComposePerturber(PerturbImage):
 
         return out_img, out_boxes
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Returns the configuration dictionary of the ComposePerturber instance."""
         cfg = super().get_config()
@@ -102,6 +104,7 @@ class ComposePerturber(PerturbImage):
         return cfg
 
     @classmethod
+    @override
     def from_config(
         cls,
         config_dict: dict[str, Any],
@@ -121,7 +124,8 @@ class ComposePerturber(PerturbImage):
         config_dict = dict(config_dict)
 
         config_dict["perturbers"] = [
-            from_config_dict(perturber, PerturbImage.get_impls()) for perturber in config_dict["perturbers"]
+            from_config_dict(config=perturber, type_iter=PerturbImage.get_impls())
+            for perturber in config_dict["perturbers"]
         ]
 
         return super().from_config(config_dict, merge_default=merge_default)

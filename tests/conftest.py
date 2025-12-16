@@ -231,13 +231,13 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
             return np.array(image)
 
     @staticmethod
-    def _gaussian_kernel(size: int = 11, sigma: float = 1.5) -> np.ndarray:
+    def _gaussian_kernel(*, size: int = 11, sigma: float = 1.5) -> np.ndarray:
         x = np.arange(size) - (size - 1) / 2.0
         gauss = np.exp(-(x**2) / (2 * sigma**2))
         return gauss / gauss.sum()
 
     @staticmethod
-    def _convolve2d(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    def _convolve2d(*, img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
         h, w = img.shape
         kh, kw = kernel.shape
         pad_h, pad_w = kh // 2, kw // 2
@@ -252,7 +252,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
 
         return output
 
-    def _compute_ssim_windowed(self, img_a: np.ndarray, img_b: np.ndarray) -> float:
+    def _compute_ssim_windowed(self, *, img_a: np.ndarray, img_b: np.ndarray) -> float:
         img_a = img_a.astype(np.float64, copy=False)
         img_b = img_b.astype(np.float64, copy=False)
 
@@ -267,7 +267,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
         c1 = (0.01 * dynamic_range) ** 2
         c2 = (0.03 * dynamic_range) ** 2
 
-        kernel = self._gaussian_kernel(11, 1.5)
+        kernel = self._gaussian_kernel(size=11, sigma=1.5)
         kernel_2d = np.outer(kernel, kernel)
 
         if img_a.ndim == 2:
@@ -281,11 +281,11 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
             a_c = img_a[:, :, c]
             b_c = img_b[:, :, c]
 
-            mu_a = self._convolve2d(a_c, kernel_2d)
-            mu_b = self._convolve2d(b_c, kernel_2d)
-            mu_aa = self._convolve2d(a_c * a_c, kernel_2d)
-            mu_bb = self._convolve2d(b_c * b_c, kernel_2d)
-            mu_ab = self._convolve2d(a_c * b_c, kernel_2d)
+            mu_a = self._convolve2d(img=a_c, kernel=kernel_2d)
+            mu_b = self._convolve2d(img=b_c, kernel=kernel_2d)
+            mu_aa = self._convolve2d(img=a_c * a_c, kernel=kernel_2d)
+            mu_bb = self._convolve2d(img=b_c * b_c, kernel=kernel_2d)
+            mu_ab = self._convolve2d(img=a_c * b_c, kernel=kernel_2d)
 
             sigma_a_sq = mu_aa - mu_a**2
             sigma_b_sq = mu_bb - mu_b**2
@@ -306,7 +306,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
         if expected_array.shape != received_array.shape:
             return False
 
-        ssim_val = self._compute_ssim_windowed(expected_array, received_array)
+        ssim_val = self._compute_ssim_windowed(img_a=expected_array, img_b=received_array)
         return ssim_val >= self.min_ssim
 
 

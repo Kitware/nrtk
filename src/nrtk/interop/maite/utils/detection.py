@@ -14,17 +14,17 @@ from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
 maite_available: bool = import_guard(
-    "maite",
-    MaiteImportError,
-    ["protocols", "protocols.object_detection", "protocols.image_classification"],
-    ["DatumMetadata", "TargetType", "DatumMetadataType"],
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols", "protocols.object_detection", "protocols.image_classification"],
+    objects=["DatumMetadata", "TargetType", "DatumMetadataType"],
 )
-kwcoco_available: bool = import_guard("kwcoco", KWCocoImportError)
+kwcoco_available: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 from kwcoco import CocoDataset  # type: ignore  # noqa: E402
 from maite.protocols.object_detection import Dataset  # noqa: E402
 
 
-def _xywh_bbox_xform(x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:
+def _xywh_bbox_xform(*, x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:
     return x1, y1, x2 - x1, y2 - y1
 
 
@@ -36,6 +36,7 @@ def _create_annotations(dataset_categories: list[dict[str, Any]]) -> "CocoDatase
 
 
 def dataset_to_coco(  # noqa: C901
+    *,
     dataset: Dataset,  # pyright: ignore [reportInvalidTypeForm]
     output_dir: Path,
     img_filenames: list[Path],

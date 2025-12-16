@@ -13,7 +13,12 @@ from typing_extensions import NotRequired, ReadOnly
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
-maite_available: bool = import_guard("maite", MaiteImportError, submodules=["protocols"], objects=["DatumMetadata"])
+maite_available: bool = import_guard(
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols"],
+    objects=["DatumMetadata"],
+)
 from maite.protocols import DatumMetadata  # noqa: E402
 
 
@@ -27,6 +32,7 @@ class NRTKDatumMetadata(DatumMetadata):  # pyright:  ignore [reportGeneralTypeIs
 
 
 def _forward_md_keys(
+    *,
     md: DatumMetadata,  # pyright:  ignore [reportInvalidTypeForm]
     aug_md: NRTKDatumMetadata,
     forwarded_keys: Sequence[str],
