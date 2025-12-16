@@ -87,7 +87,7 @@ your scenario to the right tools.
          :link-type: doc
 
       .. grid-item-card:: ✅ Validation and Trust
-         :link: /interoperability/maite/jatic_interoperability
+         :link: validation_and_trust
          :link-type: doc
 
       .. grid-item-card:: 📊 Testing & Evaluation Guides
