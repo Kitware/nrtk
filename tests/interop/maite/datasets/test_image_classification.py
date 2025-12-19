@@ -2,7 +2,6 @@ from collections.abc import Sequence
 
 import numpy as np
 import pytest
-from maite.protocols.image_classification import TargetType
 
 from nrtk.interop.maite.augmentations.image_classification import (
     JATICClassificationAugmentation,
@@ -11,10 +10,11 @@ from nrtk.interop.maite.datasets.image_classification import (
     JATICImageClassificationDataset,
 )
 from nrtk.utils._exceptions import MaiteImportError
-from nrtk.utils._import_guard import is_available
-from tests.interop.maite.utils.test_utils import ResizePerturber
+from nrtk.utils._import_guard import import_guard
+from tests.interop.maite.perturber_fixtures import ResizePerturber
 
-maite_available: bool = is_available("maite")
+maite_available: bool = import_guard(module_name="maite", exception=MaiteImportError)
+from maite.protocols.image_classification import TargetType  # noqa: E402
 
 random = np.random.default_rng()
 

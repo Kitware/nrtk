@@ -1,3 +1,5 @@
+"""Fake perturbers for testing perturb image factories."""
+
 from __future__ import annotations
 
 from collections.abc import Hashable, Iterable

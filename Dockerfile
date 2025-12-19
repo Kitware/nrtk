@@ -47,7 +47,7 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     poetry config virtualenvs.create false && poetry run pip \
     install -e .[maite-cpu,tools,headless,pybsm-headless]
 
-ENTRYPOINT [ "python", "./src/nrtk_jatic/utils/bin/nrtk_perturber_cli.py"]
+ENTRYPOINT [ "nrtk-perturber" ]
 # default args for nrtk_perturber_cli
 CMD ["/root/input/dataset", "/root/output/", \
      "/root/input/nrtk_config.json", "-v"]

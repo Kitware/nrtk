@@ -1,4 +1,6 @@
-"""Utilities for interoperability with MAITE Object Detection protocols."""
+"""Image classification utilities for NRTK-XAITK workflow notebooks."""
+
+from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any
@@ -12,4 +14,8 @@ __all__: list[str]
 __getattr__, __dir__, __all__ = lazy.attach(
     __name__,
     submodules=["dataset", "model"],
+    submod_attrs={
+        "dataset": ["HuggingFaceMaiteDataset", "create_data_subset"],
+        "model": ["HuggingFaceMaiteModel"],
+    },
 )

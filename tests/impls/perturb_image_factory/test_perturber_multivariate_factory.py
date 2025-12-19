@@ -18,7 +18,7 @@ from nrtk.impls.perturb_image_factory import PerturberMultivariateFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.fakes import FakePerturber
-from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
+from tests.utils.test_pybsm import create_sample_sensor_and_scenario
 
 
 class TestPerturberMultivariateFactory:

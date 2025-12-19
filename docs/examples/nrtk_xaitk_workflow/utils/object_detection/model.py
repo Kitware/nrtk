@@ -3,12 +3,13 @@
 __all__ = ["MaiteYOLODetector"]
 
 from collections.abc import Sequence
-from dataclasses import dataclass
 
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.utils._exceptions import NRTKXAITKHelperImportError
 from nrtk.utils._import_guard import import_guard
+
+from .dataset import YOLODetectionTarget
 
 maite_available: bool = import_guard(
     module_name="maite",
@@ -32,23 +33,6 @@ import torch  # noqa: E402
 import ultralytics.models  # noqa: E402
 from maite.protocols import ModelMetadata  # noqa: E402
 from maite.protocols.object_detection import InputType, Model  # noqa: E402
-
-
-@dataclass
-class YOLODetectionTarget:
-    """A helper class to represent object detection results in the format expected by YOLO-based models.
-
-    Attributes:
-        boxes (torch.Tensor): A tensor containing the bounding boxes for detected objects in
-            [x_min, y_min, x_max, y_max] format.
-        labels (torch.Tensor): A tensor containing the class labels for the detected objects.
-            These may be floats for compatibility with specific datasets or tools.
-        scores (torch.Tensor): A tensor containing the confidence scores for the detected objects.
-    """
-
-    boxes: torch.Tensor
-    labels: torch.Tensor
-    scores: torch.Tensor
 
 
 class MaiteYOLODetector(Model):

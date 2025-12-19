@@ -4,11 +4,11 @@ import pytest
 from nrtk.impls.perturb_image.photometric.blur import AverageBlurPerturber
 from nrtk.impls.perturb_image_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interop.maite.bin.nrtk_perturber import nrtk_perturber
 from nrtk.interop.maite.datasets.object_detection import (
     JATICDetectionTarget,
     JATICObjectDetectionDataset,
 )
-from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._import_guard import is_available
 
 deps = ["maite"]
