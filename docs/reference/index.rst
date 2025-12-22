@@ -31,7 +31,6 @@ Tools & Services
    nrtk_as_a_service
    schema
    utils
-   containers
 
 Glossary
 --------

@@ -120,7 +120,7 @@ html_theme_options = {
     "collapse_navigation": True,  # Enable collapse/expand functionality
     "show_toc_level": 1,  # Table of contents depth on page
     "navigation_with_keys": True,
-    "header_links_before_dropdown": 5,
+    "header_links_before_dropdown": 6,
     "icon_links": [
         {
             "name": "GitHub",
@@ -159,6 +159,7 @@ html_sidebars = {
     "explanations/**": ["sidebar-nav-bs"],
     "reference/**": ["sidebar-nav-bs"],
     "interoperability/**": ["sidebar-nav-bs"],
+    "containers/**": ["sidebar-nav-bs"],
     "development/**": ["sidebar-nav-bs"],
     "release_notes/**": ["sidebar-nav-bs"],
 }
