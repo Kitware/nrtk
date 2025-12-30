@@ -85,43 +85,27 @@ notebooks:
       - NOTEBOOK_DIR: "docs/examples"
         NOTEBOOK_FILE: [
           "albumentations_perturber.ipynb",
-          "coco_scorer.ipynb",
-          "photometric_perturbers.ipynb",
+          "generative_perturbers.ipynb",
           "nrtk_tutorial.ipynb",
-          "simple_generic_generator.ipynb",
-          "simple_pybsm_generator.ipynb",
           "optical_perturbers.ipynb",
-          "generative_perturbers.ipynb"
-        ]
-      - NOTEBOOK_DIR: "docs/examples/pybsm"
-        NOTEBOOK_FILE: [
-          "pybsm_test.ipynb",
+          "photometric_perturbers.ipynb",
           "pybsm_default_config.ipynb"
         ]
+      # XAITK/NRTK workflow excluded for computational reasons
       - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
-          "augmentations.ipynb",
-          # The image metric notebook needs to be updated
-          # as part of nrtk#322 before adding to CI.
-          #"compute_image_metric.ipynb",
           "jatic-perturbations-saliency.ipynb",
+          "nrtk_affine_perturbers_demo.ipynb",
           "nrtk_brightness_perturber_demo.ipynb",
           "nrtk_focus_perturber_demo.ipynb",
           "nrtk_haze_perturber_demo.ipynb",
-          "nrtk_sensor_transformation_demo.ipynb",
-          "nrtk_lens_flare_demo.ipynb",
-          "nrtk_affine_perturbers_demo.ipynb",
           "nrtk_jitter_perturber_demo.ipynb",
-          "nrtk_turbulence_perturber_demo.ipynb",
-          "nrtk_water_droplet_perturber_demo.ipynb",
+          "nrtk_lens_flare_demo.ipynb",
           "nrtk_radial_distortion_perturber_demo.ipynb",
-          # "nrtk_diffusion_perturber_demo.ipynb"
+          "nrtk_sensor_transformation_demo.ipynb",
+          "nrtk_turbulence_perturber_demo.ipynb",
+          "nrtk_water_droplet_perturber_demo.ipynb"
         ]
-      - NOTEBOOK_DIR: "docs/examples/maite/gradio"
-        NOTEBOOK_FILE: [
-          "nrtk-gradio.ipynb"
-        ]
-
 coverage:
   extends: .test-setup
   dependencies:

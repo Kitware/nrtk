@@ -13,5 +13,4 @@ revisiting background concepts.
    /examples/optical_perturbers.ipynb
    /examples/generative_perturbers.ipynb
    /examples/albumentations_perturber.ipynb
-   /examples/coco_scorer
-   /examples/pybsm/pybsm_default_config
+   /examples/pybsm_default_config
