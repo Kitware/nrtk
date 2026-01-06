@@ -66,8 +66,8 @@ These perturbations are particularly useful in applications where AI performance
 **satellite imagery, surveillance, and autonomous systems**.
 
 
-How NRTK Works: Image Perturbation and Scoring
-----------------------------------------------
+How NRTK Works: Image Perturbation
+----------------------------------
 
 Image Perturbations
 ^^^^^^^^^^^^^^^^^^^
@@ -84,30 +84,26 @@ It also provides functionality through `Strategy <https://en.wikipedia.org/wiki/
 `Adapter <https://en.wikipedia.org/wiki/Adapter_pattern>`_ patterns to allow for modular integration into systems and
 applications.
 
-Scoring and Model Evaluation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Model Evaluation
+^^^^^^^^^^^^^^^^
 
-After perturbing images, NRTK enables evaluation of AI models by:
+After perturbing images, practitioners can gain insights into how robust AI models are to real-world sensor
+variations via model evaluation. NRTK is interoperable with :ref:`MAITE <Interoperability>` (as well as the
+remainder of the JATIC tools!) and together these tools enable teams to develop more reliable vision based
+AI-systems by:
 
     * Testing model performance using perturbed datasets.
     * Comparing model outputs across different perturbation settings.
     * Supporting classification and detection tasks in a black-box manner.
 
-By using these techniques, NRTK provides insights into how robust AI models are to real-world sensor variations,
-helping teams develop more reliable vision-based AI systems.
-
-In addition to NRTK's built in scoring and model evaluation, NRTK has interoperability with the
-`maite <https://github.com/mit-ll-ai-technology/maite>`_ library and integration with other
-`JATIC <https://cdao.pages.jatic.net/public/>`_ tools.
-
 Interpreting Robustness Results
---------------------------------
+-------------------------------
 
 NRTK generates performance curves that show how model behavior changes with increasing perturbation strength.
 Understanding how to interpret these results is critical for making informed decisions about model robustness.
 
 Understanding Perturbation Parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * **Increasing parameter values** (e.g., blur sigma, noise amplitude, ground range) represent progressively
   stronger degradations or more challenging imaging conditions.
@@ -119,7 +115,7 @@ Understanding Perturbation Parameters
   additional degradation (e.g., extreme blur, where the model has already lost any useful signal).
 
 Reading Performance Curves
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Performance curves plot model metrics (accuracy, precision, recall, mAP) against perturbation strength:
 
@@ -192,11 +188,7 @@ The NRTK algorithms can be organized according to their respective tasks:
     * :ref:`Image Perturbation <Interface: PerturbImage>`
     * :ref:`Perturbation Factory <Interface: PerturbImageFactory>`
 
-- Score generation:
-    * :ref:`Scoring <Interface: ScoreDetections>`
-    * :ref:`End-to-End Generation and Scoring <Interface: GenerateObjectDetectorBlackboxResponse>`
-
-- MAITE integration:
+- MAITE interoperability:
     * :ref:`Interoperability`
 
 References

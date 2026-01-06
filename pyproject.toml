@@ -48,8 +48,6 @@ nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber
 
 [project.entry-points."smqtk_plugins"]
 # Add implementation sub-module exposure here.
-"impls.gen_object_detector_blackbox_response.simple_generic_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator"
-"impls.gen_object_detector_blackbox_response.simple_pybsm_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator"
 "impls.perturb.photometric.blur" = "nrtk.impls.perturb.photometric.blur"
 "impls.perturb.photometric.enhance" = "nrtk.impls.perturb.photometric.enhance"
 "impls.perturb.photometric.noise" = "nrtk.impls.perturb.photometric.noise"
@@ -72,11 +70,6 @@ nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber
 "impls.perturb_image_factory.generic.one_step" = "nrtk.impls.perturb_image_factory.generic.one_step"
 "impls.perturb_image_factory.generic.linspace" = "nrtk.impls.perturb_image_factory.generic.linspace"
 "impls.perturb_image_factory.generic.multivariate" = "nrtk.impls.perturb_image_factory.generic.multivariate"
-"impls.score_detections.class_agnostic_pixelwise_iou_scorer" = "nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer"
-"impls.score_detections.coco_scorer" = "nrtk.impls.score_detections.coco_scorer"
-"impls.score_detections.nop_scorer" = "nrtk.impls.score_detections.nop_scorer"
-"impls.score_detections.random_scorer" = "nrtk.impls.score_detections.random_scorer"
-"impls.image_metric.snr_image_metric" = "nrtk.impls.image_metric.snr_image_metric"
 
 [project.optional-dependencies]
 graphics = ["opencv-python>=4.6"]

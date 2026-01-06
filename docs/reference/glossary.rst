@@ -10,19 +10,14 @@ Glossary
 
    COCO
      Common Objects in Context (COCO) — A large-scale dataset that is a widely used benchmark for object detection and
-     segmentation. In NRTK, the COCO Scorer is a tool that evaluates object detection results using metrics from that
-     benchmark. The COCO format is also used in the :ref:`Interoperability` module.
+     segmentation. The COCO format is also used in the :ref:`Interoperability` module.
 
    environment perturber
      Environment perturbers simulate atmospheric and weather-related effects that occur in real-world imaging
      conditions.
 
-   generative pertubrer
+   generative perturber
      Generative perturbers use AI models to transform images through learned representations.
-
-   generator
-     A customizable component that takes a perturber factory, a scorer, and an object detector to generate item
-     response curves.
 
    geometric perturber
      Geometric perturbers alter the spatial positioning and orientation of images through transformations such as

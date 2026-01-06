@@ -25,7 +25,7 @@ to evaluate the natural robustness of computer vision algorithms.**
 Welcome to the documentation for NRTK, a tool created for developers and Test and Evaluation
 (T&E) engineers seeking to rigorously evaluate and enhance the robustness of computer vision models.
 This toolkit simulates a wide range of real-world perturbations, focusing on sensor-specific
-variables such as changes in camera focal length and aperture diameter. It provides a detailed
+variables such as changes in camera focal length and aperture diameter. It enables detailed
 analysis of how these factors affect algorithm performance and expand existing datasets. Whether
 you're dealing with subtle shifts in optical settings or more pronounced environmental changes,
 this toolkit gives you the insights and capabilities necessary to ensure your innovative computer
@@ -104,7 +104,7 @@ deployed on actual hardware facing natural perturbations in the field.
 Testing & Evaluation Tasks
 --------------------------
 
-For T&E engineers focusing on AI model testing, NRTK provides several key functionalities:
+For T&E engineers focusing on AI model testing, NRTK enables several key functionalities:
 
 
 * **Robustness Testing**: Evaluating model performance when inputs are perturbed or under distribution shift

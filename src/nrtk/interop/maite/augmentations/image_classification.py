@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__all__ = ["JATICClassificationAugmentation", "JATICClassificationAugmentationWithMetric"]
+__all__ = ["JATICClassificationAugmentation"]
 
 import copy
 from collections.abc import Iterable, Sequence
@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from nrtk.interfaces.image_metric import ImageMetric
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.metadata.datum import NRTKDatumMetadata, _forward_md_keys
 from nrtk.utils._exceptions import MaiteImportError
@@ -105,94 +104,3 @@ class JATICClassificationAugmentation(Augmentation):  # pyright:  ignore [report
     def is_usable(cls) -> bool:
         """Returns true if the necessary dependency (MAITE) is available."""
         return maite_available
-
-
-class JATICClassificationAugmentationWithMetric(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
-    """Implementation of JATIC augmentation wrapper for NRTK's Image metrics.
-
-    Implementation of JATIC augmentation for NRTK metrics operating on a MAITE-protocol
-    compliant image classification dataset.
-
-    Attributes:
-        augmentations : Sequence[Augmentation] | None
-            Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
-        metric : ImageMetric
-            Image metric to be applied for a given image.
-        metadata: AugmentationMetadata
-            Metadata for this augmentation.
-    """
-
-    def __init__(
-        self,
-        *,
-        augmentations: Sequence[Augmentation] | None,  # pyright: ignore [reportInvalidTypeForm]
-        metric: ImageMetric,
-        augment_id: str,
-    ) -> None:
-        """Initialize augmentation with metric wrapper.
-
-        Args:
-            augmentations:
-                Optional task-specific sequence of JATIC augmentations to be applied on a given batch.
-            metric:
-                Image metric to be applied for a given image.
-            augment_id:
-                Metadata ID for this augmentation.
-        """
-        self.augmentations = augmentations
-        self.metric = metric
-        self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
-
-    def _apply_augmentations(
-        self,
-        batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[Sequence[InputType] | Sequence[None], Sequence[TargetType], Sequence[DatumMetadataType]]:  # pyright: ignore [reportInvalidTypeForm]
-        """Apply augmentations to given batch."""
-        if self.augmentations:
-            aug_batch = batch
-            for aug in self.augmentations:
-                aug_batch = aug(aug_batch)
-        else:
-            imgs, anns, metadata = batch
-            aug_batch = [None] * len(imgs), anns, metadata  # pyright: ignore [reportArgumentType]
-
-        return aug_batch
-
-    def __call__(
-        self,
-        batch: IMG_CLASSIFICATION_BATCH_T,
-    ) -> tuple[Sequence[InputType], Sequence[TargetType], Sequence[NRTKDatumMetadata]]:  # pyright: ignore [reportInvalidTypeForm]
-        """Returns a batch of augmented images and a specific metric."""
-        imgs, _, _ = batch
-        metric_aug_metadata = list()  # list of individual image-level metric metadata
-
-        aug_imgs, aug_anns, aug_metadata = self._apply_augmentations(batch)
-
-        for img, aug_img, aug_md in zip(imgs, aug_imgs, aug_metadata, strict=False):  # pyright: ignore [reportArgumentType]
-            # Convert from channels-first to channels-last
-            img_1 = np.transpose(np.asarray(img), (1, 2, 0))
-            img_2 = None if aug_img is None else np.transpose(aug_img, (1, 2, 0))
-
-            # Compute Image metric values
-            metric_value = self.metric(img_1=img_1, img_2=img_2, additional_params=dict(aug_md))
-            metric_name = self.metric.__class__.__name__
-
-            existing_metrics = list()
-            if "nrtk_metric" in aug_md:
-                existing_metrics = list(aug_md["nrtk_metric"])
-            existing_metrics.append((metric_name, metric_value))
-            metric_aug_md = NRTKDatumMetadata(
-                id=aug_md["id"],
-                nrtk_metric=existing_metrics,
-            )
-
-            metric_aug_metadata.append(
-                _forward_md_keys(md=aug_md, aug_md=metric_aug_md, forwarded_keys=["id", "nrtk_metric"]),
-            )
-
-        # return batch of augmented/original images, annotations and metric-updated metadata
-        if self.augmentations:
-            # type ignore was included to handle the dual Sequence[ArrrayLike] | List[None]
-            # case for the augmented images.
-            return aug_imgs, aug_anns, metric_aug_metadata  # type: ignore
-        return imgs, aug_anns, metric_aug_metadata

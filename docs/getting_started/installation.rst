@@ -172,8 +172,7 @@ description of the extra.
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
     :ref:`PybsmPerturber`, :ref:`PybsmOTFPerturber`,
     :ref:`TurbulenceApertureOTFPerturber`, :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`,
-    :ref:`CircularApertureOTFPerturber`, :ref:`DefocusOTFPerturber`, :ref:`SimplePybsmGenerator`, and
-    :ref:`NIIRSImageMetric`.
+    :ref:`CircularApertureOTFPerturber`, and :ref:`DefocusOTFPerturber`.
 
     **maite**: installs `MAITE <https://github.com/mit-ll-ai-technology/maite>`_ and its associated dependencies.
     Required for everything in :ref:`Interoperability`.
