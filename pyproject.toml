@@ -66,10 +66,7 @@ nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber
 "impls.perturb_image.optical.detector_otf_perturber" = "nrtk.impls.perturb_image.optical.detector_otf_perturber"
 "impls.perturb_image.optical.turbulence_aperture_otf_perturber" = "nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber"
 "impls.perturb_image.optical.circular_aperture_otf_perturber" = "nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber"
-"impls.perturb_image_factory.perturber_step_factory" = "nrtk.impls.perturb_image_factory.perturber_step_factory"
-"impls.perturb_image_factory.perturber_one_step_factory" = "nrtk.impls.perturb_image_factory.perturber_one_step_factory"
-"impls.perturb_image_factory.perturber_linspace_factory" = "nrtk.impls.perturb_image_factory.perturber_linspace_factory"
-"impls.perturb_image_factory.perturber_multivariate_factory" = "nrtk.impls.perturb_image_factory.perturber_multivariate_factory"
+"impls.perturb_image_factory" = "nrtk.impls.perturb_image_factory"
 
 [project.optional-dependencies]
 graphics = ["opencv-python>=4.6"]

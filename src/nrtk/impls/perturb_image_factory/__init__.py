@@ -1,20 +1,21 @@
 """Module for all implementations of PerturbImageFactory."""
 
-from collections.abc import Callable
-from typing import Any
-
-import lazy_loader as lazy
-
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
-
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=[
-        "perturber_linspace_factory",
-        "perturber_multivariate_factory",
-        "perturber_one_step_factory",
-        "perturber_step_factory",
-    ],
+from nrtk.impls.perturb_image_factory._perturber_linspace_factory import (
+    PerturberLinspaceFactory,
 )
+from nrtk.impls.perturb_image_factory._perturber_multivariate_factory import (
+    PerturberMultivariateFactory,
+)
+from nrtk.impls.perturb_image_factory._perturber_one_step_factory import (
+    PerturberOneStepFactory,
+)
+from nrtk.impls.perturb_image_factory._perturber_step_factory import (
+    PerturberStepFactory,
+)
+
+__all__ = [
+    "PerturberLinspaceFactory",
+    "PerturberMultivariateFactory",
+    "PerturberOneStepFactory",
+    "PerturberStepFactory",
+]

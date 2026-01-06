@@ -14,9 +14,7 @@ from smqtk_core.configuration import (
 )
 
 from nrtk.impls.perturb_image.photometric.noise import SaltNoisePerturber
-from nrtk.impls.perturb_image_factory.perturber_linspace_factory import (
-    PerturberLinspaceFactory,
-)
+from nrtk.impls.perturb_image_factory import PerturberLinspaceFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls import DATA_DIR
