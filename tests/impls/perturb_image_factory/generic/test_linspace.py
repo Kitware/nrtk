@@ -23,7 +23,7 @@ from tests.impls import DATA_DIR
 from tests.test_utils import DummyPerturber
 
 
-class TestFloatStepPertubImageFactory:
+class TestLinspacePerturbImageFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "num", "expected"),
         [
