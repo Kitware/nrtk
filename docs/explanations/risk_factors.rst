@@ -17,7 +17,7 @@ The following table provides a summary of risk factors. Where applicable, a T&E 
 listed as well as functionality from NRTK that can be used to simulate the operational risk.
 
 Some of these perturbation functions are not implemented in NRTK directly but can be simulated using the
-:ref:`Albumentations perturber <nrtk.impls.perturb.wrapper.albumentations_perturber>`
+:ref:`Albumentations perturber <nrtk.impls.perturb_image.wrapper.albumentations_perturber>`
 which provides a wrapper around functionality of the `Albumentations <https://albumentations.ai/>`__ library.
 Some of the risk factors listed don't have any associated functionality or documentation in NRTK but may be covered in
 the future.
@@ -61,7 +61,7 @@ Lighting conditions and camera settings result in excessive or insufficient illu
 +-------------------------+--------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | All                                                                                              |
 +-------------------------+--------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :class:`~nrtk.impls.perturb.photometric.enhance.BrightnessPerturber`                             |
+| **NRTK Perturbation**   | :class:`~nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber`                             |
 +-------------------------+--------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/illumination-1.jpg
@@ -187,7 +187,7 @@ distinguish from the background.
 +---------------------------+--------------------------------------------------------------------------------------------------+
 | **Affected Domains**      | Ground, Sea                                                                                      |
 +---------------------------+--------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**     | :ref:`HazePerturber <nrtk.impls.perturb.environment.haze_perturber>`                             |
+| **NRTK Perturbation**     | :ref:`HazePerturber <nrtk.impls.perturb_image.environment.haze_perturber>`                             |
 +---------------------------+--------------------------------------------------------------------------------------------------+
 | **Learn More**            | :doc:`operational_risk_modules/haze`                                                             |
 +---------------------------+--------------------------------------------------------------------------------------------------+
@@ -213,7 +213,7 @@ environments where lens contamination is common.
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                                          |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`WaterDropletPerturber <nrtk.impls.perturb.environment.water_droplet_perturber>`                                |
+| **NRTK Perturbation**   | :ref:`WaterDropletPerturber <nrtk.impls.perturb_image.environment.water_droplet_perturber>`                                |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 | **Learn More**          | :doc:`operational_risk_modules/water_droplets`                                                                       |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
@@ -285,7 +285,7 @@ Vibrations in the sensor platform (e.g. from wind) induce jitter and blurring.
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`JitterOTFPerturber <nrtk.impls.perturb.optical.jitter_otf_perturber>`                        |
+| **NRTK Perturbation**   | :ref:`JitterOTFPerturber <nrtk.impls.perturb_image.optical.jitter_otf_perturber>`                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/jitter.png
@@ -307,7 +307,7 @@ Target is out of focus (due to sensor optics settings, rather than atmospheric /
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`DefocusOTFPerturber <nrtk.impls.perturb.optical.defocus_otf_perturber>`                      |
+| **NRTK Perturbation**   | :ref:`DefocusOTFPerturber <nrtk.impls.perturb_image.optical.defocus_otf_perturber>`                      |
 +-------------------------+----------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/out-of-focus.png
@@ -329,7 +329,7 @@ The sensor data exhibits noise as a result of poor lighting, high ISO settings, 
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`PybsmPerturber <nrtk.impls.perturb.optical.pybsm_perturber>`                                 |
+| **NRTK Perturbation**   | :ref:`PybsmPerturber <nrtk.impls.perturb_image.optical.pybsm_perturber>`                                 |
 +-------------------------+----------------------------------------------------------------------------------------------------+
 
 No sample available.
@@ -348,7 +348,7 @@ Localized distortion due to atmospheric conditions.
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea, UAV                                                                                                     |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`TurbulenceApertureOTFPerturber <nrtk.impls.perturb.optical.turbulence_aperture_otf_perturber>`                 |
+| **NRTK Perturbation**   | :ref:`TurbulenceApertureOTFPerturber <nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber>`                 |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/turbulence.gif
@@ -370,7 +370,7 @@ Wide-angle lenses cause distortion at the image periphery.
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                                          |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`RadialDistortionPerturber <nrtk.impls.perturb.optical.radial_distortion_perturber>`                            |
+| **NRTK Perturbation**   | :ref:`RadialDistortionPerturber <nrtk.impls.perturb_image.optical.radial_distortion_perturber>`                            |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/radio-distortion.png

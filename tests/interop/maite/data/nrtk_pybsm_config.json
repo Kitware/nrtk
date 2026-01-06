@@ -2,7 +2,7 @@
     "PerturberFactory": {
         "type": "nrtk.impls.perturb_image_factory.generic.multivariate.MultivariatePerturbImageFactory",
         "nrtk.impls.perturb_image_factory.generic.multivariate.MultivariatePerturbImageFactory": {
-            "perturber": "nrtk.impls.perturb.optical.pybsm_perturber.PybsmPerturber",
+            "perturber": "nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber",
             "theta_keys": ["f", "D", "p_x"],
             "thetas": [[0.014, 0.012], [0.001, 0.003], [0.00002]],
             "perturber_kwargs": {
