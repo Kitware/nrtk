@@ -14,7 +14,7 @@ Usage:
     used to generate perturbed image instances with controlled variations.
 
 Example:
-    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
     >>> factory = StepPerturbImageFactory(
     ...     perturber=BrightnessPerturber, theta_key="factor", start=0.0, stop=1.0, step=0.1, to_int=False
     ... )

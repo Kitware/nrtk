@@ -14,7 +14,7 @@ Usage:
     generate perturbed image instances with linearly spaced parameter variations.
 
 Example:
-    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
     >>> factory = LinspacePerturbImageFactory(
     ...     perturber=BrightnessPerturber, theta_key="factor", start=0.0, stop=1.0, num=5
     ... )

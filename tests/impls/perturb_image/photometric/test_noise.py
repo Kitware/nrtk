@@ -1,0 +1,762 @@
+from __future__ import annotations
+
+import unittest.mock as mock
+from collections.abc import Hashable, Iterable
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
+from typing import Any
+from unittest.mock import MagicMock
+
+import numpy as np
+import pytest
+from PIL import Image
+from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
+
+from nrtk.impls.perturb_image.photometric._impl.noise import (
+    _SKImageNoisePerturber,
+)
+from nrtk.impls.perturb_image.photometric.noise import (
+    GaussianNoisePerturber,
+    PepperNoisePerturber,
+    SaltAndPepperNoisePerturber,
+    SaltNoisePerturber,
+    SpeckleNoisePerturber,
+)
+from nrtk.utils._exceptions import ScikitImageImportError
+from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+
+test_rng = np.random.default_rng()
+
+
+def rng_assertions(perturber: type[_SKImageNoisePerturber], rng: int) -> None:
+    """Test that output is reproducible if a rng or seed is provided.
+
+    :param perturber: SKImage random_noise perturber class of interest.
+    :param rng: Seed value.
+    """
+    dummy_image_a = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+    dummy_image_b = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+
+    # Test as seed value
+    inst_1 = perturber(rng=rng)
+    out_1a, _ = inst_1(image=dummy_image_a)
+    out_1b, _ = inst_1(image=dummy_image_b)
+    inst_2 = perturber(rng=rng)
+    out_2a, _ = inst_2(image=dummy_image_a)
+    out_2b, _ = inst_2(image=dummy_image_b)
+    assert np.array_equal(out_1a, out_2a)
+    assert np.array_equal(out_1b, out_2b)
+
+    # Test generator
+    inst_3 = perturber(rng=np.random.default_rng(rng))
+    out_3a, _ = inst_3(image=dummy_image_a)
+    out_3b, _ = inst_3(image=dummy_image_b)
+    inst_4 = perturber(rng=np.random.default_rng(rng))
+    out_4a, _ = inst_4(image=dummy_image_a)
+    out_4b, _ = inst_4(image=dummy_image_b)
+    assert np.array_equal(out_3a, out_4a)
+    assert np.array_equal(out_3b, out_4b)
+
+
+@pytest.mark.skipif(not SaltNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
+class TestSaltNoisePerturber:
+    def test_consistency(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        rng = 42
+        amount = 0.5
+
+        # Test callable
+        out_img = perturber_assertions(
+            perturb=SaltNoisePerturber(amount=amount, rng=rng),
+            image=image,
+        )
+        psnr_tiff_snapshot.assert_match(out_img)
+
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.zeros((256, 256, 3), dtype=np.uint8), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.uint8) * 255, does_not_raise()),
+            (np.zeros((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
+            (
+                np.ones((256, 356, 3), dtype=np.csingle),
+                pytest.raises(
+                    NotImplementedError,
+                    match=r"Perturb not implemented for",
+                ),
+            ),
+        ],
+    )
+    def test_no_perturbation(
+        self,
+        image: np.ndarray,
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
+
+        This attempts to isolate perturber implementation code from external calls to the extent that
+        is possible (quantization errors also possible).
+        """
+        with expectation:
+            perturber_assertions(
+                perturb=SaltNoisePerturber(amount=0),
+                image=image,
+                expected=image,
+            )
+
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = SaltNoisePerturber()
+        out_1, _ = inst_1(image=dummy_image)
+        inst_2 = SaltNoisePerturber()
+        out_2, _ = inst_2(image=dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
+    def test_rng(self, rng: int) -> None:
+        """Ensure results are reproducible when explicit rng is provided."""
+        rng_assertions(perturber=SaltNoisePerturber, rng=rng)
+
+    @pytest.mark.parametrize(
+        ("rng", "amount", "clip"),
+        [(42, 0.8, True), (np.random.default_rng(12345), 0.3, False)],
+    )
+    def test_configuration(
+        self,
+        rng: np.random.Generator | int,
+        amount: float,
+        clip: bool,
+    ) -> None:
+        """Test configuration stability."""
+        inst = SaltNoisePerturber(rng=rng, amount=amount, clip=clip)
+        for i in configuration_test_helper(inst):
+            assert i.rng == rng
+            assert i.amount == amount
+            assert i.clip == clip
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expectation"),
+        [
+            ({"amount": 0.5, "clip": True}, does_not_raise()),
+            ({"amount": 0, "clip": True}, does_not_raise()),
+            ({"amount": 1, "clip": False}, does_not_raise()),
+            (
+                {"amount": 2.0, "clip": True},
+                pytest.raises(ValueError, match=r"SaltNoisePerturber invalid amount"),
+            ),
+            (
+                {"amount": -3.0, "clip": False},
+                pytest.raises(ValueError, match=r"SaltNoisePerturber invalid amount"),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            SaltNoisePerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = SaltNoisePerturber(rng=42, amount=0.3)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
+
+
+@pytest.mark.skipif(not PepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
+class TestPepperNoisePerturber:
+    def test_consistency(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        rng = 42
+        amount = 0.5
+
+        # Test callable
+        out_img = perturber_assertions(
+            perturb=PepperNoisePerturber(amount=amount, rng=rng),
+            image=image,
+        )
+        psnr_tiff_snapshot.assert_match(out_img)
+
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.zeros((256, 256, 3), dtype=np.uint8), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.uint8) * 255, does_not_raise()),
+            (np.zeros((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
+            (
+                np.ones((256, 356, 3), dtype=np.csingle),
+                pytest.raises(
+                    NotImplementedError,
+                    match=r"Perturb not implemented for",
+                ),
+            ),
+        ],
+    )
+    def test_no_perturbation(
+        self,
+        image: np.ndarray,
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
+
+        This attempts to isolate perturber implementation code from external calls to the extent
+        that is possible (quantization errors also possible).
+        """
+        with expectation:
+            perturber_assertions(
+                perturb=PepperNoisePerturber(amount=0),
+                image=image,
+                expected=image,
+            )
+
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = PepperNoisePerturber()
+        out_1, _ = inst_1(image=dummy_image)
+        inst_2 = PepperNoisePerturber()
+        out_2, _ = inst_2(image=dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
+    def test_rng(self, rng: int) -> None:
+        """Ensure results are reproducible when explicit rng is provided."""
+        rng_assertions(perturber=PepperNoisePerturber, rng=rng)
+
+    @pytest.mark.parametrize(
+        ("rng", "amount", "clip"),
+        [(42, 0.8, True), (np.random.default_rng(12345), 0.3, False)],
+    )
+    def test_configuration(
+        self,
+        rng: np.random.Generator | int,
+        amount: float,
+        clip: bool,
+    ) -> None:
+        """Test configuration stability."""
+        inst = PepperNoisePerturber(rng=rng, amount=amount, clip=clip)
+        for i in configuration_test_helper(inst):
+            assert i.rng == rng
+            assert i.amount == amount
+            assert i.clip == clip
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expectation"),
+        [
+            ({"amount": 0.25, "clip": True}, does_not_raise()),
+            ({"amount": 0, "clip": True}, does_not_raise()),
+            ({"amount": 1, "clip": False}, does_not_raise()),
+            (
+                {"amount": 2.5, "clip": True},
+                pytest.raises(ValueError, match=r"PepperNoisePerturber invalid amount"),
+            ),
+            (
+                {"amount": -4.2, "clip": False},
+                pytest.raises(ValueError, match=r"PepperNoisePerturber invalid amount"),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            PepperNoisePerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = PepperNoisePerturber(rng=42, amount=0.3)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
+
+
+@pytest.mark.skipif(not SaltAndPepperNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
+class TestSaltAndPepperNoisePerturber:
+    def test_consistency(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        rng = 42
+        amount = 0.5
+        salt_vs_pepper = 0.5
+
+        # Test callable
+        out_img = perturber_assertions(
+            perturb=SaltAndPepperNoisePerturber(
+                amount=amount,
+                salt_vs_pepper=salt_vs_pepper,
+                rng=rng,
+            ),
+            image=image,
+        )
+        psnr_tiff_snapshot.assert_match(out_img)
+
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.zeros((256, 256, 3), dtype=np.uint8), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.uint8) * 255, does_not_raise()),
+            (np.zeros((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
+            (
+                np.ones((256, 356, 3), dtype=np.csingle),
+                pytest.raises(
+                    NotImplementedError,
+                    match=r"Perturb not implemented for",
+                ),
+            ),
+        ],
+    )
+    def test_no_perturbation(
+        self,
+        image: np.ndarray,
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
+
+        This attempts to isolate perturber implementation code from external calls to the extent
+        that is possible (quantization errors also possible).
+        """
+        with expectation:
+            perturber_assertions(
+                perturb=SaltAndPepperNoisePerturber(amount=0),
+                image=image,
+                expected=image,
+            )
+
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = SaltAndPepperNoisePerturber()
+        out_1, _ = inst_1(image=dummy_image)
+        inst_2 = SaltAndPepperNoisePerturber()
+        out_2, _ = inst_2(image=dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
+    def test_rng(self, rng: int) -> None:
+        """Ensure results are reproducible when explicit rng is provided."""
+        rng_assertions(perturber=SaltAndPepperNoisePerturber, rng=rng)
+
+    @pytest.mark.parametrize(
+        ("rng", "amount", "salt_vs_pepper", "clip"),
+        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
+    )
+    def test_configuration(
+        self,
+        rng: np.random.Generator | int,
+        amount: float,
+        salt_vs_pepper: float,
+        clip: bool,
+    ) -> None:
+        """Test configuration stability."""
+        inst = SaltAndPepperNoisePerturber(
+            rng=rng,
+            amount=amount,
+            salt_vs_pepper=salt_vs_pepper,
+            clip=clip,
+        )
+        for i in configuration_test_helper(inst):
+            assert i.rng == rng
+            assert i.amount == amount
+            assert i.salt_vs_pepper == salt_vs_pepper
+            assert i.clip == clip
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expectation"),
+        [
+            ({"amount": 0.45, "clip": True}, does_not_raise()),
+            ({"amount": 0, "clip": True}, does_not_raise()),
+            ({"amount": 1, "clip": False}, does_not_raise()),
+            (
+                {"amount": 1.2, "clip": True},
+                pytest.raises(
+                    ValueError,
+                    match=r"SaltAndPepperNoisePerturber invalid amount",
+                ),
+            ),
+            (
+                {"amount": -0.2, "clip": False},
+                pytest.raises(
+                    ValueError,
+                    match=r"SaltAndPepperNoisePerturber invalid amount",
+                ),
+            ),
+            ({"salt_vs_pepper": 0.2, "clip": True}, does_not_raise()),
+            ({"salt_vs_pepper": 0, "clip": True}, does_not_raise()),
+            ({"salt_vs_pepper": 1, "clip": False}, does_not_raise()),
+            (
+                {"salt_vs_pepper": 5, "clip": False},
+                pytest.raises(
+                    ValueError,
+                    match=r"SaltAndPepperNoisePerturber invalid salt_vs_pepper",
+                ),
+            ),
+            (
+                {"salt_vs_pepper": -3},
+                pytest.raises(
+                    ValueError,
+                    match=r"SaltAndPepperNoisePerturber invalid salt_vs_pepper",
+                ),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            SaltAndPepperNoisePerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = SaltAndPepperNoisePerturber(rng=42, amount=0.3, salt_vs_pepper=0.5)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
+
+
+@pytest.mark.skipif(not GaussianNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
+class TestGaussianNoisePerturber:
+    def test_consistency(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.zeros((3, 3), dtype=np.uint8)
+        rng = 42
+        mean = 0
+        var = 0.05
+
+        # Test callable
+        out_img = perturber_assertions(
+            perturb=GaussianNoisePerturber(mean=mean, var=var, rng=rng),
+            image=image,
+        )
+        psnr_tiff_snapshot.assert_match(out_img)
+
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.zeros((256, 256, 3), dtype=np.uint8), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.uint8) * 255, does_not_raise()),
+            (np.zeros((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
+            (
+                np.ones((256, 356, 3), dtype=np.csingle),
+                pytest.raises(
+                    NotImplementedError,
+                    match=r"Perturb not implemented for",
+                ),
+            ),
+        ],
+    )
+    def test_no_perturbation(
+        self,
+        image: np.ndarray,
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
+
+        This attempts to isolate perturber implementation code from external calls to the extent
+        that is possible (quantization errors also possible).
+        """
+        with expectation:
+            perturber_assertions(
+                perturb=GaussianNoisePerturber(mean=0, var=0),
+                image=image,
+                expected=image,
+            )
+
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = GaussianNoisePerturber()
+        out_1, _ = inst_1(image=dummy_image)
+        inst_2 = GaussianNoisePerturber()
+        out_2, _ = inst_2(image=dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
+    def test_rng(self, rng: int) -> None:
+        """Ensure results are reproducible when explicit rng is provided."""
+        rng_assertions(perturber=GaussianNoisePerturber, rng=rng)
+
+    @pytest.mark.parametrize(
+        ("rng", "mean", "var", "clip"),
+        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
+    )
+    def test_configuration(
+        self,
+        rng: np.random.Generator | int,
+        mean: float,
+        var: float,
+        clip: bool,
+    ) -> None:
+        """Test configuration stability."""
+        inst = GaussianNoisePerturber(rng=rng, mean=mean, var=var, clip=clip)
+        for i in configuration_test_helper(inst):
+            assert i.rng == rng
+            assert i.mean == mean
+            assert i.var == var
+            assert i.clip == clip
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expectation"),
+        [
+            ({"var": 0.75, "clip": True}, does_not_raise()),
+            ({"var": 0, "clip": False}, does_not_raise()),
+            (
+                {"var": -10, "clip": True},
+                pytest.raises(ValueError, match=r"GaussianNoisePerturber invalid var"),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            GaussianNoisePerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = GaussianNoisePerturber(rng=42, mean=0.3, var=0.5)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
+
+
+@pytest.mark.skipif(not SpeckleNoisePerturber.is_usable(), reason=str(ScikitImageImportError()))
+class TestSpeckleNoisePerturber:
+    def test_consistency(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Run on a real image to ensure output matches precomputed results."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH))
+        rng = 42
+        mean = 0
+        var = 0.05
+
+        # Test callable
+        out_img = perturber_assertions(
+            perturb=SpeckleNoisePerturber(mean=mean, var=var, rng=rng),
+            image=image,
+        )
+        psnr_tiff_snapshot.assert_match(out_img)
+
+    @pytest.mark.parametrize(
+        ("image", "expectation"),
+        [
+            (np.zeros((256, 256, 3), dtype=np.uint8), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.uint8) * 255, does_not_raise()),
+            (np.zeros((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.half), does_not_raise()),
+            (
+                np.ones((256, 356, 3), dtype=np.csingle),
+                pytest.raises(
+                    NotImplementedError,
+                    match=r"Perturb not implemented for",
+                ),
+            ),
+        ],
+    )
+    def test_no_perturbation(
+        self,
+        image: np.ndarray,
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Run a dummy image through the perturber with settings for no perturbations, expect to get same image back.
+
+        This attempts to isolate perturber implementation code from external calls to the extent
+        that is possible (quantization errors also possible).
+        """
+        with expectation:
+            perturber_assertions(
+                perturb=SpeckleNoisePerturber(mean=0, var=0),
+                image=image,
+                expected=image,
+            )
+
+    def test_default_rng_reproducibility(self) -> None:
+        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+
+        # Test without providing rng (uses default=1)
+        inst_1 = SpeckleNoisePerturber()
+        out_1, _ = inst_1(image=dummy_image)
+        inst_2 = SpeckleNoisePerturber()
+        out_2, _ = inst_2(image=dummy_image)
+        assert np.array_equal(out_1, out_2)
+
+    @pytest.mark.parametrize("rng", [2])
+    def test_rng(self, rng: int) -> None:
+        """Ensure results are reproducible when explicit rng is provided."""
+        rng_assertions(perturber=SpeckleNoisePerturber, rng=rng)
+
+    @pytest.mark.parametrize(
+        ("rng", "mean", "var", "clip"),
+        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
+    )
+    def test_configuration(
+        self,
+        rng: np.random.Generator | int,
+        mean: float,
+        var: float,
+        clip: bool,
+    ) -> None:
+        """Test configuration stability."""
+        inst = SpeckleNoisePerturber(rng=rng, mean=mean, var=var, clip=clip)
+        for i in configuration_test_helper(inst):
+            assert i.rng == rng
+            assert i.mean == mean
+            assert i.var == var
+            assert i.clip == clip
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expectation"),
+        [
+            ({"var": 0.123, "clip": True}, does_not_raise()),
+            ({"var": 0, "clip": False}, does_not_raise()),
+            (
+                {"var": -10, "clip": True},
+                pytest.raises(ValueError, match=r"SpeckleNoisePerturber invalid var"),
+            ),
+        ],
+    )
+    def test_configuration_bounds(
+        self,
+        kwargs: dict[str, Any],
+        expectation: AbstractContextManager,
+    ) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            SpeckleNoisePerturber(**kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(1, 1)), {"test": 0.0}),
+                (AxisAlignedBoundingBox(min_vertex=(2, 2), max_vertex=(3, 3)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
+        """Test that bounding boxes do not change during perturb."""
+        inst = SpeckleNoisePerturber(rng=42, mean=0.3, var=0.5)
+        _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
+        assert boxes == out_boxes
+
+
+@mock.patch.object(SaltNoisePerturber, "is_usable")
+def test_missing_deps_salt_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SaltNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        SaltNoisePerturber()
+
+
+@mock.patch.object(PepperNoisePerturber, "is_usable")
+def test_missing_deps_pepper_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not PepperNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        PepperNoisePerturber()
+
+
+@mock.patch.object(SaltAndPepperNoisePerturber, "is_usable")
+def test_missing_deps_salt_and_pepper_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SaltAndPepperNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        SaltAndPepperNoisePerturber()
+
+
+@mock.patch.object(GaussianNoisePerturber, "is_usable")
+def test_missing_deps_gaussian_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not GaussianNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        GaussianNoisePerturber()
+
+
+@mock.patch.object(SpeckleNoisePerturber, "is_usable")
+def test_missing_deps_speckle_noise_perturber(mock_is_usable: MagicMock) -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    mock_is_usable.return_value = False
+    assert not SpeckleNoisePerturber.is_usable()
+    with pytest.raises(ScikitImageImportError):
+        SpeckleNoisePerturber()

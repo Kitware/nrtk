@@ -13,7 +13,7 @@ from smqtk_core.configuration import (
     to_config_dict,
 )
 
-from nrtk.impls.perturb.optical.pybsm_perturber import PybsmPerturber
+from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
 from nrtk.impls.perturb_image_factory.generic.multivariate import MultivariatePerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory

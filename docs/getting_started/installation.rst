@@ -162,11 +162,11 @@ NRTK has multiple optional extras to expand functionality. The list below contai
 description of the extra.
 
     **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb.photometric.blur` perturbers, :ref:`AlbumentationsPerturber`,
+    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :ref:`AlbumentationsPerturber`,
     :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb.photometric.blur` perturbers, :ref:`AlbumentationsPerturber`,
+    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :ref:`AlbumentationsPerturber`,
     :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
@@ -182,19 +182,19 @@ description of the extra.
     :ref:`nrtk-perturber`, and :func:`~nrtk.interop.maite.interop.object_detection.utils.dataset_to_coco`.
 
     **scikit-image**: installs `scikit-image <https://scikit-image.org/>`_. Required for
-    :mod:`~nrtk.impls.perturb.photometric.noise` perturbers.
+    :mod:`~nrtk.impls.perturb_image.photometric.noise` perturbers.
 
     **Pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
-    :mod:`~nrtk.impls.perturb.photometric.enhance` perturbers.
+    :mod:`~nrtk.impls.perturb_image.photometric.enhance` perturbers.
 
     **albumentations**: installs `nrtk-albumentations <https://github.com/Kitware/nrtk-albumentations>`_. Required for
-    :mod:`~nrtk.impls.perturb.wrapper.albumentations_perturber`,
-    :mod:`~nrtk.impls.perturb.geometric.random_rotation_perturber`, and
-    :mod:`~nrtk.impls.perturb.geometric.random_scale_perturber`.
+    :mod:`~nrtk.impls.perturb_image.wrapper.albumentations_perturber`,
+    :mod:`~nrtk.impls.perturb_image.geometric.random_rotation_perturber`, and
+    :mod:`~nrtk.impls.perturb_image.geometric.random_scale_perturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_, `shapely <https://github.com/shapely/shapely>`_, and
     `geopandas <https://geopandas.org/en/stable/>__. Required for
-    :mod:`~nrtk.impls.perturb.environment.water_droplet_perturber` perturber and utility functions.
+    :mod:`~nrtk.impls.perturb_image.environment.water_droplet_perturber` perturber and utility functions.
 
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
     `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
@@ -205,7 +205,7 @@ description of the extra.
 Installing with OpenCV
 ^^^^^^^^^^^^^^^^^^^^^^
 One of the optional packages for nrtk is OpenCV, which is required for
-:py:mod:`~nrtk.impls.perturb.photometric.blur` perturbers and
+:py:mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers and
 :doc:`Optical Transfer Function perturbations </examples/otf_visualization>`.
 
 OpenCV receives dedicated installation guidance due to its unique dual-installation options.

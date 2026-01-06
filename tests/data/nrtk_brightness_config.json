@@ -1,7 +1,7 @@
 {
     "type": "nrtk.impls.perturb_image_factory.generic.step.StepPerturbImageFactory",
     "nrtk.impls.perturb_image_factory.generic.step.StepPerturbImageFactory": {
-        "perturber": "nrtk.impls.perturb.photometric.enhance.BrightnessPerturber",
+        "perturber": "nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber",
         "theta_key": "factor",
         "start": 1,
         "stop": 10,

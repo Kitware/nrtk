@@ -13,7 +13,7 @@ from smqtk_core.configuration import (
     to_config_dict,
 )
 
-from nrtk.impls.perturb.photometric.noise import SaltNoisePerturber
+from nrtk.impls.perturb_image.photometric.noise import SaltNoisePerturber
 from nrtk.impls.perturb_image_factory.generic.linspace import (
     LinspacePerturbImageFactory,
 )

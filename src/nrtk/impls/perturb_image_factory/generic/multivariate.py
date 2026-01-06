@@ -7,7 +7,7 @@ Dependencies:
     - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
 
 Example:
-    >>> from nrtk.impls.perturb.photometric.enhance import BrightnessPerturber
+    >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
     >>> factory = MultivariatePerturbImageFactory(
     ...     perturber=BrightnessPerturber, theta_keys=["factor"], thetas=[[0.1, 0.5]]
     ... )

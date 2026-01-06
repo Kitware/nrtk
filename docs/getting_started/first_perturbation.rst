@@ -31,7 +31,7 @@ Below is some example code that applies a Jitter OTF transformation:
 
 .. code-block:: python
 
-    from nrtk.impls.perturb.optical.jitter_otf_perturber import JitterOTFPerturber
+    from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
     import numpy as np
     from PIL import Image
 
