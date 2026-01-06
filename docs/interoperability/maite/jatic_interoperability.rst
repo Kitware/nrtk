@@ -12,6 +12,9 @@ realistic image perturbations, MAITE provides a standardized interface for evalu
 test conditions. Using these tools together enables modular, reproducible assessments of AI robustness under
 sensor-driven variation.
 
+To integrate NRTK with MAITE, start here to incorporate NRTK perturbations into
+MAITE workflows using MAITE-compliant augmentation, dataset, and metadata wrappers.
+
 Enable NRTK Perturbations as MAITE Augmentations
 ------------------------------------------------
 

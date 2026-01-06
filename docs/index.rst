@@ -71,10 +71,16 @@ reliability of your computer vision applications in facing real-world challenges
       Perturbers, APIs, schemas, and implementation details.
 
    .. grid-item-card:: Interoperability
-      :link: interoperability/index
+      :link: interoperability/maite/jatic_interoperability
       :link-type: doc
 
       MAITE Adapters for T&E workflows
+
+   .. grid-item-card:: Containerization
+      :link: containers/aukus
+      :link-type: doc
+
+      Container images for NRTK workflows.
 
    .. grid-item-card:: Development
       :link: development/index
@@ -138,8 +144,10 @@ necessarily representing the official policies or endorsements, either expressed
    tutorials/index
    how_to_guides/index
    explanations/index
+   validation_and_trust
    reference/index
-   interoperability/index
+   interoperability/maite/jatic_interoperability
+   containers/aukus
    development/index
    release_notes/index
 
