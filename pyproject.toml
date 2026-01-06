@@ -66,10 +66,10 @@ nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber
 "impls.perturb_image.optical.detector_otf_perturber" = "nrtk.impls.perturb_image.optical.detector_otf_perturber"
 "impls.perturb_image.optical.turbulence_aperture_otf_perturber" = "nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber"
 "impls.perturb_image.optical.circular_aperture_otf_perturber" = "nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber"
-"impls.perturb_image_factory.generic.step" = "nrtk.impls.perturb_image_factory.generic.step"
-"impls.perturb_image_factory.generic.one_step" = "nrtk.impls.perturb_image_factory.generic.one_step"
-"impls.perturb_image_factory.generic.linspace" = "nrtk.impls.perturb_image_factory.generic.linspace"
-"impls.perturb_image_factory.generic.multivariate" = "nrtk.impls.perturb_image_factory.generic.multivariate"
+"impls.perturb_image_factory.step" = "nrtk.impls.perturb_image_factory.step"
+"impls.perturb_image_factory.one_step" = "nrtk.impls.perturb_image_factory.one_step"
+"impls.perturb_image_factory.linspace" = "nrtk.impls.perturb_image_factory.linspace"
+"impls.perturb_image_factory.multivariate" = "nrtk.impls.perturb_image_factory.multivariate"
 
 [project.optional-dependencies]
 graphics = ["opencv-python>=4.6"]

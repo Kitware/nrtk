@@ -11,7 +11,7 @@ from smqtk_core.configuration import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image_factory.generic.one_step import OneStepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.one_step import OneStepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.test_utils import DummyPerturber
