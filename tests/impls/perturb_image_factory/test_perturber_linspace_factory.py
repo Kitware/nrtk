@@ -17,17 +17,17 @@ from nrtk.impls.perturb_image.photometric.noise import SaltNoisePerturber
 from nrtk.impls.perturb_image_factory import PerturberLinspaceFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.fakes import FakePerturber
 from tests.impls import DATA_DIR
-from tests.test_utils import DummyPerturber
 
 
 class TestPerturberLinspaceFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "num", "expected"),
         [
-            (DummyPerturber, "param1", 1, 3, 5, (1, 1.5, 2.0, 2.5, 3)),
-            (DummyPerturber, "param2", 3, 9, 2, (3, 9)),
-            (DummyPerturber, "param1", 4, 4, 1, (4,)),
+            (FakePerturber, "param1", 1, 3, 5, (1, 1.5, 2.0, 2.5, 3)),
+            (FakePerturber, "param2", 3, 9, 2, (3, 9)),
+            (FakePerturber, "param1", 4, 4, 1, (4,)),
         ],
     )
     def test_iteration(
@@ -64,11 +64,11 @@ class TestPerturberLinspaceFactory:
             "expectation",
         ),
         [
-            (DummyPerturber, "param1", 1, 6, 10, 0, 1, does_not_raise()),
-            (DummyPerturber, "param1", 1, 6, 10, 3, 2.666666666666667, does_not_raise()),
-            (DummyPerturber, "param1", 1, 6, 2, 3, -1, pytest.raises(IndexError)),
-            (DummyPerturber, "param1", 1, 6, 2, -1, -1, pytest.raises(IndexError)),
-            (DummyPerturber, "param1", 4, 3, 1, 0, 4, does_not_raise()),
+            (FakePerturber, "param1", 1, 6, 10, 0, 1, does_not_raise()),
+            (FakePerturber, "param1", 1, 6, 10, 3, 2.666666666666667, does_not_raise()),
+            (FakePerturber, "param1", 1, 6, 2, 3, -1, pytest.raises(IndexError)),
+            (FakePerturber, "param1", 1, 6, 2, -1, -1, pytest.raises(IndexError)),
+            (FakePerturber, "param1", 4, 3, 1, 0, 4, does_not_raise()),
         ],
         ids=["first idx", "last idx", "idx == len", "neg idx", "empty iter"],
     )
@@ -114,7 +114,7 @@ class TestPerturberLinspaceFactory:
     ) -> None:
         """Test the generated theta values."""
         factory = PerturberLinspaceFactory(
-            perturber=DummyPerturber,
+            perturber=FakePerturber,
             theta_key="param1",
             start=start,
             stop=stop,
@@ -126,8 +126,8 @@ class TestPerturberLinspaceFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "num"),
         [
-            (DummyPerturber, "param1", 1.0, 5.0, 2),
-            (DummyPerturber, "param2", 3.0, 9.0, 3),
+            (FakePerturber, "param1", 1.0, 5.0, 2),
+            (FakePerturber, "param2", 3.0, 9.0, 3),
         ],
     )
     def test_configuration(
@@ -155,7 +155,7 @@ class TestPerturberLinspaceFactory:
         [
             (
                 {
-                    "perturber": DummyPerturber,
+                    "perturber": FakePerturber,
                     "theta_key": "param1",
                     "start": 1,
                     "stop": 2,
@@ -164,7 +164,7 @@ class TestPerturberLinspaceFactory:
             ),
             (
                 {
-                    "perturber": DummyPerturber(param1=1, param2=2),
+                    "perturber": FakePerturber(param1=1, param2=2),
                     "theta_key": "param2",
                     "start": 1,
                     "stop": 2,
@@ -181,8 +181,8 @@ class TestPerturberLinspaceFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "num"),
         [
-            (DummyPerturber, "param1", 1.0, 5.0, 2),
-            (DummyPerturber, "param2", 3.0, 9.0, 3),
+            (FakePerturber, "param1", 1.0, 5.0, 2),
+            (FakePerturber, "param2", 3.0, 9.0, 3),
         ],
     )
     def test_hydration(

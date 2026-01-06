@@ -10,12 +10,19 @@ from typing_extensions import override
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
-class DummyPerturber(PerturbImage):
-    """Shared dummy perturber for testing purposes."""
+class FakePerturber(PerturbImage):
+    """Fake perturber for testing purposes.
 
-    def __init__(self, *, param1: float = 1, param2: float = 2) -> None:
+    Accepts arbitrary keyword arguments and returns them via get_config().
+    This allows it to be used with any theta_key in factory tests.
+
+    Default parameters param1 and param2 are provided for common test cases.
+    """
+
+    def __init__(self, *, param1: float = 1, param2: float = 2, **kwargs: Any) -> None:
         self.param1 = param1
         self.param2 = param2
+        self._extra_kwargs = kwargs
 
     @override
     def perturb(
@@ -32,4 +39,6 @@ class DummyPerturber(PerturbImage):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        return {"param1": self.param1, "param2": self.param2}
+        config: dict[str, Any] = {"param1": self.param1, "param2": self.param2}
+        config.update(self._extra_kwargs)
+        return config

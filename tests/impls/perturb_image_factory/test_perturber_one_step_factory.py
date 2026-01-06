@@ -14,15 +14,15 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image_factory import PerturberOneStepFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from tests.test_utils import DummyPerturber
+from tests.fakes import FakePerturber
 
 
 class TestPerturberStepFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "theta_value"),
         [
-            (DummyPerturber, "param1", 1.0),
-            (DummyPerturber, "param2", 3.0),
+            (FakePerturber, "param1", 1.0),
+            (FakePerturber, "param2", 3.0),
         ],
     )
     def test_iteration(
@@ -39,7 +39,7 @@ class TestPerturberStepFactory:
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "theta_value"),
-        [(DummyPerturber, "param1", 1.0), (DummyPerturber, "param2", 3.0)],
+        [(FakePerturber, "param1", 1.0), (FakePerturber, "param2", 3.0)],
     )
     def test_configuration(self, perturber: type[PerturbImage], theta_key: str, theta_value: float) -> None:
         """Test configuration stability."""
@@ -56,7 +56,7 @@ class TestPerturberStepFactory:
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "theta_value"),
-        [(DummyPerturber, "param1", 1.0), (DummyPerturber, "param2", 3.0)],
+        [(FakePerturber, "param1", 1.0), (FakePerturber, "param2", 3.0)],
     )
     def test_hydration(
         self,
