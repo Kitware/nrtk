@@ -1,7 +1,7 @@
-"""Defines LinspacePerturbImageFactory to create PerturbImage instances with parameters linearly spaced over a range.
+"""Defines PerturberLinspaceFactory to create PerturbImage instances with parameters linearly spaced over a range.
 
 Classes:
-    LinspacePerturbImageFactory: A factory class for creating `PerturbImage` instances
+    PerturberLinspaceFactory: A factory class for creating `PerturbImage` instances
     where a specified parameter varies over a defined range in linearly spaced steps.
 
 Dependencies:
@@ -9,20 +9,20 @@ Dependencies:
     - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
 
 Usage:
-    To use `LinspacePerturbImageFactory`, initialize it with a `PerturbImage` type, a `theta_key`
+    To use `PerturberLinspaceFactory`, initialize it with a `PerturbImage` type, a `theta_key`
     to vary, and specify the start, stop, and number of samples. This factory can then be used to
     generate perturbed image instances with linearly spaced parameter variations.
 
 Example:
     >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
-    >>> factory = LinspacePerturbImageFactory(
+    >>> factory = PerturberLinspaceFactory(
     ...     perturber=BrightnessPerturber, theta_key="factor", start=0.0, stop=1.0, num=5
     ... )
 """
 
 from __future__ import annotations
 
-__all__ = ["LinspacePerturbImageFactory"]
+__all__ = ["PerturberLinspaceFactory"]
 
 from collections.abc import Sequence
 from typing import Any
@@ -34,7 +34,7 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
-class LinspacePerturbImageFactory(PerturbImageFactory):
+class PerturberLinspaceFactory(PerturbImageFactory):
     """Simple PerturbImageFactory implementation to step through the given range of values.
 
     Attributes:

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
-from nrtk.impls.perturb_image_factory.multivariate import MultivariatePerturbImageFactory
+from nrtk.impls.perturb_image_factory.perturber_multivariate_factory import PerturberMultivariateFactory
 from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectionDataset
 from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
@@ -53,7 +53,7 @@ class TestNRTKPerturberPyBSM:
         """Test that an appropriate error is raised if required metadata is missing."""
         dataset = _load_dataset(dataset_path=str(DATASET_FOLDER), load_metadata=False)
 
-        pybsm_factory = MultivariatePerturbImageFactory(
+        pybsm_factory = PerturberMultivariateFactory(
             perturber=PybsmPerturber,
             theta_keys=["f", "D"],
             thetas=[[0.014, 0.012], [0.001]],

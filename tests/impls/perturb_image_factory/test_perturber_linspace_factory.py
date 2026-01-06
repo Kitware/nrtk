@@ -14,8 +14,8 @@ from smqtk_core.configuration import (
 )
 
 from nrtk.impls.perturb_image.photometric.noise import SaltNoisePerturber
-from nrtk.impls.perturb_image_factory.linspace import (
-    LinspacePerturbImageFactory,
+from nrtk.impls.perturb_image_factory.perturber_linspace_factory import (
+    PerturberLinspaceFactory,
 )
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -23,7 +23,7 @@ from tests.impls import DATA_DIR
 from tests.test_utils import DummyPerturber
 
 
-class TestLinspacePerturbImageFactory:
+class TestPerturberLinspaceFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "num", "expected"),
         [
@@ -42,7 +42,7 @@ class TestLinspacePerturbImageFactory:
         expected: tuple[int, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = LinspacePerturbImageFactory(
+        factory = PerturberLinspaceFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -86,7 +86,7 @@ class TestLinspacePerturbImageFactory:
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
-        factory = LinspacePerturbImageFactory(
+        factory = PerturberLinspaceFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -115,7 +115,7 @@ class TestLinspacePerturbImageFactory:
         expected: list[float],
     ) -> None:
         """Test the generated theta values."""
-        factory = LinspacePerturbImageFactory(
+        factory = PerturberLinspaceFactory(
             perturber=DummyPerturber,
             theta_key="param1",
             start=start,
@@ -142,7 +142,7 @@ class TestLinspacePerturbImageFactory:
         endpoint: bool = True,
     ) -> None:
         """Test configuration stability."""
-        inst = LinspacePerturbImageFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, num=num)
+        inst = PerturberLinspaceFactory(perturber=perturber, theta_key=theta_key, start=start, stop=stop, num=num)
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber
             assert i.theta_key == theta_key
@@ -178,7 +178,7 @@ class TestLinspacePerturbImageFactory:
     def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
-            LinspacePerturbImageFactory(**kwargs)
+            PerturberLinspaceFactory(**kwargs)
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "num"),
@@ -197,7 +197,7 @@ class TestLinspacePerturbImageFactory:
         num: int,
     ) -> None:
         """Test configuration hydration using from_config_dict."""
-        original_factory = LinspacePerturbImageFactory(
+        original_factory = PerturberLinspaceFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,

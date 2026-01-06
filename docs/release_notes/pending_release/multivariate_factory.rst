@@ -1,6 +1,6 @@
-* Created a generic ``MultivariatePerturbImageFactory`` from ``_PybsmPerturbImageFactory``.
+* Created a generic ``PerturberMultivariateFactory`` from ``_PybsmPerturbImageFactory``.
 
-* Updated ``CustomPybsmPerturbImageFactory`` to inherit from ``MultivariatePerturbImageFactory``.
+* Updated ``CustomPybsmPerturbImageFactory`` to inherit from ``PerturberMultivariateFactory``.
 
 * Updated ``CustomPybsmPerturbImageFactory`` to contain all pyBSM functionality.
 

@@ -1,6 +1,6 @@
 """Defines a factory to create PerturbImage instances for flexible image perturbations.
 
-MultivariatePerturbImageFactory: A base factory class that generates multiple `PerturbImage` instances
+PerturberMultivariateFactory: A base factory class that generates multiple `PerturbImage` instances
 with specified perturbation parameters.
 
 Dependencies:
@@ -8,12 +8,12 @@ Dependencies:
 
 Example:
     >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
-    >>> factory = MultivariatePerturbImageFactory(
+    >>> factory = PerturberMultivariateFactory(
     ...     perturber=BrightnessPerturber, theta_keys=["factor"], thetas=[[0.1, 0.5]]
     ... )
 """
 
-__all__ = ["MultivariatePerturbImageFactory"]
+__all__ = ["PerturberMultivariateFactory"]
 
 from collections.abc import Iterable, Iterator, Sequence
 from typing import Any
@@ -25,7 +25,7 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
-class MultivariatePerturbImageFactory(PerturbImageFactory):
+class PerturberMultivariateFactory(PerturbImageFactory):
     """Base factory for creating `PerturbImage` instances with customizable parameters.
 
     This factory generates multiple `PerturbImage` instances, each configured with a unique combination
@@ -56,7 +56,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         return [
             [i] + e
             for i in range(top[layer])
-            for e in MultivariatePerturbImageFactory._build_set_list(layer=layer + 1, top=top)
+            for e in PerturberMultivariateFactory._build_set_list(layer=layer + 1, top=top)
         ]
 
     def __init__(
@@ -67,7 +67,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         thetas: Sequence[Any],
         perturber_kwargs: dict[str, Any] | None = None,
     ) -> None:
-        """Initializes the MultivariatePerturbImageFactory.
+        """Initializes the PerturberMultivariateFactory.
 
         Args:
             perturber:
@@ -84,7 +84,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
         self._thetas = thetas
 
         top = [len(entry) for entry in self.thetas]
-        self.sets: Sequence[list[int]] = MultivariatePerturbImageFactory._build_set_list(layer=0, top=top)
+        self.sets: Sequence[list[int]] = PerturberMultivariateFactory._build_set_list(layer=0, top=top)
         self.n: int = 0
         self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
@@ -167,7 +167,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
                 Indicator variable describing whether or not to use default config values. Defaults to True.
 
         Returns:
-            Instantiation of MultivariatePerturbImageFactory.
+            Instantiation of PerturberMultivariateFactory.
         """
         config_dict = dict(config_dict)
 
@@ -197,7 +197,7 @@ class MultivariatePerturbImageFactory(PerturbImageFactory):
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the `MultivariatePerturbImageFactory` instance."""
+        """Returns the current configuration of the `PerturberMultivariateFactory` instance."""
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_keys": self.theta_keys,

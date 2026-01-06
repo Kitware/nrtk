@@ -1,7 +1,7 @@
-"""Defines StepPerturbImageFactory, which creates PerturbImage instances varying a parameter over a range in steps.
+"""Defines PerturberStepFactory, which creates PerturbImage instances varying a parameter over a range in steps.
 
 Classes:
-    StepPerturbImageFactory: Factory for producing `PerturbImage` instances with a specific
+    PerturberStepFactory: Factory for producing `PerturbImage` instances with a specific
     parameter (`theta_key`) varying over a specified range.
 
 Dependencies:
@@ -9,20 +9,20 @@ Dependencies:
     - nrtk.interfaces for the `PerturbImage` and `PerturbImageFactory` interfaces.
 
 Usage:
-    Instantiate `StepPerturbImageFactory` with a `PerturbImage` type, a `theta_key` to vary,
+    Instantiate `PerturberStepFactory` with a `PerturbImage` type, a `theta_key` to vary,
     and the start, stop, and step values for the parameter range. This factory can then be
     used to generate perturbed image instances with controlled variations.
 
 Example:
     >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
-    >>> factory = StepPerturbImageFactory(
+    >>> factory = PerturberStepFactory(
     ...     perturber=BrightnessPerturber, theta_key="factor", start=0.0, stop=1.0, step=0.1, to_int=False
     ... )
 """
 
 from __future__ import annotations
 
-__all__ = ["StepPerturbImageFactory"]
+__all__ = ["PerturberStepFactory"]
 
 import math
 from collections.abc import Sequence
@@ -34,7 +34,7 @@ from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
-class StepPerturbImageFactory(PerturbImageFactory):
+class PerturberStepFactory(PerturbImageFactory):
     """Simple PerturbImageFactory implementation to step through the given range of values.
 
     perturber (type[PerturbImage]):
