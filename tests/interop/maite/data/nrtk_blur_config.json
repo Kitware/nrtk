@@ -1,7 +1,7 @@
 {
     "PerturberFactory": {
-        "type": "nrtk.impls.perturb_image_factory.generic.one_step.OneStepPerturbImageFactory",
-        "nrtk.impls.perturb_image_factory.generic.one_step.OneStepPerturbImageFactory": {
+        "type": "nrtk.impls.perturb_image_factory.one_step.OneStepPerturbImageFactory",
+        "nrtk.impls.perturb_image_factory.one_step.OneStepPerturbImageFactory": {
             "perturber": "nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber",
             "theta_key": "ksize",
             "theta_value": 1,

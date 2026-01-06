@@ -14,7 +14,7 @@ from smqtk_core.configuration import (
 )
 
 from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
-from nrtk.impls.perturb_image_factory.generic.multivariate import MultivariatePerturbImageFactory
+from nrtk.impls.perturb_image_factory.multivariate import MultivariatePerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario

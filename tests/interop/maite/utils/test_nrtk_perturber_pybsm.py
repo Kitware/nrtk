@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
-from nrtk.impls.perturb_image_factory.generic.multivariate import MultivariatePerturbImageFactory
+from nrtk.impls.perturb_image_factory.multivariate import MultivariatePerturbImageFactory
 from nrtk.interop.maite.datasets.object_detection import COCOJATICObjectDetectionDataset
 from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber

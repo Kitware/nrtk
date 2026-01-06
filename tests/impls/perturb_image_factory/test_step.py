@@ -19,7 +19,7 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.optical.detector_otf_perturber import DetectorOTFPerturber
 from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
 from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
-from nrtk.impls.perturb_image_factory.generic.step import StepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.step import StepPerturbImageFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls import DATA_DIR
