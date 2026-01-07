@@ -17,8 +17,8 @@ from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
 from nrtk.impls.perturb_image_factory import PerturberMultivariateFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.fakes import FakePerturber
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
-from tests.test_utils import DummyPerturber
 
 
 class TestPerturberMultivariateFactory:
@@ -26,13 +26,13 @@ class TestPerturberMultivariateFactory:
         ("perturber", "theta_keys", "thetas", "expected"),
         [
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1"],
                 [[1, 3, 5]],
                 ((1,), (3,), (5,)),
             ),
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
                 ((1, 2), (1, 4), (3, 2), (3, 4)),
@@ -58,7 +58,7 @@ class TestPerturberMultivariateFactory:
         ("perturber", "theta_keys", "thetas", "idx", "expected_val", "expectation"),
         [
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
                 0,
@@ -66,7 +66,7 @@ class TestPerturberMultivariateFactory:
                 does_not_raise(),
             ),
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
                 3,
@@ -74,7 +74,7 @@ class TestPerturberMultivariateFactory:
                 does_not_raise(),
             ),
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
                 4,
@@ -82,7 +82,7 @@ class TestPerturberMultivariateFactory:
                 pytest.raises(IndexError),
             ),
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
                 -1,
@@ -111,9 +111,9 @@ class TestPerturberMultivariateFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_keys", "thetas", "expected_sets"),
         [
-            (DummyPerturber, ["param1"], [[1, 2, 3, 4]], [[0], [1], [2], [3]]),
+            (FakePerturber, ["param1"], [[1, 2, 3, 4]], [[0], [1], [2], [3]]),
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
                 [[0, 0], [0, 1], [1, 0], [1, 1]],
@@ -139,12 +139,12 @@ class TestPerturberMultivariateFactory:
         ("perturber", "theta_keys", "thetas"),
         [
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1"],
                 [[1, 2, 3, 4]],
             ),
             (
-                DummyPerturber,
+                FakePerturber,
                 ["param1", "param2"],
                 [[1, 3], [2, 4]],
             ),

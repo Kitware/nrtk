@@ -22,20 +22,20 @@ from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import T
 from nrtk.impls.perturb_image_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from tests.fakes import FakePerturber
 from tests.impls import DATA_DIR
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.test_utils import DummyPerturber
 
 
 class TestPerturberStepFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step", "to_int", "expected"),
         [
-            (DummyPerturber, "param1", 1.0, 6.0, 2.0, True, (1.0, 3.0, 5.0)),
-            (DummyPerturber, "param2", 3.0, 9.0, 3.0, True, (3.0, 6.0)),
-            (DummyPerturber, "param1", 3.0, 9.0, 1.5, False, (3.0, 4.5, 6.0, 7.5)),
-            (DummyPerturber, "param1", 4.0, 4.0, 1.0, False, ()),
+            (FakePerturber, "param1", 1.0, 6.0, 2.0, True, (1.0, 3.0, 5.0)),
+            (FakePerturber, "param2", 3.0, 9.0, 3.0, True, (3.0, 6.0)),
+            (FakePerturber, "param1", 3.0, 9.0, 1.5, False, (3.0, 4.5, 6.0, 7.5)),
+            (FakePerturber, "param1", 4.0, 4.0, 1.0, False, ()),
         ],
     )
     def test_iteration(
@@ -73,11 +73,11 @@ class TestPerturberStepFactory:
             "expectation",
         ),
         [
-            (DummyPerturber, "param1", 1.0, 6.0, 2.0, 0, 1, does_not_raise()),
-            (DummyPerturber, "param1", 1.0, 6.0, 2.0, 2, 5, does_not_raise()),
-            (DummyPerturber, "param1", 1.0, 6.0, 2.0, 3, -1, pytest.raises(IndexError)),
-            (DummyPerturber, "param1", 1.0, 6.0, 2.0, -1, -1, pytest.raises(IndexError)),
-            (DummyPerturber, "param1", 4.0, 4.0, 1.0, 0, -1, pytest.raises(IndexError)),
+            (FakePerturber, "param1", 1.0, 6.0, 2.0, 0, 1, does_not_raise()),
+            (FakePerturber, "param1", 1.0, 6.0, 2.0, 2, 5, does_not_raise()),
+            (FakePerturber, "param1", 1.0, 6.0, 2.0, 3, -1, pytest.raises(IndexError)),
+            (FakePerturber, "param1", 1.0, 6.0, 2.0, -1, -1, pytest.raises(IndexError)),
+            (FakePerturber, "param1", 4.0, 4.0, 1.0, 0, -1, pytest.raises(IndexError)),
         ],
         ids=["first idx", "last idx", "idx == len", "neg idx", "empty iter"],
     )
@@ -106,7 +106,7 @@ class TestPerturberStepFactory:
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step", "to_int"),
-        [(DummyPerturber, "param1", 1.0, 5.0, 2.0, False), (DummyPerturber, "param2", 3.0, 9.0, 3.0, True)],
+        [(FakePerturber, "param1", 1.0, 5.0, 2.0, False), (FakePerturber, "param2", 3.0, 9.0, 3.0, True)],
     )
     def test_configuration(
         self,
@@ -140,7 +140,7 @@ class TestPerturberStepFactory:
         [
             (
                 {
-                    "perturber": DummyPerturber,
+                    "perturber": FakePerturber,
                     "theta_key": "param1",
                     "start": 1.0,
                     "stop": 2.0,
@@ -149,7 +149,7 @@ class TestPerturberStepFactory:
             ),
             (
                 {
-                    "perturber": DummyPerturber(param1=1, param2=2),
+                    "perturber": FakePerturber(param1=1, param2=2),
                     "theta_key": "param2",
                     "start": 1.0,
                     "stop": 2.0,
@@ -165,7 +165,7 @@ class TestPerturberStepFactory:
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step"),
-        [(DummyPerturber, "param1", 1.0, 5.0, 2.0), (DummyPerturber, "param2", 3.0, 9.0, 3.0)],
+        [(FakePerturber, "param1", 1.0, 5.0, 2.0), (FakePerturber, "param2", 3.0, 9.0, 3.0)],
     )
     def test_hydration(
         self,
