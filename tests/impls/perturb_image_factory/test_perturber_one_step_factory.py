@@ -11,13 +11,13 @@ from smqtk_core.configuration import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image_factory.one_step import OneStepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.perturber_one_step_factory import PerturberOneStepFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.test_utils import DummyPerturber
 
 
-class TestStepPerturbImageFactory:
+class TestPerturberStepFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "theta_value"),
         [
@@ -33,7 +33,7 @@ class TestStepPerturbImageFactory:
         theta_value: float,
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = OneStepPerturbImageFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
+        factory = PerturberOneStepFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
         assert len(factory) == 1
         assert factory[0].get_config() == snapshot
 
@@ -43,7 +43,7 @@ class TestStepPerturbImageFactory:
     )
     def test_configuration(self, perturber: type[PerturbImage], theta_key: str, theta_value: float) -> None:
         """Test configuration stability."""
-        inst = OneStepPerturbImageFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
+        inst = PerturberOneStepFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
         for i in configuration_test_helper(inst):
             assert i.perturber == perturber
             assert i.theta_key == theta_key
@@ -66,7 +66,7 @@ class TestStepPerturbImageFactory:
         theta_value: float,
     ) -> None:
         """Test configuration hydration using from_config_dict."""
-        original_factory = OneStepPerturbImageFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
+        original_factory = PerturberOneStepFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
 
         original_factory_config = original_factory.get_config()
 

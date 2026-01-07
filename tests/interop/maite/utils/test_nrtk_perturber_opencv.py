@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from nrtk.impls.perturb_image.photometric.blur import AverageBlurPerturber
-from nrtk.impls.perturb_image_factory.step import StepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.perturber_step_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.datasets.object_detection import (
     JATICDetectionTarget,
@@ -30,7 +30,7 @@ class TestNRTKPerturberOpenCV:
         ("perturber_factory", "img_dirs"),
         [
             (
-                StepPerturbImageFactory(
+                PerturberStepFactory(
                     perturber=AverageBlurPerturber,
                     theta_key="ksize",
                     start=1,

@@ -19,7 +19,7 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.optical.detector_otf_perturber import DetectorOTFPerturber
 from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
 from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
-from nrtk.impls.perturb_image_factory.step import StepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.perturber_step_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls import DATA_DIR
@@ -28,7 +28,7 @@ from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_asser
 from tests.test_utils import DummyPerturber
 
 
-class TestStepPerturbImageFactory:
+class TestPerturberStepFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step", "to_int", "expected"),
         [
@@ -49,7 +49,7 @@ class TestStepPerturbImageFactory:
         expected: tuple[float, ...],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = StepPerturbImageFactory(
+        factory = PerturberStepFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -93,7 +93,7 @@ class TestStepPerturbImageFactory:
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
-        factory = StepPerturbImageFactory(
+        factory = PerturberStepFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -118,7 +118,7 @@ class TestStepPerturbImageFactory:
         to_int: bool,
     ) -> None:
         """Test configuration stability."""
-        inst = StepPerturbImageFactory(
+        inst = PerturberStepFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -161,7 +161,7 @@ class TestStepPerturbImageFactory:
     def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test that an exception is properly raised (or not) based on argument value."""
         with expectation:
-            StepPerturbImageFactory(**kwargs)
+            PerturberStepFactory(**kwargs)
 
     @pytest.mark.parametrize(
         ("perturber", "theta_key", "start", "stop", "step"),
@@ -177,7 +177,7 @@ class TestStepPerturbImageFactory:
         step: float,
     ) -> None:
         """Test configuration hydration using from_config_dict."""
-        original_factory = StepPerturbImageFactory(
+        original_factory = PerturberStepFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,
@@ -273,7 +273,7 @@ class TestStepPerturbImageFactory:
         step: float,
     ) -> None:
         """Test perturber instance modification for a perturber factory."""
-        perturber_factory = StepPerturbImageFactory(
+        perturber_factory = PerturberStepFactory(
             perturber=perturber,
             theta_key=theta_key,
             start=start,

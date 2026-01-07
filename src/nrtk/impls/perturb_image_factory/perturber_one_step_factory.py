@@ -1,28 +1,28 @@
-"""Defines OneStepPerturbImageFactory, creating a single PerturbImage with fixed parameters for one-step perturbations.
+"""Defines PerturberOneStepFactory, creating a single PerturbImage with fixed parameters for one-step perturbations.
 
 Classes:
-    OneStepPerturbImageFactory: A factory that generates one `PerturbImage` instance
+    PerturberOneStepFactory: A factory that generates one `PerturbImage` instance
     configured with a specific parameter key and value.
 
 Dependencies:
-    - nrtk.impls.perturb_image_factory.step.StepPerturbImageFactory for the base
+    - nrtk.impls.perturb_image_factory.perturber_step_factory.PerturberStepFactory for the base
       factory functionality.
     - nrtk.interfaces.perturb_image.PerturbImage as the interface for the perturber.
 
 Example usage:
     >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
-    >>> factory = OneStepPerturbImageFactory(perturber=BrightnessPerturber, theta_key="factor", theta_value=0.5)
+    >>> factory = PerturberOneStepFactory(perturber=BrightnessPerturber, theta_key="factor", theta_value=0.5)
 """
 
-__all__ = ["OneStepPerturbImageFactory"]
+__all__ = ["PerturberOneStepFactory"]
 
 from typing import Any
 
-from nrtk.impls.perturb_image_factory.step import StepPerturbImageFactory
+from nrtk.impls.perturb_image_factory.perturber_step_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
-class OneStepPerturbImageFactory(StepPerturbImageFactory):
+class PerturberOneStepFactory(PerturberStepFactory):
     """Simple PerturbImageFactory implementation to return a factory with one perturber.
 
     Attributes:
@@ -74,7 +74,7 @@ class OneStepPerturbImageFactory(StepPerturbImageFactory):
         self.theta_value = theta_value
 
     def get_config(self) -> dict[str, Any]:
-        """Returns a configuration dictionary for the OneStepPerturbImageFactory instance."""
+        """Returns a configuration dictionary for the PerturberOneStepFactory instance."""
         cfg = super().get_config()
         cfg["theta_value"] = self.theta_value
         return {k: cfg[k] for k in ("perturber", "theta_key", "theta_value", "to_int")}

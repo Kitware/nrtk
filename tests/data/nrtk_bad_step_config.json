@@ -1,6 +1,6 @@
 {
-    "type": "nrtk.impls.perturb_image_factory.step.StepPerturbImageFactory",
-    "nrtk.impls.perturb_image_factory.step.StepPerturbImageFactory": {
+    "type": "nrtk.impls.perturb_image_factory.perturber_step_factory.PerturberStepFactory",
+    "nrtk.impls.perturb_image_factory.perturber_step_factory.PerturberStepFactory": {
         "perturber": "not a perturber",
         "theta_key": "ksize",
         "start": 1,

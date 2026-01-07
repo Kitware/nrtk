@@ -14,14 +14,14 @@ from smqtk_core.configuration import (
 )
 
 from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
-from nrtk.impls.perturb_image_factory.multivariate import MultivariatePerturbImageFactory
+from nrtk.impls.perturb_image_factory.perturber_multivariate_factory import PerturberMultivariateFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
 from tests.test_utils import DummyPerturber
 
 
-class TestMultivariatePerturbImageFactory:
+class TestPerturberMultivariateFactory:
     @pytest.mark.parametrize(
         ("perturber", "theta_keys", "thetas", "expected"),
         [
@@ -47,7 +47,7 @@ class TestMultivariatePerturbImageFactory:
         expected: tuple[tuple[int, ...]],
     ) -> None:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        factory = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
         assert len(expected) == len(factory)
         for idx, p in enumerate(factory):
             for count, _ in enumerate(theta_keys):
@@ -102,7 +102,7 @@ class TestMultivariatePerturbImageFactory:
         expectation: AbstractContextManager,
     ) -> None:
         """Ensure it is possible to access a perturber instance via indexing."""
-        factory = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        factory = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
         with expectation:
             for count, _ in enumerate(theta_keys):
                 perturb_cfg = factory[idx].get_config()
@@ -128,7 +128,7 @@ class TestMultivariatePerturbImageFactory:
         expected_sets: Sequence[Sequence[int]],
     ) -> None:
         """Test configuration stability."""
-        inst = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        inst = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
 
         for i in configuration_test_helper(inst):
             assert i.theta_keys == theta_keys
@@ -158,7 +158,7 @@ class TestMultivariatePerturbImageFactory:
         thetas: Sequence[Any],
     ) -> None:
         """Test configuration hydration using from_config_dict."""
-        original_factory = MultivariatePerturbImageFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        original_factory = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
 
         original_factory_config = original_factory.get_config()
 
@@ -178,7 +178,7 @@ class TestMultivariatePerturbImageFactory:
     not PybsmPerturber.is_usable(),
     reason="not PybsmPerturber.is_usable()",
 )
-class TestStepPerturbImageFactory:
+class TestPerturberStepFactory:
     @pytest.mark.parametrize(
         ("theta_keys", "thetas", "expected"),
         [
@@ -203,7 +203,7 @@ class TestStepPerturbImageFactory:
         """Ensure factory can be iterated upon and the varied parameter matches expectations."""
         sensor_and_scenario = create_sample_sensor_and_scenario()
 
-        factory = MultivariatePerturbImageFactory(
+        factory = PerturberMultivariateFactory(
             perturber=PybsmPerturber,
             theta_keys=theta_keys,
             thetas=thetas,
@@ -261,7 +261,7 @@ class TestStepPerturbImageFactory:
         """Ensure it is possible to access a perturber instance via indexing."""
         sensor_and_scenario = create_sample_sensor_and_scenario()
 
-        factory = MultivariatePerturbImageFactory(
+        factory = PerturberMultivariateFactory(
             perturber=PybsmPerturber,
             theta_keys=theta_keys,
             thetas=thetas,
@@ -293,7 +293,7 @@ class TestStepPerturbImageFactory:
         """Test configuration stability."""
         sensor_and_scenario = create_sample_sensor_and_scenario()
 
-        inst = MultivariatePerturbImageFactory(
+        inst = PerturberMultivariateFactory(
             perturber=PybsmPerturber,
             theta_keys=theta_keys,
             thetas=thetas,
@@ -332,7 +332,7 @@ class TestStepPerturbImageFactory:
         thetas: Sequence[Any],
     ) -> None:
         """Test configuration hydration using from_config_dict."""
-        original_factory = MultivariatePerturbImageFactory(
+        original_factory = PerturberMultivariateFactory(
             perturber=PybsmPerturber,
             theta_keys=theta_keys,
             thetas=thetas,

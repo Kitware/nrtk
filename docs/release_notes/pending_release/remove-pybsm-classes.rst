@@ -1,6 +1,6 @@
 * Removed ``CustomPybsmPerturbImageFactory``.
 
-* Updated ``MultivariatePerturbImageFactory`` to take additional perturber arguments.
+* Updated ``PerturberMultivariateFactory`` to take additional perturber arguments.
 
 * Removed ``PybsmSensor`` and ``PybsmScenario`` from ``PerturbImage`` implementations.
 

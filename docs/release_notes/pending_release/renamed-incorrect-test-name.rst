@@ -1,1 +1,1 @@
-* FIX: Renamed ``TestFloatStepPerturbImageFactory`` to ``TestLinspacePerturbImageFactory``.
+* FIX: Renamed ``TestFloatPerturberStepFactory`` to ``TestPerturberLinspaceFactory``.
