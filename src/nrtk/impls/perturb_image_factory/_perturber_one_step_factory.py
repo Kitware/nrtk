@@ -5,7 +5,7 @@ Classes:
     configured with a specific parameter key and value.
 
 Dependencies:
-    - nrtk.impls.perturb_image_factory.perturber_step_factory.PerturberStepFactory for the base
+    - nrtk.impls.perturb_image_factory.PerturberStepFactory for the base
       factory functionality.
     - nrtk.interfaces.perturb_image.PerturbImage as the interface for the perturber.
 
@@ -18,7 +18,7 @@ __all__ = ["PerturberOneStepFactory"]
 
 from typing import Any
 
-from nrtk.impls.perturb_image_factory.perturber_step_factory import PerturberStepFactory
+from nrtk.impls.perturb_image_factory._perturber_step_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image import PerturbImage
 
 

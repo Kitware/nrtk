@@ -114,7 +114,7 @@ Perturbation Factory
    :template: custom-module-template.rst
    :recursive:
 
-   ~nrtk.impls.perturb_image_factory.perturber_linspace_factory
-   ~nrtk.impls.perturb_image_factory.perturber_one_step_factory
-   ~nrtk.impls.perturb_image_factory.perturber_step_factory
-   ~nrtk.impls.perturb_image_factory.perturber_multivariate_factory
+   ~nrtk.impls.perturb_image_factory._perturber_linspace_factory
+   ~nrtk.impls.perturb_image_factory._perturber_one_step_factory
+   ~nrtk.impls.perturb_image_factory._perturber_step_factory
+   ~nrtk.impls.perturb_image_factory._perturber_multivariate_factory

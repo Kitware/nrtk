@@ -1,6 +1,6 @@
 {
-    "type": "nrtk.impls.perturb_image_factory.perturber_step_factory.PerturberStepFactory",
-    "nrtk.impls.perturb_image_factory.perturber_step_factory.PerturberStepFactory": {
+    "type": "nrtk.impls.perturb_image_factory._perturber_step_factory.PerturberStepFactory",
+    "nrtk.impls.perturb_image_factory._perturber_step_factory.PerturberStepFactory": {
         "perturber": "nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber",
         "theta_key": "factor",
         "start": 1,
