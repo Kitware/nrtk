@@ -2,34 +2,42 @@ import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import py  # type: ignore
 import pytest
 from click.testing import CliRunner
-from maite.protocols.object_detection import Dataset
 
-from nrtk.interop.maite.utils.bin.nrtk_perturber_cli import is_usable, nrtk_perturber_cli
-from nrtk.interop.maite.utils.detection import maite_available
+import nrtk.interop.maite.utils.bin.nrtk_perturber_cli
+from nrtk.interop.maite.utils.bin.nrtk_perturber_cli import kwcoco_available, maite_available, nrtk_perturber_cli
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
+from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_BLUR_CONFIG, NRTK_PYBSM_CONFIG
 
+_ = import_guard(
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols.object_detection"],
+    objects=["Dataset"],
+)
+from maite.protocols.object_detection import Dataset  # noqa: E402
 
+
+@pytest.mark.skipif(not kwcoco_available, reason=str(KWCocoImportError()))
+@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
 class TestNRTKPerturberCLI:
     """These tests make use of the `tmpdir` fixture from `pytest`.
 
     Find more information here: https://docs.pytest.org/en/6.2.x/tmpdir.html
     """
 
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
-    @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
     @mock.patch(
         "nrtk.interop.maite.utils.bin.nrtk_perturber_cli.nrtk_perturber",
         return_value=[
-            ("_f-0.012_D-0.001_px-2e-05", MagicMock(spec=Dataset) if maite_available else Dataset),
-            ("_f-0.012_D-0.003_px-2e-05", MagicMock(spec=Dataset) if maite_available else Dataset),
-            ("_f-0.014_D-0.001_px-2e-05", MagicMock(spec=Dataset) if maite_available else Dataset),
-            ("_f-0.014_D-0.003_px-2e-05", MagicMock(spec=Dataset) if maite_available else Dataset),
+            ("_f-0.012_D-0.001_px-2e-05", MagicMock(spec=Dataset)),
+            ("_f-0.012_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
+            ("_f-0.014_D-0.001_px-2e-05", MagicMock(spec=Dataset)),
+            ("_f-0.014_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
         ],
     )
     @mock.patch("nrtk.interop.maite.utils.bin.nrtk_perturber_cli.dataset_to_coco", return_value=None)
@@ -94,7 +102,6 @@ class TestNRTKPerturberCLI:
         ]
         dataset_to_coco_patch.assert_has_calls(calls)
 
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
     @pytest.mark.parametrize(
         ("config_file", "expectation"),
         [
@@ -149,41 +156,38 @@ class TestNRTKPerturberCLI:
                 catch_exceptions=False,
             )
 
-    def test_config_gen(self, tmpdir: py.path.local) -> None:
-        """Test the generate configuration file option."""
-        output_dir = tmpdir.join(Path("out"))
 
-        output_config = tmpdir.join(Path("gen_conf.json"))
+@pytest.mark.parametrize(
+    ("kwcoco_avail", "maite_avail", "expectation"),
+    [
+        (False, True, pytest.raises(KWCocoImportError)),
+        (True, False, pytest.raises(MaiteImportError)),
+    ],
+)
+def test_missing_deps(
+    tmpdir: py.path.local,
+    kwcoco_avail: bool,
+    maite_avail: bool,
+    expectation: AbstractContextManager,
+) -> None:
+    """Test that proper warning is displayed when required dependencies are not installed."""
+    output_dir = tmpdir.join(Path("out"))
+    mock_coco = MagicMock()
+    mock_coco.__bool__.return_value = kwcoco_avail
+    mock_maite = MagicMock()
+    mock_maite.__bool__.return_value = maite_avail
 
-        runner = CliRunner()
-        runner.invoke(
+    runner = CliRunner()
+
+    with (
+        patch.object(nrtk.interop.maite.utils.bin.nrtk_perturber_cli, "kwcoco_available", mock_coco),
+        patch.object(nrtk.interop.maite.utils.bin.nrtk_perturber_cli, "maite_available", mock_maite),
+        expectation,
+    ):
+        _ = runner.invoke(
             nrtk_perturber_cli,
-            [
-                str(DATASET_FOLDER),
-                str(output_dir),
-                str(NRTK_PYBSM_CONFIG),
-                "-g",
-                str(output_config),
-            ],
+            [str(DATASET_FOLDER), str(output_dir), str(NRTK_PYBSM_CONFIG)],
+            catch_exceptions=False,
         )
 
-        # Check that config file was created
-        assert output_config.check(file=1)
-        # Check that no output was generated
-        assert not output_dir.check(dir=1)
-
-    @mock.patch("nrtk.interop.maite.utils.bin.nrtk_perturber_cli.is_usable", False)
-    def test_missing_deps(self, tmpdir: py.path.local) -> None:
-        """Test that proper warning is displayed when required dependencies are not installed."""
-        output_dir = tmpdir.join(Path("out"))
-
-        runner = CliRunner()
-
-        with pytest.raises(KWCocoImportError):
-            _ = runner.invoke(
-                nrtk_perturber_cli,
-                [str(DATASET_FOLDER), str(output_dir), str(NRTK_PYBSM_CONFIG)],
-                catch_exceptions=False,
-            )
-
-        assert not output_dir.check(dir=1)
+    assert not output_dir.check(dir=1)
