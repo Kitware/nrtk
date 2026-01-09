@@ -5,7 +5,6 @@ from __future__ import annotations
 __all__ = ["JATICObjectDetectionDataset", "COCOJATICObjectDetectionDataset"]
 
 import copy
-import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -35,8 +34,6 @@ from maite.protocols.object_detection import (  # noqa: E402
 )
 
 OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
-
-LOG = logging.getLogger(__name__)
 
 
 @dataclass

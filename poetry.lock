@@ -3456,32 +3456,6 @@ test = ["pytest", "pytest-console-scripts", "pytest-jupyter", "pytest-tornasync"
 
 [[package]]
 name = "nrtk-albumentations"
-version = "2.2.0"
-description = "Fork of Albumentations in direct support of NRTK (Natural Robustness Toolkit). Fast, flexible, and advanced augmentation library for deep learning, computer vision, and medical imaging. Offers a wide range of transformations for both 2D (images, masks, bboxes, keypoints) and 3D (volumes, volumetric masks, keypoints) data, with optimized performance and seamless integration into ML workflows."
-optional = true
-python-versions = "<4.0,>=3.10"
-groups = ["main"]
-markers = "extra == \"notebook-testing\""
-files = [
-    {file = "nrtk_albumentations-2.2.0-py3-none-any.whl", hash = "sha256:2f9d8eff8bb6005d214fb102a23af995e2a5117b2283cce06fd307dc597d2bdb"},
-    {file = "nrtk_albumentations-2.2.0.tar.gz", hash = "sha256:e639767cb71359b33c5d4cad914bbc059b48a2cd2800118695dcb907c7bfde6d"},
-]
-
-[package.dependencies]
-eval-type-backport = "*"
-numpy = [
-    {version = ">=1.26,<2.0", markers = "python_version < \"3.13\""},
-    {version = ">=2.1", markers = "python_version >= \"3.13\""},
-]
-pydantic = ">=2.9.2"
-PyYAML = "*"
-scipy = ">=1.14.1"
-simsimd = ">=5.9.2"
-stringzilla = ">=3.10.4"
-typing-extensions = ">=4.9.0"
-
-[[package]]
-name = "nrtk-albumentations"
 version = "2.2.1"
 description = "Fork of Albumentations in direct support of NRTK (Natural Robustness Toolkit). Fast, flexible, and advanced augmentation library for deep learning, computer vision, and medical imaging. Offers a wide range of transformations for both 2D (images, masks, bboxes, keypoints) and 3D (volumes, volumetric masks, keypoints) data, with optimized performance and seamless integration into ML workflows."
 optional = true
@@ -5020,15 +4994,19 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-json-logger"
-version = "2.0.7"
-description = "A python library adding a json log formatter"
+version = "4.0.0"
+description = "JSON Log Formatter for the Python Logging Package"
 optional = false
-python-versions = ">=3.6"
-groups = ["tests"]
+python-versions = ">=3.8"
+groups = ["main", "tests"]
 files = [
-    {file = "python-json-logger-2.0.7.tar.gz", hash = "sha256:23e7ec02d34237c5aa1e29a070193a4ea87583bb4e7f8fd06d3de8264c4b2e1c"},
-    {file = "python_json_logger-2.0.7-py3-none-any.whl", hash = "sha256:f380b826a991ebbe3de4d897aeec42760035ac760345e57b812938dc8b35e2bd"},
+    {file = "python_json_logger-4.0.0-py3-none-any.whl", hash = "sha256:af09c9daf6a813aa4cc7180395f50f2a9e5fa056034c9953aec92e381c5ba1e2"},
+    {file = "python_json_logger-4.0.0.tar.gz", hash = "sha256:f58e68eb46e1faed27e0f574a55a0455eecd7b8a5b88b85a784519ba3cff047f"},
 ]
+markers = {main = "extra == \"maite\""}
+
+[package.extras]
+dev = ["backports.zoneinfo ; python_version < \"3.9\"", "black", "build", "freezegun", "mdx_truly_sane_lists", "mike", "mkdocs", "mkdocs-awesome-pages-plugin", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-material (>=8.5)", "mkdocstrings[python]", "msgspec ; implementation_name != \"pypy\"", "mypy", "orjson ; implementation_name != \"pypy\"", "pylint", "pytest", "tzdata", "validate-pyproject[all]"]
 
 [[package]]
 name = "pytz"
@@ -7926,7 +7904,7 @@ albumentations = ["nrtk-albumentations"]
 diffusion = ["Pillow", "accelerate", "diffusers", "protobuf", "torch", "transformers"]
 graphics = ["opencv-python"]
 headless = ["opencv-python-headless"]
-maite = ["fastapi", "maite", "pydantic", "pydantic-settings", "uvicorn"]
+maite = ["fastapi", "maite", "pydantic", "pydantic-settings", "python-json-logger", "uvicorn"]
 notebook-testing = ["datasets", "jupytext", "matplotlib", "nrtk-albumentations", "numba", "tabulate", "torch", "torchmetrics", "torchvision", "transformers", "ultralytics"]
 pillow = ["Pillow"]
 pybsm = ["pybsm"]
@@ -7937,4 +7915,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "d4e605eb06c1b0e2ae84909f54f6495ecfbe2ab7b5ab66239ecc2d232efd0a49"
+content-hash = "acde61bbe7fb252e890998b9bf98d660e0c81f1f0a300dd0ee9ec35e54cc65af"

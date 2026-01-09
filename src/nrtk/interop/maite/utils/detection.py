@@ -12,6 +12,7 @@ from PIL import Image  # type: ignore
 
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
+from nrtk.utils._logging import setup_logging
 
 maite_available: bool = import_guard(
     module_name="maite",
@@ -22,6 +23,8 @@ maite_available: bool = import_guard(
 kwcoco_available: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 from kwcoco import CocoDataset  # type: ignore  # noqa: E402
 from maite.protocols.object_detection import Dataset  # noqa: E402
+
+logger: logging.Logger = setup_logging(name=__name__)
 
 
 def _xywh_bbox_xform(*, x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:
@@ -92,14 +95,14 @@ def dataset_to_coco(  # noqa: C901
             )
 
         mod_metadata.append(metadata)
-    logging.info(f"Saved perturbed images to {output_dir}")
+    logger.info(f"Saved perturbed images to {output_dir}")
 
     metadata_file = output_dir / "image_metadata.json"
 
     with open(metadata_file, "w") as f:
         json.dump(mod_metadata, f)
-    logging.info(f"Saved image metadata to {metadata_file}")
+    logger.info(f"Saved image metadata to {metadata_file}")
 
     annotations_file = output_dir / "annotations.json"
     annotations.dump(annotations_file)
-    logging.info(f"Saved annotations to {annotations_file}")
+    logger.info(f"Saved annotations to {annotations_file}")
