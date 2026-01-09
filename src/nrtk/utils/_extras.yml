@@ -1,7 +1,7 @@
 Pillow:
 - Pillow>=10.3.0
 albumentations:
-- nrtk-albumentations>=2.2.0
+- nrtk-albumentations>=2.2.1
 diffusion:
 - torch>=2.2.0
 - diffusers>=0.21.0
