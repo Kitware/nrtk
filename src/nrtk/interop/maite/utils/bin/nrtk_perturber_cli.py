@@ -2,11 +2,12 @@
 
 import json
 import logging
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, TextIO
+from typing import TextIO
 
 import click  # type: ignore
-from smqtk_core.configuration import from_config_dict, make_default_config
+from smqtk_core.configuration import from_config_dict
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop.maite.datasets.object_detection import (
@@ -14,20 +15,33 @@ from nrtk.interop.maite.datasets.object_detection import (
 )
 from nrtk.interop.maite.utils.detection import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
-from nrtk.utils._exceptions import KWCocoImportError
+from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 
-is_usable: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
-from kwcoco import CocoDataset  # type: ignore  # noqa: E402
+kwcoco_available: bool = import_guard(
+    module_name="kwcoco",
+    exception=KWCocoImportError,
+    submodules=["coco_dataset"],
+    objects=["CocoDataset"],
+)
+from kwcoco.coco_dataset import CocoDataset  # noqa: E402
+
+maite_available: bool = import_guard(
+    module_name="maite",
+    exception=MaiteImportError,
+    submodules=["protocols"],
+    objects=["DatumMetadata"],
+)
+from maite.protocols import DatumMetadata  # noqa: E402
 
 
-def _load_metadata(*, dataset_dir: str, kwcoco_dataset: "CocoDataset") -> list[dict[str, Any]]:
+def _load_metadata(*, dataset_dir: str, kwcoco_dataset: "CocoDataset") -> Sequence[DatumMetadata]:
     metadata_file = Path(dataset_dir) / "image_metadata.json"
     if not metadata_file.is_file():
         logging.warn(
             "Could not identify metadata file, assuming no metadata. Expected at '[dataset_dir]/image_metadata.json'",
         )
-        return [{"id": idx} for idx in range(len(kwcoco_dataset.imgs))]
+        return [DatumMetadata(id=idx) for idx in range(len(kwcoco_dataset.imgs))]
     logging.info(f"Loading metadata from {metadata_file}")
     with open(metadata_file) as f:
         return json.load(f)
@@ -42,19 +56,12 @@ def _set_logging(verbose: bool) -> None:
 @click.argument("dataset_dir", type=click.Path(exists=True))
 @click.argument("output_dir", type=click.Path(exists=False))
 @click.argument("config_file", type=click.File(mode="r"))
-@click.option(
-    "-g",
-    "--generate-config-file",
-    help="write default config to specified file",
-    type=click.File(mode="w"),
-)
 @click.option("--verbose", "-v", count=True, help="print progress messages")
 def nrtk_perturber_cli(
     *,
     dataset_dir: str,
     output_dir: str,
     config_file: TextIO,
-    generate_config_file: TextIO,
     verbose: bool,
 ) -> None:
     """Generate NRTK perturbed images and detections from a given set of source images and COCO-format annotations.
@@ -68,8 +75,6 @@ def nrtk_perturber_cli(
             Directory to write the perturbed images to.
         config_file:
             Configuration file specifying the PerturbImageFactory configuration.
-        generate_config_file:
-            File to write default config file, only written if specified.
         verbose:
             Display progress messages. Default is false.
 
@@ -77,13 +82,6 @@ def nrtk_perturber_cli(
         ValueError: COCO annotations file is not found
         KWCocoImportError: KWCOCO is not available
     """
-    if generate_config_file:
-        config: dict[str, Any] = dict()
-        config["PerturberFactory"] = make_default_config(PerturbImageFactory.get_impls())
-        json.dump(config, generate_config_file, indent=4)
-
-        exit()
-
     _set_logging(verbose)
 
     logging.info(f"Dataset path: {dataset_dir}")
@@ -93,9 +91,11 @@ def nrtk_perturber_cli(
     if not coco_file.is_file():
         raise ValueError("Could not identify annotations file. Expected at '[dataset_dir]/annotations.json'")
     logging.info(f"Loading kwcoco annotations from {coco_file}")
-    if not is_usable:
+    if not kwcoco_available:
         raise KWCocoImportError
-    kwcoco_dataset = CocoDataset(coco_file)
+    if not maite_available:
+        raise MaiteImportError
+    kwcoco_dataset = CocoDataset(data=coco_file)
 
     # Load metadata, if it exists
     metadata = _load_metadata(dataset_dir=dataset_dir, kwcoco_dataset=kwcoco_dataset)
