@@ -3461,7 +3461,7 @@ description = "Fork of Albumentations in direct support of NRTK (Natural Robustn
 optional = true
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
-markers = "extra == \"albumentations\" or extra == \"notebook-testing\""
+markers = "extra == \"notebook-testing\""
 files = [
     {file = "nrtk_albumentations-2.2.0-py3-none-any.whl", hash = "sha256:2f9d8eff8bb6005d214fb102a23af995e2a5117b2283cce06fd307dc597d2bdb"},
     {file = "nrtk_albumentations-2.2.0.tar.gz", hash = "sha256:e639767cb71359b33c5d4cad914bbc059b48a2cd2800118695dcb907c7bfde6d"},
@@ -3473,6 +3473,29 @@ numpy = [
     {version = ">=1.26,<2.0", markers = "python_version < \"3.13\""},
     {version = ">=2.1", markers = "python_version >= \"3.13\""},
 ]
+pydantic = ">=2.9.2"
+PyYAML = "*"
+scipy = ">=1.14.1"
+simsimd = ">=5.9.2"
+stringzilla = ">=3.10.4"
+typing-extensions = ">=4.9.0"
+
+[[package]]
+name = "nrtk-albumentations"
+version = "2.2.1"
+description = "Fork of Albumentations in direct support of NRTK (Natural Robustness Toolkit). Fast, flexible, and advanced augmentation library for deep learning, computer vision, and medical imaging. Offers a wide range of transformations for both 2D (images, masks, bboxes, keypoints) and 3D (volumes, volumetric masks, keypoints) data, with optimized performance and seamless integration into ML workflows."
+optional = true
+python-versions = "<4.0,>=3.10"
+groups = ["main"]
+markers = "extra == \"albumentations\" or extra == \"notebook-testing\""
+files = [
+    {file = "nrtk_albumentations-2.2.1-py3-none-any.whl", hash = "sha256:590178a7f80a37f30d9f6f4dc00ac9be7804cdf67a50c423c5f5f8f0862ea3d1"},
+    {file = "nrtk_albumentations-2.2.1.tar.gz", hash = "sha256:37fa0c5b5b653b0ec2ea0d37cb15744e1b4fc345b602829dbdc5906339352522"},
+]
+
+[package.dependencies]
+eval-type-backport = "*"
+numpy = ">=1.26"
 pydantic = ">=2.9.2"
 PyYAML = "*"
 scipy = ">=1.14.1"
@@ -7914,4 +7937,4 @@ waterdroplet = ["geopandas", "scipy", "shapely"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "4fdeaec57b72fa1dd40d59a88291c712b17591f03b5010c2d48afb825d0edc6b"
+content-hash = "d4e605eb06c1b0e2ae84909f54f6495ecfbe2ab7b5ab66239ecc2d232efd0a49"
