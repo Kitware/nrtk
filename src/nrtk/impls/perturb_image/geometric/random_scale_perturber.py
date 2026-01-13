@@ -8,7 +8,7 @@ Dependencies:
     - numpy: For numerical operations and random number generation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
-    - nrtk.impls.perturb_image.generic.albumentations_perturber: Base implementation for Albumentations perturbers.
+    - nrtk.impls.perturb_image.wrapper.albumentations_perturber: Base implementation for Albumentations perturbers.
 
 Example usage:
     >>> if not RandomScalePerturber.is_usable():
