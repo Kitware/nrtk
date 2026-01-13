@@ -78,5 +78,5 @@ Limitations and Next Steps
   wavelength-dependent effects. For more detailed analysis, validation details, datasets,
   and recommended parameter sweeps, see the
   :doc:`HazePerturber T&E guide </examples/maite/nrtk_haze_perturber_demo>`.
-* See *Validation & Trust* for cross-perturber validation status.
+* See :doc:`/validation_and_trust` for cross-perturber validation status.
 * Related Risks: :ref:`extreme-illumination`, :ref:`lens-water-droplet`
