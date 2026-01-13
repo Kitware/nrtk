@@ -12,7 +12,7 @@ Example usage:
     >>> factor = 0.75
     >>> perturber = HazePerturber(factor=factor)
     >>> image = np.ones((256, 256, 3))
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 """
 
 from __future__ import annotations

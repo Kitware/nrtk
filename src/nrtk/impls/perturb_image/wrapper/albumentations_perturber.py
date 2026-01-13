@@ -18,7 +18,7 @@ Example usage:
     >>> parameters = {"drop_length": 40, "drop_width": 10}
     >>> image = np.ones((256, 256, 3))
     >>> perturber = AlbumentationsPerturber(perturber=perturber, parameters=parameters)
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 """
 
 from __future__ import annotations

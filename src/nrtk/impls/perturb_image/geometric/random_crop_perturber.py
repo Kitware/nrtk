@@ -12,7 +12,7 @@ Example usage:
     >>> image = np.ones((256, 256, 3))
     >>> crop_size = (image.shape[0] // 2, image.shape[1] // 2)
     >>> perturber = RandomCropPerturber(crop_size=crop_size)
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 """
 
 from __future__ import annotations

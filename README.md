@@ -146,7 +146,7 @@ INPUT_IMG_FILE = 'docs/images/input.jpg'
 image = np.array(Image.open(INPUT_IMG_FILE))
 
 otf = JitterOTFPerturber(sx=8e-6, sy=8e-6, name="test_name")
-out_image = otf.perturb(image)
+out_image = otf(image)
 ```
 
 This code uses default values and provides a sample input image. However, you

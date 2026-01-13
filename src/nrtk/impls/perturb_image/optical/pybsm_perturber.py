@@ -17,7 +17,7 @@ Example usage:
     >>> perturber = PybsmPerturber(**sensor_and_scenario)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
-    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)  # doctest: +SKIP
+    >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)  # doctest: +SKIP
 """
 
 from __future__ import annotations

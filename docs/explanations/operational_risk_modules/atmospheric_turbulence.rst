@@ -50,7 +50,7 @@ Minimal Code Example
        altitude=50.0,       # sensor height above ground (m)
        slant_range=70.7,    # line-of-sight distance to target (m)
    )
-   perturbed_img, boxes = perturber.perturb(image=img_in, boxes=boxes, img_gsd=0.03)
+   perturbed_img, boxes = perturber(image=img_in, boxes=boxes, img_gsd=0.03)
 
 Key Parameters
 --------------

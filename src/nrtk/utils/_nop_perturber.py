@@ -14,7 +14,7 @@ Usage:
 
 Example:
     nop_perturber = _NOPPerturber()
-    output_image = nop_perturber.perturb(image=input_image)
+    output_image = nop_perturber(image=input_image)
 """
 
 from __future__ import annotations

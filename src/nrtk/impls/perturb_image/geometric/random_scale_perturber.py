@@ -19,7 +19,7 @@ Example usage:
     >>> limit = 0.5
     >>> perturber = RandomScalePerturber(limit=limit)
     >>> image = np.ones((256, 256, 3))
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 """
 
 from __future__ import annotations

@@ -36,7 +36,7 @@ Example usage:
     >>> num_drops = 20
     >>> perturber = WaterDropletPerturber(size_range=size_range, num_drops=num_drops)
     >>> image = np.ones((256, 256, 3))
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.

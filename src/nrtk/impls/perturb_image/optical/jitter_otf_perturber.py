@@ -16,7 +16,7 @@ Example usage:
     >>> perturber = JitterOTFPerturber(s_x=s_x)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
-    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)
+    >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)
 """
 
 from __future__ import annotations

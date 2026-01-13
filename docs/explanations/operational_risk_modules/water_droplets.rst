@@ -50,7 +50,7 @@ Minimal Code Example
        size_range=[0.0, 1.0],
        blur_strength=0.25
    )
-   perturbed_img, boxes = perturber.perturb(image=img_in, boxes=boxes)
+   perturbed_img, boxes = perturber(image=img_in, boxes=boxes)
 
 Key Parameters
 --------------

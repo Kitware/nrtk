@@ -25,7 +25,7 @@ Example usage:
     >>> k = [0.5, 0.3, 0.1]
     >>> perturber = RadialDistortionPerturber(k=k)
     >>> image = np.ones((256, 256, 3))
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 """
 
 from __future__ import annotations
