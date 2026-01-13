@@ -119,5 +119,5 @@ Limitations and Next Steps
 * Applies **frame-by-frame** — droplet positions are randomized each call, so there's no
   temporal consistency across video frames (suitable for static image robustness testing).
 * Requires optional dependencies: install via ``pip install nrtk[waterdroplet]``.
-* See *Validation & Trust* for cross-perturber validation status.
+* See :doc:`/validation_and_trust` for cross-perturber validation status.
 * Related Risks: :ref:`lens-contamination`, :ref:`mist-fog-snow`
