@@ -13,6 +13,7 @@ from nrtk.interop.maite.augmentations.object_detection import JATICDetectionAugm
 from nrtk.interop.maite.datasets.object_detection import JATICObjectDetectionDataset
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
+from nrtk.utils._logging import setup_logging
 
 maite_available: bool = import_guard(
     module_name="maite",
@@ -20,6 +21,8 @@ maite_available: bool = import_guard(
     submodules=["protocols.object_detection"],
 )
 from maite.protocols.object_detection import Dataset  # noqa: E402
+
+logger: logging.Logger = setup_logging(name=__name__)
 
 
 def nrtk_perturber(*, maite_dataset: Dataset, perturber_factory: PerturbImageFactory) -> Iterable[tuple[str, Dataset]]:  # pyright: ignore [reportInvalidTypeForm]
@@ -54,17 +57,17 @@ def nrtk_perturber(*, maite_dataset: Dataset, perturber_factory: PerturbImageFac
         thetas = [perturber_factory.thetas]
 
     perturber_combinations = [dict(zip(perturb_factory_keys, v, strict=False)) for v in itertools.product(*thetas)]
-    logging.info(f"Perturber sweep values: {perturber_combinations}")
+    logger.info(f"Perturber sweep values: {perturber_combinations}")
 
     # Iterate through the different perturber factory parameter combinations and
     # save the perturbed images to disk
-    logging.info("Starting perturber sweep")
+    logger.info("Starting perturber sweep")
     augmented_datasets: list[Dataset] = []  # pyright: ignore [reportInvalidTypeForm]
     output_perturb_params: list[str] = []
     for i, (perturber_combo, perturber) in enumerate(zip(perturber_combinations, perturber_factory, strict=False)):
         output_perturb_params.append("".join(f"_{k!s}-{v!s}" for k, v in perturber_combo.items()))
 
-        logging.info(f"Starting perturbation for {output_perturb_params[i]}")
+        logger.info(f"Starting perturbation for {output_perturb_params[i]}")
 
         aug_imgs = []
         aug_dets = []

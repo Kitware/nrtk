@@ -17,6 +17,7 @@ from nrtk.interop.maite.utils.detection import dataset_to_coco
 from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
+from nrtk.utils._logging import setup_logging
 
 kwcoco_available: bool = import_guard(
     module_name="kwcoco",
@@ -34,22 +35,24 @@ maite_available: bool = import_guard(
 )
 from maite.protocols import DatumMetadata  # noqa: E402
 
+logger: logging.Logger = setup_logging(name=__name__)
+
 
 def _load_metadata(*, dataset_dir: str, kwcoco_dataset: "CocoDataset") -> Sequence[DatumMetadata]:
     metadata_file = Path(dataset_dir) / "image_metadata.json"
     if not metadata_file.is_file():
-        logging.warn(
+        logger.warning(
             "Could not identify metadata file, assuming no metadata. Expected at '[dataset_dir]/image_metadata.json'",
         )
         return [DatumMetadata(id=idx) for idx in range(len(kwcoco_dataset.imgs))]
-    logging.info(f"Loading metadata from {metadata_file}")
+    logger.info(f"Loading metadata from {metadata_file}")
     with open(metadata_file) as f:
         return json.load(f)
 
 
 def _set_logging(verbose: bool) -> None:
     if verbose:
-        logging.basicConfig(level=logging.INFO)
+        logger.setLevel(logging.INFO)
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
@@ -84,13 +87,13 @@ def nrtk_perturber_cli(
     """
     _set_logging(verbose)
 
-    logging.info(f"Dataset path: {dataset_dir}")
+    logger.info(f"Dataset path: {dataset_dir}")
 
     # Load COCO dataset
     coco_file = Path(dataset_dir) / "annotations.json"
     if not coco_file.is_file():
         raise ValueError("Could not identify annotations file. Expected at '[dataset_dir]/annotations.json'")
-    logging.info(f"Loading kwcoco annotations from {coco_file}")
+    logger.info(f"Loading kwcoco annotations from {coco_file}")
     if not kwcoco_available:
         raise KWCocoImportError
     if not maite_available:

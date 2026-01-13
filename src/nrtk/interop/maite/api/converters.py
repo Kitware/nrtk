@@ -5,7 +5,6 @@ from __future__ import annotations
 __all__ = ["build_factory", "load_COCOJATIC_dataset"]
 
 import json
-import logging
 import os
 
 from smqtk_core.configuration import from_config_dict
@@ -18,8 +17,6 @@ from nrtk.utils._import_guard import import_guard
 
 is_usable: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 from kwcoco import CocoDataset  # type: ignore  # noqa: E402
-
-LOG = logging.getLogger(__name__)
 
 
 def build_factory(data: NrtkPerturbInputSchema) -> PerturbImageFactory:
