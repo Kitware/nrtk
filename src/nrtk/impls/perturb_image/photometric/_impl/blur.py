@@ -23,13 +23,13 @@ Example:
     ...     pytest.skip("OpenCV perturbers are not usable")
     >>> image = np.ones((256, 256, 3), dtype=np.float32)
     >>> avg_blur = AverageBlurPerturber(ksize=3)
-    >>> blurred_image, _ = avg_blur.perturb(image=image)
+    >>> blurred_image, _ = avg_blur(image=image)
 
     >>> gauss_blur = GaussianBlurPerturber(ksize=5)
-    >>> blurred_image, _ = gauss_blur.perturb(image=image)
+    >>> blurred_image, _ = gauss_blur(image=image)
 
     >>> median_blur = MedianBlurPerturber(ksize=3)
-    >>> blurred_image, _ = median_blur.perturb(image=image)
+    >>> blurred_image, _ = median_blur(image=image)
 
 Note:
     Each class requires OpenCV for functionality. An ImportError will be raised if OpenCV is

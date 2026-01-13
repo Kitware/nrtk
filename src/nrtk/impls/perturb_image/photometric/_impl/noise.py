@@ -27,7 +27,7 @@ Example:
     ...     pytest.skip("skimage perturbers are not usable")
     >>> image = np.ones((256, 256, 3))
     >>> gaussian_perturber = GaussianNoisePerturber(mean=0, var=0.01)
-    >>> noisy_image, _ = gaussian_perturber.perturb(image=image)
+    >>> noisy_image, _ = gaussian_perturber(image=image)
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.

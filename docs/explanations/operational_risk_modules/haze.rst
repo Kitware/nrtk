@@ -44,7 +44,7 @@ Minimal Code Example
    from nrtk.impls.perturb_image.environment.haze_perturber import HazePerturber
 
    perturber = HazePerturber(factor=1.0)  # medium haze
-   img_out = perturber.perturb(image=img_in)
+   img_out = perturber(image=img_in)
 
 Key Parameters
 --------------

@@ -13,7 +13,7 @@ Example usage:
     >>> perturber = RandomTranslationPerturber()
     >>> image = np.ones((256, 256, 3))
     >>> max_translation_limit = (image.shape[0] // 2, image.shape[1] // 2)
-    >>> perturbed_image, _ = perturber.perturb(image=image, max_translation_limit=max_translation_limit)
+    >>> perturbed_image, _ = perturber(image=image, max_translation_limit=max_translation_limit)
 """
 
 from __future__ import annotations

@@ -14,7 +14,7 @@ Example usage:
     >>> image = np.ones((256, 256, 3))
     >>> perturbers = [RandomCropPerturber(), BrightnessPerturber(factor=0.5)]
     >>> perturber = ComposePerturber(perturbers=perturbers)
-    >>> perturbed_image, _ = perturber.perturb(image=image)
+    >>> perturbed_image, _ = perturber(image=image)
 """
 
 from __future__ import annotations

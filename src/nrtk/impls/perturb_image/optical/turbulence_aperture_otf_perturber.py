@@ -18,7 +18,7 @@ Example usage:
     >>> perturber = TurbulenceApertureOTFPerturber(D=D, altitude=altitude)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
-    >>> perturbed_image, _ = perturber.perturb(image=image, img_gsd=img_gsd)  # doctest: +SKIP
+    >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)  # doctest: +SKIP
 
 Notes:
     - The boxes returned from `perturb` are identical to the boxes passed in.

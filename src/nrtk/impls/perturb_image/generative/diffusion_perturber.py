@@ -21,7 +21,7 @@ Example:
     ...     model_name="timbrooks/instruct-pix2pix", prompt="add rain to the image"
     ... )
     >>> image = np.ones((256, 256, 3))
-    >>> perturbed_image, _ = diffusion_perturber.perturb(image=image)  # doctest: +SKIP
+    >>> perturbed_image, _ = diffusion_perturber(image=image)  # doctest: +SKIP
 
 Note:
     This implementation uses the Instruct Pix2Pix model for prompt-based image transformations.

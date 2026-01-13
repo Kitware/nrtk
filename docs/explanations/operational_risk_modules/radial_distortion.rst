@@ -43,11 +43,11 @@ Minimal Code Example
 
    # Fisheye (barrel) distortion - positive k values
    perturber = RadialDistortionPerturber(k=[0.3, 0.0, 0.0])
-   perturbed_img, boxes = perturber.perturb(image=img_in, boxes=boxes)
+   perturbed_img, boxes = perturber(image=img_in, boxes=boxes)
 
    # Pincushion distortion - negative k values
    perturber = RadialDistortionPerturber(k=[-0.3, 0.0, 0.0])
-   perturbed_img, boxes = perturber.perturb(image=img_in, boxes=boxes)
+   perturbed_img, boxes = perturber(image=img_in, boxes=boxes)
 
 Key Parameters
 --------------

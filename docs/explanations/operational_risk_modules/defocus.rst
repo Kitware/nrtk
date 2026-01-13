@@ -46,7 +46,7 @@ Minimal Code Example
        w_x=5.0e-6,  # blur spot radius in x direction (m)
        w_y=5.0e-6,  # blur spot radius in y direction (m)
    )
-   perturbed_img, boxes = perturber.perturb(image=img_in, boxes=boxes, img_gsd=0.03)
+   perturbed_img, boxes = perturber(image=img_in, boxes=boxes, img_gsd=0.03)
 
 Key Parameters
 --------------
