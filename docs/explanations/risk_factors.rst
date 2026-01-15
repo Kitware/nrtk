@@ -19,6 +19,9 @@ listed as well as functionality from NRTK that can be used to simulate the opera
 Some of these perturbation functions are not implemented in NRTK directly but can be simulated using the
 :ref:`Albumentations perturber <nrtk.impls.perturb_image.wrapper.albumentations_perturber>`
 which provides a wrapper around functionality of the `Albumentations <https://albumentations.ai/>`__ library.
+The :doc:`Apply Albumentations Perturbations </examples/albumentations_perturber>` notebook shows how to use
+Ablumentations with NRTK.
+
 Some of the risk factors listed don't have any associated functionality or documentation in NRTK but may be covered in
 the future.
 
