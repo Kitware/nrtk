@@ -76,4 +76,4 @@ sphinx-lint:
   script:
     # Only looks at the docs directory, ignoring docs/_implementations
     # sphinx-lint does not currently support configuration via pyproject.toml
-    - poetry run sphinx-lint --enable all --disable leaked-markup --max-line-length 120 -i docs/_implementations docs
+    - poetry run sphinx-lint --enable all --disable leaked-markup --max-line-length 120 docs
