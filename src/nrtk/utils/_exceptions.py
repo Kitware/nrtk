@@ -79,7 +79,7 @@ class ScikitImageImportError(ImportError):
 class WaterDropletImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs
-        super().__init__("""Scipy, Shapely and GeoPandas must be installed. Please install via nrtk[waterdroplet]`.""")
+        super().__init__("Scipy and Numba must be installed. Please install via `nrtk[waterdroplet]`.")
 
 
 class NotebookTestingImportError(ImportError):

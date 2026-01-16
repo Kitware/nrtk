@@ -73,6 +73,7 @@ pytest-extras:
     - poetry run papermill
         --progress-bar -k python3 --stdout-file - --stderr-file -
         "${NOTEBOOK_FILE}" /dev/null
+  cache: []
 
 notebooks:
   extends: .notebooks

@@ -18,13 +18,13 @@ https://www.cvlibs.net/publications/Roser2010ACCVWORK.pdf
 Classes:
     WaterDropletPerturber:
         Implements the physics-based, photorealistic water/rain droplet model, utilizing
-        Scipy, Shapely, and GeoPandas functionalities.
+        Scipy and Numba functionalities.
     Bezier:
         Implements a class to compute Bezier curve based on the segment information
 
 Dependencies:
     - Scipy for image processing.
-    - Shapely and GeoPandas for Curve generation related operations.
+    - Numba for JIT-compiled point-in-polygon operations.
     - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
 
 Example usage:
@@ -49,7 +49,7 @@ __all__ = ["WaterDropletPerturber"]
 import copy
 import math
 from collections.abc import Hashable, Iterable, Sequence
-from typing import Any
+from typing import Any, Protocol
 
 from typing_extensions import override
 
@@ -60,20 +60,216 @@ from nrtk.utils._import_guard import import_guard
 scipy_available: bool = import_guard(
     module_name="scipy",
     exception=WaterDropletImportError,
-    submodules=["special", "ndimage"],
+    submodules=["special", "spatial", "ndimage"],
 )
-shapely_available: bool = import_guard(
-    module_name="shapely",
-    exception=WaterDropletImportError,
-    submodules=["geometry"],
-)
-geopandas_available: bool = import_guard(module_name="geopandas", exception=WaterDropletImportError)
-import geopandas  # noqa: E402
+
+# NOTE: Using try-except instead of import_guard for numba to avoid a conflict
+# with smqtk_detection's centernet.py. The import_guard creates a mock module in
+# sys.modules, which causes centernet.py's `find_spec('numba')` call to fail with
+# "ValueError: numba.__spec__ is not set". This will be resolved when we switch
+# to the new import guard approach.
+numba_available: bool
+try:
+    import numba
+
+    numba_available = True
+except ImportError:
+    numba = None  # type: ignore[assignment]
+    numba_available = False
+
 import numpy as np  # noqa: E402
 from scipy.ndimage import gaussian_filter  # noqa: E402
+from scipy.spatial import KDTree  # noqa: E402
 from scipy.special import binom  # noqa: E402
-from shapely.geometry import Polygon  # noqa: E402
 from smqtk_image_io.bbox import AxisAlignedBoundingBox  # noqa: E402
+
+
+def _points_in_polygon_impl(*, points: np.ndarray, polygon: np.ndarray) -> np.ndarray:
+    """Check if points are inside a polygon using ray casting algorithm.
+
+    This is the pure Python implementation of the ray casting algorithm
+    for point-in-polygon tests. For each point, it casts a horizontal ray
+    to the right and counts edge crossings. Odd count = inside.
+
+    Args:
+        points: Array of shape (N, 2) containing x, y coordinates to test.
+        polygon: Array of shape (M, 2) containing polygon vertices in order.
+
+    Returns:
+        Boolean array of shape (N,) indicating which points are inside.
+    """
+    n_points = points.shape[0]
+    n_verts = polygon.shape[0]
+    result = np.zeros(n_points, dtype=np.bool_)
+
+    for i in range(n_points):
+        px, py = points[i, 0], points[i, 1]
+        inside = False
+
+        j = n_verts - 1
+        for k in range(n_verts):
+            vkx, vky = polygon[k, 0], polygon[k, 1]
+            vjx, vjy = polygon[j, 0], polygon[j, 1]
+
+            # Check if ray from point crosses this edge
+            if ((vky > py) != (vjy > py)) and (px < (vjx - vkx) * (py - vky) / (vjy - vky) + vkx):
+                inside = not inside
+
+            j = k
+
+        result[i] = inside
+
+    return result
+
+
+def _compute_refraction_mapping_impl(
+    *,
+    xs: np.ndarray,
+    ys: np.ndarray,
+    gls: np.ndarray,
+    normal: np.ndarray,
+    n_air: float,
+    n_water: float,
+    M: int,  # noqa: N803
+    B: int,  # noqa: N803
+    center: np.ndarray,
+    radius: float,
+    intrinsic: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute refraction mapping for all pixels in a droplet.
+
+    This is the pure Python implementation that computes where each pixel maps to
+    after refraction through the water droplet.
+
+    Args:
+        xs: Array of x coordinates for pixels in the droplet.
+        ys: Array of y coordinates for pixels in the droplet.
+        gls: Glass coordinate system mapping matrix.
+        normal: Normal vector to the glass plane.
+        n_air: Refractive index of air.
+        n_water: Refractive index of water.
+        M: Distance to glass plane in cm.
+        B: Distance to background plane in cm.
+        center: Center of the droplet sphere.
+        radius: Radius of the droplet sphere.
+        intrinsic: Camera intrinsic matrix.
+
+    Returns:
+        Tuple of (u_coords, v_coords) arrays with mapped pixel coordinates.
+    """
+    n_pixels = xs.shape[0]
+    u_out = np.empty(n_pixels, dtype=np.float64)
+    v_out = np.empty(n_pixels, dtype=np.float64)
+
+    # Precompute constants
+    normal_dot = normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]
+    o_g = (normal[2] * M / normal_dot) * normal
+    gamma = np.arcsin(n_air / n_water)
+
+    for i in range(n_pixels):
+        x = xs[i]
+        y = ys[i]
+        p_g = gls[x, y]
+
+        # Compute alpha and beta for refraction at glass surface
+        p_g_norm = np.sqrt(p_g[0] ** 2 + p_g[1] ** 2 + p_g[2] ** 2)
+        p_g_dot_normal = p_g[0] * normal[0] + p_g[1] * normal[1] + p_g[2] * normal[2]
+        alpha = np.arccos(p_g_dot_normal / p_g_norm)
+        beta = np.arcsin(n_air * np.sin(alpha) / n_water)
+
+        # Compute refracted ray direction at glass surface
+        po = p_g - o_g
+        po_norm = np.sqrt(po[0] ** 2 + po[1] ** 2 + po[2] ** 2)
+        po = po / po_norm
+        tan_beta = np.tan(beta)
+        i_1 = normal + tan_beta * po
+        i_1_norm = np.sqrt(i_1[0] ** 2 + i_1[1] ** 2 + i_1[2] ** 2)
+        i_1 = i_1 / i_1_norm
+
+        # Find intersection with sphere
+        oc = p_g - center
+        tmp = i_1[0] * oc[0] + i_1[1] * oc[1] + i_1[2] * oc[2]
+        oc_dot = oc[0] * oc[0] + oc[1] * oc[1] + oc[2] * oc[2]
+        d = -tmp + np.sqrt(abs(tmp**2 - oc_dot + radius**2))
+        p_w = p_g + d * i_1
+
+        # Compute normal at sphere surface
+        normal_w = p_w - center
+        normal_w_norm = np.sqrt(normal_w[0] ** 2 + normal_w[1] ** 2 + normal_w[2] ** 2)
+        normal_w = normal_w / normal_w_norm
+
+        # Compute tangent direction
+        nw_dot_nw = normal_w[0] * normal_w[0] + normal_w[1] * normal_w[1] + normal_w[2] * normal_w[2]
+        pw_dot_nw = p_w[0] * normal_w[0] + p_w[1] * normal_w[1] + p_w[2] * normal_w[2]
+        pg_dot_nw = p_g[0] * normal_w[0] + p_g[1] * normal_w[1] + p_g[2] * normal_w[2]
+        d2 = (pw_dot_nw - pg_dot_nw) / nw_dot_nw
+        p_a = p_w - (d2 * normal_w + p_g)
+        p_a_norm = np.sqrt(p_a[0] ** 2 + p_a[1] ** 2 + p_a[2] ** 2)
+        if p_a_norm > 1e-10:
+            p_a = p_a / p_a_norm
+
+        # Compute angle of incidence at sphere
+        pw_minus_pg = p_w - p_g
+        pw_pg_norm = np.sqrt(pw_minus_pg[0] ** 2 + pw_minus_pg[1] ** 2 + pw_minus_pg[2] ** 2)
+        nw_dot_pwpg = normal_w[0] * pw_minus_pg[0] + normal_w[1] * pw_minus_pg[1] + normal_w[2] * pw_minus_pg[2]
+        eta = np.arccos(nw_dot_pwpg / pw_pg_norm)
+
+        # Clamp eta to avoid total internal reflection
+        if eta >= gamma:
+            eta = gamma - 0.2
+
+        # Compute refracted ray at sphere surface
+        theta = np.arcsin(n_water * np.sin(eta) / n_air)
+        i_2 = normal_w + np.tan(theta) * p_a
+        p_e = p_w + ((B - p_w[2]) / i_2[2]) * i_2
+
+        # Project to image plane
+        u_out[i] = np.round((intrinsic[0, 0] * p_e[0] + intrinsic[0, 2] * p_e[2]) / B)
+        v_out[i] = np.round((intrinsic[1, 1] * p_e[1] + intrinsic[1, 2] * p_e[2]) / B)
+
+    return u_out, v_out
+
+
+# Protocol types for the JIT-compiled or pure Python functions
+class _PointsInPolygonProtocol(Protocol):
+    """Protocol for point-in-polygon function signature."""
+
+    def __call__(self, *, points: np.ndarray, polygon: np.ndarray) -> np.ndarray: ...
+
+
+class _ComputeRefractionMappingProtocol(Protocol):
+    """Protocol for refraction mapping function signature."""
+
+    def __call__(
+        self,
+        *,
+        xs: np.ndarray,
+        ys: np.ndarray,
+        gls: np.ndarray,
+        normal: np.ndarray,
+        n_air: float,
+        n_water: float,
+        M: int,  # noqa: N803
+        B: int,  # noqa: N803
+        center: np.ndarray,
+        radius: float,
+        intrinsic: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray]: ...
+
+
+# Apply numba JIT compilation when available for performance
+_points_in_polygon: _PointsInPolygonProtocol
+_compute_refraction_mapping: _ComputeRefractionMappingProtocol
+
+if numba_available:  # pragma: no cover - JIT compilation not tracked by coverage
+    _points_in_polygon = numba.njit(cache=True)(_points_in_polygon_impl)  # type: ignore[union-attr]
+    _compute_refraction_mapping = numba.njit(  # type: ignore[union-attr]
+        cache=True,
+        parallel=True,
+    )(_compute_refraction_mapping_impl)
+else:  # pragma: no cover - fallback when numba not installed
+    _points_in_polygon = _points_in_polygon_impl
+    _compute_refraction_mapping = _compute_refraction_mapping_impl
 
 
 class Bezier:
@@ -245,7 +441,7 @@ class WaterDropletPerturber(PerturbImage):
             seed = 1
 
         Raises:
-            ImportError: If Scipy, Shapely or GeoPandas is not found.
+            ImportError: If Scipy or Numba is not found.
         """
         if not self.is_usable():
             raise WaterDropletImportError
@@ -444,38 +640,69 @@ class WaterDropletPerturber(PerturbImage):
         left_bottom = gls[0][height - 1]
         right_bottom = gls[width - 1][height - 1]
 
-        def __random_tau() -> int:
+        def _random_tau() -> int:
             """Determines angle between tangent and glass plane."""
             return math.floor(self.rng.uniform(low=30, high=45))
 
-        def __random_loc() -> float:
+        def _random_loc() -> float:
             """Determine random multiplier value that is applied to the water droplet size computation."""
             return self.rng.uniform(low=self.size_range[0], high=self.size_range[1])
 
-        def __w_in_plane(*, u: int, v: int) -> int:
+        def _w_in_plane(*, u: int, v: int) -> int:
             """Estimate the "depth" value of a pixel in the coordinate system of the glass plane."""
             return (self.normal[2] * self.M - self.normal[0] * u - self.normal[1] * v) / self.normal[2]
 
-        def __remove_overlapping_drops() -> None:  # noqa: C901
-            """Remove overlapping droplet spheres."""
-            indices_to_remove = list()
-            for i in range(len(self.g_centers)):
-                center = self.g_centers[i]
-                radius = self.g_radius[i]
-                for j in range(len(self.g_centers)):
-                    if i >= j:
-                        continue
-                    center_other = self.g_centers[j]
-                    radius_other = self.g_radius[j]
-                    distance_between_centers = np.linalg.norm(center - center_other)
-                    sum_radii = radius + radius_other
-                    if sum_radii > distance_between_centers:
-                        indices_to_remove.append(i)
-                        # we don't need to identify an overlapping drop more than once
-                        break
-            indices_to_remove.sort(reverse=True)
+        def _check_overlap(
+            *,
+            i: int,
+            nearby: list[int],
+            centers: np.ndarray,
+            radii: np.ndarray,
+            indices_to_remove: set[int],
+        ) -> bool:
+            """Check if droplet i overlaps with any nearby droplet."""
+            for j in nearby:
+                if i >= j or j in indices_to_remove:
+                    continue
+                if radii[i] + radii[j] > np.linalg.norm(centers[i] - centers[j]):
+                    return True
+            return False
 
-            for index in indices_to_remove:
+        def _find_overlapping_indices(*, centers: np.ndarray, radii: np.ndarray) -> set[int]:
+            """Find indices of droplets that overlap with others using KDTree spatial indexing."""
+            tree = KDTree(data=centers)
+            max_radius = radii.max()
+            indices_to_remove: set[int] = set()
+
+            for i in range(len(centers)):
+                if i in indices_to_remove:
+                    continue
+                nearby = tree.query_ball_point(x=centers[i], r=radii[i] + max_radius)
+                if _check_overlap(
+                    i=i,
+                    nearby=nearby,
+                    centers=centers,
+                    radii=radii,
+                    indices_to_remove=indices_to_remove,
+                ):
+                    indices_to_remove.add(i)
+            return indices_to_remove
+
+        def _remove_overlapping_drops() -> None:
+            """Remove overlapping droplet spheres using spatial indexing (KDTree).
+
+            Uses O(n log n) spatial indexing instead of O(n²) pairwise comparison
+            to efficiently detect and remove overlapping droplets.
+            """
+            if len(self.g_centers) < 2:
+                return
+
+            indices_to_remove = _find_overlapping_indices(
+                centers=np.array(self.g_centers),
+                radii=np.array(self.g_radius),
+            )
+
+            for index in sorted(indices_to_remove, reverse=True):
                 self.g_centers.pop(index)
                 self.g_radius.pop(index)
                 self.centers.pop(index)
@@ -484,13 +711,13 @@ class WaterDropletPerturber(PerturbImage):
         for _ in range(self.num_drops):
             u = left_bottom[0] + (right_bottom[0] - left_bottom[0]) * self.rng.random()
             v = left_upper[1] + (right_bottom[1] - left_upper[1]) * self.rng.random()
-            w = __w_in_plane(u=u, v=v)
+            w = _w_in_plane(u=u, v=v)
 
             # Convert the angle between tangent and glass plane from degrees to radians
-            tau = __random_tau() / 180 * np.pi
+            tau = _random_tau() / 180 * np.pi
 
             # Water droplet size computation
-            glass_r = 0.1 + (width // 500) * __random_loc()
+            glass_r = 0.1 + (width // 500) * _random_loc()
 
             # raindrop radius in sky dataset
             r_sphere = glass_r / np.sin(tau)
@@ -504,9 +731,9 @@ class WaterDropletPerturber(PerturbImage):
             self.g_radius.append(glass_r)
             self.centers.append(c)
             self.radius.append(r_sphere)
-        __remove_overlapping_drops()
+        _remove_overlapping_drops()
 
-    def _in_sphere_raindrop(self, gls: np.ndarray) -> np.ndarray:  # noqa: C901
+    def _in_sphere_raindrop(self, gls: np.ndarray) -> np.ndarray:
         """Helper function for rendering.
 
         Determine if a given pixel (x, y) is inside any simulated raindrop on
@@ -529,15 +756,15 @@ class WaterDropletPerturber(PerturbImage):
             q[indices] = i
 
             # Find the center of the droplet in terms of the image pixels
-            x_cent = np.where(dist == np.min(dist))[0][0]
-            y_cent = np.where(dist == np.min(dist))[1][0]
+            min_idx = np.unravel_index(np.argmin(dist), dist.shape)
+            x_cent, y_cent = min_idx[0], min_idx[1]
             diff = np.abs(dist - radius)
-            rad_loc = np.where(diff == np.min(diff))
-            x_rad, y_rad = rad_loc
+            rad_idx = np.unravel_index(np.argmin(diff), diff.shape)
+            x_rad, y_rad = rad_idx[0], rad_idx[1]
             cent_rad = int(np.sqrt((x_rad - x_cent) ** 2 + (y_rad - y_cent) ** 2))
             cent = [int(x_cent - 1.5 * cent_rad), int(y_cent - 1.5 * cent_rad)]
 
-            def __get_all_points(
+            def _get_all_points(
                 *,
                 pts_lst_array: list[int],
                 rng: np.random.Generator,
@@ -545,10 +772,10 @@ class WaterDropletPerturber(PerturbImage):
                 rad: float = 0.2,
                 edgy: float = 0.5,
                 scale: float = 1,
-            ) -> list[np.ndarray]:
+            ) -> np.ndarray:
                 """Helper function to get all random points within Bézier curve."""
                 pts_lst = [pts_lst_array[0:2]]
-                enclosed_points = list()
+                enclosed_points = np.empty((0, 2), dtype=np.int64)
                 for c in pts_lst:
                     points = (
                         WaterDropletPerturber.get_random_points_within_min_dist(
@@ -564,98 +791,38 @@ class WaterDropletPerturber(PerturbImage):
                         edgy=edgy,
                     )
                     curve_points = np.column_stack((x, y))
-                    polygon = Polygon(curve_points)
-                    xmin, ymin, xmax, ymax = polygon.bounds
+                    # Compute bounding box from curve points
+                    xmin, ymin = curve_points.min(axis=0)
+                    xmax, ymax = curve_points.max(axis=0)
                     grid_x, grid_y = np.mgrid[xmin:xmax:150j, ymin:ymax:150j]
-                    grid_x, grid_y = grid_x.flatten(), grid_y.flatten()
-                    points_gs = geopandas.GeoSeries(geopandas.points_from_xy(x=grid_x, y=grid_y))
-                    enclosed_points = [
-                        np.asarray([int(grid_x[i]), int(grid_y[i])])
-                        for i, val in enumerate(polygon.contains(points_gs))
-                        if val
-                    ]
+                    grid_points = np.column_stack((grid_x.ravel(), grid_y.ravel()))
+                    # Use Numba-accelerated point-in-polygon test
+                    inside_mask = _points_in_polygon(points=grid_points, polygon=curve_points)
+                    enclosed_points = grid_points[inside_mask].astype(np.int64)
 
                 return enclosed_points
 
             # Draw a Bézier shape centered at the center of the sphere and
             # find all the pixels that fall within the Bézier shape
-            all_points = __get_all_points(
+            all_points = _get_all_points(
                 pts_lst_array=cent,
                 rng=self.rng,
                 rad=0.6,
                 scale=2 * cent_rad,
             )
-            for point in all_points:
-                if point[0] >= q.shape[0] or point[1] >= q.shape[1]:
-                    continue
-                q[point[0], point[1]] = i
+            # Vectorized bounds check and assignment
+            if all_points.size > 0:
+                valid_mask = (
+                    (all_points[:, 0] >= 0)
+                    & (all_points[:, 0] < q.shape[0])
+                    & (all_points[:, 1] >= 0)
+                    & (all_points[:, 1] < q.shape[1])
+                )
+                valid_points = all_points[valid_mask]
+                q[valid_points[:, 0], valid_points[:, 1]] = i
         return q
 
-    def _to_sphere_section_env(self, *, x: int, y: int, idx: int, intrinsic: np.ndarray, gls: np.ndarray) -> np.ndarray:
-        """Helper function for rendering.
-
-        Calculate where a point (x, y) would map to on a sphere's surface,
-        considering the effects of refraction (bending of light as it passes through
-        different media).
-
-        How it works:
-        - Converts the pixel to a 3D point in the glass coordinate system.
-        - Applies refraction and other transformations to find the equivalent point on the sphere's surface.
-        - Maps this point back to the image plane and returns the adjusted pixel coordinates.
-
-        Args:
-            x:
-                x-value from 2D coordinate system.
-            y:
-                x-value from 2D coordinate system.
-            idx:
-                Index for idx-th points from a list of points.
-            intrinsic:
-                Intrinsic (Camera) parameters matrix.
-            gls:
-                Glass (3D) coordinate system mapping matrix.
-
-        Returns:
-            3D point coordinates of water droplet (spherical model).
-        """
-        p_g = gls[x, y]
-
-        alpha = np.arccos(np.dot(p_g, self.normal) / np.linalg.norm(p_g))
-        beta = np.arcsin(self.n_air * np.sin(alpha) / self.n_water)
-        o_g = (self.normal[2] * self.M / np.dot(self.normal, self.normal)) * self.normal
-
-        po = p_g - o_g
-        po = po / np.linalg.norm(po)
-        i_1 = self.normal + np.tan(beta) * po
-        i_1 = i_1 / np.linalg.norm(i_1)
-
-        oc = p_g - self.centers[idx]
-        tmp = np.dot(i_1, oc)
-        d = -(tmp) + np.sqrt(abs(tmp**2 - np.dot(oc, oc) + self.radius[idx] ** 2))
-        p_w = p_g + d * i_1
-
-        normal_w = p_w - self.centers[idx]
-        normal_w = normal_w / np.linalg.norm(normal_w)
-
-        d = (np.dot(p_w, normal_w) - np.dot(normal_w, p_g)) / np.dot(normal_w, normal_w)
-        p_a = p_w - (d * normal_w + p_g)
-        p_a = p_a / np.linalg.norm(p_a)
-
-        eta = np.arccos(np.dot(normal_w, p_w - p_g) / np.linalg.norm(p_w - p_g))
-
-        # The angle between the normal to the spherical surface at the point of
-        # incidence and the optical axis.
-        gamma = np.arcsin(self.n_air / self.n_water)
-        if eta >= gamma:
-            eta = gamma - 0.2
-
-        theta = np.arcsin(self.n_water * np.sin(eta) / self.n_air)
-        i_2 = normal_w + np.tan(theta) * p_a
-        p_e = p_w + ((self.B - p_w[2]) / i_2[2]) * i_2
-        p_i = np.dot(intrinsic, np.transpose(p_e)) / self.B
-        return np.round(p_i)
-
-    def render(self, image: np.ndarray[Any, Any]) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:  # noqa: C901
+    def render(self, image: np.ndarray[Any, Any]) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         """Rendering the image with the Water Droplet effect.
 
         Args:
@@ -700,25 +867,47 @@ class WaterDropletPerturber(PerturbImage):
         rain_image = copy.deepcopy(image)
         for idx in np.unique(q):
             if idx != -1:
+                idx_int = int(idx)
                 idxs = np.where(q == idx)
-                for _, (x, y) in enumerate(zip(idxs[0], idxs[1], strict=False)):
-                    # Translate refractive distortions to the "surface" of the droplet
-                    p = self._to_sphere_section_env(x=x, y=y, idx=int(idx), intrinsic=intrinsic, gls=gls)
-                    u = p[0]
-                    v = p[1]
-                    # Conditions to keep the droplets within the bounds of the image
-                    if u >= w:
-                        u = w - 1
-                    elif u < 0:
-                        u = 0
-                    if v >= h:
-                        v = h - 1
-                    elif v < 0:
-                        v = 0
+                xs = idxs[0].astype(np.int64)
+                ys = idxs[1].astype(np.int64)
 
-                    # Add effects to image and draw boundaries in image mask
-                    rain_image[y - 1, x - 1] = image[int(v), int(u)]
-                    mask[y - 1, x - 1] = 255
+                if xs.size == 0:
+                    continue
+
+                # Vectorized computation of refraction mapping for all pixels in this droplet
+                u_coords, v_coords = _compute_refraction_mapping(
+                    xs=xs,
+                    ys=ys,
+                    gls=gls,
+                    normal=self.normal,
+                    n_air=self.n_air,
+                    n_water=self.n_water,
+                    M=self.M,
+                    B=self.B,
+                    center=self.centers[idx_int],
+                    radius=self.radius[idx_int],
+                    intrinsic=intrinsic,
+                )
+
+                # Vectorized bounds clamping
+                u_coords = np.clip(u_coords, 0, w - 1).astype(np.int64)
+                v_coords = np.clip(v_coords, 0, h - 1).astype(np.int64)
+
+                # Vectorized image and mask update
+                dest_y = ys - 1
+                dest_x = xs - 1
+
+                # Ensure destination indices are valid
+                valid_mask = (dest_y >= 0) & (dest_y < h) & (dest_x >= 0) & (dest_x < w)
+                dest_y = dest_y[valid_mask]
+                dest_x = dest_x[valid_mask]
+                u_coords = u_coords[valid_mask]
+                v_coords = v_coords[valid_mask]
+
+                rain_image[dest_y, dest_x] = image[v_coords, u_coords]
+                mask[dest_y, dest_x] = 255
+
         return rain_image, mask
 
     def blur(
@@ -847,5 +1036,5 @@ class WaterDropletPerturber(PerturbImage):
     @classmethod
     @override
     def is_usable(cls) -> bool:
-        """Returns true if the necessary dependencies (Scipy, Shapely and GeoPandas) are available."""
-        return scipy_available and shapely_available and geopandas_available
+        """Returns true if the necessary dependencies (Scipy and Numba) are available."""
+        return scipy_available and numba_available
