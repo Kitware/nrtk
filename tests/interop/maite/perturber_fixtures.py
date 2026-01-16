@@ -1,3 +1,5 @@
+"""Fake perturbers for MAITE interop testing."""
+
 from __future__ import annotations
 
 from collections.abc import Hashable, Iterable
@@ -12,6 +14,8 @@ from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class ResizePerturber(PerturbImage):
+    """Resize perturber for testing MAITE interop."""
+
     def __init__(self, w: int, h: int) -> None:
         self.w = w
         self.h = h

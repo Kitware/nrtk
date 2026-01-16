@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-__all__ = ["JATICObjectDetectionDataset", "COCOJATICObjectDetectionDataset"]
+__all__ = ["JATICObjectDetectionDataset", "COCOJATICObjectDetectionDataset", "dataset_to_coco"]
 
 import copy
+import json
+import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +18,7 @@ from typing_extensions import ReadOnly
 
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
+from nrtk.utils._logging import setup_logging
 
 maite_available: bool = import_guard(
     module_name="maite",
@@ -32,6 +35,9 @@ from maite.protocols.object_detection import (  # noqa: E402
     InputType,
     TargetType,
 )
+
+logger: logging.Logger = setup_logging(name=__name__)
+
 
 OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 
@@ -262,3 +268,91 @@ class JATICObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
     def is_usable(cls) -> bool:
         """Returns True if the required MAITE module is available."""
         return maite_available
+
+
+def _xywh_bbox_xform(*, x1: int, y1: int, x2: int, y2: int) -> tuple[int, int, int, int]:
+    """Transform bounding box from xyxy format to xywh format."""
+    return x1, y1, x2 - x1, y2 - y1
+
+
+def _create_annotations(dataset_categories: list[dict[str, Any]]) -> CocoDataset:  # pyright: ignore [reportReturnType]
+    """Create a new CocoDataset with the given categories."""
+    annotations = CocoDataset()  # pyright: ignore [reportCallIssue]
+    for cat in dataset_categories:
+        annotations.add_category(name=cat["name"], supercategory=cat["supercategory"], id=cat["id"])
+    return annotations
+
+
+def dataset_to_coco(  # noqa: C901
+    *,
+    dataset: Dataset,  # pyright: ignore [reportInvalidTypeForm]
+    output_dir: Path,
+    img_filenames: list[Path],
+    dataset_categories: list[dict[str, Any]],
+) -> None:
+    """Save dataset object to file as a COCO formatted dataset.
+
+    Args:
+        dataset:
+            MAITE-compliant object detection dataset
+        output_dir:
+            The location where data will be saved.
+        img_filenames:
+            Filenames of images to be saved.
+        dataset_categories:
+            A list of the categories related to this dataset.
+            Each dictionary should contain the following keys: id, name, supercategory.
+
+    Raises:
+        KWCocoImportError: KWCOCO is not available.
+        MaiteImportError: MAITE is not available.
+        ValueError: Image filename and dataset length mismatch.
+    """
+    if not kwcoco_available:
+        raise KWCocoImportError
+    if not maite_available:
+        raise MaiteImportError
+    if len(img_filenames) != len(dataset):
+        raise ValueError(f"Image filename and dataset length mismatch ({len(img_filenames)} != {len(dataset)})")
+
+    mod_metadata = list()
+
+    annotations = _create_annotations(dataset_categories)
+
+    for i in range(len(dataset)):
+        image, dets, metadata = dataset[i]
+        filename = output_dir / img_filenames[i]
+        filename.parent.mkdir(parents=True, exist_ok=True)
+
+        im = Image.fromarray(np.transpose(np.asarray(image), (1, 2, 0)))
+        im.save(filename)
+
+        labels = np.asarray(dets.labels)
+        bboxes = np.asarray(dets.boxes)
+        annotations.add_images([{"id": i, "file_name": str(filename)}])
+        for lbl, bbox in zip(labels, bboxes, strict=False):
+            annotations.add_annotation(
+                image_id=i,
+                category_id=int(lbl),
+                bbox=list(
+                    _xywh_bbox_xform(
+                        x1=int(bbox[0]),
+                        y1=int(bbox[1]),
+                        x2=int(bbox[2]),
+                        y2=int(bbox[3]),
+                    ),
+                ),
+            )
+
+        mod_metadata.append(metadata)
+    logger.info(f"Saved perturbed images to {output_dir}")
+
+    metadata_file = output_dir / "image_metadata.json"
+
+    with open(metadata_file, "w") as f:
+        json.dump(mod_metadata, f)
+    logger.info(f"Saved image metadata to {metadata_file}")
+
+    annotations_file = output_dir / "annotations.json"
+    annotations.dump(annotations_file)
+    logger.info(f"Saved annotations to {annotations_file}")

@@ -18,7 +18,7 @@ from nrtk.impls.perturb_image.optical.defocus_otf_perturber import DefocusOTFPer
 from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import create_sample_sensor_and_scenario
+from tests.utils.test_pybsm import create_sample_sensor_and_scenario
 
 
 @pytest.mark.skipif(not DefocusOTFPerturber.is_usable(), reason=str(PyBSMImportError()))

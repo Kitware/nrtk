@@ -1,13 +1,12 @@
 """Utilities for interoperability with MAITE OD dataset protocols."""
 
-__all__ = ["VisDroneObjectDetectionDataset", "stratified_sample_dataset"]
+__all__ = ["VisDroneObjectDetectionDataset", "stratified_sample_dataset", "YOLODetectionTarget"]
 
 # Python imports
 import csv
 import os
 import random
 from collections import defaultdict
-from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -64,7 +63,7 @@ class VisDroneMetadata(DatumMetadata):  # pyright: ignore [reportGeneralTypeIssu
     """TypedDict for VisDrone-detection datum-level metdata."""
 
     # pyright fails when failing to import maite.protocols
-    filename: ReadOnly[Sequence[str]]  # pyright: ignore [reportInvalidTypeForm]
+    filename: ReadOnly[str]  # pyright: ignore [reportInvalidTypeForm]
 
 
 class VisDroneObjectDetectionDataset(Dataset):

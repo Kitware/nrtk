@@ -7,7 +7,7 @@ Functions:
     default_sensor_scenario: Load default sensor and scenario configurations from config files.
 
 Example usage:
-    from nrtk.impls.perturb_image.utils import default_sensor_scenario
+    from nrtk.utils._pybsm import default_sensor_scenario
 
     # Load UAV configuration
     sensor, scenario = default_sensor_scenario("uav")
@@ -88,7 +88,7 @@ def default_sensor_scenario(*, config_type: str, data_dir: str | None = None) ->
         # Try different potential locations for the config file
         potential_paths = [
             Path("./data") / config_filename,  # Current notebook directory
-            Path(__file__).parent / "data" / config_filename,  # Relative to this module
+            Path(__file__).parent / "_data" / config_filename,  # Relative to this module
         ]
 
         config_path = None

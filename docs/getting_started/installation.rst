@@ -179,7 +179,7 @@ description of the extra.
 
     **tools**: installs `KWCOCO <https://github.com/Kitware/kwcoco>`_ and
     `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for :ref:`COCOJATICObjectDetectionDataset`,
-    :ref:`nrtk-perturber`, and :func:`~nrtk.interop.maite.interop.object_detection.utils.dataset_to_coco`.
+    :ref:`nrtk-perturber`, and :func:`~nrtk.interop.maite.datasets.object_detection.dataset_to_coco`.
 
     **scikit-image**: installs `scikit-image <https://scikit-image.org/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.photometric.noise` perturbers.

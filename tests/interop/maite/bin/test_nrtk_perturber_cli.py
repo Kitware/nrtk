@@ -8,8 +8,8 @@ import py  # type: ignore
 import pytest
 from click.testing import CliRunner
 
-import nrtk.interop.maite.utils.bin.nrtk_perturber_cli
-from nrtk.interop.maite.utils.bin.nrtk_perturber_cli import kwcoco_available, maite_available, nrtk_perturber_cli
+import nrtk.interop.maite.bin.nrtk_perturber_cli
+from nrtk.interop.maite.bin.nrtk_perturber_cli import kwcoco_available, maite_available, nrtk_perturber_cli
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_BLUR_CONFIG, NRTK_PYBSM_CONFIG
@@ -32,7 +32,7 @@ class TestNRTKPerturberCLI:
     """
 
     @mock.patch(
-        "nrtk.interop.maite.utils.bin.nrtk_perturber_cli.nrtk_perturber",
+        "nrtk.interop.maite.bin.nrtk_perturber_cli.nrtk_perturber",
         return_value=[
             ("_f-0.012_D-0.001_px-2e-05", MagicMock(spec=Dataset)),
             ("_f-0.012_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
@@ -40,7 +40,7 @@ class TestNRTKPerturberCLI:
             ("_f-0.014_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
         ],
     )
-    @mock.patch("nrtk.interop.maite.utils.bin.nrtk_perturber_cli.dataset_to_coco", return_value=None)
+    @mock.patch("nrtk.interop.maite.bin.nrtk_perturber_cli.dataset_to_coco", return_value=None)
     def test_nrtk_perturber(
         self,
         dataset_to_coco_patch: MagicMock,
@@ -180,8 +180,8 @@ def test_missing_deps(
     runner = CliRunner()
 
     with (
-        patch.object(nrtk.interop.maite.utils.bin.nrtk_perturber_cli, "kwcoco_available", mock_coco),
-        patch.object(nrtk.interop.maite.utils.bin.nrtk_perturber_cli, "maite_available", mock_maite),
+        patch.object(nrtk.interop.maite.bin.nrtk_perturber_cli, "kwcoco_available", mock_coco),
+        patch.object(nrtk.interop.maite.bin.nrtk_perturber_cli, "maite_available", mock_maite),
         expectation,
     ):
         _ = runner.invoke(

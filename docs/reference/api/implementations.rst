@@ -103,7 +103,7 @@ Utility Components
    :template: custom-module-template.rst
    :recursive:
 
-   ~nrtk.impls.utils.utils
+   ~nrtk.utils._pybsm
 
 ---------------------
 Perturbation Factory

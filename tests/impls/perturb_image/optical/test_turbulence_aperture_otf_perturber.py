@@ -20,7 +20,7 @@ from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import (
 from nrtk.utils._exceptions import PyBSMImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.impls.test_pybsm_utils import create_sample_sensor, create_sample_sensor_and_scenario
+from tests.utils.test_pybsm import create_sample_sensor, create_sample_sensor_and_scenario
 
 
 @pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMImportError()))

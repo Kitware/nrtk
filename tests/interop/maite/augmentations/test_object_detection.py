@@ -3,15 +3,17 @@ from collections.abc import Sequence
 
 import numpy as np
 import pytest
-from maite.protocols.object_detection import DatumMetadataType, TargetType
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop.maite.augmentations.object_detection import JATICDetectionAugmentation
 from nrtk.interop.maite.datasets.object_detection import JATICDetectionTarget
-from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
 from nrtk.utils._nop_perturber import _NOPPerturber
-from tests.interop.maite.utils.test_utils import ResizePerturber
+from tests.interop.maite.perturber_fixtures import ResizePerturber
+
+maite_available: bool = import_guard(module_name="maite", exception=MaiteImportError)
+from maite.protocols.object_detection import DatumMetadataType, TargetType  # noqa: E402
 
 random = np.random.default_rng()
 

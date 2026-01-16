@@ -3,11 +3,13 @@ from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 
 import pytest
-from maite.protocols import DatumMetadata
 
 from nrtk.interop.maite.metadata.datum import NRTKDatumMetadata, _forward_md_keys
-from nrtk.interop.maite.utils.detection import maite_available
 from nrtk.utils._exceptions import MaiteImportError
+from nrtk.utils._import_guard import import_guard
+
+maite_available: bool = import_guard(module_name="maite", exception=MaiteImportError)
+from maite.protocols import DatumMetadata  # noqa: E402
 
 
 @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))

@@ -42,7 +42,7 @@ dependencies = [
 Documentation = "https://nrtk.readthedocs.io/"
 
 [project.scripts]
-nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber_cli"
+nrtk-perturber = "nrtk.interop.maite.bin.nrtk_perturber_cli:nrtk_perturber_cli"
 
 [project.entry-points."smqtk_plugins"]
 # Add implementation sub-module exposure here.

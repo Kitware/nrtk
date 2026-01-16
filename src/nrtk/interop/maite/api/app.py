@@ -13,8 +13,8 @@ from nrtk.interop.maite.api.schema import (
     NrtkPerturbInputSchema,
     NrtkPerturbOutputSchema,
 )
-from nrtk.interop.maite.utils.detection import dataset_to_coco
-from nrtk.interop.maite.utils.nrtk_perturber import nrtk_perturber
+from nrtk.interop.maite.bin.nrtk_perturber import nrtk_perturber
+from nrtk.interop.maite.datasets.object_detection import dataset_to_coco
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -43,10 +43,10 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
 
     Args:
         data:
-            NrtkPybsmPerturbInputSchema from schema.py
+            NrtkPerturbInputSchema from schema.py
 
     Returns:
-        NrtkPybsmPerturberOutputSchema from schema.py
+        NrtkPerturbOutputSchema from schema.py
 
     Raises:
         HTTPException upon failure
