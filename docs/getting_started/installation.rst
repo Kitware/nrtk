@@ -192,8 +192,7 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.geometric.random_rotation_perturber`, and
     :mod:`~nrtk.impls.perturb_image.geometric.random_scale_perturber`.
 
-    **waterdroplet**: installs `scipy <https://scipy.org/>`_, `shapely <https://github.com/shapely/shapely>`_, and
-    `geopandas <https://geopandas.org/en/stable/>__. Required for
+    **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `numba <https://numba.pydata.org/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.environment.water_droplet_perturber` perturber and utility functions.
 
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
@@ -348,7 +347,7 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``pyBSM``
     * - :ref:`WaterDropletPerturber`
       - ``waterdroplet``
-      - ``scipy``, ``shapely``, ``geopandas``
+      - ``scipy``, ``numba``
 
 .. :auto installation-links:
 

@@ -11,7 +11,11 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.environment.water_droplet_perturber import WaterDropletPerturber
+from nrtk.impls.perturb_image.environment.water_droplet_perturber import (
+    WaterDropletPerturber,
+    _compute_refraction_mapping_impl,
+    _points_in_polygon_impl,
+)
 from nrtk.utils._exceptions import WaterDropletImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
@@ -255,6 +259,18 @@ class TestWaterDropletPerturber:
         _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
+    @pytest.mark.parametrize("num_drops", [0, 1])
+    def test_few_droplets_no_overlap_check(self, num_drops: int) -> None:
+        """Test that perturb handles 0 or 1 droplets without overlap removal issues."""
+        # Use a local RNG to avoid affecting other tests that use the module-level rng
+        _rng = np.random.default_rng(2345)
+        image = _rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+        inst = WaterDropletPerturber(num_drops=num_drops, seed=42)
+        out_image, _ = inst.perturb(image=image)
+        # Verify the output is valid (same shape, uint8 type)
+        assert out_image.shape == image.shape
+        assert out_image.dtype == np.uint8
+
 
 @pytest.mark.skipif(not WaterDropletPerturber.is_usable(), reason=str(WaterDropletImportError()))
 class TestWaterDropletPerturberUtils:
@@ -323,3 +339,61 @@ def test_missing_deps(mock_is_usable: MagicMock) -> None:
     assert not WaterDropletPerturber.is_usable()
     with pytest.raises(WaterDropletImportError):
         WaterDropletPerturber()
+
+
+@pytest.mark.parametrize(
+    ("points", "expected"),
+    [
+        ([[0.5, 0.5], [0.25, 0.25], [0.75, 0.75]], [True, True, True]),  # all inside
+        ([[2.0, 2.0], [-0.5, 0.5], [0.5, -0.5]], [False, False, False]),  # all outside
+        ([[0.5, 0.5], [2.0, 2.0], [0.25, 0.75]], [True, False, True]),  # mixed
+    ],
+)
+def test_points_in_polygon_impl(points: list[list[float]], expected: list[bool]) -> None:
+    """Test _points_in_polygon_impl with various point configurations."""
+    polygon = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
+    points_arr = np.array(points, dtype=np.float64)
+    result = _points_in_polygon_impl(points=points_arr, polygon=polygon)
+    np.testing.assert_array_equal(result, np.array(expected))
+
+
+def test_compute_refraction_mapping_impl() -> None:
+    """Test _compute_refraction_mapping_impl produces valid output."""
+    # Create minimal test inputs
+    xs = np.array([5, 6], dtype=np.int64)
+    ys = np.array([5, 6], dtype=np.int64)
+
+    # Create a simple glass coordinate system (10x10x3)
+    gls = np.zeros((10, 10, 3), dtype=np.float64)
+    for i in range(10):
+        for j in range(10):
+            gls[i, j] = [float(i), float(j), 30.0]
+
+    normal = np.array([0.0, -1.0, 1.0], dtype=np.float64)
+    n_air = 1.0
+    n_water = 1.33
+    m_dist = 30
+    b_dist = 1000
+    center = np.array([5.0, 5.0, 29.5], dtype=np.float64)
+    radius = 0.5
+    intrinsic = np.array([[400, 0, 5], [0, 400, 5], [0, 0, 1]], dtype=np.float64)
+
+    u_out, v_out = _compute_refraction_mapping_impl(
+        xs=xs,
+        ys=ys,
+        gls=gls,
+        normal=normal,
+        n_air=n_air,
+        n_water=n_water,
+        M=m_dist,
+        B=b_dist,
+        center=center,
+        radius=radius,
+        intrinsic=intrinsic,
+    )
+
+    # Verify output shape and type
+    assert u_out.shape == (2,)
+    assert v_out.shape == (2,)
+    assert u_out.dtype == np.float64
+    assert v_out.dtype == np.float64
