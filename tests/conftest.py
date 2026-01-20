@@ -80,17 +80,6 @@ def fuzzy_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(FuzzyFloatSnapshotExtension)
 
 
-class WeakFuzzySnapshotExtension(FuzzyFloatSnapshotExtension):
-    def __init__(self, *, rtol: float = 0.1, atol: float = 1e-5, **kwargs: Any) -> None:
-        super().__init__(rtol=rtol, atol=atol, **kwargs)
-
-
-# Should not be used without maintainer approval
-@pytest.fixture
-def weak_fuzzy_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(WeakFuzzySnapshotExtension)
-
-
 class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
     _file_extension = "tiff"
 
@@ -126,17 +115,6 @@ class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
 @pytest.fixture
 def tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(TIFFImageSnapshotExtension)
-
-
-class WeakTIFFImageSnapshotExtension(TIFFImageSnapshotExtension):
-    def __init__(self, *, rtol: float = 0.1, atol: float = 1e-5, **kwargs: Any) -> None:
-        super().__init__(rtol=rtol, atol=atol, **kwargs)
-
-
-# Should not be used without maintainer approval
-@pytest.fixture
-def weak_tiff_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(WeakTIFFImageSnapshotExtension)
 
 
 class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
