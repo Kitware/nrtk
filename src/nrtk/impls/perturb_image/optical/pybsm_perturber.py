@@ -217,6 +217,13 @@ class PybsmPerturber(PybsmOTFPerturber):
             ValueError: If reflectance_range length != 2
             ValueError: If reflectance_range not strictly ascending
         """
+        # Convert list inputs to numpy arrays (needed when loading from JSON config)
+        reflectance_range = np.asarray(reflectance_range)
+        opt_trans_wavelengths = np.asarray(opt_trans_wavelengths)
+        optics_transmission = np.asarray(optics_transmission) if optics_transmission is not None else None
+        qe_wavelengths = np.asarray(qe_wavelengths) if qe_wavelengths is not None else None
+        qe = np.asarray(qe) if qe is not None else None
+
         if reflectance_range.shape[0] != 2:
             raise ValueError(f"Reflectance range array must have length of 2, got {reflectance_range.shape[0]}")
         if reflectance_range[0] >= reflectance_range[1]:
@@ -284,31 +291,6 @@ class PybsmPerturber(PybsmOTFPerturber):
     def __repr__(self) -> str:
         """Returns a representation of the perturber including sensor and scenario names."""
         return self.__str__()
-
-    @classmethod
-    @override
-    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> PybsmPerturber:
-        """Instantiates a PybsmPerturber from a configuration dictionary.
-
-        Args:
-            config_dict:
-                Configuration dictionary with initialization parameters.
-            merge_default:
-                Whether to merge with default configuration. Defaults to True.
-
-        Returns:
-            An instance of PybsmPerturber.
-        """
-        config_dict = dict(config_dict)
-
-        # # Convert input data to expected constructor types
-        config_dict["reflectance_range"] = np.array(config_dict["reflectance_range"])
-        config_dict["opt_trans_wavelengths"] = np.array(config_dict["opt_trans_wavelengths"])
-        config_dict["optics_transmission"] = np.array(config_dict["optics_transmission"])
-        config_dict["qe_wavelengths"] = np.array(config_dict["qe_wavelengths"])
-        config_dict["qe"] = np.array(config_dict["qe"])
-
-        return super(PybsmOTFPerturber, cls).from_config(config_dict, merge_default=merge_default)
 
     @override
     def get_config(self) -> dict[str, Any]:
