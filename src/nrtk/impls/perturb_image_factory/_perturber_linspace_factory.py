@@ -61,6 +61,7 @@ class PerturberLinspaceFactory(PerturbImageFactory):
         stop: float,
         num: int = 1,
         endpoint: bool = True,
+        perturber_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
@@ -80,11 +81,13 @@ class PerturberLinspaceFactory(PerturbImageFactory):
                 Number of instances to generate.
             endpoint:
                 Decides if stop is included.
+            perturber_kwargs:
+                Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
             TypeError: Given a perturber instance instead of type.
         """
-        super().__init__(perturber=perturber, theta_key=theta_key)
+        super().__init__(perturber=perturber, theta_key=theta_key, perturber_kwargs=perturber_kwargs)
 
         self.start = start
         self.stop = stop

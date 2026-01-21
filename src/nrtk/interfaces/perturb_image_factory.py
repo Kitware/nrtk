@@ -36,7 +36,13 @@ class PerturbImageFactory(Plugfigurable):
         theta_key (str): perturber parameter to vary between instances
     """
 
-    def __init__(self, *, perturber: type[PerturbImage], theta_key: str) -> None:
+    def __init__(
+        self,
+        *,
+        perturber: type[PerturbImage],
+        theta_key: str,
+        perturber_kwargs: dict[str, Any] | None = None,
+    ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
@@ -47,6 +53,8 @@ class PerturbImageFactory(Plugfigurable):
                 Python implementation type of the PerturbImage interface to produce.
             theta_key:
                 Perturber parameter to vary between instances.
+            perturber_kwargs:
+                Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
             TypeError: Given a perturber instance instead of type.
@@ -57,6 +65,12 @@ class PerturbImageFactory(Plugfigurable):
             raise TypeError("Passed a perturber instance, expected type")
         self.perturber = perturber
         self.n = -1
+        self.perturber_kwargs: dict[str, Any] = dict() if perturber_kwargs is None else perturber_kwargs
+
+    def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
+        """Returns PerturberImage implementation with given input args."""
+        input_kwargs = self.perturber_kwargs | kwargs
+        return self.perturber(**input_kwargs)
 
     @property
     @abc.abstractmethod
@@ -85,7 +99,7 @@ class PerturbImageFactory(Plugfigurable):
         """
         if self.n < len(self.thetas):
             kwargs = {self.theta_key: self.thetas[self.n]}
-            func = self.perturber(**kwargs)
+            func = self._create_perturber(kwargs=kwargs)
             self.n: int = self.n + 1
             return func
         raise StopIteration
@@ -97,7 +111,8 @@ class PerturbImageFactory(Plugfigurable):
             idx: Index of desired perturber (supports negative indices).
         """
         kwargs = {self.theta_key: self.thetas[idx]}
-        return self.perturber(**kwargs)
+
+        return self._create_perturber(kwargs=kwargs)
 
     @override
     @classmethod
@@ -153,4 +168,5 @@ class PerturbImageFactory(Plugfigurable):
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_key": self.theta_key,
+            "perturber_kwargs": self.perturber_kwargs,
         }
