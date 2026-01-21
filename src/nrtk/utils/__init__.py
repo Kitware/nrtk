@@ -1,15 +1,7 @@
 """Package for nrtk utils needed for carrying out pertubations."""
 
-from collections.abc import Callable
-from typing import Any
+from nrtk.utils._pybsm import default_sensor_scenario
 
-import lazy_loader as lazy
+default_sensor_scenario.__module__ = __name__
 
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
-
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=["_pybsm"],
-)
+__all__ = ["default_sensor_scenario"]

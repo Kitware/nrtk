@@ -258,78 +258,33 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - Perturber
       - Extra(s) Required
       - Key Dependencies Provided by Extra(s)
-    * - :ref:`AlbumentationsPerturber`
-      - ``albumentations``, and (``graphics`` or ``headless``)
-      - ``nrtk-albumentations``, ``OpenCV``
+    * - **Photometric Perturbers**
+      -
+      -
     * - :ref:`AverageBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
     * - :ref:`BrightnessPerturber`
       - ``Pillow``
       - ``Pillow``
-    * - :ref:`CircularApertureOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
     * - :ref:`ColorPerturber`
       - ``Pillow``
       - ``Pillow``
-    * - :ref:`ComposePerturber`
-      - ---
-      - ---
     * - :ref:`ContrastPerturber`
       - ``Pillow``
       - ``Pillow``
-    * - :ref:`DefocusOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
-    * - :ref:`DetectorOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
-    * - :ref:`DiffusionPerturber`
-      - ``diffusion``
-      - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
     * - :ref:`GaussianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
     * - :ref:`GaussianNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
-    * - :ref:`HazePerturber`
-      - ---
-      - ---
-    * - :ref:`JitterOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
     * - :ref:`MedianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
-    * - :ref:`NOPPerturber`
-      - ---
-      - ---
     * - :ref:`PepperNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
-    * - :ref:`PyBSMOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
-    * - :ref:`PyBSMPerturber`
-      - ``pybsm``
-      - ``pyBSM``
-    * - :ref:`RadialDistortionPerturber`
-      - ---
-      - ---
-    * - :ref:`RandomCropPerturber`
-      - ---
-      - ---
-    * - :ref:`RandomRotationPerturber`
-      - ``albumentations``, and (``graphics`` or ``headless``)
-      - ``nrtk-albumentations``, ``OpenCV``
-    * - :ref:`RandomScalePerturber`
-      - ``albumentations``, and (``graphics`` or ``headless``)
-      - ``nrtk-albumentations``, ``OpenCV``
-    * - :ref:`RandomTranslationPerturber`
-      - ---
-      - ---
     * - :ref:`SaltAndPepperNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
@@ -342,12 +297,72 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`SpeckleNoisePerturber`
       - ``scikit-image``
       - ``scikit-image``
-    * - :ref:`TurbulenceApertureOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
+    * - **Geometric Perturbers**
+      -
+      -
+    * - :ref:`RandomCropPerturber`
+      - ---
+      - ---
+    * - :ref:`RandomRotationPerturber`
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``nrtk-albumentations``, ``OpenCV``
+    * - :ref:`RandomScalePerturber`
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``nrtk-albumentations``, ``OpenCV``
+    * - :ref:`RandomTranslationPerturber`
+      - ---
+      - ---
+    * - **Environment Perturbers**
+      -
+      -
+    * - :ref:`HazePerturber`
+      - ---
+      - ---
     * - :ref:`WaterDropletPerturber`
       - ``waterdroplet``
       - ``scipy``, ``numba``
+    * - **Optical Perturbers**
+      -
+      -
+    * - :ref:`CircularApertureOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`DefocusOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`DetectorOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`JitterOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`PyBSMOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`PyBSMPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - :ref:`RadialDistortionPerturber`
+      - ---
+      - ---
+    * - :ref:`TurbulenceApertureOTFPerturber`
+      - ``pybsm``
+      - ``pyBSM``
+    * - **Generative Perturbers**
+      -
+      -
+    * - :ref:`DiffusionPerturber`
+      - ``diffusion``
+      - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
+    * - **Wrapper Perturbers**
+      -
+      -
+    * - :ref:`AlbumentationsPerturber`
+      - ``albumentations``, and (``graphics`` or ``headless``)
+      - ``nrtk-albumentations``, ``OpenCV``
+    * - :ref:`ComposePerturber`
+      - ---
+      - ---
 
 .. :auto installation-links:
 

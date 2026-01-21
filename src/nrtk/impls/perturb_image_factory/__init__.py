@@ -13,6 +13,12 @@ from nrtk.impls.perturb_image_factory._perturber_step_factory import (
     PerturberStepFactory,
 )
 
+# Override __module__ to reflect the public API path for plugin discovery
+PerturberLinspaceFactory.__module__ = __name__
+PerturberMultivariateFactory.__module__ = __name__
+PerturberOneStepFactory.__module__ = __name__
+PerturberStepFactory.__module__ = __name__
+
 __all__ = [
     "PerturberLinspaceFactory",
     "PerturberMultivariateFactory",

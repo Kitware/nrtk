@@ -7,10 +7,10 @@ Functions:
     default_sensor_scenario: Load default sensor and scenario configurations from config files.
 
 Example usage:
-    from nrtk.utils._pybsm import default_sensor_scenario
+    from nrtk.utils import default_sensor_scenario
 
     # Load UAV configuration
-    sensor, scenario = default_sensor_scenario("uav")
+    sensor, scenario = default_sensor_scenario(config_type="uav")
 """
 
 from __future__ import annotations
@@ -39,21 +39,24 @@ def default_sensor_scenario(*, config_type: str, data_dir: str | None = None) ->
     - "ground": Ground-based imaging system configuration
 
     Args:
-        config_type: String identifier for the configuration type to load.
-                    Must be one of the supported configuration types.
-        data_dir: Optional path to the directory containing configuration files.
-                 If None, the function will search in default locations.
-                 Can be a string path or pathlib.Path object.
+        config_type:
+            String identifier for the configuration type to load. Must be one of the supported configuration types.
+        data_dir:
+            Optional path to the directory containing configuration files. If None, the function will search in default
+            locations. Can be a string path or pathlib.Path object.
 
     Returns:
         A dictionary containing sensor and scenario parameters
 
     Raises:
-        ValueError: If the configuration type is not supported or the
-                   configuration file is missing required keys.
-        FileNotFoundError: If the configuration file cannot be found.
-        json.JSONDecodeError: If the configuration file contains invalid JSON.
-        IOError: If there's an error reading the configuration file.
+        ValueError:
+            If the configuration type is not supported or the configuration file is missing required keys.
+        FileNotFoundError:
+            If the configuration file cannot be found.
+        json.JSONDecodeError:
+            If the configuration file contains invalid JSON.
+        IOError:
+            If there's an error reading the configuration file.
     """
     # Define supported configuration types
     supported_configs = {

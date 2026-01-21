@@ -103,7 +103,7 @@ Utility Components
    :template: custom-module-template.rst
    :recursive:
 
-   ~nrtk.utils._pybsm
+   ~nrtk.utils
 
 ---------------------
 Perturbation Factory
@@ -114,7 +114,4 @@ Perturbation Factory
    :template: custom-module-template.rst
    :recursive:
 
-   ~nrtk.impls.perturb_image_factory._perturber_linspace_factory
-   ~nrtk.impls.perturb_image_factory._perturber_one_step_factory
-   ~nrtk.impls.perturb_image_factory._perturber_step_factory
-   ~nrtk.impls.perturb_image_factory._perturber_multivariate_factory
+   ~nrtk.impls.perturb_image_factory
