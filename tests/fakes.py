@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Hashable, Iterable
+from collections.abc import Hashable, Iterable, Sequence
 from typing import Any
 
 import numpy as np
@@ -10,6 +10,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
 
 class FakePerturber(PerturbImage):
@@ -44,3 +45,40 @@ class FakePerturber(PerturbImage):
         config: dict[str, Any] = {"param1": self.param1, "param2": self.param2}
         config.update(self._extra_kwargs)
         return config
+
+
+class PerturberFakeFactory(PerturbImageFactory):
+    """Fake factory for testing purposes.
+
+    A minimal concrete implementation of PerturbImageFactory that can be used
+    to test interface behavior without depending on any specific implementation.
+    """
+
+    def __init__(
+        self,
+        *,
+        perturber: type[PerturbImage],
+        theta_key: str,
+        theta_values: Sequence[Any],
+    ) -> None:
+        super().__init__(perturber=perturber, theta_key=theta_key)
+        self._theta_values = list(theta_values)
+
+    @property
+    @override
+    def thetas(self) -> Sequence[Any]:
+        return self._theta_values
+
+    @override
+    def __getitem__(self, idx: int) -> PerturbImage:
+        if idx < 0 or idx >= len(self):
+            raise IndexError(idx)
+        return self.perturber(**{self.theta_key: self._theta_values[idx]})
+
+    @override
+    def get_config(self) -> dict[str, Any]:
+        return {
+            "perturber": self.perturber.get_type_string(),
+            "theta_key": self.theta_key,
+            "theta_values": self._theta_values,
+        }

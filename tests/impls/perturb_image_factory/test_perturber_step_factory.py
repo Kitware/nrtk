@@ -1,294 +1,210 @@
+"""Tests for PerturberStepFactory.
+
+PerturberStepFactory creates perturbers with theta values at regular step
+intervals over a range, using numpy.arange-like semantics.
+
+Test Cases (in addition to shared base class tests):
+    Iteration (Valid)
+        - Integer steps with to_int=True
+        - Float steps with to_int=False
+
+    Iteration (Empty)
+        - start == stop produces empty factory
+
+    Indexing
+        - Indexing empty factory raises IndexError
+
+    Edge Cases (parametrized)
+        - Step larger than range produces single value
+        - Negative step with descending range works
+        - Fractional step count (non-integer division) handled correctly
+        - Negative value ranges work correctly
+
+    to_int Parameter (parametrized)
+        - to_int=True returns integer theta values
+        - to_int=False returns float theta values
+        - to_int=True truncates fractional values
+"""
+
 from __future__ import annotations
 
-import json
+from collections.abc import Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pytest
-from PIL import Image
-from smqtk_core.configuration import (
-    configuration_test_helper,
-    from_config_dict,
-    to_config_dict,
-)
-from syrupy.assertion import SnapshotAssertion
+from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.detector_otf_perturber import DetectorOTFPerturber
-from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
-from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
 from nrtk.impls.perturb_image_factory import PerturberStepFactory
-from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.fakes import FakePerturber
-from tests.impls import DATA_DIR
-from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
+from tests.impls.perturb_image_factory import _TestPerturbImageFactory
 
 
-class TestPerturberStepFactory:
+class TestPerturberStepFactory(_TestPerturbImageFactory):
+    """Tests for PerturberStepFactory. See module docstring for test cases."""
+
+    default_factory_kwargs = {
+        "theta_key": "param1",
+        "start": 1.0,
+        "stop": 6.0,
+        "step": 2.0,
+        "to_int": True,
+    }
+
+    @override
+    def _make_factory(self, **kwargs: Any) -> PerturberStepFactory:
+        """Create a factory with FakePerturber pre-filled."""
+        return PerturberStepFactory(perturber=FakePerturber, **kwargs)
+
+    # ========================= Iteration (Valid) ==========================
+
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step", "to_int", "expected"),
+        ("factory_kwargs", "expected"),
         [
-            (FakePerturber, "param1", 1.0, 6.0, 2.0, True, (1.0, 3.0, 5.0)),
-            (FakePerturber, "param2", 3.0, 9.0, 3.0, True, (3.0, 6.0)),
-            (FakePerturber, "param1", 3.0, 9.0, 1.5, False, (3.0, 4.5, 6.0, 7.5)),
-            (FakePerturber, "param1", 4.0, 4.0, 1.0, False, ()),
-        ],
-    )
-    def test_iteration(
-        self,
-        perturber: type[PerturbImage],
-        theta_key: str,
-        start: float,
-        stop: float,
-        step: float,
-        to_int: bool,
-        expected: tuple[float, ...],
-    ) -> None:
-        """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = PerturberStepFactory(
-            perturber=perturber,
-            theta_key=theta_key,
-            start=start,
-            stop=stop,
-            step=step,
-            to_int=to_int,
-        )
-        assert len(expected) == len(factory)
-        for idx, p in enumerate(factory):
-            assert p.get_config()[theta_key] == expected[idx]
-
-    @pytest.mark.parametrize(
-        (
-            "perturber",
-            "theta_key",
-            "start",
-            "stop",
-            "step",
-            "idx",
-            "expected_val",
-            "expectation",
-        ),
-        [
-            (FakePerturber, "param1", 1.0, 6.0, 2.0, 0, 1, does_not_raise()),
-            (FakePerturber, "param1", 1.0, 6.0, 2.0, 2, 5, does_not_raise()),
-            (FakePerturber, "param1", 1.0, 6.0, 2.0, 3, -1, pytest.raises(IndexError)),
-            (FakePerturber, "param1", 1.0, 6.0, 2.0, -1, -1, pytest.raises(IndexError)),
-            (FakePerturber, "param1", 4.0, 4.0, 1.0, 0, -1, pytest.raises(IndexError)),
-        ],
-        ids=["first idx", "last idx", "idx == len", "neg idx", "empty iter"],
-    )
-    def test_indexing(
-        self,
-        perturber: type[PerturbImage],
-        theta_key: str,
-        start: float,
-        stop: float,
-        step: float,
-        idx: int,
-        expected_val: float,
-        expectation: AbstractContextManager,
-    ) -> None:
-        """Ensure it is possible to access a perturber instance via indexing."""
-        factory = PerturberStepFactory(
-            perturber=perturber,
-            theta_key=theta_key,
-            start=start,
-            stop=stop,
-            step=step,
-            to_int=True,
-        )
-        with expectation:
-            assert factory[idx].get_config()[theta_key] == expected_val
-
-    @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step", "to_int"),
-        [(FakePerturber, "param1", 1.0, 5.0, 2.0, False), (FakePerturber, "param2", 3.0, 9.0, 3.0, True)],
-    )
-    def test_configuration(
-        self,
-        perturber: type[PerturbImage],
-        theta_key: str,
-        start: float,
-        stop: float,
-        step: float,
-        to_int: bool,
-    ) -> None:
-        """Test configuration stability."""
-        inst = PerturberStepFactory(
-            perturber=perturber,
-            theta_key=theta_key,
-            start=start,
-            stop=stop,
-            step=step,
-            to_int=to_int,
-        )
-        for i in configuration_test_helper(inst):
-            assert i.perturber == perturber
-            assert i.theta_key == theta_key
-            assert i.start == start
-            assert i.stop == stop
-            assert i.step == step
-            assert start in i.thetas
-            assert stop not in i.thetas
-
-    @pytest.mark.parametrize(
-        ("kwargs", "expectation"),
-        [
-            (
+            pytest.param(
                 {
-                    "perturber": FakePerturber,
                     "theta_key": "param1",
                     "start": 1.0,
-                    "stop": 2.0,
+                    "stop": 6.0,
+                    "step": 2.0,
+                    "to_int": True,
                 },
-                does_not_raise(),
+                [1.0, 3.0, 5.0],
+                id="integer steps",
             ),
-            (
+            pytest.param(
                 {
-                    "perturber": FakePerturber(param1=1, param2=2),
-                    "theta_key": "param2",
-                    "start": 1.0,
-                    "stop": 2.0,
+                    "theta_key": "param1",
+                    "start": 3.0,
+                    "stop": 9.0,
+                    "step": 1.5,
+                    "to_int": False,
                 },
-                pytest.raises(TypeError, match=r"Passed a perturber instance, expected type"),
+                [3.0, 4.5, 6.0, 7.5],
+                id="float steps",
             ),
         ],
     )
-    def test_configuration_bounds(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
-        """Test that an exception is properly raised (or not) based on argument value."""
-        with expectation:
-            PerturberStepFactory(**kwargs)
+    @override
+    def test_iteration_valid(self, factory_kwargs: dict[str, Any], expected: Sequence[Any]) -> None:
+        super().test_iteration_valid(factory_kwargs=factory_kwargs, expected=expected)
+
+    # ========================= Iteration (Empty) ==========================
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "start", "stop", "step"),
-        [(FakePerturber, "param1", 1.0, 5.0, 2.0), (FakePerturber, "param2", 3.0, 9.0, 3.0)],
-    )
-    def test_hydration(
-        self,
-        tmp_path: Path,
-        perturber: type[PerturbImage],
-        theta_key: str,
-        start: float,
-        stop: float,
-        step: float,
-    ) -> None:
-        """Test configuration hydration using from_config_dict."""
-        original_factory = PerturberStepFactory(
-            perturber=perturber,
-            theta_key=theta_key,
-            start=start,
-            stop=stop,
-            step=step,
-        )
-
-        original_factory_config = original_factory.get_config()
-
-        config_file_path = tmp_path / "config.json"
-        with open(str(config_file_path), "w") as f:
-            json.dump(to_config_dict(original_factory), f)
-
-        with open(str(config_file_path)) as config_file:
-            config = json.load(config_file)
-            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
-            hydrated_factory_config = hydrated_factory.get_config()
-
-            assert original_factory_config == hydrated_factory_config
-
-    @pytest.mark.parametrize(
-        ("config_file_name", "expectation"),
-        [
-            (
-                "nrtk_brightness_config.json",
-                does_not_raise(),
-            ),
-            (
-                "nrtk_bad_step_config.json",
-                pytest.raises(ValueError, match=r"not a perturber is not a valid perturber."),
-            ),
-        ],
-    )
-    def test_hydration_bounds(self, config_file_name: str, expectation: AbstractContextManager) -> None:
-        """Test that an exception is properly raised (or not) based on argument value."""
-        with expectation, open(str(DATA_DIR / config_file_name)) as config_file:
-            config = json.load(config_file)
-            from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
-
-    @pytest.mark.parametrize(
-        ("perturber", "modifying_param", "modifying_val", "theta_key", "start", "stop", "step"),
+        "empty_factory_kwargs",
         [
             pytest.param(
-                JitterOTFPerturber,
-                "s_y",
-                0,
-                "s_x",
-                2e-3,
-                6e-3,
-                1e-3,
-                marks=pytest.mark.skipif(
-                    not JitterOTFPerturber.is_usable(),
-                    reason="JitterOTFPerturber not usable",
-                ),
-            ),
-            pytest.param(
-                DetectorOTFPerturber,
-                "w_x",
-                0,
-                "w_y",
-                3e-3,
-                9e-3,
-                1e-3,
-                marks=pytest.mark.skipif(
-                    not DetectorOTFPerturber.is_usable(),
-                    reason="DetectorOTFPerturber not usable",
-                ),
-            ),
-            pytest.param(
-                TurbulenceApertureOTFPerturber,
-                "altitude",
-                250,
-                "D",
-                40e-5,
-                40e-3,
-                66e-4,
-                marks=pytest.mark.skipif(
-                    not TurbulenceApertureOTFPerturber.is_usable(),
-                    reason="TurbulenceApertureOTFPerturber not usable",
-                ),
+                {"theta_key": "param1", "start": 4.0, "stop": 4.0, "step": 1.0},
+                id="start equals stop",
             ),
         ],
     )
-    def test_perturb_instance_modification(
+    @override
+    def test_iteration_empty(self, empty_factory_kwargs: dict[str, Any]) -> None:
+        super().test_iteration_empty(empty_factory_kwargs=empty_factory_kwargs)
+
+    # ============================== Indexing ==============================
+
+    @pytest.mark.parametrize(
+        ("idx", "expected_val", "expectation"),
+        [
+            pytest.param(0, 1, does_not_raise(), id="first"),
+            pytest.param(2, 5, does_not_raise(), id="last"),
+            pytest.param(3, None, pytest.raises(IndexError), id="out of bounds"),
+            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+        ],
+    )
+    @override
+    def test_indexing(
         self,
-        psnr_tiff_snapshot: SnapshotAssertion,
-        perturber: type[PerturbImage],
-        modifying_param: str,
-        modifying_val: float,
-        theta_key: str,
-        start: float,
-        stop: float,
-        step: float,
+        idx: int,
+        expected_val: float | None,
+        expectation: AbstractContextManager,
     ) -> None:
-        """Test perturber instance modification for a perturber factory."""
-        perturber_factory = PerturberStepFactory(
-            perturber=perturber,
-            theta_key=theta_key,
-            start=start,
-            stop=stop,
-            step=step,
-            to_int=False,
+        super().test_indexing(idx=idx, expected_val=expected_val, expectation=expectation)
+
+    def test_indexing_empty(self) -> None:
+        """Indexing empty factory raises IndexError."""
+        factory = self._make_factory(
+            theta_key="param1",
+            start=4.0,
+            stop=4.0,
+            step=1.0,
         )
-        img = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        img_md = {"img_gsd": 3.19 / 160.0}
-        for perturber_inst in perturber_factory:
-            setattr(perturber, modifying_param, modifying_val)
-            out_img = pybsm_perturber_assertions(
-                perturb=perturber_inst,
-                image=img,
-                expected=None,
-                **img_md,
-            )
-            psnr_tiff_snapshot.assert_match(out_img)
+        with pytest.raises(IndexError):
+            _ = factory[0]
+
+    # ============================= Edge Cases =============================
+
+    @pytest.mark.parametrize(
+        ("factory_kwargs", "expected_len", "expected_thetas"),
+        [
+            pytest.param(
+                {"theta_key": "param1", "start": 0.0, "stop": 0.5, "step": 1.0},
+                1,
+                [0.0],
+                id="step larger than range",
+            ),
+            pytest.param(
+                {"theta_key": "param1", "start": 5.0, "stop": 0.0, "step": -1.0},
+                5,
+                [5.0, 4.0, 3.0, 2.0, 1.0],
+                id="negative step descending",
+            ),
+            pytest.param(
+                {"theta_key": "param1", "start": 0.0, "stop": 1.0, "step": 0.3},
+                4,
+                [0.0, 0.3, 0.6, 0.9],
+                id="fractional step count",
+            ),
+            pytest.param(
+                {"theta_key": "param1", "start": -2.0, "stop": 2.0, "step": 1.0},
+                4,
+                [-2.0, -1.0, 0.0, 1.0],
+                id="negative values",
+            ),
+        ],
+    )
+    def test_edge_cases(
+        self,
+        factory_kwargs: dict[str, Any],
+        expected_len: int,
+        expected_thetas: list[float],
+    ) -> None:
+        """Edge case ranges produce correct theta values."""
+        factory = self._make_factory(**factory_kwargs)
+        assert len(factory) == expected_len
+        for actual, exp in zip(factory.thetas, expected_thetas, strict=True):
+            assert np.isclose(actual, exp, atol=1e-4)
+
+    # ========================== to_int Parameter ==========================
+
+    @pytest.mark.parametrize(
+        ("to_int", "start", "expected_type", "expected_values"),
+        [
+            pytest.param(True, 1.0, int, [1, 2, 3, 4], id="to_int=True returns integers"),
+            pytest.param(False, 1.0, float, [1.0, 2.0, 3.0, 4.0], id="to_int=False returns floats"),
+            pytest.param(True, 1.5, int, [1, 2, 3, 4], id="to_int=True truncates fractional"),
+        ],
+    )
+    def test_to_int_returns_correct_type(
+        self,
+        to_int: bool,
+        start: float,
+        expected_type: type,
+        expected_values: list,
+    ) -> None:
+        """to_int parameter controls whether theta values are int or float."""
+        factory = self._make_factory(
+            theta_key="param1",
+            start=start,
+            stop=5.0,
+            step=1.0,
+            to_int=to_int,
+        )
+        thetas = factory.thetas
+        assert all(isinstance(t, expected_type) for t in thetas)
+        assert np.allclose(thetas, expected_values)

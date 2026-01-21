@@ -265,6 +265,15 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         super().__init__()
         self._simulator: ImageSimulator
 
+        # Convert list inputs to numpy arrays (needed when loading from JSON config)
+        opt_trans_wavelengths = np.asarray(opt_trans_wavelengths)
+        if optics_transmission is not None:
+            optics_transmission = np.asarray(optics_transmission)
+        if qe_wavelengths is not None:
+            qe_wavelengths = np.asarray(qe_wavelengths)
+        if qe is not None:
+            qe = np.asarray(qe)
+
         if ihaze not in PybsmOTFPerturber.ihaze_values:
             raise ValueError(
                 f"Invalid ihaze value ({ihaze}) must be in {PybsmOTFPerturber.ihaze_values}",

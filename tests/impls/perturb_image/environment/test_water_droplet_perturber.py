@@ -322,8 +322,9 @@ class TestWaterDropletPerturberUtils:
         recursive: int,
     ) -> None:
         """Regression testing for the `get_random_points_within_min_dist` util function."""
+        _rng = np.random.default_rng(2345)
         rand_points = WaterDropletPerturber.get_random_points_within_min_dist(
-            rng=rng,
+            rng=_rng,
             n=n,
             scale=scale,
             min_dst=min_dst,

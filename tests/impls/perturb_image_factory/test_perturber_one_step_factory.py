@@ -1,82 +1,128 @@
+"""Tests for PerturberOneStepFactory.
+
+PerturberOneStepFactory is a convenience factory that creates exactly one
+perturber with a single theta value. It extends PerturberStepFactory.
+
+Note: This factory always produces exactly one perturber, so there are no
+empty factory cases.
+
+Test Cases (in addition to shared base class tests):
+    Iteration (Valid)
+        - Single positive value
+        - Zero value
+        - Negative value
+
+    to_int Parameter (parametrized)
+        - to_int=True returns integer theta value
+        - to_int=False returns float theta value
+        - to_int=True truncates fractional value
+"""
+
 from __future__ import annotations
 
-import json
-from pathlib import Path
+from collections.abc import Sequence
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
+from typing import Any
 
+import numpy as np
 import pytest
-from smqtk_core.configuration import (
-    configuration_test_helper,
-    from_config_dict,
-    to_config_dict,
-)
-from syrupy.assertion import SnapshotAssertion
+from typing_extensions import override
 
 from nrtk.impls.perturb_image_factory import PerturberOneStepFactory
-from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.fakes import FakePerturber
+from tests.impls.perturb_image_factory import _TestPerturbImageFactory
 
 
-class TestPerturberStepFactory:
+class TestPerturberOneStepFactory(_TestPerturbImageFactory):
+    """Tests for PerturberOneStepFactory. See module docstring for test cases."""
+
+    default_factory_kwargs = {
+        "theta_key": "param1",
+        "theta_value": 5.0,
+    }
+
+    @override
+    def _make_factory(self, **kwargs: Any) -> PerturberOneStepFactory:
+        """Create a factory with FakePerturber pre-filled."""
+        return PerturberOneStepFactory(perturber=FakePerturber, **kwargs)
+
+    # ========================= Iteration (Valid) ==========================
+
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "theta_value"),
+        ("factory_kwargs", "expected"),
         [
-            (FakePerturber, "param1", 1.0),
-            (FakePerturber, "param2", 3.0),
+            pytest.param(
+                {"theta_key": "param1", "theta_value": 5.0},
+                [5.0],
+                id="single value",
+            ),
+            pytest.param(
+                {"theta_key": "param1", "theta_value": 0.0},
+                [0.0],
+                id="zero value",
+            ),
+            pytest.param(
+                {"theta_key": "param1", "theta_value": -5.0},
+                [-5.0],
+                id="negative value",
+            ),
         ],
     )
-    def test_iteration(
-        self,
-        snapshot: SnapshotAssertion,
-        perturber: type[PerturbImage],
-        theta_key: str,
-        theta_value: float,
-    ) -> None:
-        """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = PerturberOneStepFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
-        assert len(factory) == 1
-        assert factory[0].get_config() == snapshot
+    @override
+    def test_iteration_valid(self, factory_kwargs: dict[str, Any], expected: Sequence[Any]) -> None:
+        super().test_iteration_valid(factory_kwargs=factory_kwargs, expected=expected)
+
+    # ========================= Iteration (Empty) ==========================
+
+    @pytest.mark.skip(reason="OneStepFactory always produces exactly one perturber; no empty cases possible")
+    @override
+    def test_iteration_empty(self, empty_factory_kwargs: dict[str, Any]) -> None:  # pragma: no cover
+        pass
+
+    # ============================== Indexing ==============================
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "theta_value"),
-        [(FakePerturber, "param1", 1.0), (FakePerturber, "param2", 3.0)],
+        ("idx", "expected_val", "expectation"),
+        [
+            pytest.param(0, 5.0, does_not_raise(), id="index 0"),
+            pytest.param(1, None, pytest.raises(IndexError), id="out of bounds"),
+            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+        ],
     )
-    def test_configuration(self, perturber: type[PerturbImage], theta_key: str, theta_value: float) -> None:
-        """Test configuration stability."""
-        inst = PerturberOneStepFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
-        for i in configuration_test_helper(inst):
-            assert i.perturber == perturber
-            assert i.theta_key == theta_key
-            assert i.theta_value == theta_value
-            assert i.stop == theta_value + 0.1
-            assert i.step == 1.0
-            assert not i.to_int
-            assert i.theta_value in i.thetas
-            assert i.stop not in i.thetas
+    @override
+    def test_indexing(
+        self,
+        idx: int,
+        expected_val: float | None,
+        expectation: AbstractContextManager,
+    ) -> None:
+        super().test_indexing(idx=idx, expected_val=expected_val, expectation=expectation)
+
+    # ========================== to_int Parameter ==========================
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_key", "theta_value"),
-        [(FakePerturber, "param1", 1.0), (FakePerturber, "param2", 3.0)],
+        ("to_int", "theta_value", "expected_type", "expected_value"),
+        [
+            pytest.param(True, 5.0, int, 5, id="to_int=True returns integer"),
+            pytest.param(False, 5.0, float, 5.0, id="to_int=False returns float"),
+            pytest.param(True, 5.7, int, 5, id="to_int=True truncates fractional"),
+        ],
     )
-    def test_hydration(
+    def test_to_int_returns_correct_type(
         self,
-        tmp_path: Path,
-        perturber: type[PerturbImage],
-        theta_key: str,
+        to_int: bool,
         theta_value: float,
+        expected_type: type,
+        expected_value: float,
     ) -> None:
-        """Test configuration hydration using from_config_dict."""
-        original_factory = PerturberOneStepFactory(perturber=perturber, theta_key=theta_key, theta_value=theta_value)
-
-        original_factory_config = original_factory.get_config()
-
-        config_file_path = tmp_path / "config.json"
-        with open(str(config_file_path), "w") as f:
-            json.dump(to_config_dict(original_factory), f)
-
-        with open(str(config_file_path)) as config_file:
-            config = json.load(config_file)
-            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
-            hydrated_factory_config = hydrated_factory.get_config()
-
-            assert original_factory_config == hydrated_factory_config
+        """to_int parameter controls whether theta values are int or float."""
+        factory = self._make_factory(
+            theta_key="param1",
+            theta_value=theta_value,
+            to_int=to_int,
+        )
+        thetas = factory.thetas
+        assert len(thetas) == 1
+        assert isinstance(thetas[0], expected_type)
+        assert np.isclose(thetas[0], expected_value)

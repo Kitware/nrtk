@@ -18,8 +18,7 @@ __all__ = ["PerturberMultivariateFactory"]
 from collections.abc import Iterable, Iterator, Sequence
 from typing import Any
 
-import numpy as np
-from typing_extensions import Self, override
+from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
@@ -78,9 +77,31 @@ class PerturberMultivariateFactory(PerturbImageFactory):
                 Values to use for each perturbation parameter.
             perturber_kwargs:
                 Default kwargs to be used by the perturber. Defaults to {}.
+
+        Raises:
+            TypeError: If perturber is an instance instead of a type.
+            ValueError: If theta_keys is empty or theta_keys and thetas have different lengths.
         """
+        # Validate perturber is a type, not an instance
+        if not isinstance(perturber, type):
+            raise TypeError("Passed a perturber instance, expected type")
+
+        # Convert theta_keys to list to allow len() and reuse
+        theta_keys_list = list(theta_keys)
+
+        # Validate theta_keys is not empty
+        if len(theta_keys_list) == 0:
+            raise ValueError("theta_keys must not be empty; at least one parameter key is required")
+
+        # Validate theta_keys and thetas have same length
+        if len(theta_keys_list) != len(thetas):
+            raise ValueError(
+                f"theta_keys and thetas must have the same length; "
+                f"got {len(theta_keys_list)} keys and {len(thetas)} theta sequences",
+            )
+
         self.perturber = perturber
-        self.theta_keys = theta_keys
+        self.theta_keys = theta_keys_list
         self._thetas = thetas
 
         top = [len(entry) for entry in self.thetas]
@@ -129,9 +150,9 @@ class PerturberMultivariateFactory(PerturbImageFactory):
             PerturbImage: The configured `PerturbImage` instance.
 
         Raises:
-            IndexError: If the index is out of range.
+            IndexError: If the index is out of range or negative.
         """
-        if idx >= len(self.sets):
+        if idx < 0 or idx >= len(self.sets):
             raise IndexError("Index out of range")
         kwargs = {k: self.thetas[i][self.sets[idx][i]] for i, k in enumerate(self.theta_keys)}
 
@@ -152,48 +173,6 @@ class PerturberMultivariateFactory(PerturbImageFactory):
             str: The parameter key name, "params".
         """
         return "params"
-
-    @classmethod
-    @override
-    def from_config(cls, config_dict: dict[str, Any], merge_default: bool = True) -> Self:
-        """Rehydrates an object instance from a serializable config dictionary.
-
-        Args:
-            cls:
-                The class of the object which will be instantiated.
-            config_dict:
-                Dictionary of serializable values that will be included in the object instance.
-            merge_default:
-                Indicator variable describing whether or not to use default config values. Defaults to True.
-
-        Returns:
-            Instantiation of PerturberMultivariateFactory.
-        """
-        config_dict = dict(config_dict)
-
-        # Convert input data to expected constructor types
-        opt_trans_wavelengths = config_dict["perturber_kwargs"].get("opt_trans_wavelengths", None)
-        if opt_trans_wavelengths is not None:
-            config_dict["perturber_kwargs"]["opt_trans_wavelengths"] = np.array(
-                config_dict["perturber_kwargs"]["opt_trans_wavelengths"],
-            )
-
-        # Non-JSON type arguments with defaults (so they might not be there)
-        optics_transmission = config_dict["perturber_kwargs"].get("optics_transmission", None)
-        if optics_transmission is not None:
-            config_dict["perturber_kwargs"]["optics_transmission"] = np.array(
-                config_dict["perturber_kwargs"]["optics_transmission"],
-            )
-        qe_wavelengths = config_dict["perturber_kwargs"].get("qe_wavelengths", None)
-        if qe_wavelengths is not None:
-            config_dict["perturber_kwargs"]["qe_wavelengths"] = np.array(
-                config_dict["perturber_kwargs"]["qe_wavelengths"],
-            )
-        qe = config_dict["perturber_kwargs"].get("qe", None)
-        if qe is not None:
-            config_dict["perturber_kwargs"]["qe"] = np.array(config_dict["perturber_kwargs"]["qe"])
-
-        return super().from_config(config_dict, merge_default=merge_default)
 
     @override
     def get_config(self) -> dict[str, Any]:

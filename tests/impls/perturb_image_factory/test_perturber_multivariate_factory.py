@@ -1,352 +1,249 @@
-import json
+"""Tests for PerturberMultivariateFactory.
+
+PerturberMultivariateFactory creates perturbers with theta values as a cartesian
+product of multiple parameter sequences. Unlike other factories, it varies
+multiple parameters simultaneously using theta_keys (plural).
+
+Note: This class inherits from _TestPerturbImageFactory but overrides several
+tests because:
+    1. Uses theta_keys (list) instead of theta_key (str)
+    2. Produces cartesian product combinations rather than linear sequences
+    3. Has different thetas structure (list of lists vs single list)
+    4. Has additional perturber_kwargs parameter
+
+Test Cases (in addition to shared base class tests):
+    Iteration (Valid)
+        - Single key produces linear sequence
+        - Two keys produce cartesian product (2x2)
+        - Three keys produce cartesian product (2x2x2)
+
+    Iteration (Empty)
+        - Empty theta values [[]] produces empty factory
+
+    Indexing
+        - First index returns correct combination
+        - Last index returns correct combination
+        - Beyond bounds raises IndexError
+        - Negative index raises IndexError
+
+    Input Validation
+        - Empty theta_keys raises ValueError
+        - Mismatched theta_keys/thetas lengths raises ValueError
+
+    perturber_kwargs Parameter
+        - perturber_kwargs are passed to created perturbers
+        - Theta values override perturber_kwargs for same key
+
+    Length / Cartesian Product
+        - Length equals number of values for single key
+        - Length equals product of all value list lengths
+
+    theta_key Property
+        - Returns "params" (fixed value for multivariate)
+
+    Edge Cases
+        - Single value per key (no variation) works
+"""
+
+from __future__ import annotations
+
 from collections.abc import Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from pathlib import Path
 from typing import Any
 
-import numpy as np
 import pytest
-from smqtk_core.configuration import (
-    configuration_test_helper,
-    from_config_dict,
-    to_config_dict,
-)
+from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
 from nrtk.impls.perturb_image_factory import PerturberMultivariateFactory
-from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.fakes import FakePerturber
-from tests.utils.test_pybsm import create_sample_sensor_and_scenario
+from tests.impls.perturb_image_factory import _TestPerturbImageFactory
 
 
-class TestPerturberMultivariateFactory:
+class TestPerturberMultivariateFactory(_TestPerturbImageFactory):
+    """Tests for PerturberMultivariateFactory. See module docstring for test cases."""
+
+    default_factory_kwargs: dict[str, Any] = {
+        "theta_keys": ["param1", "param2"],
+        "thetas": [[1, 3], [2, 4]],
+    }
+
+    @override
+    def _make_factory(self, **kwargs: Any) -> PerturberMultivariateFactory:
+        """Create a factory with FakePerturber pre-filled."""
+        return PerturberMultivariateFactory(perturber=FakePerturber, **kwargs)
+
+    # ========================= Iteration (Valid) ==========================
+    # Override: multivariate uses theta_keys (plural) and cartesian products
+
     @pytest.mark.parametrize(
-        ("perturber", "theta_keys", "thetas", "expected"),
+        ("factory_kwargs", "expected"),
         [
-            (
-                FakePerturber,
-                ["param1"],
-                [[1, 3, 5]],
-                ((1,), (3,), (5,)),
+            pytest.param(
+                {"theta_keys": ["param1"], "thetas": [[1, 2, 3]]},
+                [(1,), (2,), (3,)],
+                id="single key",
             ),
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-                ((1, 2), (1, 4), (3, 2), (3, 4)),
+            pytest.param(
+                {"theta_keys": ["param1", "param2"], "thetas": [[1, 3], [2, 4]]},
+                [(1, 2), (1, 4), (3, 2), (3, 4)],
+                id="cartesian product 2x2",
+            ),
+            pytest.param(
+                {"theta_keys": ["param1", "param2", "extra"], "thetas": [[1, 2], [3, 4], [5, 6]]},
+                [
+                    (1, 3, 5),
+                    (1, 3, 6),
+                    (1, 4, 5),
+                    (1, 4, 6),
+                    (2, 3, 5),
+                    (2, 3, 6),
+                    (2, 4, 5),
+                    (2, 4, 6),
+                ],
+                id="cartesian product 2x2x2",
             ),
         ],
     )
-    def test_iteration(
+    @override
+    def test_iteration_valid(
         self,
-        perturber: type[PerturbImage],
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        expected: tuple[tuple[int, ...]],
+        factory_kwargs: dict[str, Any],
+        expected: Sequence[tuple[Any, ...]],
     ) -> None:
-        """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        factory = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
-        assert len(expected) == len(factory)
-        for idx, p in enumerate(factory):
-            for count, _ in enumerate(theta_keys):
-                perturb_cfg = p.get_config()
-                assert perturb_cfg[theta_keys[count]] == expected[idx][count]
+        """Iteration produces correct cartesian product of theta values."""
+        factory = self._make_factory(**factory_kwargs)
+        theta_keys = factory_kwargs["theta_keys"]
+
+        assert len(list(factory)) == len(expected)
+        for perturber, expected_vals in zip(factory, expected, strict=True):
+            assert isinstance(perturber, FakePerturber)
+            config = perturber.get_config()
+            for key, expected_val in zip(theta_keys, expected_vals, strict=True):
+                assert config[key] == expected_val
+
+    # ========================= Iteration (Empty) ==========================
 
     @pytest.mark.parametrize(
-        ("perturber", "theta_keys", "thetas", "idx", "expected_val", "expectation"),
+        "empty_factory_kwargs",
         [
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-                0,
-                (1, 2),
-                does_not_raise(),
-            ),
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-                3,
-                (3, 4),
-                does_not_raise(),
-            ),
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-                4,
-                (-1, -1),
-                pytest.raises(IndexError),
-            ),
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-                -1,
-                (3, 4),
-                does_not_raise(),
+            pytest.param(
+                {"theta_keys": ["param1"], "thetas": [[]]},
+                id="empty thetas",
             ),
         ],
-        ids=["first idx", "last idx", "idx == len", "neg idx"],
     )
-    def test_indexing(
+    @override
+    def test_iteration_empty(self, empty_factory_kwargs: dict[str, Any]) -> None:
+        super().test_iteration_empty(empty_factory_kwargs=empty_factory_kwargs)
+
+    # ============================== Indexing ==============================
+    # Multivariate checks multiple keys per perturber, different signature than base
+
+    @pytest.mark.parametrize(
+        ("idx", "expected_vals", "expectation"),
+        [
+            pytest.param(0, (1, 2), does_not_raise(), id="first"),
+            pytest.param(3, (3, 4), does_not_raise(), id="last"),
+            pytest.param(4, None, pytest.raises(IndexError), id="out of bounds"),
+            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+        ],
+    )
+    def test_indexing_cartesian(
         self,
-        perturber: type[PerturbImage],
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
         idx: int,
-        expected_val: tuple[int, ...],
+        expected_vals: tuple[int, ...] | None,
         expectation: AbstractContextManager,
     ) -> None:
-        """Ensure it is possible to access a perturber instance via indexing."""
-        factory = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
+        """Indexing returns the correct perturber with cartesian product values."""
+        factory = self._make_factory(**self.default_factory_kwargs)
+        theta_keys = self.default_factory_kwargs["theta_keys"]
         with expectation:
-            for count, _ in enumerate(theta_keys):
-                perturb_cfg = factory[idx].get_config()
-                assert perturb_cfg[theta_keys[count]] == expected_val[count]
+            config = factory[idx].get_config()
+            assert expected_vals is not None  # For type narrowing
+            for key, expected in zip(theta_keys, expected_vals, strict=False):
+                assert config[key] == expected
 
-    @pytest.mark.parametrize(
-        ("perturber", "theta_keys", "thetas", "expected_sets"),
-        [
-            (FakePerturber, ["param1"], [[1, 2, 3, 4]], [[0], [1], [2], [3]]),
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-                [[0, 0], [0, 1], [1, 0], [1, 1]],
-            ),
-        ],
-    )
-    def test_configuration(
-        self,
-        perturber: type[PerturbImage],
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        expected_sets: Sequence[Sequence[int]],
-    ) -> None:
-        """Test configuration stability."""
-        inst = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
-
-        for i in configuration_test_helper(inst):
-            assert i.theta_keys == theta_keys
-            assert i.thetas == thetas
-            assert i.sets == expected_sets
-
-    @pytest.mark.parametrize(
-        ("perturber", "theta_keys", "thetas"),
-        [
-            (
-                FakePerturber,
-                ["param1"],
-                [[1, 2, 3, 4]],
-            ),
-            (
-                FakePerturber,
-                ["param1", "param2"],
-                [[1, 3], [2, 4]],
-            ),
-        ],
-    )
-    def test_hydration(
-        self,
-        perturber: type[PerturbImage],
-        tmp_path: Path,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-    ) -> None:
-        """Test configuration hydration using from_config_dict."""
-        original_factory = PerturberMultivariateFactory(perturber=perturber, theta_keys=theta_keys, thetas=thetas)
-
-        original_factory_config = original_factory.get_config()
-
-        config_file_path = tmp_path / "config.json"
-        with open(str(config_file_path), "w") as f:
-            json.dump(to_config_dict(original_factory), f)
-
-        with open(str(config_file_path)) as config_file:
-            config = json.load(config_file)
-            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
-            hydrated_factory_config = hydrated_factory.get_config()
-
-            assert original_factory_config == hydrated_factory_config
-
-
-@pytest.mark.skipif(
-    not PybsmPerturber.is_usable(),
-    reason="not PybsmPerturber.is_usable()",
-)
-class TestPerturberStepFactory:
-    @pytest.mark.parametrize(
-        ("theta_keys", "thetas", "expected"),
-        [
-            (
-                ["altitude"],
-                [[1000, 2000, 3000, 4000]],
-                ((1000,), (2000,), (3000,), (4000,)),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [0.5, 0.75]],
-                ((1000, 0.5), (1000, 0.75), (2000, 0.5), (2000, 0.75)),
-            ),
-        ],
-    )
-    def test_iteration(
-        self,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        expected: tuple[tuple[int, ...]],
-    ) -> None:
-        """Ensure factory can be iterated upon and the varied parameter matches expectations."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
-
-        factory = PerturberMultivariateFactory(
-            perturber=PybsmPerturber,
-            theta_keys=theta_keys,
-            thetas=thetas,
-            perturber_kwargs=sensor_and_scenario,
-        )
-        assert len(expected) == len(factory)
-        for idx, p in enumerate(factory):
-            for count, theta_key in enumerate(theta_keys):
-                perturb_cfg = p.get_config()
-                if theta_key in perturb_cfg:
-                    assert perturb_cfg[theta_key] == expected[idx][count]
-
-    @pytest.mark.parametrize(
-        ("theta_keys", "thetas", "idx", "expected_val", "expectation"),
-        [
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [0.5, 0.75]],
-                0,
-                (1000, 0.5),
-                does_not_raise(),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [10000, 20000]],
-                3,
-                (2000, 20000),
-                does_not_raise(),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [10000, 20000]],
-                4,
-                (-1, -1),
-                pytest.raises(IndexError),
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [10000, 20000]],
-                -1,
-                (2000, 20000),
-                does_not_raise(),
-            ),
-        ],
-        ids=["first idx", "last idx", "idx == len", "neg idx"],
-    )
+    @pytest.mark.skip(reason="Multivariate uses theta_keys (multiple), different signature")
+    @override
     def test_indexing(
         self,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
         idx: int,
-        expected_val: tuple[int, ...],
+        expected_val: float | None,
         expectation: AbstractContextManager,
     ) -> None:
-        """Ensure it is possible to access a perturber instance via indexing."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        pass  # pragma: no cover
 
-        factory = PerturberMultivariateFactory(
-            perturber=PybsmPerturber,
-            theta_keys=theta_keys,
-            thetas=thetas,
-            perturber_kwargs=sensor_and_scenario,
+    # =========================== Property Tests ===========================
+    # Override: len(factory) is cartesian product, not len(thetas)
+
+    def test_len_is_cartesian_product(self) -> None:
+        """len(factory) equals product of all theta list lengths."""
+        factory = self._make_factory(**self.default_factory_kwargs)
+        # default_factory_kwargs has thetas=[[1, 3], [2, 4]] -> 2 * 2 = 4
+        assert len(factory) == 4
+
+    @pytest.mark.skip(reason="Multivariate len is cartesian product, not len(thetas)")
+    @override
+    def test_len_matches_thetas_length(self) -> None:
+        pass  # pragma: no cover
+
+    # ========================== Input Validation ==========================
+
+    def test_rejects_empty_theta_keys(self) -> None:
+        """Empty theta_keys raises ValueError."""
+        with pytest.raises(ValueError, match=r"theta_keys.*empty|at least one"):
+            self._make_factory(theta_keys=list(), thetas=list())
+
+    def test_rejects_mismatched_theta_keys_and_thetas_length(self) -> None:
+        """Mismatched theta_keys/thetas lengths raises ValueError."""
+        with pytest.raises(ValueError, match=r"length|must have.*same"):
+            self._make_factory(
+                theta_keys=["param1", "param2"],
+                thetas=[[1, 2]],  # only one list, but two keys
+            )
+
+    # ===================== perturber_kwargs Parameter =====================
+
+    def test_perturber_kwargs_passed_to_perturber(self) -> None:
+        """perturber_kwargs are passed to created perturbers."""
+        factory = self._make_factory(
+            theta_keys=["param1"],
+            thetas=[[1, 2]],
+            perturber_kwargs={"param2": 99},
         )
-        with expectation:
-            for count, theta_key in enumerate(theta_keys):
-                perturb_cfg = factory[idx].get_config()
-                if theta_key in perturb_cfg:
-                    assert perturb_cfg[theta_key] == expected_val[count]
+        perturber = factory[0]
+        config = perturber.get_config()
+        assert config["param1"] == 1
+        assert config["param2"] == 99
 
-    @pytest.mark.parametrize(
-        ("theta_keys", "thetas", "expected_sets"),
-        [
-            (["altitude"], [[1000, 2000, 3000, 4000]], [[0], [1], [2], [3]]),
-            (
-                ["altitude", "ground_range"],
-                [[1000, 2000], [10000, 20000]],
-                [[0, 0], [0, 1], [1, 0], [1, 1]],
-            ),
-        ],
-    )
-    def test_configuration(
-        self,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-        expected_sets: Sequence[Sequence[int]],
-    ) -> None:
-        """Test configuration stability."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
-
-        inst = PerturberMultivariateFactory(
-            perturber=PybsmPerturber,
-            theta_keys=theta_keys,
-            thetas=thetas,
-            perturber_kwargs=sensor_and_scenario,
+    def test_theta_values_override_perturber_kwargs(self) -> None:
+        """Theta values override perturber_kwargs for same key."""
+        factory = self._make_factory(
+            theta_keys=["param1"],
+            thetas=[[10, 20]],
+            perturber_kwargs={"param1": 999},  # should be overridden
         )
+        perturber = factory[0]
+        config = perturber.get_config()
+        assert config["param1"] == 10  # theta value, not perturber_kwargs
 
-        for i in configuration_test_helper(inst):
-            assert i.theta_keys == theta_keys
-            assert i.thetas == thetas
+    # ========================= theta_key Property =========================
 
-            for param_name, param_value in i.perturber_kwargs.items():
-                if isinstance(param_value, np.ndarray):
-                    assert np.allclose(sensor_and_scenario[param_name], param_value)
-                else:
-                    assert sensor_and_scenario[param_name] == param_value
+    def test_theta_key_returns_params(self) -> None:
+        """theta_key property returns "params" (fixed value for multivariate)."""
+        factory = self._make_factory(**self.default_factory_kwargs)
+        assert factory.theta_key == "params"
 
-            assert i.sets == expected_sets
+    # ============================= Edge Cases =============================
 
-    @pytest.mark.parametrize(
-        ("theta_keys", "thetas"),
-        [
-            (
-                ["altitude"],
-                [[1000, 2000, 3000, 4000]],
-            ),
-            (
-                ["altitude", "D"],
-                [[1000, 2000], [0.5, 0.75]],
-            ),
-        ],
-    )
-    def test_hydration(
-        self,
-        tmp_path: Path,
-        theta_keys: Sequence[str],
-        thetas: Sequence[Any],
-    ) -> None:
-        """Test configuration hydration using from_config_dict."""
-        original_factory = PerturberMultivariateFactory(
-            perturber=PybsmPerturber,
-            theta_keys=theta_keys,
-            thetas=thetas,
+    def test_single_value_per_key(self) -> None:
+        """Single value per key (no variation) works."""
+        factory = self._make_factory(
+            theta_keys=["param1", "param2"],
+            thetas=[[1], [2]],
         )
-
-        original_factory_config = original_factory.get_config()
-
-        config_file_path = tmp_path / "config.json"
-        with open(str(config_file_path), "w") as f:
-            json.dump(to_config_dict(original_factory), f)
-
-        with open(str(config_file_path)) as config_file:
-            config = json.load(config_file)
-            hydrated_factory = from_config_dict(config=config, type_iter=PerturbImageFactory.get_impls())
-            hydrated_factory_config = hydrated_factory.get_config()
-
-            assert original_factory_config == hydrated_factory_config
+        assert len(factory) == 1
+        config = factory[0].get_config()
+        assert config["param1"] == 1
+        assert config["param2"] == 2
