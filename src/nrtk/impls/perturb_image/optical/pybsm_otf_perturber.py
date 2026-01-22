@@ -23,6 +23,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.utils._constants import DEFAULT_PYBSM_PARAMS
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -36,45 +37,6 @@ pybsm_available: bool = import_guard(
 from pybsm.simulation import ImageSimulator  # noqa: E402
 from pybsm.simulation.scenario import Scenario  # noqa: E402
 from pybsm.simulation.sensor import Sensor  # noqa: E402
-
-# Default parameter values used in __init__ and get_default_config
-DEFAULT_PARAMS: dict[str, Any] = {
-    # Sensor parameters
-    "sensor_name": "Sensor",
-    "D": 275e-3,
-    "f": 4,
-    "p_x": 0.008e-3,
-    "p_y": None,
-    "opt_trans_wavelengths": np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
-    "optics_transmission": None,
-    "eta": 0.0,
-    "w_x": None,
-    "w_y": None,
-    "int_time": 1.0,
-    "n_tdi": 1.0,
-    "dark_current": 0.0,
-    "read_noise": 0.0,
-    "max_n": int(100.0e6),
-    "bit_depth": 100.0,
-    "max_well_fill": 1.0,
-    "s_x": 0.0,
-    "s_y": 0.0,
-    "qe_wavelengths": None,
-    "qe": None,
-    # Scenario parameters
-    "scenario_name": "Scenario",
-    "ihaze": 1,
-    "altitude": 9000,
-    "ground_range": 0,
-    "aircraft_speed": 0.0,
-    "target_reflectance": 0.15,
-    "target_temperature": 295.0,
-    "background_reflectance": 0.07,
-    "background_temperature": 293.0,
-    "ha_wind_speed": 21.0,
-    "cn2_at_1m": 1.7e-14,
-    "interp": True,
-}
 
 
 class PybsmOTFPerturber(PerturbImage, ABC):
@@ -112,45 +74,45 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     def __init__(  # noqa: C901
         self,
         *,
-        sensor_name: str = DEFAULT_PARAMS["sensor_name"],
-        D: float = DEFAULT_PARAMS["D"],  # noqa:N803
-        f: float = DEFAULT_PARAMS["f"],
-        p_x: float = DEFAULT_PARAMS["p_x"],
-        p_y: float | None = DEFAULT_PARAMS["p_y"],  # Defaults to None since the default value is dependent on p_x
-        opt_trans_wavelengths: np.ndarray[Any, Any] = DEFAULT_PARAMS["opt_trans_wavelengths"],
-        optics_transmission: np.ndarray[Any, Any] | None = DEFAULT_PARAMS[
+        sensor_name: str = DEFAULT_PYBSM_PARAMS["sensor_name"],
+        D: float = DEFAULT_PYBSM_PARAMS["D"],  # noqa:N803
+        f: float = DEFAULT_PYBSM_PARAMS["f"],
+        p_x: float = DEFAULT_PYBSM_PARAMS["p_x"],
+        p_y: float | None = DEFAULT_PYBSM_PARAMS["p_y"],  # Defaults to None since the default value is dependent on p_x
+        opt_trans_wavelengths: np.ndarray[Any, Any] = DEFAULT_PYBSM_PARAMS["opt_trans_wavelengths"],
+        optics_transmission: np.ndarray[Any, Any] | None = DEFAULT_PYBSM_PARAMS[
             "optics_transmission"
         ],  # Defaults to None since the default value is dependent on opt_trans_wavelengths
-        eta: float = DEFAULT_PARAMS["eta"],
-        w_x: float | None = DEFAULT_PARAMS["w_x"],  # Defaults to None since the default value is dependent on p_x
-        w_y: float | None = DEFAULT_PARAMS["w_y"],  # Defaults to None since the default value is dependent on p_x
-        int_time: float = DEFAULT_PARAMS["int_time"],
-        n_tdi: float = DEFAULT_PARAMS["n_tdi"],
-        dark_current: float = DEFAULT_PARAMS["dark_current"],
-        read_noise: float = DEFAULT_PARAMS["read_noise"],
-        max_n: int = DEFAULT_PARAMS["max_n"],
-        bit_depth: float = DEFAULT_PARAMS["bit_depth"],
-        max_well_fill: float = DEFAULT_PARAMS["max_well_fill"],
-        s_x: float = DEFAULT_PARAMS["s_x"],
-        s_y: float = DEFAULT_PARAMS["s_y"],
-        qe_wavelengths: np.ndarray[Any, Any] | None = DEFAULT_PARAMS[
+        eta: float = DEFAULT_PYBSM_PARAMS["eta"],
+        w_x: float | None = DEFAULT_PYBSM_PARAMS["w_x"],  # Defaults to None since the default value is dependent on p_x
+        w_y: float | None = DEFAULT_PYBSM_PARAMS["w_y"],  # Defaults to None since the default value is dependent on p_x
+        int_time: float = DEFAULT_PYBSM_PARAMS["int_time"],
+        n_tdi: float = DEFAULT_PYBSM_PARAMS["n_tdi"],
+        dark_current: float = DEFAULT_PYBSM_PARAMS["dark_current"],
+        read_noise: float = DEFAULT_PYBSM_PARAMS["read_noise"],
+        max_n: int = DEFAULT_PYBSM_PARAMS["max_n"],
+        bit_depth: float = DEFAULT_PYBSM_PARAMS["bit_depth"],
+        max_well_fill: float = DEFAULT_PYBSM_PARAMS["max_well_fill"],
+        s_x: float = DEFAULT_PYBSM_PARAMS["s_x"],
+        s_y: float = DEFAULT_PYBSM_PARAMS["s_y"],
+        qe_wavelengths: np.ndarray[Any, Any] | None = DEFAULT_PYBSM_PARAMS[
             "qe_wavelengths"
         ],  # Defaults to None since the default value is dependent on opt_trans_wavelengths
-        qe: np.ndarray[Any, Any] | None = DEFAULT_PARAMS[
+        qe: np.ndarray[Any, Any] | None = DEFAULT_PYBSM_PARAMS[
             "qe"
         ],  # Defaults to None since the default value is dependent on opt_trans_wavelengths
-        scenario_name: str = DEFAULT_PARAMS["scenario_name"],
-        ihaze: int = DEFAULT_PARAMS["ihaze"],
-        altitude: float = DEFAULT_PARAMS["altitude"],
-        ground_range: float = DEFAULT_PARAMS["ground_range"],
-        aircraft_speed: float = DEFAULT_PARAMS["aircraft_speed"],
-        target_reflectance: float = DEFAULT_PARAMS["target_reflectance"],
-        target_temperature: float = DEFAULT_PARAMS["target_temperature"],
-        background_reflectance: float = DEFAULT_PARAMS["background_reflectance"],
-        background_temperature: float = DEFAULT_PARAMS["background_temperature"],
-        ha_wind_speed: float = DEFAULT_PARAMS["ha_wind_speed"],
-        cn2_at_1m: float = DEFAULT_PARAMS["cn2_at_1m"],
-        interp: bool = DEFAULT_PARAMS["interp"],
+        scenario_name: str = DEFAULT_PYBSM_PARAMS["scenario_name"],
+        ihaze: int = DEFAULT_PYBSM_PARAMS["ihaze"],
+        altitude: float = DEFAULT_PYBSM_PARAMS["altitude"],
+        ground_range: float = DEFAULT_PYBSM_PARAMS["ground_range"],
+        aircraft_speed: float = DEFAULT_PYBSM_PARAMS["aircraft_speed"],
+        target_reflectance: float = DEFAULT_PYBSM_PARAMS["target_reflectance"],
+        target_temperature: float = DEFAULT_PYBSM_PARAMS["target_temperature"],
+        background_reflectance: float = DEFAULT_PYBSM_PARAMS["background_reflectance"],
+        background_temperature: float = DEFAULT_PYBSM_PARAMS["background_temperature"],
+        ha_wind_speed: float = DEFAULT_PYBSM_PARAMS["ha_wind_speed"],
+        cn2_at_1m: float = DEFAULT_PYBSM_PARAMS["cn2_at_1m"],
+        interp: bool = DEFAULT_PYBSM_PARAMS["interp"],
         **kwargs: Any,
     ) -> None:
         """Initialize the pybsm OTF perturber.
