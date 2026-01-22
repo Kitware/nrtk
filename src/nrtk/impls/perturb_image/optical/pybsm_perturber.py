@@ -32,6 +32,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
+from nrtk.utils._constants import DEFAULT_PYBSM_PARAMS
 from nrtk.utils._exceptions import PyBSMImportError
 from nrtk.utils._import_guard import import_guard
 
@@ -39,11 +40,6 @@ from nrtk.utils._import_guard import import_guard
 pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
 
 from pybsm.simulation import ImageSimulator, SystemOTFSimulator  # noqa: E402
-
-DEFAULT_PARAMETERS: dict[str, Any] = {
-    "reflectance_range": np.array([0.05, 0.5]),  # It is bad standards to call np.array within argument defaults
-    "opt_trans_wavelengths": np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
-}
 
 
 class PybsmPerturber(PybsmOTFPerturber):
@@ -63,14 +59,14 @@ class PybsmPerturber(PybsmOTFPerturber):
     def __init__(
         self,
         *,
-        reflectance_range: np.ndarray[Any, Any] = DEFAULT_PARAMETERS["reflectance_range"],
+        reflectance_range: np.ndarray[Any, Any] = DEFAULT_PYBSM_PARAMS["reflectance_range"],
         rng_seed: int | None = 1,
         sensor_name: str = "Sensor",
         D: float = 275e-3,  # noqa:N803
         f: float = 4,
         p_x: float = 0.008e-3,
         p_y: float | None = None,  # Defaults to None since the default value is dependent on p_x
-        opt_trans_wavelengths: np.ndarray[Any, Any] = DEFAULT_PARAMETERS["opt_trans_wavelengths"],
+        opt_trans_wavelengths: np.ndarray[Any, Any] = DEFAULT_PYBSM_PARAMS["opt_trans_wavelengths"],
         optics_transmission: np.ndarray[Any, Any]
         | None = None,  # Defaults to None since the default value is dependent on opt_trans_wavelengths
         eta: float = 0.0,
