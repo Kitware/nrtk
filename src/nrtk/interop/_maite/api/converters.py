@@ -27,8 +27,10 @@ def build_factory(data: NrtkPerturbInputSchema) -> PerturbImageFactory:
             dictionary of Schema from schema.py
 
     Raises:
-        FileNotFoundError if data.config_file does not exists
-        ValueError if data.config_file does not have PerturberFactory key
+        FileNotFoundError:
+            if data.config_file does not exists
+        ValueError:
+            if data.config_file does not have PerturberFactory key
     """
     if not os.path.isfile(data.config_file):
         raise FileNotFoundError(f"Config file at {data.config_file} was not found")
@@ -49,8 +51,10 @@ def load_COCOMAITE_dataset(  # noqa: N802
             dictionary of Schema from schema.py
 
     Raises:
-        KWCocoImportError: KWCoco is not available
-        ValueError: data.image_metadata does not have "id" key
+        KWCocoImportError:
+            KWCoco is not available
+        ValueError:
+            data.image_metadata does not have "id" key
     """
     if not is_usable:
         raise KWCocoImportError

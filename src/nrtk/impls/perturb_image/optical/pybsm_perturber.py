@@ -209,9 +209,12 @@ class PybsmPerturber(PybsmOTFPerturber):
 
 
         Raises:
-            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            ValueError: If reflectance_range length != 2
-            ValueError: If reflectance_range not strictly ascending
+            ImportError:
+                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ValueError:
+                If reflectance_range length != 2
+            ValueError:
+                If reflectance_range not strictly ascending
         """
         # Convert list inputs to numpy arrays (needed when loading from JSON config)
         reflectance_range = np.asarray(reflectance_range)

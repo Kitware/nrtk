@@ -82,9 +82,12 @@ def handle_aukus_post(data: AukusDatasetSchema) -> list[AukusDatasetSchema]:
         AukusDatasetSchema from schema.py
 
     Raises:
-        HTTPException upon failure
-        FastApiImportError: FastAPI is not available
-        PydanticSettingsImportError: PydanticSettings is not available
+        HTTPException:
+            upon failure
+        FastApiImportError:
+            FastAPI is not available
+        PydanticSettingsImportError:
+            PydanticSettings is not available
     """
     if not fastapi_available:
         raise FastApiImportError

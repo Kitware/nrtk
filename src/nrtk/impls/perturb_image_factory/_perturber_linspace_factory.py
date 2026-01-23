@@ -85,7 +85,8 @@ class PerturberLinspaceFactory(PerturbImageFactory):
                 Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
-            TypeError: Given a perturber instance instead of type.
+            TypeError:
+                Given a perturber instance instead of type.
         """
         super().__init__(perturber=perturber, theta_key=theta_key, perturber_kwargs=perturber_kwargs)
 

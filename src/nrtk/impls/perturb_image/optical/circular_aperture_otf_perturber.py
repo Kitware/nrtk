@@ -94,9 +94,12 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            ValueError: If mtf_wavelengths and mtf_weights are not equal length
-            ValueError: If mtf_wavelengths is empty or mtf_weights is empty
+            ImportError:
+                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ValueError:
+                If mtf_wavelengths and mtf_weights are not equal length
+            ValueError:
+                If mtf_wavelengths is empty or mtf_weights is empty
         """
         if mtf_wavelengths is not None and len(mtf_wavelengths) == 0:
             raise ValueError("mtf_wavelengths is empty")

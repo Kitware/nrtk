@@ -57,7 +57,8 @@ class PerturbImageFactory(Plugfigurable):
                 Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
-            TypeError: Given a perturber instance instead of type.
+            TypeError:
+                Given a perturber instance instead of type.
         """
         self._theta_key = theta_key
 
@@ -95,7 +96,8 @@ class PerturbImageFactory(Plugfigurable):
         """Return the next perturber instance.
 
         Raises:
-            StopIteration: Iterator exhausted.
+            StopIteration:
+                Iterator exhausted.
         """
         if self.n < len(self.thetas):
             kwargs = {self.theta_key: self.thetas[self.n]}

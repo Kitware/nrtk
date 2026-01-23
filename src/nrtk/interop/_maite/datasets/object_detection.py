@@ -88,8 +88,10 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
                 Dataset ID, defaults to filepath.
 
         Raises:
-            ImportError: required dependencies are not installed.
-            ValueError: metadata is missing for any image in the dataset.
+            ImportError:
+                required dependencies are not installed.
+            ValueError:
+                metadata is missing for any image in the dataset.
         """
         if not kwcoco_available:
             raise KWCocoImportError
@@ -304,9 +306,12 @@ def dataset_to_coco(  # noqa: C901
             Each dictionary should contain the following keys: id, name, supercategory.
 
     Raises:
-        KWCocoImportError: KWCOCO is not available.
-        MaiteImportError: MAITE is not available.
-        ValueError: Image filename and dataset length mismatch.
+        KWCocoImportError:
+            KWCOCO is not available.
+        MaiteImportError:
+            MAITE is not available.
+        ValueError:
+            Image filename and dataset length mismatch.
     """
     if not kwcoco_available:
         raise KWCocoImportError

@@ -74,8 +74,10 @@ class RandomRotationPerturber(AlbumentationsPerturber):
                 Random seed for reproducible results. Defaults to 1 for deterministic behavior.
 
         Raises:
-            ValueError: Rotation probability must be between 0.0 and 1.0 inclusive.
-            ValueError: Color fill values must be integers between 0 and 255 inclusive.
+            ValueError:
+                Rotation probability must be between 0.0 and 1.0 inclusive.
+            ValueError:
+                Color fill values must be integers between 0 and 255 inclusive.
         """
         if not 0.0 <= probability <= 1.0:
             raise ValueError("Rotation probability must be between 0.0 and 1.0 inclusive.")

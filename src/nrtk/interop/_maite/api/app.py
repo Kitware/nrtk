@@ -49,7 +49,8 @@ def handle_post(data: NrtkPerturbInputSchema) -> NrtkPerturbOutputSchema:
         NrtkPerturbOutputSchema from schema.py
 
     Raises:
-        HTTPException upon failure
+        HTTPException:
+            upon failure
     """
     if not fastapi_available:
         raise HTTPException(status_code=400, detail=str(FastApiImportError()))

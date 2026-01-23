@@ -90,7 +90,8 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
             the absent value(s) will default to 4um for w_x/w_y and 50mm for f.
 
         Raises:
-            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ImportError:
+                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
         super().__init__(interp=interp, **kwargs)

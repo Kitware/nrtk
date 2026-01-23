@@ -82,7 +82,8 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
             the absent value(s) will default to 0.0 for both.
 
         Raises:
-            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ImportError:
+                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
         super().__init__(interp=interp, **kwargs)
