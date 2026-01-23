@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.interop.maite.augmentations.image_classification import JATICClassificationAugmentation
+from nrtk.interop import MAITEClassificationAugmentation
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 from nrtk.utils._nop_perturber import _NOPPerturber
@@ -18,7 +18,7 @@ random = np.random.default_rng()
 
 
 @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
-class TestJATICClassificationAugmentation:
+class TestMAITEClassificationAugmentation:
     @pytest.mark.parametrize(
         "perturber",
         [
@@ -37,7 +37,7 @@ class TestJATICClassificationAugmentation:
         as the core perturber and that bboxes and metadata are appropriately
         updated.
         """
-        augmentation = JATICClassificationAugmentation(augment=perturber, augment_id="test_augment")
+        augmentation = MAITEClassificationAugmentation(augment=perturber, augment_id="test_augment")
         img_in = random.integers(0, 255, (3, 256, 256), dtype=np.uint8)
         target_class_in = [0]
         md_in: list[DatumMetadataType] = [{"id": 1}]  # pyright: ignore [reportInvalidTypeForm]
@@ -89,9 +89,9 @@ class TestJATICClassificationAugmentation:
         targets_out = targets_in
         md_out = md_in
         for p_idx, perturber in enumerate(perturbers):
-            augmentation = JATICClassificationAugmentation(augment=perturber, augment_id=f"test_augment_{p_idx}")
+            augmentation = MAITEClassificationAugmentation(augment=perturber, augment_id=f"test_augment_{p_idx}")
             imgs_out, targets_out, md_out = augmentation((imgs_out, targets_out, md_out))
 
         assert "nrtk_perturber_config" in md_out[0]
         all_perturber_configs = [perturber.get_config() for perturber in perturbers]
-        assert md_out[0]["nrtk_perturber_config"] == all_perturber_configs
+        assert md_out[0].get("nrtk_perturber_config") == all_perturber_configs

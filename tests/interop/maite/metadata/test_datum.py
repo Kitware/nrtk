@@ -4,7 +4,7 @@ from contextlib import nullcontext as does_not_raise
 
 import pytest
 
-from nrtk.interop.maite.metadata.datum import NRTKDatumMetadata, _forward_md_keys
+from nrtk.interop._maite.metadata.datum import NRTKDatumMetadata, _forward_md_keys
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
 

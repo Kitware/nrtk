@@ -14,7 +14,7 @@ graphics:
 headless:
 - opencv-python-headless>=4.6
 maite:
-- maite>=0.9.0,<0.10.0
+- maite>=0.9.2,<0.10.0
 - fastapi>=0.110.0
 - uvicorn>=0.29.0
 - pydantic>=2.6.4

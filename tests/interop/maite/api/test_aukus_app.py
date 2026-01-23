@@ -6,9 +6,9 @@ import pytest
 import responses
 from starlette.testclient import TestClient
 
-from nrtk.interop.maite.api.aukus_app import AUKUS_app, Settings
-from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema
-from nrtk.interop.maite.api.schema import DatasetSchema, NrtkPerturbOutputSchema
+from nrtk.interop._maite.api.aukus_app import AUKUS_app, Settings
+from nrtk.interop._maite.api.aukus_schema import AukusDatasetSchema
+from nrtk.interop._maite.api.schema import DatasetSchema, NrtkPerturbOutputSchema
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG

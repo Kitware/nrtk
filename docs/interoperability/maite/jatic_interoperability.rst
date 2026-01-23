@@ -23,9 +23,8 @@ For tutorials utilizing these adapters to evaluate model robustness against key 
 
 .. autosummary::
    :toctree: _implementations/interop
-   :template: custom-module-template.rst
+   :template: custom-class-template.rst
    :recursive:
 
-   nrtk.interop.maite.augmentations
-   nrtk.interop.maite.datasets
-   nrtk.interop.maite.metadata
+   ~nrtk.interop.MAITEClassificationAugmentation
+   ~nrtk.interop.MAITEDetectionAugmentation

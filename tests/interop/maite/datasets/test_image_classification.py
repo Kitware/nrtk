@@ -3,11 +3,9 @@ from collections.abc import Sequence
 import numpy as np
 import pytest
 
-from nrtk.interop.maite.augmentations.image_classification import (
-    JATICClassificationAugmentation,
-)
-from nrtk.interop.maite.datasets.image_classification import (
-    JATICImageClassificationDataset,
+from nrtk.interop import MAITEClassificationAugmentation
+from nrtk.interop._maite.datasets.image_classification import (
+    MAITEImageClassificationDataset,
 )
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
@@ -19,13 +17,13 @@ from maite.protocols.image_classification import TargetType  # noqa: E402
 random = np.random.default_rng()
 
 
-class TestJATICImageClassificationDataset:
+class TestMAITEImageClassificationDataset:
     @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
     @pytest.mark.parametrize(
         ("dataset", "expected_lbls_out"),
         [
             (
-                JATICImageClassificationDataset(
+                MAITEImageClassificationDataset(
                     imgs=[
                         random.integers(0, 255, (3, 256, 256), dtype=np.uint8),
                         random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
@@ -38,7 +36,7 @@ class TestJATICImageClassificationDataset:
                 [np.asarray([0]), np.asarray([1])],
             ),
             (
-                JATICImageClassificationDataset(
+                MAITEImageClassificationDataset(
                     imgs=[
                         random.integers(0, 255, (3, 256, 256), dtype=np.uint8),
                         random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
@@ -53,7 +51,7 @@ class TestJATICImageClassificationDataset:
     )
     def test_dataset_adapter(
         self,
-        dataset: JATICImageClassificationDataset,
+        dataset: MAITEImageClassificationDataset,
         expected_lbls_out: Sequence[TargetType],  # pyright: ignore [reportInvalidTypeForm]
     ) -> None:
         """Test that the dataset adapter functions appropriately.
@@ -62,7 +60,7 @@ class TestJATICImageClassificationDataset:
         and metadata and can be ingested by the augmentation adapter object.
         """
         perturber = ResizePerturber(w=64, h=512)
-        augmentation = JATICClassificationAugmentation(augment=perturber, augment_id="test_augment")
+        augmentation = MAITEClassificationAugmentation(augment=perturber, augment_id="test_augment")
         for idx in range(len(dataset)):
             img_in = dataset[idx][0]
             lbl_in = dataset[idx][1]

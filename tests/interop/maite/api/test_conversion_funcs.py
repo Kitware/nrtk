@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
-from nrtk.interop.maite.api.converters import build_factory
-from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
+from nrtk.interop._maite.api.converters import build_factory
+from nrtk.interop._maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import (
@@ -21,7 +21,7 @@ from tests.interop.maite import (
 maite_available: bool = import_guard(module_name="maite", exception=MaiteImportError)
 kwcoco_available: bool = import_guard(module_name="kwcoco", exception=KWCocoImportError)
 is_usable = maite_available and kwcoco_available
-from nrtk.interop.maite.api.converters import load_COCOJATIC_dataset  # noqa: E402
+from nrtk.interop._maite.api.converters import load_COCOMAITE_dataset  # noqa: E402
 
 
 @pytest.mark.skipif(
@@ -143,7 +143,7 @@ class TestAPIConversionFunctions:
         with pytest.raises(ValueError, match=r"Config"):
             build_factory(schema)
 
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
+    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk[tools]' not installed.")
     @pytest.mark.parametrize(
         "data",
         [
@@ -160,17 +160,17 @@ class TestAPIConversionFunctions:
             ),
         ],
     )
-    def test_load_COCOJATIC_dataset(self, data: dict[str, Any]) -> None:  # noqa: N802
-        """Test if load_COCOJATIC_dataset returns the expected dataset."""
+    def test_load_COCOMAITE_dataset(self, data: dict[str, Any]) -> None:  # noqa: N802
+        """Test if load_COCOMAITE_dataset returns the expected dataset."""
         schema = NrtkPerturbInputSchema.model_validate(data)
-        dataset = load_COCOJATIC_dataset(schema)
+        dataset = load_COCOMAITE_dataset(schema)
         # Check all images metadata for gsd
         for i in range(len(dataset)):
             assert dict(dataset[i][2])["gsd"] == dict(data["image_metadata"][i])["gsd"]
         # Check number of image matches
         assert len(dataset) == len(os.listdir(os.path.join(data["dataset_dir"], "images")))
 
-    @mock.patch("nrtk.interop.maite.api.converters.is_usable", False)
+    @mock.patch("nrtk.interop._maite.api.converters.is_usable", False)
     @pytest.mark.parametrize(
         "data",
         [
@@ -187,14 +187,14 @@ class TestAPIConversionFunctions:
             ),
         ],
     )
-    def test_load_COCOJATIC_dataset_not_usable(self, data: dict[str, Any]) -> None:  # noqa: N802
+    def test_load_COCOMAITE_dataset_not_usable(self, data: dict[str, Any]) -> None:  # noqa: N802
         """Test that ImportError appropriately raised when imports missing."""
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(KWCocoImportError):
-            _ = load_COCOJATIC_dataset(schema)
+            _ = load_COCOMAITE_dataset(schema)
 
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
+    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk[tools]' not installed.")
     @pytest.mark.parametrize(
         "data",
         [
@@ -211,9 +211,9 @@ class TestAPIConversionFunctions:
             ),
         ],
     )
-    def test_load_COCOJATIC_dataset_bad_metadata(self, data: dict[str, Any]) -> None:  # noqa: N802
+    def test_load_COCOMAITE_dataset_bad_metadata(self, data: dict[str, Any]) -> None:  # noqa: N802
         """Test that ValueError appropriately raised when bad metadata is provided."""
         schema = NrtkPerturbInputSchema.model_validate(data)
 
         with pytest.raises(ValueError, match=r"ID not present in image metadata. Is it a DatumMetadataType?"):
-            _ = load_COCOJATIC_dataset(schema)
+            _ = load_COCOMAITE_dataset(schema)

@@ -10,11 +10,11 @@ import numpy as np
 import py
 import pytest
 
-from nrtk.interop.maite.augmentations.object_detection import JATICDetectionAugmentation
-from nrtk.interop.maite.datasets.object_detection import (
-    COCOJATICObjectDetectionDataset,
-    JATICDetectionTarget,
-    JATICObjectDetectionDataset,
+from nrtk.interop import MAITEDetectionAugmentation
+from nrtk.interop._maite.datasets.object_detection import (
+    COCOMAITEObjectDetectionDataset,
+    MAITEDetectionTarget,
+    MAITEObjectDetectionDataset,
     dataset_to_coco,
 )
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
@@ -30,7 +30,7 @@ random = np.random.default_rng()
 
 
 @pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
-class TestJATICObjectDetectionDataset:
+class TestMAITEObjectDetectionDataset:
     @pytest.mark.parametrize(
         ("imgs", "input_dets", "datum_metadata", "dataset_id", "index2label", "expected_dets_out"),
         [
@@ -40,12 +40,12 @@ class TestJATICObjectDetectionDataset:
                     random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
                 ],
                 [
-                    JATICDetectionTarget(
+                    MAITEDetectionTarget(
                         boxes=np.asarray([[0.0, 0.0, 100.0, 100.0], [0.0, 0.0, 100.0, 100.0]]),
                         labels=np.asarray([1, 1]),
                         scores=np.asarray([1, 1]),
                     ),
-                    JATICDetectionTarget(
+                    MAITEDetectionTarget(
                         boxes=np.asarray([[0.0, 0, 50.0, 50.0]]),
                         labels=np.asarray([0]),
                         scores=np.asarray([1]),
@@ -56,14 +56,14 @@ class TestJATICObjectDetectionDataset:
                 {0: "cat1", 1: "cat2"},
                 [
                     [
-                        JATICDetectionTarget(
+                        MAITEDetectionTarget(
                             boxes=np.asarray([[0.0, 0.0, 25.0, 200.0], [0.0, 0.0, 25.0, 200.0]]),
                             labels=np.asarray([1, 1]),
                             scores=np.asarray([1, 1]),
                         ),
                     ],
                     [
-                        JATICDetectionTarget(
+                        MAITEDetectionTarget(
                             boxes=np.asarray([[0.0, 0, 25.0, 200.0]]),
                             labels=np.asarray([0]),
                             scores=np.asarray([1]),
@@ -88,7 +88,7 @@ class TestJATICObjectDetectionDataset:
         images with corresponding detections and metadata and can be ingested
         by the augmentation adapter object.
         """
-        dataset = JATICObjectDetectionDataset(
+        dataset = MAITEObjectDetectionDataset(
             imgs=imgs,
             dets=input_dets,
             datum_metadata=datum_metadata,
@@ -96,7 +96,7 @@ class TestJATICObjectDetectionDataset:
             index2label=index2label,
         )
         perturber = ResizePerturber(w=64, h=512)
-        augmentation = JATICDetectionAugmentation(augment=perturber, augment_id="test_augment")
+        augmentation = MAITEDetectionAugmentation(augment=perturber, augment_id="test_augment")
         for idx in range(len(dataset)):
             img_in = dataset[idx][0]
             det_in = dataset[idx][1]
@@ -130,7 +130,7 @@ class TestJATICObjectDetectionDataset:
         (
             [random.integers(0, 255, size=(3, 10, 10), dtype=np.uint8)],
             [
-                JATICDetectionTarget(
+                MAITEDetectionTarget(
                     boxes=random.integers(0, 4, size=(2, 4)),
                     labels=random.integers(0, 2, size=(2,)),
                     scores=random.random(2),
@@ -148,7 +148,7 @@ class TestJATICObjectDetectionDataset:
         (
             [random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 2,
             [
-                JATICDetectionTarget(
+                MAITEDetectionTarget(
                     boxes=random.integers(0, 4, size=(2, 4)),
                     labels=random.integers(0, 2, size=(2,)),
                     scores=random.random(2),
@@ -179,7 +179,7 @@ def test_dataset_to_coco(
     """Test that a MAITE dataset is appropriately saved to file in COCO format."""
     tmp_path = Path(tmpdir)
 
-    dataset = JATICObjectDetectionDataset(
+    dataset = MAITEObjectDetectionDataset(
         imgs=imgs,
         dets=input_dets,
         datum_metadata=datum_metadata,
@@ -209,7 +209,7 @@ def test_dataset_to_coco(
             metadata = json.load(f)
 
         # Re-create MAITE dataset from file
-        coco_dataset = COCOJATICObjectDetectionDataset(
+        coco_dataset = COCOMAITEObjectDetectionDataset(
             kwcoco_dataset=kwcoco.CocoDataset(label_file),  # pyright: ignore [reportCallIssue]
             image_metadata=metadata,
         )
@@ -232,17 +232,17 @@ def test_dataset_to_coco(
 
 
 @pytest.mark.skipif(maite_available, reason="MAITE is available")
-@mock.patch("nrtk.interop.maite.datasets.object_detection.kwcoco_available", True)
+@mock.patch("nrtk.interop._maite.datasets.object_detection.kwcoco_available", True)
 def test_missing_deps_maite() -> None:
     """Test that an exception is raised when required dependencies are not installed."""
-    assert not COCOJATICObjectDetectionDataset.is_usable()
+    assert not COCOMAITEObjectDetectionDataset.is_usable()
     with pytest.raises(MaiteImportError):
-        COCOJATICObjectDetectionDataset(kwcoco_dataset=None, image_metadata=list(), skip_no_anns=False)
+        COCOMAITEObjectDetectionDataset(kwcoco_dataset=None, image_metadata=list(), skip_no_anns=False)
 
 
 @pytest.mark.skipif(kwcoco_available, reason="KWCOCO is available")
 def test_missing_deps_kwcoco() -> None:
     """Test that an exception is raised when required dependencies are not installed."""
-    assert not COCOJATICObjectDetectionDataset.is_usable()
+    assert not COCOMAITEObjectDetectionDataset.is_usable()
     with pytest.raises(KWCocoImportError):
-        COCOJATICObjectDetectionDataset(kwcoco_dataset=None, image_metadata=list(), skip_no_anns=False)
+        COCOMAITEObjectDetectionDataset(kwcoco_dataset=None, image_metadata=list(), skip_no_anns=False)
