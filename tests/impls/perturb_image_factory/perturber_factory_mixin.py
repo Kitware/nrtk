@@ -1,6 +1,6 @@
 """Base test class for PerturbImageFactory implementations.
 
-This module provides ``_TestPerturbImageFactory``, an abstract base test class that
+This module provides ``PerturberFactoryMixin``, an abstract base test class that
 defines shared test cases for all PerturbImageFactory implementations. Concrete
 factory test classes (e.g., TestPerturberLinspaceFactory, TestPerturberStepFactory)
 inherit from this class to automatically run common tests.
@@ -71,7 +71,7 @@ from tests.fakes import FakePerturber
 from tests.utils import deep_equals
 
 
-class _TestPerturbImageFactory:
+class PerturberFactoryMixin:
     """Base test class for PerturbImageFactory implementations.
 
     See module docstring for full list of shared test cases and usage instructions.

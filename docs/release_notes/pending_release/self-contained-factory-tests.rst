@@ -2,6 +2,6 @@
   depend on ``nrtk.impls`` perturber implementations and instead use
   ``FakePerturber`` from ``tests/fakes.py``.
 
-* Added ``_TestPerturbImageFactory`` base class in
+* Added ``PerturberFactoryMixin`` base class in
   ``tests/impls/perturb_image_factory/`` to provide shared plugin
   discovery tests.

@@ -4,7 +4,7 @@ PerturberMultivariateFactory creates perturbers with theta values as a cartesian
 product of multiple parameter sequences. Unlike other factories, it varies
 multiple parameters simultaneously using theta_keys (plural).
 
-Note: This class inherits from _TestPerturbImageFactory but overrides several
+Note: This class inherits from PerturberFactoryMixin but overrides several
 tests because:
     1. Uses theta_keys (list) instead of theta_key (str)
     2. Produces cartesian product combinations rather than linear sequences
@@ -57,10 +57,10 @@ from typing_extensions import override
 
 from nrtk.impls.perturb_image_factory import PerturberMultivariateFactory
 from tests.fakes import FakePerturber
-from tests.impls.perturb_image_factory import _TestPerturbImageFactory
+from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
-class TestPerturberMultivariateFactory(_TestPerturbImageFactory):
+class TestPerturberMultivariateFactory(PerturberFactoryMixin):
     """Tests for PerturberMultivariateFactory. See module docstring for test cases."""
 
     default_factory_kwargs: dict[str, Any] = {

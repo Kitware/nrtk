@@ -31,10 +31,10 @@ from typing_extensions import override
 
 from nrtk.impls.perturb_image_factory import PerturberOneStepFactory
 from tests.fakes import FakePerturber
-from tests.impls.perturb_image_factory import _TestPerturbImageFactory
+from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
-class TestPerturberOneStepFactory(_TestPerturbImageFactory):
+class TestPerturberOneStepFactory(PerturberFactoryMixin):
     """Tests for PerturberOneStepFactory. See module docstring for test cases."""
 
     default_factory_kwargs = {

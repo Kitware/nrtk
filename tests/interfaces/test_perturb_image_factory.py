@@ -2,9 +2,9 @@
 
 This module tests the abstract PerturbImageFactory interface behavior using
 PerturberFakeFactory as the concrete implementation, inheriting shared test
-cases from _TestPerturbImageFactory.
+cases from PerturberFactoryMixin.
 
-Test Cases (inherited from _TestPerturbImageFactory):
+Test Cases (inherited from PerturberFactoryMixin):
     - Iteration (valid/empty)
     - Indexing
     - Repeatability
@@ -29,10 +29,10 @@ from typing_extensions import override
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from tests.fakes import FakePerturber, PerturberFakeFactory
-from tests.impls.perturb_image_factory import _TestPerturbImageFactory
+from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
-class TestPerturbImageFactory(_TestPerturbImageFactory):
+class TestPerturbImageFactory(PerturberFactoryMixin):
     """Tests for PerturbImageFactory interface."""
 
     default_factory_kwargs = {
