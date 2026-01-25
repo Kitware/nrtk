@@ -1,3 +1,3 @@
-from ._test_perturb_image_factory import _TestPerturbImageFactory
+from .perturber_factory_mixin import PerturberFactoryMixin
 
-__all__ = ["_TestPerturbImageFactory"]
+__all__ = ["PerturberFactoryMixin"]

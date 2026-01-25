@@ -3,7 +3,7 @@
 * Moved numpy array conversion from ``PerturberMultivariateFactory.from_config`` to pyBSM perturber
   ``__init__`` methods.
 
-* Introduced ``_TestPerturbImageFactory`` base test class with shared test cases for all factory implementations.
+* Introduced ``PerturberFactoryMixin`` base test class with shared test cases for all factory implementations.
 
 * Replaced dependency on perturber implementations requiring extras with ``FakePerturber`` in factory tests.
 

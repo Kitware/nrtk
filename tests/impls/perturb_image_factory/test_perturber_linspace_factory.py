@@ -34,10 +34,10 @@ from typing_extensions import override
 
 from nrtk.impls.perturb_image_factory import PerturberLinspaceFactory
 from tests.fakes import FakePerturber
-from tests.impls.perturb_image_factory import _TestPerturbImageFactory
+from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
-class TestPerturberLinspaceFactory(_TestPerturbImageFactory):
+class TestPerturberLinspaceFactory(PerturberFactoryMixin):
     """Tests for PerturberLinspaceFactory. See module docstring for test cases."""
 
     default_factory_kwargs = {
