@@ -1,26 +1,209 @@
 ###############################################################################
 # Stage -- Build and publish Docker images
 ###############################################################################
-.trigger_containers:
-  stage: container
-  trigger:
-    include: .gitlab-ci/pipelines/.gitlab-container.yml
-    strategy: depend
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: manual
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: on_success  # Or "always" if you want it no matter what
-    - when: never
-  allow_failure: true
-  variables:
-    PIPELINE_CONTEXT: ""
-    CONTAINER_NAME: ""
-    DOCKERFILE_FILE: ""
+.container-setup:
+    extends: .shared-setup
+    stage: container
+    variables:
+      CONTAINER_NAME: "nrtk-perturber"
+      DOCKERFILE_FILE: "Dockerfile"
+      PIPELINE_CONTEXT: "$CI_PIPELINE_SOURCE"
+      # Minimum supported version of Python
+      PYTHON_VERSION: "3.10"
+      HARBOR_URL: "harbor.jatic.net"
+      HARBOR_PORT: "443"
+      HARBOR_PROJECT: "kitware"
+      HARBOR_REPO: "$CI_PROJECT_NAME"
+    rules:
+      # If changes are made to an active merge request.
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        when: manual
+      - when: never
+    before_script:
+      - echo ${KITWARE_HARBOR_TOKEN} | docker login ${HARBOR_URL}:${HARBOR_PORT}/v2 --username 'robot$kitware+robot' --password-stdin || echo "Failed to login to Harbor..."
 
-trigger_nrtk:
-  extends: .trigger_containers
-  variables:
-    CONTAINER_NAME: "nrtk-perturber"
-    DOCKERFILE_FILE: "Dockerfile"
-    PIPELINE_CONTEXT: "$CI_PIPELINE_SOURCE"
+      - NRTK_MAJOR_MINOR=$(awk -F '"' '/^version *=/ {split($2,v,"."); print v[1]"."v[2]; exit}' pyproject.toml)
+
+      - apk update
+      - apk add --no-cache curl jq
+      - |
+        ARTIFACT_API="https://${HARBOR_URL}/api/v2.0/projects/${HARBOR_PROJECT}/repositories/${HARBOR_REPO}%252F${CONTAINER_NAME}/artifacts"
+
+        RESPONSE=$(curl --fail-with-body -X 'GET' ${ARTIFACT_API})
+
+        LATEST_TAG=$(echo "${RESPONSE}" \
+        | jq --arg nrtk_major_minor "$NRTK_MAJOR_MINOR" -r '[.[]|.tags[]?.name | select(startswith("v\($nrtk_major_minor)."))] | sort_by(ltrimstr("v")|split(".") | map(tonumber)) | last')
+
+    after_script:
+      - echo "Logging out from Harbor..."
+      - docker logout ${HARBOR_URL}:${HARBOR_PORT} || echo "Failed to logout from Harbor..."
+    allow_failure: true
+    image: docker:25.0.5-git
+
+# Job to build the Docker image for an MR branch
+build:
+  extends: .container-setup
+  before_script:
+    - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag contains ${NRTK_MAJOR_MINOR}"
+        IMAGE_TAG="v${NRTK_MAJOR_MINOR}.0"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG=$(echo "$LATEST_TAG" | awk -F. '{printf("v%d.%d.%d", $1, $2, $3+1)}')
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+
+    - apk add --no-cache cosign
+  script:
+    - |
+      echo "Image tag: ${IMAGE_PATH}"
+
+      docker build --quiet \
+      --tag="${IMAGE_PATH}" \
+      --build-arg="PYTHON_VERSION=${PYTHON_VERSION}" \
+      --build-arg="PROJECT_PATH=${CI_BUILDS_DIR}/${CI_PROJECT_PATH}" \
+      --build-arg="CI_JOB_TOKEN=${CI_JOB_TOKEN}" \
+      --platform linux/amd64 \
+      --no-cache \
+      -f "${DOCKERFILE_FILE}" \
+      .
+
+    - echo "Pushing image to Harbor..."
+    - docker push ${IMAGE_PATH}
+
+    - echo "Getting image digest from Harbor..."
+    - docker pull "${IMAGE_PATH}"
+    - IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_PATH")
+    - echo "Converting private key..."
+    - printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > cosign.key
+    - chmod 600 cosign.key
+    - cosign sign --key cosign.key --yes "$IMAGE_DIGEST"
+
+verify_signature:
+  extends: .container-setup
+  needs:
+    - job: build
+      artifacts: false
+  before_script:
+    - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag found. Defaulting to  latest."
+        IMAGE_TAG="latest"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG="${LATEST_TAG}"
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+
+    - apk add --no-cache cosign
+  script:
+    - echo "Getting image from Harbor..."
+    - docker pull "${IMAGE_PATH}"
+    - cosign verify --key cosign.pub "${IMAGE_PATH}"
+
+scan:
+  extends: .container-setup
+  needs:
+    - job: build
+      artifacts: false
+  before_script:
+    - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag found. Defaulting to  latest."
+        IMAGE_TAG="latest"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG="${LATEST_TAG}"
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+
+    - apk add --no-cache curl docker
+    - echo "Installing Trivy..."
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+    - curl -sSfL -o junit.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/junit.tpl
+  script:
+    - echo "Pulling image from Harbor..."
+    - docker pull "${IMAGE_PATH}"
+    - IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_PATH")
+
+    - echo "Scanning image with Trivy..."
+    - ./bin/trivy image "${IMAGE_DIGEST}" --scanners vuln --format template --template "@junit.tpl" -o trivy.xml --severity HIGH,CRITICAL --exit-code 1
+  artifacts:
+    untracked: false
+    when: on_failure
+    paths:
+      - trivy.xml
+
+test:
+  extends: .container-setup
+  needs:
+    - job: build
+      artifacts: false
+  before_script:
+    - !reference [.container-setup, before_script]
+    - |
+      if [ "$LATEST_TAG" == "null" ]; then
+        echo "No image tag found. Defaulting to  latest."
+        IMAGE_TAG="latest"
+      else
+        echo "Found ${LATEST_TAG} as the latest tag"
+        IMAGE_TAG="${LATEST_TAG}"
+      fi
+
+      echo "Image tag ${IMAGE_TAG}"
+      IMAGE_PATH="${HARBOR_URL}:${HARBOR_PORT}/${HARBOR_PROJECT}/${HARBOR_REPO}/${CONTAINER_NAME}:${IMAGE_TAG}"
+  script:
+    - echo "Pulling image from Harbor..."
+    - docker pull "${IMAGE_PATH}"
+    - docker run --rm "${IMAGE_PATH}"
+
+# ###############################################################################
+# These two should be combined into one eventually
+# ###############################################################################
+# .cleanup:
+#   extends: .container-setup
+#   stage: .post
+#   needs:
+#     - job: build
+#       artifacts: false
+#   allow_failure: true
+
+# cleanup_remote:
+#   extends: .cleanup
+#   rules:
+#   - if: '$PIPELINE_CONTEXT == "merge_request_event"'
+#     when: always
+#   - when: never
+#   script:
+#     - apk update
+#     - apk add --no-cache curl jq
+#     - |
+#       # Set the correct repo path
+#       ARTIFACT_API="https://${HARBOR_URL}/api/v2.0/projects/${HARBOR_PROJECT}/repositories/${HARBOR_REPO}%252F${CONTAINER_NAME}/artifacts"
+
+#       echo "Fetching artifacts from: $ARTIFACT_API"
+
+#       RESPONSE=$(curl -X 'GET' -u "robot$kitware+robot:${KITWARE_HARBOR_TOKEN}" \
+#         -H 'accept: application/json' \
+#         "$ARTIFACT_API")
+
+#       DIGEST=$(echo "$RESPONSE" | jq -r --arg TAG "$CI_COMMIT_SHORT_SHA" '.[] | select(.tags[]?.name == $TAG) | .digest')
+
+#       echo "Extracted digest: $DIGEST"
+#       ENCODED_DIGEST="${DIGEST/:/%3A}"
+
+#       DELETE_API="${ARTIFACT_API}/${ENCODED_DIGEST}"
+
+#       echo "Deleting artifact from: $DELETE_API"
+
+#       curl -X 'DELETE' -u "robot$kitware+robot:${KITWARE_HARBOR_TOKEN}" -H 'accept: application/json' "$DELETE_API"

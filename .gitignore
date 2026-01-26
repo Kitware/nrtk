@@ -147,3 +147,6 @@ cython_debug/
 # Example notebooks
 docs/examples/data
 docs/examples/pybsm/data
+
+# cosign private key
+cosign.key
