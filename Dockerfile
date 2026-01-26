@@ -45,7 +45,7 @@ WORKDIR $PYSETUP_PATH/src
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     --mount=type=cache,target=/root/.cache/pypoetry,sharing=locked \
     poetry config virtualenvs.create false && poetry run pip \
-    install -e .[maite-cpu,tools,headless,pybsm-headless]
+    install -e .[maite,tools,headless,pybsm]
 
 ENTRYPOINT [ "nrtk-perturber" ]
 # default args for nrtk_perturber_cli

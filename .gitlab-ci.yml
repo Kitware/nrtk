@@ -1,6 +1,5 @@
 stages:
   # trigger stages need to come first
-  - container
   - compliance
 
   # Our CI/CD Jobs
@@ -13,6 +12,9 @@ stages:
   - mirror
   - publish
   - devel
+
+  # Containerization
+  - container
 
   # JATIC Required Stages
   - security # this can be replaced with DevSecOps security job
@@ -43,6 +45,7 @@ include:
   - local: .gitlab-ci/.gitlab-publish.yml
     <<: *skippable
   - local: .gitlab-ci/.gitlab-container.yml
+    <<: *skippable
 
   - local: .gitlab-ci/.gitlab-security.yml
     <<: *unschedulable
