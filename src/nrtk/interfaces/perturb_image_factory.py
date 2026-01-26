@@ -94,16 +94,9 @@ class PerturbImageFactory(Plugfigurable):
         """Get the perturber for a specific index.
 
         Args:
-            idx:
-                Index of desired perturber.
-
-        Raises:
-            IndexError: The given index does not exist.
+            idx: Index of desired perturber (supports negative indices).
         """
-        if idx < 0 or idx >= len(self.thetas):
-            raise IndexError
         kwargs = {self.theta_key: self.thetas[idx]}
-
         return self.perturber(**kwargs)
 
     @override

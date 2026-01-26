@@ -113,8 +113,10 @@ class TestPerturberStepFactory(PerturberFactoryMixin):
         [
             pytest.param(0, 1, does_not_raise(), id="first"),
             pytest.param(2, 5, does_not_raise(), id="last"),
-            pytest.param(3, None, pytest.raises(IndexError), id="out of bounds"),
-            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+            pytest.param(3, None, pytest.raises(IndexError), id="out of bounds positive"),
+            pytest.param(-1, 5, does_not_raise(), id="negative -1 (last)"),
+            pytest.param(-3, 1, does_not_raise(), id="negative -3 (first)"),
+            pytest.param(-4, None, pytest.raises(IndexError), id="out of bounds negative"),
         ],
     )
     @override
@@ -136,6 +138,8 @@ class TestPerturberStepFactory(PerturberFactoryMixin):
         )
         with pytest.raises(IndexError):
             _ = factory[0]
+        with pytest.raises(IndexError):
+            _ = factory[-1]
 
     # ============================= Edge Cases =============================
 
