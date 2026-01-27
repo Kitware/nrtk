@@ -4434,15 +4434,15 @@ test = ["cffi", "hypothesis", "pandas", "pytest", "pytz"]
 
 [[package]]
 name = "pybsm"
-version = "0.14.0"
+version = "0.14.1"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 markers = "extra == \"pybsm\""
 files = [
-    {file = "pybsm-0.14.0-py3-none-any.whl", hash = "sha256:c5ba01477a55fdda92c33d9fd55d58a43c8f61a8c85f21909ab612fa7e8745d8"},
-    {file = "pybsm-0.14.0.tar.gz", hash = "sha256:554888bda91b5ef8cbd9897d098b8bd2233e1e95cae17eba53523054a678c161"},
+    {file = "pybsm-0.14.1-py3-none-any.whl", hash = "sha256:01f9a71e49e5ee6b32d89569621d8124b9760b000cf7b8789841f83c1f626ceb"},
+    {file = "pybsm-0.14.1.tar.gz", hash = "sha256:d6f267ef3163bba94b805717dda67588db3a47ef8b28c72b0d19a08b0a7904c0"},
 ]
 
 [package.dependencies]
@@ -7761,4 +7761,4 @@ waterdroplet = ["numba", "scipy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "2113a0512c425ba261fff44c317b1f5674c21458417436546a8f851b16887350"
+content-hash = "e155f601496ee375e55eebae2dd1aea27a58af3e34a02580b480e10cad525cd0"
