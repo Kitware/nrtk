@@ -100,8 +100,10 @@ class TestPerturberLinspaceFactory(PerturberFactoryMixin):
         [
             pytest.param(0, 0.0, does_not_raise(), id="first"),
             pytest.param(4, 1.0, does_not_raise(), id="last"),
-            pytest.param(5, None, pytest.raises(IndexError), id="out of bounds"),
-            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+            pytest.param(5, None, pytest.raises(IndexError), id="out of bounds positive"),
+            pytest.param(-1, 1.0, does_not_raise(), id="negative -1 (last)"),
+            pytest.param(-5, 0.0, does_not_raise(), id="negative -5 (first)"),
+            pytest.param(-6, None, pytest.raises(IndexError), id="out of bounds negative"),
         ],
     )
     @override
@@ -123,6 +125,8 @@ class TestPerturberLinspaceFactory(PerturberFactoryMixin):
         )
         with pytest.raises(IndexError):
             _ = factory[0]
+        with pytest.raises(IndexError):
+            _ = factory[-1]
 
     # ========================= Endpoint Parameter =========================
 

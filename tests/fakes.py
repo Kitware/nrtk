@@ -71,8 +71,6 @@ class PerturberFakeFactory(PerturbImageFactory):
 
     @override
     def __getitem__(self, idx: int) -> PerturbImage:
-        if idx < 0 or idx >= len(self):
-            raise IndexError(idx)
         return self.perturber(**{self.theta_key: self._theta_values[idx]})
 
     @override

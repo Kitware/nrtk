@@ -145,8 +145,10 @@ class TestPerturberMultivariateFactory(PerturberFactoryMixin):
         [
             pytest.param(0, (1, 2), does_not_raise(), id="first"),
             pytest.param(3, (3, 4), does_not_raise(), id="last"),
-            pytest.param(4, None, pytest.raises(IndexError), id="out of bounds"),
-            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+            pytest.param(4, None, pytest.raises(IndexError), id="out of bounds positive"),
+            pytest.param(-1, (3, 4), does_not_raise(), id="negative -1 (last)"),
+            pytest.param(-4, (1, 2), does_not_raise(), id="negative -4 (first)"),
+            pytest.param(-5, None, pytest.raises(IndexError), id="out of bounds negative"),
         ],
     )
     def test_indexing_cartesian(

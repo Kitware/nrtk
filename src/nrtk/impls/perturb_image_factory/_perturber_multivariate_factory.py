@@ -144,18 +144,12 @@ class PerturberMultivariateFactory(PerturbImageFactory):
         """Retrieves a specific `PerturbImage` instance by index.
 
         Args:
-            idx (int): Index of the desired perturbation configuration.
+            idx: Index of the desired perturbation configuration (supports negative indices).
 
         Returns:
             PerturbImage: The configured `PerturbImage` instance.
-
-        Raises:
-            IndexError: If the index is out of range or negative.
         """
-        if idx < 0 or idx >= len(self.sets):
-            raise IndexError("Index out of range")
         kwargs = {k: self.thetas[i][self.sets[idx][i]] for i, k in enumerate(self.theta_keys)}
-
         return self._create_perturber(kwargs=kwargs)
 
     @property

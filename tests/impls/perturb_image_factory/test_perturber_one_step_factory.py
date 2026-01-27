@@ -86,8 +86,9 @@ class TestPerturberOneStepFactory(PerturberFactoryMixin):
         ("idx", "expected_val", "expectation"),
         [
             pytest.param(0, 5.0, does_not_raise(), id="index 0"),
-            pytest.param(1, None, pytest.raises(IndexError), id="out of bounds"),
-            pytest.param(-1, None, pytest.raises(IndexError), id="negative"),
+            pytest.param(1, None, pytest.raises(IndexError), id="out of bounds positive"),
+            pytest.param(-1, 5.0, does_not_raise(), id="negative -1 (last/only)"),
+            pytest.param(-2, None, pytest.raises(IndexError), id="out of bounds negative"),
         ],
     )
     @override
