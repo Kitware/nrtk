@@ -56,9 +56,9 @@ def _set_logging(verbose: bool) -> None:
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
-@click.argument("dataset_dir", type=click.Path(exists=True))
-@click.argument("output_dir", type=click.Path(exists=False))
-@click.argument("config_file", type=click.File(mode="r"))
+@click.option("--dataset_dir", "-d", type=click.Path(exists=True), envvar="INPUT_DATASET_PATH")
+@click.option("--output_dir", "-o", type=click.Path(exists=False), envvar="OUTPUT_DATASET_PATH")
+@click.option("--config_file", "-c", type=click.File(mode="r"), envvar="CONFIG_FILE")
 @click.option("--verbose", "-v", count=True, help="print progress messages")
 def nrtk_perturber_cli(
     *,
