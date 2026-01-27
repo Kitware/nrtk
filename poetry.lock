@@ -2707,15 +2707,15 @@ files = [
 
 [[package]]
 name = "maite"
-version = "0.9.0"
+version = "0.9.2"
 description = "Library of common types, protocols (a.k.a. structural subtypes), and utilities to support AI test and evaluation"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"maite\""
 files = [
-    {file = "maite-0.9.0-py3-none-any.whl", hash = "sha256:30a4b33eb6d43ebb99855eacd25ae9f5ed593bfc7a1863285c0e04cf9b5f3ae6"},
-    {file = "maite-0.9.0.tar.gz", hash = "sha256:002cd05302d55b1e3be6542b01fce671e8a85be700377b1f28bb703ef9995969"},
+    {file = "maite-0.9.2-py3-none-any.whl", hash = "sha256:4abaf670b5b6f913527e667af23ec9cbdb25e5e71ac8ac4c8225ef77b2f4e863"},
+    {file = "maite-0.9.2.tar.gz", hash = "sha256:b076f5890fe37656e8eaedfdc07aa91e35eb180df767cdead4260f985bd1b94c"},
 ]
 
 [package.dependencies]
@@ -2723,9 +2723,9 @@ numpy = ">=1.24.2"
 typing-extensions = ">=4.5,<4.6 || >4.6"
 
 [package.extras]
-builddocs = ["datasets (>=3)", "jupyter", "kornia", "matplotlib", "nbconvert", "pycocotools", "pytest (>=7.0.0)", "torch (>=1.7,!=1.12.0)", "torchmetrics[detection]", "torchvision", "tox (>=4.24.2,<5.0.0)", "transformers", "ultralytics", "watermark"]
+builddocs = ["datasets (>=3)", "ipykernel (==6.30.1)", "jupyter", "kornia", "matplotlib", "nbconvert", "pycocotools", "pytest (>=7.0.0)", "torch (>=1.7,!=1.12.0)", "torchmetrics[detection]", "torchvision", "tox (>=4.24.2,<5.0.0)", "transformers", "ultralytics", "watermark"]
 dev = ["pre-commit", "tox"]
-test = ["hypothesis (>=6.61.0,<=6.113)", "jupytext (>=1.14.0)", "numpydoc (>=1.5.0)", "pip", "pyright (>=1.1.280,!=1.1.401)", "pytest (>=7.0.0)", "pytest-mock (>=3.10.0)", "torch (>=1.7,!=1.12.0)"]
+test = ["hypothesis (>=6.61.0,<=6.113)", "jupytext (>=1.14.0)", "numpydoc (>=1.5.0,!=1.10.0)", "pip", "pyright (>=1.1.280,!=1.1.401)", "pytest (>=7.0.0)", "pytest-mock (>=3.10.0)", "torch (>=1.7,!=1.12.0)"]
 torchmetrics = ["torchmetrics[detection] (>=1.7.0,<2.0.0)"]
 yolo-models = ["boto3 (>=1.35)", "botocore (>=1.35)", "matplotlib (>=3.7.1)", "opencv-python-headless (>=4.6.0)", "pandas (>=2.0)", "roboflow (>=1.1.30)", "torch (>=2.2.0)", "ultralytics (>=8.2.78)", "yolov5 (>=7.0.13)"]
 
@@ -7761,4 +7761,4 @@ waterdroplet = ["numba", "scipy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "e155f601496ee375e55eebae2dd1aea27a58af3e34a02580b480e10cad525cd0"
+content-hash = "680784e184d0e7650631d7cb306e71dddfea5b8b3fe873774acad8e0f748929d"

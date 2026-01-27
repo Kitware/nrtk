@@ -9,11 +9,11 @@ import py  # type: ignore
 import pytest
 from starlette.testclient import TestClient
 
-from nrtk.interop.maite.api.app import app
-from nrtk.interop.maite.api.schema import NrtkPerturbInputSchema
-from nrtk.interop.maite.datasets.object_detection import (
-    JATICDetectionTarget,
-    JATICObjectDetectionDataset,
+from nrtk.interop._maite.api.app import app
+from nrtk.interop._maite.api.schema import NrtkPerturbInputSchema
+from nrtk.interop._maite.datasets.object_detection import (
+    MAITEDetectionTarget,
+    MAITEObjectDetectionDataset,
 )
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard, is_available
@@ -27,14 +27,14 @@ is_usable = all(is_available(dep) for dep in deps)
 random = np.random.default_rng()
 
 if is_usable:
-    # MAITE is required for JATICObjectDetectionDataset
+    # MAITE is required for MAITEObjectDetectionDataset
     TEST_RETURN_VALUE = [  # repeated test return value for 3 tests, saved to var to save space
         (
             "perturb1",
-            JATICObjectDetectionDataset(
+            MAITEObjectDetectionDataset(
                 imgs=[random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 11,
                 dets=[
-                    JATICDetectionTarget(
+                    MAITEDetectionTarget(
                         boxes=random.random((2, 4)),
                         labels=random.random(2),
                         scores=random.random(2),
@@ -62,8 +62,8 @@ def test_client() -> Generator:
     reason="fastapi and/or pydantic not found. Please install via `nrtk[maite]`",
 )
 class TestApp:
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
-    @mock.patch("nrtk.interop.maite.api.app.nrtk_perturber", return_value=TEST_RETURN_VALUE)
+    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk[tools]' not installed.")
+    @mock.patch("nrtk.interop._maite.api.app.nrtk_perturber", return_value=TEST_RETURN_VALUE)
     def test_handle_post_pybsm(self, patch: MagicMock, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Check for an appropriate response to a "good" request."""
         # Test data to be sent in the POST request
@@ -161,7 +161,7 @@ class TestApp:
         # Check that the correct number of images are in the dir
         assert len(os.listdir(os.path.join(str(image_dir)))) == 11
 
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk-jatic[tools]' not installed.")
+    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk[tools]' not installed.")
     def test_bad_gsd_post(self, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Test that an error response is appropriately propagated to the user."""
         test_data = NrtkPerturbInputSchema(
@@ -228,7 +228,7 @@ class TestApp:
             == "Configuration dictionary given does not have an implementation type specification."
         )
 
-    @mock.patch("nrtk.interop.maite.api.app.fastapi_available", False)
+    @mock.patch("nrtk.interop._maite.api.app.fastapi_available", False)
     def test_missing_deps(self, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Test that an exception is raised when required dependencies are not installed."""
         test_data = NrtkPerturbInputSchema(

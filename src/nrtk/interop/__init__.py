@@ -1,15 +1,13 @@
-"""Package related to interoperability of nrtk functions."""
+"""Define the nrtk.interop package."""
 
-from collections.abc import Callable
-from typing import Any
+from nrtk.interop._maite.augmentations.image_classification import MAITEClassificationAugmentation
+from nrtk.interop._maite.augmentations.object_detection import MAITEDetectionAugmentation
 
-import lazy_loader as lazy
+# Override __module__ to reflect the public API path
+MAITEClassificationAugmentation.__module__ = __name__
+MAITEDetectionAugmentation.__module__ = __name__
 
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
-
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=["maite"],
-)
+__all__ = [
+    "MAITEClassificationAugmentation",
+    "MAITEDetectionAugmentation",
+]
