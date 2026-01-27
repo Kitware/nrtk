@@ -30,6 +30,7 @@ _IMPORT_NAME_OVERRIDES = {
     "scikit-image": "skimage",
     "opencv-python": "cv2",
     "opencv-python-headless": "cv2",
+    "nrtk-albumentations": "albumentations",
 }
 
 
