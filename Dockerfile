@@ -47,13 +47,15 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     poetry config virtualenvs.create false && poetry run pip \
     install -e .[maite,tools,headless,pybsm]
 
+# Setip environment variables with default args
+ENV INPUT_DATASET_PATH="/input/data/dataset/"
+ENV OUTPUT_DATASET_PATH="/output/data/result/"
+ENV CONFIG_FILE="/input/nrtk_config.json"
+
 ENTRYPOINT [ "nrtk-perturber" ]
-# default args for nrtk_perturber_cli
-CMD ["/root/input/dataset", "/root/output/", \
-     "/root/input/nrtk_config.json", "-v"]
 
 # To run this docker container, use the following command:
-# `docker run -v /path/to/input:/root/input/:ro -v /path/to/output:/root/output/ nrtk-perturber`
+# `docker run -v /path/to/input:/input/:ro -v /path/to/output:/output/ nrtk-perturber`
 # This will mount the inputs to the correct locations the default args are used.
 # See https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 # for more info on mounting volumes

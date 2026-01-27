@@ -19,19 +19,41 @@ the container will terminate.
 How to Use
 ----------
 To run the AUKUS container, use the following command:
-``docker run -v /path/to/input:/root/input/:ro -v /path/to/output:/root/output/ nrtk-perturber``
+``docker run -v /path/to/input:/input/:ro -v /path/to/output:/output/ nrtk-perturber``
 This will mount the inputs to the correct locations and use the ``nrtk-perturber`` CLI script
-with the default args. The CLI script will attempt to load a COCO dataset from the ``dataset``
+with the default args. The CLI script will attempt to load a COCO dataset from the ``/input/data/dataset/``
 directory, save perturbed images to
-``/root/output``, and load a config file named ``nrtk_config.json``. The ``dataset`` directory
-and ``nrtk_config.json`` file must be in the directory mounted to ``/root/input/``.
+``/output/data/result/``, and load a config file named ``nrtk_config.json``. The ``dataset`` directory
+and ``nrtk_config.json`` file must be in the directory mounted to ``/input/``.
 
-If the user wants to use different input paths, the container expects the following
-arguments:
+Input Arguments
+---------------
+
+The container accepts three input arguments:
 
    * ``dataset_dir``: input COCO dataset
    * ``output_dir``: directory to store the generated saliency maps
    * ``config_file``: configuration file specifying the ``PerturbImageFactory`` params for image perturbation
+
+These can be controlled in two ways: ``Environment Variables`` or ``CLI Options``.
+
+The following environment variables are used by default:
+
+   * ``INPUT_DATASET_PATH``: Path to input dataset (default: ``/input/data/dataset/``)
+   * ``OUTPUT_DATASET_PATH``: Path to output directory (default: ``/output/data/result/``)
+   * ``CONFIG_FILE``: Path to config file (default: ``/input/nrtk_config.json``)
+
+To override defaults, use the ``-e`` flag:
+``docker run -e INPUT_DATASET_PATH=/custom/path ... nrtk-perturber``
+
+If a user does not want to use environment variables, they can use command line options. After the container name,
+the user can use the following flags:
+
+   * ``--dataset_dir`` or ``-d``: Path to input dataset
+   * ``--output_dir`` or ``-o``: Path to output directory
+   * ``--config_file`` or ``-c``: Path to config file
+
+Command line options take precendence over environment variables if both are provided.
 
 Note: The values for ``dataset_dir`` and ``config_file`` should be written from the
 perspective of the container (i.e. ``/path/on/container/dataset_dir/`` instead of

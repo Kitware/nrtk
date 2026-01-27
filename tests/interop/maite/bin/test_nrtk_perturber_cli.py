@@ -53,7 +53,12 @@ class TestNRTKPerturberCLI:
         runner = CliRunner()
         result = runner.invoke(
             nrtk_perturber_cli,
-            [str(DATASET_FOLDER), str(output_dir), str(NRTK_PYBSM_CONFIG), "-v"],
+            [
+                f"--dataset_dir={str(DATASET_FOLDER)}",
+                f"--output_dir={str(output_dir)}",
+                f"--config_file={str(NRTK_PYBSM_CONFIG)}",
+                "-v",
+            ],
             catch_exceptions=False,
         )
 
@@ -135,7 +140,12 @@ class TestNRTKPerturberCLI:
             runner = CliRunner()
             result = runner.invoke(
                 nrtk_perturber_cli,
-                [str(DATASET_FOLDER), str(output_dir), str(config_file), "-v"],
+                [
+                    f"--dataset_dir={str(DATASET_FOLDER)}",
+                    f"--output_dir={str(output_dir)}",
+                    f"--config_file={str(config_file)}",
+                    "-v",
+                ],
                 catch_exceptions=False,
             )
 
@@ -152,7 +162,12 @@ class TestNRTKPerturberCLI:
         with pytest.raises(ValueError, match=r"Could not identify annotations file."):
             runner.invoke(
                 nrtk_perturber_cli,
-                [str(DATASET_FOLDER), str(output_dir), str(NRTK_PYBSM_CONFIG), "-v"],
+                [
+                    f"--dataset_dir={str(DATASET_FOLDER)}",
+                    f"--output_dir={str(output_dir)}",
+                    f"--config_file={str(NRTK_PYBSM_CONFIG)}",
+                    "-v",
+                ],
                 catch_exceptions=False,
             )
 
@@ -186,7 +201,12 @@ def test_missing_deps(
     ):
         _ = runner.invoke(
             nrtk_perturber_cli,
-            [str(DATASET_FOLDER), str(output_dir), str(NRTK_PYBSM_CONFIG)],
+            [
+                f"--dataset_dir={str(DATASET_FOLDER)}",
+                f"--output_dir={str(output_dir)}",
+                f"--config_file={str(NRTK_PYBSM_CONFIG)}",
+                "-v",
+            ],
             catch_exceptions=False,
         )
 
