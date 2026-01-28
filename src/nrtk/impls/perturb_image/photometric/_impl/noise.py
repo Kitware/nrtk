@@ -179,10 +179,10 @@ class SaltNoisePerturber(_SPNoisePerturber):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with salt noise."""
-        super().perturb(image=image, boxes=boxes, **additional_params)
+        super().perturb(image=image, boxes=boxes, **kwargs)
         return self._perturb(image=image, mode="salt", amount=self.amount), boxes
 
 
@@ -204,10 +204,10 @@ class PepperNoisePerturber(_SPNoisePerturber):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with pepper noise."""
-        super().perturb(image=image, boxes=boxes, **additional_params)
+        super().perturb(image=image, boxes=boxes, **kwargs)
         return self._perturb(image=image, mode="pepper", amount=self.amount), boxes
 
 
@@ -261,10 +261,10 @@ class SaltAndPepperNoisePerturber(_SPNoisePerturber):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with S&P noise."""
-        super().perturb(image=image, boxes=boxes, **additional_params)
+        super().perturb(image=image, boxes=boxes, **kwargs)
 
         return self._perturb(
             image=image,
@@ -330,10 +330,10 @@ class GaussianNoisePerturber(_GSNoisePerturber):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with Gaussian noise."""
-        super().perturb(image=image, boxes=boxes, **additional_params)
+        super().perturb(image=image, boxes=boxes, **kwargs)
         return self._perturb(image=image, mode="gaussian", var=self.var, mean=self.mean), boxes
 
 
@@ -346,8 +346,8 @@ class SpeckleNoisePerturber(_GSNoisePerturber):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with multiplicative noise."""
-        super().perturb(image=image, boxes=boxes, **additional_params)
+        super().perturb(image=image, boxes=boxes, **kwargs)
         return self._perturb(image=image, mode="speckle", var=self.var, mean=self.mean), boxes

@@ -68,7 +68,7 @@ class ComposePerturber(PerturbImage):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Apply the sequence of perturbers to the input image.
 
@@ -78,7 +78,7 @@ class ComposePerturber(PerturbImage):
             boxes:
                 The bounding boxes for the input image. This is the single image
                 output from DetectImageObjects.detect_objects.
-            additional_params:
+            kwargs:
                 Additional perturbation keyword arguments.
 
         Returns:
@@ -89,7 +89,7 @@ class ComposePerturber(PerturbImage):
 
         # Applies series of perturbations to a the given input image
         for perturber in self.perturbers:
-            out_img, out_boxes = perturber(image=out_img, boxes=out_boxes, **additional_params)
+            out_img, out_boxes = perturber(image=out_img, boxes=out_boxes, **kwargs)
 
         if len(self.perturbers) == 0:
             out_img = copy.deepcopy(image)

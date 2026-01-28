@@ -14,7 +14,7 @@ Usage:
 
 Example:
     class CustomPerturbImage(PerturbImage):
-        def perturb(self, *, image, **additional_params:
+        def perturb(self, *, image, **kwargs:
             # Custom perturbation logic here
             pass
 
@@ -48,7 +48,7 @@ class PerturbImage(Plugfigurable):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Generate a perturbed image for the given image stimulus.
 
@@ -61,7 +61,7 @@ class PerturbImage(Plugfigurable):
             boxes:
                 Input bounding boxes as a Iterable of tuples containing bounding boxes.
                 This is the single image output from DetectImageObjects.detect_objects
-            additional_params:
+            kwargs:
                 Implementation-specific keyword arguments.
 
         Returns:
@@ -135,10 +135,10 @@ class PerturbImage(Plugfigurable):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Calls ``perturb()`` with the given input image."""
-        return self.perturb(image=image, boxes=boxes, **additional_params)
+        return self.perturb(image=image, boxes=boxes, **kwargs)
 
     @classmethod
     def get_type_string(cls) -> str:

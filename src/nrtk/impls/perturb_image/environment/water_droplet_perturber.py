@@ -978,7 +978,7 @@ class WaterDropletPerturber(PerturbImage):
         *,
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Applies the Water Droplet perturbation effect to the provided input image.
 
@@ -987,7 +987,7 @@ class WaterDropletPerturber(PerturbImage):
                 The image to be perturbed.
             boxes:
                 Bounding boxes for source detections.
-            additional_params:
+            kwargs:
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:

@@ -80,7 +80,7 @@ class TestJitterOTFPerturber:
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image, img_gsd=img_gsd)
 
     @pytest.mark.parametrize(
-        ("additional_params", "expectation"),
+        ("kwargs", "expectation"),
         [
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
@@ -89,9 +89,9 @@ class TestJitterOTFPerturber:
             ),
         ],
     )
-    def test_provided_additional_params(
+    def test_provided_kwargs(
         self,
-        additional_params: dict[str, Any],
+        kwargs: dict[str, Any],
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
@@ -99,10 +99,10 @@ class TestJitterOTFPerturber:
         perturber = JitterOTFPerturber(interp=True, **sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, **additional_params)
+            _ = perturber(image=image, **kwargs)
 
     @pytest.mark.parametrize(
-        ("additional_params", "expectation"),
+        ("kwargs", "expectation"),
         [
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
@@ -111,16 +111,16 @@ class TestJitterOTFPerturber:
             ),
         ],
     )
-    def test_default_additional_params(
+    def test_default_kwargs(
         self,
-        additional_params: dict[str, Any],
+        kwargs: dict[str, Any],
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
         perturber = JitterOTFPerturber()
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, **additional_params)
+            _ = perturber(image=image, **kwargs)
 
     @pytest.mark.parametrize("s_x", [0.5, 1.5])
     @pytest.mark.parametrize("s_y", [0.5, 1.5])

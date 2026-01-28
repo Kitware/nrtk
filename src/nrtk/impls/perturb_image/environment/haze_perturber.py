@@ -53,7 +53,7 @@ class HazePerturber(PerturbImage):
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         depth_map: np.ndarray[Any, Any] | None = None,
         sky_color: list[float] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Apply haze to an image based on depth_map and sky_color.
 
@@ -68,7 +68,7 @@ class HazePerturber(PerturbImage):
             sky_color:
                 Sky color to use for weathering. If sky_color is not provided, then an average pixel value will be
                 calculated and used as the sky color.
-            additional_params:
+            kwargs:
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:

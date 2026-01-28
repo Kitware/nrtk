@@ -124,7 +124,7 @@ class TestTurbulenceApertureOTFPerturber:
         pybsm_perturber_assertions(perturb=inst, image=img, expected=out_img, **img_md)
 
     @pytest.mark.parametrize(
-        ("use_sensor_scenario", "additional_params", "expectation"),
+        ("use_sensor_scenario", "kwargs", "expectation"),
         [
             (True, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
@@ -135,10 +135,10 @@ class TestTurbulenceApertureOTFPerturber:
             (False, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
         ],
     )
-    def test_additional_params(
+    def test_kwargs(
         self,
         use_sensor_scenario: bool,
-        additional_params: dict[str, Any],
+        kwargs: dict[str, Any],
         expectation: AbstractContextManager,
     ) -> None:
         """Test that exceptions are appropriately raised based on available metadata."""
@@ -148,7 +148,7 @@ class TestTurbulenceApertureOTFPerturber:
         perturber = TurbulenceApertureOTFPerturber(**sensor_and_scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber.perturb(image=img, **additional_params)
+            _ = perturber.perturb(image=img, **kwargs)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "expectation"),

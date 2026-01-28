@@ -25,7 +25,7 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 def _perturb(
     image: np.ndarray,
     boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,  # noqa: ARG001
-    additional_params: dict[str, Any] | None = None,  # noqa: ARG001
+    kwargs: dict[str, Any] | None = None,  # noqa: ARG001
 ) -> tuple[np.ndarray, None]:  # pragma: no cover
     return np.copy(image) + 1, None
 

@@ -168,7 +168,7 @@ class TestPyBSMPerturber:
             PybsmPerturber(altitude=altitude)
 
     @pytest.mark.parametrize(
-        ("additional_params", "expectation"),
+        ("kwargs", "expectation"),
         [
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
@@ -180,13 +180,13 @@ class TestPyBSMPerturber:
             ),
         ],
     )
-    def test_additional_params(self, additional_params: dict[str, Any], expectation: AbstractContextManager) -> None:
+    def test_kwargs(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test variations of additional params."""
         sensor_and_scenario = create_sample_sensor_and_scenario()
         perturber = PybsmPerturber(reflectance_range=np.array([0.05, 0.5]), **sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
-            _ = perturber(image=image, **additional_params)
+            _ = perturber(image=image, **kwargs)
 
     @pytest.mark.parametrize(
         "boxes",
