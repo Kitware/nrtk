@@ -218,21 +218,29 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
     def _convolve2d(*, img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
         h, w = img.shape
         kh, kw = kernel.shape
+        assert kh % 2 == 1
+        assert kw % 2 == 1
         pad_h, pad_w = kh // 2, kw // 2
 
-        padded = np.pad(img, ((pad_h, pad_h), (pad_w, pad_w)), mode="reflect")
-        output = np.zeros_like(img)
-
-        for i in range(h):
-            for j in range(w):
-                window = padded[i : i + kh, j : j + kw]
-                output[i, j] = np.sum(window * kernel)
+        output = np.zeros((h, w), like=img)
+        for i in range(kh):
+            for j in range(kw):
+                pad_i = (max(0, pad_h - i), max(0, i - pad_h))
+                pad_j = (max(0, pad_w - j), max(0, j - pad_w))
+                output += (
+                    np.pad(
+                        img[pad_i[1] : -pad_i[0] if pad_i[0] else None, pad_j[1] : -pad_j[0] if pad_j[0] else None],
+                        (pad_i, pad_j),
+                        mode="reflect",
+                    )
+                    * kernel[i, j]
+                )
 
         return output
 
     def _compute_ssim_windowed(self, *, img_a: np.ndarray, img_b: np.ndarray) -> float:
-        img_a = img_a.astype(np.float64, copy=False)
-        img_b = img_b.astype(np.float64, copy=False)
+        img_a = img_a.astype(np.float32, copy=False)
+        img_b = img_b.astype(np.float32, copy=False)
 
         if np.issubdtype(img_a.dtype, np.floating) or np.issubdtype(
             img_b.dtype,
