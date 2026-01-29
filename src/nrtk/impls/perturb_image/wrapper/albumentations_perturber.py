@@ -81,8 +81,10 @@ class AlbumentationsPerturber(PerturbImage):
 
 
         Raises:
-            ValueError: Given perturber is not available in Albumentations.
-            ValueError: Given perturber does not inherit BasicTransform.
+            ValueError:
+                Given perturber is not available in Albumentations.
+            ValueError:
+                Given perturber does not inherit BasicTransform.
         """
         if not self.is_usable():
             raise AlbumentationsImportError

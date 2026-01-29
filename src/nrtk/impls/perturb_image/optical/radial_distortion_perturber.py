@@ -65,7 +65,8 @@ class RadialDistortionPerturber(PerturbImage):
             color_fill (Sequence[int]): Background color fill for RGB image.
 
         Raises:
-            ValueError: Errors when k does not have exactly 3 values
+            ValueError:
+                Errors when k does not have exactly 3 values
         """
         super().__init__()
         self.k = k

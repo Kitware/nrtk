@@ -220,7 +220,8 @@ class PybsmOTFPerturber(PerturbImage, ABC):
                 Defaults to False.
             kwargs: sensor and/or scenario values to modify
         Raises:
-            ImportError: pyBSM is not found
+            ImportError:
+                pyBSM is not found
         """
         if not self.is_usable():
             raise PyBSMImportError
@@ -312,8 +313,10 @@ class PybsmOTFPerturber(PerturbImage, ABC):
                 The array must contain at least two elements and must be in ascending order.
 
         Raises:
-            ValueError: If `opt_trans_wavelengths` contains fewer than two elements.
-            ValueError: If the wavelengths in `opt_trans_wavelengths` are not in ascending order.
+            ValueError:
+                If `opt_trans_wavelengths` contains fewer than two elements.
+            ValueError:
+                If the wavelengths in `opt_trans_wavelengths` are not in ascending order.
         """
         if opt_trans_wavelengths.shape[0] < 2:
             raise ValueError(

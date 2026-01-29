@@ -79,8 +79,10 @@ class PerturberMultivariateFactory(PerturbImageFactory):
                 Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
-            TypeError: If perturber is an instance instead of a type.
-            ValueError: If theta_keys is empty or theta_keys and thetas have different lengths.
+            TypeError:
+                If perturber is an instance instead of a type.
+            ValueError:
+                If theta_keys is empty or theta_keys and thetas have different lengths.
         """
         # Validate perturber is a type, not an instance
         if not isinstance(perturber, type):
@@ -125,7 +127,8 @@ class PerturberMultivariateFactory(PerturbImageFactory):
         """Returns the next `PerturbImage` instance with a unique parameter configuration.
 
         Raises:
-            StopIteration: When all configurations have been iterated over.
+            StopIteration:
+                When all configurations have been iterated over.
         """
         if self.n < len(self.sets):
             kwargs = {k: self.thetas[i][self.sets[self.n][i]] for i, k in enumerate(self.theta_keys)}

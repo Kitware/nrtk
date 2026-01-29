@@ -82,7 +82,8 @@ class JitterOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            ImportError: If pyBSM is not found
+            ImportError:
+                If pyBSM is not found
         """
         super().__init__(interp=interp, **kwargs)
         self._use_default_psf = not kwargs

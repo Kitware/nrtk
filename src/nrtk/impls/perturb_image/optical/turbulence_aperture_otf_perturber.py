@@ -128,11 +128,16 @@ class TurbulenceApertureOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            ImportError: If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            ValueError: If mtf_wavelengths and mtf_weights are not equal length
-            ValueError: If mtf_wavelengths is empty or mtf_weights is empty
-            ValueError: If cn2at1m <= 0.0
+            ImportError:
+                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ImportError:
+                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
+            ValueError:
+                If mtf_wavelengths and mtf_weights are not equal length
+            ValueError:
+                If mtf_wavelengths is empty or mtf_weights is empty
+            ValueError:
+                If cn2at1m <= 0.0
         """
         if mtf_wavelengths is not None and len(mtf_wavelengths) == 0:
             raise ValueError("mtf_wavelengths is empty")

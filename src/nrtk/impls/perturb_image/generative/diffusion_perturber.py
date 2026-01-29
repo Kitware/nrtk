@@ -306,8 +306,10 @@ class DiffusionPerturber(PerturbImage):
             - Updated bounding boxes (currently returned unchanged)
 
         Raises:
-            ValueError: If the input image cannot be converted to PIL format.
-            RuntimeError: If the diffusion model fails to load or process the image.
+            ValueError:
+                If the input image cannot be converted to PIL format.
+            RuntimeError:
+                If the diffusion model fails to load or process the image.
         """
         perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 

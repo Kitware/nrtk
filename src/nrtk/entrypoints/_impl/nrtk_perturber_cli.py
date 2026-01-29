@@ -82,8 +82,10 @@ def nrtk_perturber_cli(
             Display progress messages. Default is false.
 
     Raises:
-        ValueError: COCO annotations file is not found
-        KWCocoImportError: KWCOCO is not available
+        ValueError:
+            COCO annotations file is not found
+        KWCocoImportError:
+            KWCOCO is not available
     """
     _set_logging(verbose)
 

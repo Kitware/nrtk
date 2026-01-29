@@ -43,7 +43,8 @@ def nrtk_perturber(*, maite_dataset: Dataset, perturber_factory: PerturbImageFac
         A list of tuples containing perturber configurations and augmented datasets
 
     Raises:
-        MaiteImportError: maite is not available
+        MaiteImportError:
+            maite is not available
     """
     if not maite_available:
         raise MaiteImportError
