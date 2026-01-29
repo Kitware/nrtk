@@ -177,7 +177,7 @@ class TestRandomTranslationPerturber:
             ),
         ],
     )
-    def test_additional_params(
+    def test_kwargs(
         self,
         image: np.ndarray,
         max_translation_limit: tuple[int, int],
@@ -203,14 +203,14 @@ class TestRandomTranslationPerturber:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
-        additional_params = dict()
+        kwargs = dict()
         if max_translation_limit is not None:
-            additional_params = {"max_translation_limit": max_translation_limit}
+            kwargs = {"max_translation_limit": max_translation_limit}
         out_img, _ = bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
             boxes=None,
             expected=None,
-            **additional_params,
+            **kwargs,
         )
         psnr_tiff_snapshot.assert_match(out_img)

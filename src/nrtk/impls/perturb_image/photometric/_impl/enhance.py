@@ -139,10 +139,10 @@ class BrightnessPerturber(_PerturbImage):
         *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted brightness."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
+        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Brightness
         if TYPE_CHECKING and not isinstance(
@@ -162,10 +162,10 @@ class ColorPerturber(_PerturbImage):
         *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted color balance."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
+        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Color
         if TYPE_CHECKING and not isinstance(
@@ -185,10 +185,10 @@ class ContrastPerturber(_PerturbImage):
         *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted contrast."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
+        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Contrast
         if TYPE_CHECKING and not isinstance(
@@ -217,10 +217,10 @@ class SharpnessPerturber(_PerturbImage):
         *,
         image: NDArray[Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted sharpness."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **additional_params)
+        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Sharpness
         if TYPE_CHECKING and not isinstance(

@@ -133,7 +133,7 @@ class RadialDistortionPerturber(PerturbImage):
                 Input image as a numpy array of shape (H, W, C).
             boxes:
                 List of bounding boxes in AxisAlignedBoundingBox format and their corresponding classes.
-            additional_params:
+            kwargs:
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:

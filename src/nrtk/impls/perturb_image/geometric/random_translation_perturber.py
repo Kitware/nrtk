@@ -70,7 +70,7 @@ class RandomTranslationPerturber(PerturbImage):
         image: np.ndarray[Any, Any],
         boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
         max_translation_limit: tuple[int, int] | None = None,
-        **additional_params: Any,
+        **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Randomly translates an image and adjusts bounding boxes.
 
@@ -82,7 +82,7 @@ class RandomTranslationPerturber(PerturbImage):
             max_translation_limit:
                 Max translation magnitude (translate_h, translate_w) lesser than or equal to the size of the input
                 image.
-            additional_params:
+            kwargs:
                 Additional perturbation keyword arguments (currently unused).
 
         Returns:

@@ -99,7 +99,7 @@ class TestCircularApertureOTFPerturber:
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image, img_gsd=img_gsd)
 
     @pytest.mark.parametrize(
-        ("additional_params", "expectation"),
+        ("kwargs", "expectation"),
         [
             ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
@@ -108,9 +108,9 @@ class TestCircularApertureOTFPerturber:
             ),
         ],
     )
-    def test_provided_additional_params(
+    def test_provided_kwargs(
         self,
-        additional_params: dict[str, Any],
+        kwargs: dict[str, Any],
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
@@ -118,7 +118,7 @@ class TestCircularApertureOTFPerturber:
         perturber = CircularApertureOTFPerturber(**sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
-            _ = perturber(image=image, **additional_params)
+            _ = perturber(image=image, **kwargs)
 
     @pytest.mark.parametrize(
         ("mtf_wavelengths", "mtf_weights", "D", "eta", "interp", "expectation"),
