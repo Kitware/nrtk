@@ -66,6 +66,8 @@ Lighting conditions and camera settings result in excessive or insufficient illu
 +-------------------------+--------------------------------------------------------------------------------------------------+
 | **NRTK Perturbation**   | :class:`~nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber`                       |
 +-------------------------+--------------------------------------------------------------------------------------------------+
+| **Learn More**          | :doc:`operational_risk_modules/extreme_illumination`                                             |
++-------------------------+--------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/illumination-1.jpg
   :width: 500px
@@ -290,6 +292,8 @@ Vibrations in the sensor platform (e.g. from wind) induce jitter and blurring.
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **NRTK Perturbation**   | :ref:`JitterOTFPerturber <nrtk.impls.perturb_image.optical.jitter_otf_perturber>`                  |
 +-------------------------+----------------------------------------------------------------------------------------------------+
+| **Learn More**          | :doc:`operational_risk_modules/high_frequency_vibration`                                           |
++-------------------------+----------------------------------------------------------------------------------------------------+
 
 .. figure:: /images/risks/jitter.png
   :width: 500px
@@ -336,8 +340,11 @@ The sensor data exhibits noise as a result of poor lighting, high ISO settings, 
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **NRTK Perturbation**   | :ref:`PybsmPerturber <nrtk.impls.perturb_image.optical.pybsm_perturber>`                           |
 +-------------------------+----------------------------------------------------------------------------------------------------+
+| **Learn More**          | :doc:`operational_risk_modules/sensor_noise_resolution`                                            |
++-------------------------+----------------------------------------------------------------------------------------------------+
 
-No sample available.
+.. figure:: /images/risks/sensor_dark_current_sample.png
+  :width: 500px
 
 .. _turbulence:
 
