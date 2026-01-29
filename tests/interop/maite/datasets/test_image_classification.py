@@ -3,7 +3,7 @@ from collections.abc import Sequence
 import numpy as np
 import pytest
 
-from nrtk.interop import MAITEClassificationAugmentation
+from nrtk.interop import MAITEImageClassificationAugmentation
 from nrtk.interop._maite.datasets.image_classification import (
     MAITEImageClassificationDataset,
 )
@@ -60,7 +60,7 @@ class TestMAITEImageClassificationDataset:
         and metadata and can be ingested by the augmentation adapter object.
         """
         perturber = ResizePerturber(w=64, h=512)
-        augmentation = MAITEClassificationAugmentation(augment=perturber, augment_id="test_augment")
+        augmentation = MAITEImageClassificationAugmentation(augment=perturber, augment_id="test_augment")
         for idx in range(len(dataset)):
             img_in = dataset[idx][0]
             lbl_in = dataset[idx][1]

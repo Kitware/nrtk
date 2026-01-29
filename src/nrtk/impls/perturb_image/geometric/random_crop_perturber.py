@@ -111,16 +111,19 @@ class RandomCropPerturber(PerturbImage):
         Returns:
             Cropped image with the modified bounding boxes.
         """
-        image, boxes = super().perturb(image=image, boxes=boxes)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes)
 
         # Set crop_size to image size if crop_size is None
-        crop_size = self.crop_size if self.crop_size is not None else (image.shape[0], image.shape[1])
+        if self.crop_size is not None:
+            crop_size = self.crop_size
+        else:
+            crop_size = (perturbed_image.shape[0], perturbed_image.shape[1])
 
-        if crop_size == image.shape[:2]:
-            return image.copy(), boxes
+        if crop_size == perturbed_image.shape[:2]:
+            return perturbed_image.copy(), perturbed_boxes
 
         crop_h, crop_w = crop_size
-        orig_h, orig_w = image.shape[:2]
+        orig_h, orig_w = perturbed_image.shape[:2]
 
         # Ensure crop size is smaller than image dimensions
         crop_h = min(crop_h, orig_h)
@@ -131,20 +134,20 @@ class RandomCropPerturber(PerturbImage):
         crop_y = self.rng.integers(low=0, high=(orig_h - crop_h))
 
         # Perform the crop
-        cropped_image = image[crop_y : crop_y + crop_h, crop_x : crop_x + crop_w].copy()
+        perturbed_image = perturbed_image[crop_y : crop_y + crop_h, crop_x : crop_x + crop_w].copy()
 
-        if boxes is None:
-            return cropped_image, []
+        if perturbed_boxes is None:
+            return perturbed_image, []
 
         # Adjust bounding boxes
-        adjusted_bboxes = RandomCropPerturber._compute_bboxes(
-            boxes=boxes,
+        perturbed_boxes = RandomCropPerturber._compute_bboxes(
+            boxes=perturbed_boxes,
             crop_x=crop_x,
             crop_y=crop_y,
             crop_w=crop_w,
             crop_h=crop_h,
         )
-        return cropped_image, adjusted_bboxes
+        return perturbed_image, perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:

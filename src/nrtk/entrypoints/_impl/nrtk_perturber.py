@@ -9,7 +9,7 @@ from collections.abc import Iterable
 import numpy as np
 
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
-from nrtk.interop import MAITEDetectionAugmentation
+from nrtk.interop import MAITEObjectDetectionAugmentation
 from nrtk.interop._maite.datasets.object_detection import MAITEObjectDetectionDataset
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
@@ -73,7 +73,7 @@ def nrtk_perturber(*, maite_dataset: Dataset, perturber_factory: PerturbImageFac
         aug_dets = []
         aug_metadata = []
 
-        maite_perturber = MAITEDetectionAugmentation(augment=perturber, augment_id=output_perturb_params[i])
+        maite_perturber = MAITEObjectDetectionAugmentation(augment=perturber, augment_id=output_perturb_params[i])
 
         # Formatting data to be of batch_size=1 in order to support MAITE
         # detection protocol's expected input for Augmentation

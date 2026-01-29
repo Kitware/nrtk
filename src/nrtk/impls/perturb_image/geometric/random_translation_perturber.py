@@ -88,15 +88,15 @@ class RandomTranslationPerturber(PerturbImage):
         Returns:
             Translated image with the modified bounding boxes.
         """
-        super().perturb(image=image)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         if max_translation_limit is None:
-            translate_h, translate_w = (image.shape[0], image.shape[1])
+            translate_h, translate_w = (perturbed_image.shape[0], perturbed_image.shape[1])
         else:
             translate_h, translate_w = max_translation_limit
 
-        if abs(translate_h) > image.shape[0] or abs(translate_w) > image.shape[1]:
-            raise ValueError(f"Max translation limit should be less than or equal to {image.shape[:2]}")
+        if abs(translate_h) > perturbed_image.shape[0] or abs(translate_w) > perturbed_image.shape[1]:
+            raise ValueError(f"Max translation limit should be less than or equal to {perturbed_image.shape[:2]}")
 
         # Randomly select the translation magnitude for each direction
         translate_x, translate_y = (0, 0)
@@ -106,13 +106,17 @@ class RandomTranslationPerturber(PerturbImage):
             translate_y = self.rng.integers(low=-translate_h, high=translate_h)
 
         # Apply background color fill based on the number of image dimensions
-        if image.ndim == 3:
-            final_image = np.full_like(image, self.color_fill.astype(image.dtype), dtype=image.dtype)
+        if perturbed_image.ndim == 3:
+            final_image = np.full_like(
+                perturbed_image,
+                self.color_fill.astype(perturbed_image.dtype),
+                dtype=perturbed_image.dtype,
+            )
         else:
-            final_image = np.zeros_like(image, dtype=image.dtype)
+            final_image = np.zeros_like(perturbed_image, dtype=perturbed_image.dtype)
 
         # Perform the translation
-        translated_image = np.roll(image.copy(), (translate_y, translate_x), axis=[0, 1])
+        translated_image = np.roll(perturbed_image.copy(), (translate_y, translate_x), axis=[0, 1])
 
         # Apply the valid translated image region to the final background image
         if translate_x >= 0 and translate_y >= 0:
@@ -125,7 +129,7 @@ class RandomTranslationPerturber(PerturbImage):
             final_image[:translate_y, :translate_x, ...] = translated_image[:translate_y, :translate_x, ...]
 
         # Adjust bounding boxes
-        adjusted_bboxes = []
+        perturbed_boxes = []
         if boxes is not None:
             for bbox, metadata in boxes:
                 # Compute the shifted_min coords for the bounding box to align with
@@ -164,8 +168,10 @@ class RandomTranslationPerturber(PerturbImage):
 
                 # Apply the shifted coordinates to the output bounding box
                 adjusted_box = AxisAlignedBoundingBox(min_vertex=shifted_min, max_vertex=shifted_max)
-                adjusted_bboxes.append((adjusted_box, metadata))
-        return final_image, adjusted_bboxes
+                perturbed_boxes.append((adjusted_box, metadata))
+
+        perturbed_image = final_image
+        return perturbed_image, perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:

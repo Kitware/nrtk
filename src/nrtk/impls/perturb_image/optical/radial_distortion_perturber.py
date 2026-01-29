@@ -139,27 +139,27 @@ class RadialDistortionPerturber(PerturbImage):
         Returns:
             Distorted image as numpy array and updated bounding boxes
         """
-        super().perturb(image=image)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes)
 
         # Get w, h and empty output image
-        h, w = float(image.shape[0]), float(image.shape[1])
-        out = np.full_like(image, self.color_fill.astype(image.dtype), dtype=image.dtype)
+        h, w = float(perturbed_image.shape[0]), float(perturbed_image.shape[1])
+        out = np.full_like(perturbed_image, self.color_fill.astype(perturbed_image.dtype), dtype=perturbed_image.dtype)
 
         # Get distorted coordinates
-        x0, y0 = np.meshgrid(np.arange(image.shape[1]), np.arange(image.shape[0]))
+        x0, y0 = np.meshgrid(np.arange(perturbed_image.shape[1]), np.arange(perturbed_image.shape[0]))
         x1, y1 = self._radial_transform(x0=x0, y0=y0, w=w, h=h, k=self.k)
 
         # Valid index mask
-        valid_mask = (x1 >= 0) & (x1 < image.shape[1]) & (y1 >= 0) & (y1 < image.shape[0])
+        valid_mask = (x1 >= 0) & (x1 < perturbed_image.shape[1]) & (y1 >= 0) & (y1 < perturbed_image.shape[0])
 
         # Assign using correct shape and axis order
-        out[y0[valid_mask], x0[valid_mask]] = image[y1[valid_mask], x1[valid_mask]]
+        out[y0[valid_mask], x0[valid_mask]] = perturbed_image[y1[valid_mask], x1[valid_mask]]
 
         # Update bounding boxes
-        if boxes:
-            boxes = list(boxes)
-            for i in range(len(boxes)):
-                box, label = boxes[i]
+        if perturbed_boxes:
+            perturbed_boxes = list(perturbed_boxes)
+            for i in range(len(perturbed_boxes)):
+                box, label = perturbed_boxes[i]
 
                 # Get corners
                 min_x, min_y = box.min_vertex
@@ -171,9 +171,10 @@ class RadialDistortionPerturber(PerturbImage):
                 x1, y1 = self._radial_transform(x0=x0, y0=y0, w=w, h=h, k=[-k for k in self.k])
 
                 # New axis-aligned bounding box from distorted corners
-                boxes[i] = (self._align_box(np.transpose([x1, y1])), label)
+                perturbed_boxes[i] = (self._align_box(np.transpose([x1, y1])), label)
 
-        return out.astype(np.uint8), boxes
+        perturbed_image = out.astype(np.uint8)
+        return perturbed_image, perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:

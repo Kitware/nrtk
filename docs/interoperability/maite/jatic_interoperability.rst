@@ -26,5 +26,5 @@ For tutorials utilizing these adapters to evaluate model robustness against key 
    :template: custom-class-template.rst
    :recursive:
 
-   ~nrtk.interop.MAITEClassificationAugmentation
-   ~nrtk.interop.MAITEDetectionAugmentation
+   ~nrtk.interop.MAITEImageClassificationAugmentation
+   ~nrtk.interop.MAITEObjectDetectionAugmentation

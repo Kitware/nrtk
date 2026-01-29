@@ -149,29 +149,33 @@ class AlbumentationsPerturber(PerturbImage):
         Returns:
             Image with transform applied and bounding boxes with their coordinates adjusted by the transform.
         """
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+
         # Create bboxes and labels in a format usable by Albumentations
         bboxes = list()
         labels = list()
-        if boxes:
-            for box in boxes:
-                bboxes.append(AlbumentationsPerturber._aabb_to_bbox(box=box[0], image=image))
+        if perturbed_boxes:
+            for box in perturbed_boxes:
+                bboxes.append(AlbumentationsPerturber._aabb_to_bbox(box=box[0], image=perturbed_image))
                 labels.append(box[1])
 
         # Run transform
         output = self.transform(
-            image=image,
+            image=perturbed_image,
             bboxes=np.array(bboxes),
         )
-        output_image = output["image"].astype(np.uint8)
+        perturbed_image = output["image"].astype(np.uint8)
 
         # Create output_bboxes in the format expected by PerturbImage output
-        output_boxes = None
-        if boxes:
-            output_boxes = [
-                (AlbumentationsPerturber._bbox_to_aabb(box=bbox, image=output_image), label)
+        if perturbed_boxes:
+            perturbed_boxes = [
+                (AlbumentationsPerturber._bbox_to_aabb(box=bbox, image=perturbed_image), label)
                 for bbox, label in zip(output["bboxes"], labels, strict=False)
             ]
-        return output_image, output_boxes
+        else:
+            perturbed_boxes = None
+
+        return perturbed_image, perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:

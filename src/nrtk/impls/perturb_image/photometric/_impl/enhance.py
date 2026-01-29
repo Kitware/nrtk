@@ -142,7 +142,7 @@ class BrightnessPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted brightness."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Brightness
         if TYPE_CHECKING and not isinstance(
@@ -150,7 +150,7 @@ class BrightnessPerturber(_PerturbImage):
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return super()._perturb(enhancement=enhancement, image=_image), _boxes
+        return super()._perturb(enhancement=enhancement, image=perturbed_image), perturbed_boxes
 
 
 class ColorPerturber(_PerturbImage):
@@ -165,7 +165,7 @@ class ColorPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted color balance."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Color
         if TYPE_CHECKING and not isinstance(
@@ -173,7 +173,7 @@ class ColorPerturber(_PerturbImage):
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return super()._perturb(enhancement=enhancement, image=_image), _boxes
+        return super()._perturb(enhancement=enhancement, image=perturbed_image), perturbed_boxes
 
 
 class ContrastPerturber(_PerturbImage):
@@ -188,7 +188,7 @@ class ContrastPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted contrast."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Contrast
         if TYPE_CHECKING and not isinstance(
@@ -196,7 +196,7 @@ class ContrastPerturber(_PerturbImage):
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return super()._perturb(enhancement=enhancement, image=_image), _boxes
+        return super()._perturb(enhancement=enhancement, image=perturbed_image), perturbed_boxes
 
 
 class SharpnessPerturber(_PerturbImage):
@@ -220,7 +220,7 @@ class SharpnessPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[NDArray[Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with adjusted sharpness."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         enhancement = ImageEnhance.Sharpness
         if TYPE_CHECKING and not isinstance(
@@ -228,4 +228,4 @@ class SharpnessPerturber(_PerturbImage):
             type(_Enhancement),
         ):  # pragma: no cover
             raise ValueError("enhancement does not conform to _Enhancement protocol")
-        return super()._perturb(enhancement=enhancement, image=_image), _boxes
+        return super()._perturb(enhancement=enhancement, image=perturbed_image), perturbed_boxes

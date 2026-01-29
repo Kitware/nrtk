@@ -309,11 +309,13 @@ class DiffusionPerturber(PerturbImage):
             ValueError: If the input image cannot be converted to PIL format.
             RuntimeError: If the diffusion model fails to load or process the image.
         """
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+
         if self.prompt == "do not change the image":
-            return image, boxes
+            return perturbed_image, perturbed_boxes
 
         try:
-            pil_image = fromarray(image).convert("RGB")
+            pil_image = fromarray(perturbed_image).convert("RGB")
 
             resized_image = self._resize_image(pil_image)
 
@@ -331,14 +333,13 @@ class DiffusionPerturber(PerturbImage):
             )
             # pull single image from list of images
             _images, _ = pipeline_result
-            generated_image: np.ndarray
 
             if isinstance(_images, Image):
-                generated_image = np.array(_images, dtype=np.uint8)
+                perturbed_image = np.array(_images, dtype=np.uint8)
             else:
-                generated_image = np.array(_images[0], dtype=np.uint8)
+                perturbed_image = np.array(_images[0], dtype=np.uint8)
 
-            return generated_image, boxes
+            return perturbed_image, perturbed_boxes
 
         except Exception as e:
             raise RuntimeError(f"Failed to generate perturbed image: {e}") from e

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__all__ = ["MAITEClassificationAugmentation"]
+__all__ = ["MAITEImageClassificationAugmentation"]
 
 import copy
 from collections.abc import Iterable, Sequence
@@ -32,7 +32,7 @@ from maite.protocols.image_classification import (  # noqa: E402
 IMG_CLASSIFICATION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]
 
 
-class MAITEClassificationAugmentation(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
+class MAITEImageClassificationAugmentation(Augmentation):  # pyright:  ignore [reportGeneralTypeIssues]
     """Implementation of MAITE Image Classification Augmentation for NRTK perturbers.
 
     Implementation of MAITE Augmentation for NRTK perturbers operating on a MAITE-protocol

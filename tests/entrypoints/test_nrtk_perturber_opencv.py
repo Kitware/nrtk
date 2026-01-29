@@ -6,8 +6,8 @@ from nrtk.impls.perturb_image.photometric.blur import AverageBlurPerturber
 from nrtk.impls.perturb_image_factory import PerturberStepFactory
 from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 from nrtk.interop._maite.datasets.object_detection import (
-    MAITEDetectionTarget,
     MAITEObjectDetectionDataset,
+    MAITEObjectDetectionTarget,
 )
 from nrtk.utils._import_guard import is_available
 
@@ -48,7 +48,7 @@ class TestNRTKPerturberOpenCV:
         dataset = MAITEObjectDetectionDataset(
             imgs=[np.random.default_rng().integers(low=0, high=255, size=(3, 256, 256), dtype=np.uint8)] * num_imgs,
             dets=[
-                MAITEDetectionTarget(
+                MAITEObjectDetectionTarget(
                     boxes=np.array([[1.0, 2.0, 3.0, 4.0]]),
                     labels=np.array([0]),
                     scores=np.array([0.5]),

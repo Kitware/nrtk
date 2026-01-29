@@ -10,11 +10,11 @@ import numpy as np
 import py
 import pytest
 
-from nrtk.interop import MAITEDetectionAugmentation
+from nrtk.interop import MAITEObjectDetectionAugmentation
 from nrtk.interop._maite.datasets.object_detection import (
     COCOMAITEObjectDetectionDataset,
-    MAITEDetectionTarget,
     MAITEObjectDetectionDataset,
+    MAITEObjectDetectionTarget,
     dataset_to_coco,
 )
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
@@ -40,12 +40,12 @@ class TestMAITEObjectDetectionDataset:
                     random.integers(0, 255, (3, 128, 128), dtype=np.uint8),
                 ],
                 [
-                    MAITEDetectionTarget(
+                    MAITEObjectDetectionTarget(
                         boxes=np.asarray([[0.0, 0.0, 100.0, 100.0], [0.0, 0.0, 100.0, 100.0]]),
                         labels=np.asarray([1, 1]),
                         scores=np.asarray([1, 1]),
                     ),
-                    MAITEDetectionTarget(
+                    MAITEObjectDetectionTarget(
                         boxes=np.asarray([[0.0, 0, 50.0, 50.0]]),
                         labels=np.asarray([0]),
                         scores=np.asarray([1]),
@@ -56,14 +56,14 @@ class TestMAITEObjectDetectionDataset:
                 {0: "cat1", 1: "cat2"},
                 [
                     [
-                        MAITEDetectionTarget(
+                        MAITEObjectDetectionTarget(
                             boxes=np.asarray([[0.0, 0.0, 25.0, 200.0], [0.0, 0.0, 25.0, 200.0]]),
                             labels=np.asarray([1, 1]),
                             scores=np.asarray([1, 1]),
                         ),
                     ],
                     [
-                        MAITEDetectionTarget(
+                        MAITEObjectDetectionTarget(
                             boxes=np.asarray([[0.0, 0, 25.0, 200.0]]),
                             labels=np.asarray([0]),
                             scores=np.asarray([1]),
@@ -96,7 +96,7 @@ class TestMAITEObjectDetectionDataset:
             index2label=index2label,
         )
         perturber = ResizePerturber(w=64, h=512)
-        augmentation = MAITEDetectionAugmentation(augment=perturber, augment_id="test_augment")
+        augmentation = MAITEObjectDetectionAugmentation(augment=perturber, augment_id="test_augment")
         for idx in range(len(dataset)):
             img_in = dataset[idx][0]
             det_in = dataset[idx][1]
@@ -130,7 +130,7 @@ class TestMAITEObjectDetectionDataset:
         (
             [random.integers(0, 255, size=(3, 10, 10), dtype=np.uint8)],
             [
-                MAITEDetectionTarget(
+                MAITEObjectDetectionTarget(
                     boxes=random.integers(0, 4, size=(2, 4)),
                     labels=random.integers(0, 2, size=(2,)),
                     scores=random.random(2),
@@ -148,7 +148,7 @@ class TestMAITEObjectDetectionDataset:
         (
             [random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 2,
             [
-                MAITEDetectionTarget(
+                MAITEObjectDetectionTarget(
                     boxes=random.integers(0, 4, size=(2, 4)),
                     labels=random.integers(0, 2, size=(2,)),
                     scores=random.random(2),

@@ -12,8 +12,8 @@ from starlette.testclient import TestClient
 from nrtk.interop._maite.api.app import app
 from nrtk.interop._maite.api.schema import NrtkPerturbInputSchema
 from nrtk.interop._maite.datasets.object_detection import (
-    MAITEDetectionTarget,
     MAITEObjectDetectionDataset,
+    MAITEObjectDetectionTarget,
 )
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard, is_available
@@ -34,7 +34,7 @@ if is_usable:
             MAITEObjectDetectionDataset(
                 imgs=[random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 11,
                 dets=[
-                    MAITEDetectionTarget(
+                    MAITEObjectDetectionTarget(
                         boxes=random.random((2, 4)),
                         labels=random.random(2),
                         scores=random.random(2),
