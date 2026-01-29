@@ -60,8 +60,9 @@ class PerturberFakeFactory(PerturbImageFactory):
         perturber: type[PerturbImage],
         theta_key: str,
         theta_values: Sequence[Any],
+        perturber_kwargs: dict[str, Any] | None = None,
     ) -> None:
-        super().__init__(perturber=perturber, theta_key=theta_key)
+        super().__init__(perturber=perturber, theta_key=theta_key, perturber_kwargs=perturber_kwargs)
         self._theta_values = list(theta_values)
 
     @property
@@ -71,7 +72,7 @@ class PerturberFakeFactory(PerturbImageFactory):
 
     @override
     def __getitem__(self, idx: int) -> PerturbImage:
-        return self.perturber(**{self.theta_key: self._theta_values[idx]})
+        return self._create_perturber({self.theta_key: self._theta_values[idx]})
 
     @override
     def get_config(self) -> dict[str, Any]:
@@ -79,4 +80,5 @@ class PerturberFakeFactory(PerturbImageFactory):
             "perturber": self.perturber.get_type_string(),
             "theta_key": self.theta_key,
             "theta_values": self._theta_values,
+            "perturber_kwargs": self.perturber_kwargs,
         }

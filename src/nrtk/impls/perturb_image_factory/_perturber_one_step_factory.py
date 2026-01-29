@@ -43,6 +43,7 @@ class PerturberOneStepFactory(PerturberStepFactory):
         theta_key: str,
         theta_value: float,
         to_int: bool = False,
+        perturber_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the factory to produce an instance of PerturbImage for the given type.
 
@@ -58,6 +59,8 @@ class PerturberOneStepFactory(PerturberStepFactory):
                 Initial and only value of ``theta_key``.
             to_int:
                 Boolean variable determining whether the theta is cast as int or float. Defaults to False.
+            perturber_kwargs:
+                Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
             TypeError: Given a perturber instance instead of type.
@@ -69,6 +72,7 @@ class PerturberOneStepFactory(PerturberStepFactory):
             stop=theta_value + 0.1,
             step=1.0,
             to_int=to_int,
+            perturber_kwargs=perturber_kwargs,
         )
 
         self.theta_value = theta_value
@@ -77,4 +81,4 @@ class PerturberOneStepFactory(PerturberStepFactory):
         """Returns a configuration dictionary for the PerturberOneStepFactory instance."""
         cfg = super().get_config()
         cfg["theta_value"] = self.theta_value
-        return {k: cfg[k] for k in ("perturber", "theta_key", "theta_value", "to_int")}
+        return {k: cfg[k] for k in ("perturber", "theta_key", "theta_value", "to_int", "perturber_kwargs")}

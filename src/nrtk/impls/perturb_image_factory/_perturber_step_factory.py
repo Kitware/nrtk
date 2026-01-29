@@ -60,6 +60,7 @@ class PerturberStepFactory(PerturbImageFactory):
         stop: float,
         step: float = 1.0,
         to_int: bool = False,
+        perturber_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
@@ -79,11 +80,13 @@ class PerturberStepFactory(PerturbImageFactory):
                 Step value between instances.
             to_int:
                 Boolean variable determining whether the thetas are cast as ints or floats. Defaults to False.
+            perturber_kwargs:
+                Default kwargs to be used by the perturber. Defaults to {}.
 
         Raises:
             TypeError: Given a perturber instance instead of type.
         """
-        super().__init__(perturber=perturber, theta_key=theta_key)
+        super().__init__(perturber=perturber, theta_key=theta_key, perturber_kwargs=perturber_kwargs)
 
         self.to_int = to_int
         self.start = start

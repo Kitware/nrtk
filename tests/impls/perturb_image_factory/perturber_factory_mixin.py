@@ -200,6 +200,28 @@ class PerturberFactoryMixin:
         with pytest.raises(TypeError, match=r"Passed a perturber instance, expected type"):
             impl_class(perturber=FakePerturber(), **self.default_factory_kwargs)  # type: ignore[arg-type]
 
+    # ===================== perturber_kwargs Parameter =====================
+
+    def test_perturber_kwargs_passed_to_perturber(self) -> None:
+        """perturber_kwargs are passed to created perturbers."""
+        factory = self._make_factory(
+            **(self.default_factory_kwargs | {"perturber_kwargs": {"param2": 99}}),
+        )
+        perturber = factory[0]
+        config = perturber.get_config()
+        assert config["param1"] == factory.thetas[0]
+        assert config["param2"] == 99
+
+    def test_theta_values_override_perturber_kwargs(self) -> None:
+        """Theta values override perturber_kwargs for same key."""
+        factory = self._make_factory(
+            **(self.default_factory_kwargs | {"perturber_kwargs": {"param1": 999}}),  # should be overridden
+        )
+        perturber = factory[0]
+        config = perturber.get_config()
+        assert config["param1"] != 999
+        assert config["param1"] == factory.thetas[0]  # theta value, not perturber_kwargs
+
     # =========================== Property Tests ===========================
 
     def test_len_matches_thetas_length(self) -> None:

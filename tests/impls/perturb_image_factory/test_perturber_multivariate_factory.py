@@ -206,7 +206,9 @@ class TestPerturberMultivariateFactory(PerturberFactoryMixin):
             )
 
     # ===================== perturber_kwargs Parameter =====================
+    # Override: multivariate uses theta_keys (plural)
 
+    @override
     def test_perturber_kwargs_passed_to_perturber(self) -> None:
         """perturber_kwargs are passed to created perturbers."""
         factory = self._make_factory(
@@ -219,6 +221,7 @@ class TestPerturberMultivariateFactory(PerturberFactoryMixin):
         assert config["param1"] == 1
         assert config["param2"] == 99
 
+    @override
     def test_theta_values_override_perturber_kwargs(self) -> None:
         """Theta values override perturber_kwargs for same key."""
         factory = self._make_factory(

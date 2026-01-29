@@ -109,11 +109,6 @@ class PerturberMultivariateFactory(PerturbImageFactory):
         self.n: int = 0
         self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
-    def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
-        """Returns PerturberImage implementation with given input args."""
-        input_kwargs = self.perturber_kwargs | kwargs
-        return self.perturber(**input_kwargs)
-
     @override
     def __len__(self) -> int:
         """Returns the number of possible perturbation instances."""
