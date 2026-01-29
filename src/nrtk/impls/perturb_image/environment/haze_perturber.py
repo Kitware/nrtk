@@ -74,26 +74,28 @@ class HazePerturber(PerturbImage):
         Returns:
             Image with haze applied and source bounding boxes.
         """
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+
         # Use either the provided depth map or a map containing all values = 1
         if depth_map is None:
-            depth_map = np.ones_like(image)
+            depth_map = np.ones_like(perturbed_image)
         else:
-            if len(image.shape) != len(depth_map.shape):
+            if len(perturbed_image.shape) != len(depth_map.shape):
                 raise ValueError(
-                    f"image dims ({len(image.shape)}) does not match depth_map dims ({len(depth_map.shape)})",
+                    f"image dims ({len(perturbed_image.shape)}) does not match depth_map dims ({len(depth_map.shape)})",
                 )
 
         # Use either the provided sky_color map or a map containing avg. pixel values
         if sky_color is None:
-            final_sky_color = np.mean(image, axis=(0, 1))
+            final_sky_color = np.mean(perturbed_image, axis=(0, 1))
         else:
-            final_sky_color = self._check_sky_color(image=image, sky_color=sky_color)
+            final_sky_color = self._check_sky_color(image=perturbed_image, sky_color=sky_color)
 
         # Beer's Law of Attenuation based on the haze factor and depth map
         attenuation = np.exp(-self.factor * depth_map)
-        output = image * attenuation + final_sky_color * (1 - attenuation)
+        perturbed_image = perturbed_image * attenuation + final_sky_color * (1 - attenuation)
 
-        return output.astype(np.uint8), boxes
+        return perturbed_image.astype(np.uint8), perturbed_boxes
 
     def _check_sky_color(self, *, image: np.ndarray, sky_color: list[float]) -> list[float]:
         if (len(image.shape) == 3 and len(sky_color) != 3) or (len(image.shape) == 2 and len(sky_color) != 1):

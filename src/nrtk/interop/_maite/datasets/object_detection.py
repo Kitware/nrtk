@@ -43,7 +43,7 @@ OBJ_DETECTION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 
 
 @dataclass
-class MAITEDetectionTarget:
+class MAITEObjectDetectionTarget:
     """Dataclass for the datum-level MAITE output detection format."""
 
     boxes: np.ndarray[Any, Any]
@@ -131,7 +131,7 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
             if not img_file_path.exists():
                 continue
             self._image_ids.append(img_id)
-            self._annotations[img_id] = MAITEDetectionTarget(
+            self._annotations[img_id] = MAITEObjectDetectionTarget(
                 boxes=bboxes,
                 labels=np.asarray(labels),
                 scores=np.asarray(scores),

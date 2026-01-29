@@ -363,12 +363,12 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         _, blur_img, noisy_img = self._simulator.simulate_image(image, gsd=img_gsd)
 
         if self._simulator.add_noise and noisy_img is not None:  # noqa: SIM108
-            out_img = noisy_img
+            perturbed_image = noisy_img
         else:
-            out_img = blur_img
+            perturbed_image = blur_img
 
         # Handle formatting and box rescaling
-        return self._handle_boxes_and_format(sim_img=out_img, boxes=boxes, orig_shape=image.shape)
+        return self._handle_boxes_and_format(sim_img=perturbed_image, boxes=boxes, orig_shape=image.shape)
 
     @override
     def get_config(self) -> dict[str, Any]:

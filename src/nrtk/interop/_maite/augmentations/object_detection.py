@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__all__ = ["MAITEDetectionAugmentation"]
+__all__ = ["MAITEObjectDetectionAugmentation"]
 
 import copy
 from collections.abc import Iterable, Sequence
@@ -12,7 +12,7 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.interop._maite.datasets.object_detection import MAITEDetectionTarget
+from nrtk.interop._maite.datasets.object_detection import MAITEObjectDetectionTarget
 from nrtk.interop._maite.metadata.datum import NRTKDatumMetadata, _forward_md_keys
 from nrtk.utils._exceptions import MaiteImportError
 from nrtk.utils._import_guard import import_guard
@@ -35,16 +35,16 @@ from maite.protocols.object_detection import (  # noqa: E402
 OBJ_DETECTION_BATCH_T = tuple[Sequence[InputType], Sequence[TargetType], Sequence[DatumMetadataType]]
 
 
-class MAITEDetectionAugmentation(Augmentation):  # pyright: ignore [reportGeneralTypeIssues]
+class MAITEObjectDetectionAugmentation(Augmentation):  # pyright: ignore [reportGeneralTypeIssues]
     """Implementation of MAITE Object Detection Augmentation for NRTK perturbers.
 
     Implementation of MAITE Augmentation for NRTK perturbers
     operating on a MAITE-protocol compliant Object Detection dataset.
 
     Given a set of ground truth labels alongside an image and image
-    metadata, MAITEDetectionAugmentation will properly scale the
+    metadata, MAITEObjectDetectionAugmentation will properly scale the
     labels in accordance with the change in the image scale due to
-    applied pertubation. At this time MAITEDetectionAugmentation does
+    applied pertubation. At this time MAITEObjectDetectionAugmentation does
     not support any other augmentation to the labels such as cropping,
     translation, or rotation.
 
@@ -104,7 +104,7 @@ class MAITEDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
                 break
             aug_imgs.append(np.transpose(aug_img, (2, 0, 1)))
 
-            # re-format annotations to MAITEDetectionTarget for returning
+            # re-format annotations to MAITEObjectDetectionTarget for returning
             aug_img_bboxes, aug_img_score_dicts = zip(*aug_img_anns, strict=False)
             aug_img_bboxes_arr = np.vstack([np.hstack((bbox.min_vertex, bbox.max_vertex)) for bbox in aug_img_bboxes])
             aug_img_labels, aug_img_scores = zip(
@@ -116,7 +116,7 @@ class MAITEDetectionAugmentation(Augmentation):  # pyright: ignore [reportGenera
                 strict=False,
             )
             aug_dets.append(
-                MAITEDetectionTarget(
+                MAITEObjectDetectionTarget(
                     boxes=aug_img_bboxes_arr,
                     labels=np.array(aug_img_labels),
                     scores=np.array(aug_img_scores),

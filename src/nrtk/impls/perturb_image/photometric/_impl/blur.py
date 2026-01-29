@@ -73,13 +73,13 @@ class _PerturbImage(PerturbImage):
         **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying average blurring."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         # Check for channel last format
-        if _image.ndim == 3 and _image.shape[2] > 4:
+        if perturbed_image.ndim == 3 and perturbed_image.shape[2] > 4:
             raise ValueError("Image is not in expected format (H, W, C)")
 
-        return _image, _boxes
+        return perturbed_image, perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:
@@ -129,9 +129,9 @@ class AverageBlurPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying average blurring."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
-        return cv2.blur(_image, ksize=(self.ksize, self.ksize)), _boxes
+        return cv2.blur(perturbed_image, ksize=(self.ksize, self.ksize)), perturbed_boxes
 
 
 class GaussianBlurPerturber(_PerturbImage):
@@ -163,9 +163,9 @@ class GaussianBlurPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying Gaussian blurring."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
-        return cv2.GaussianBlur(_image, ksize=(self.ksize, self.ksize), sigmaX=0), _boxes
+        return cv2.GaussianBlur(perturbed_image, ksize=(self.ksize, self.ksize), sigmaX=0), perturbed_boxes
 
 
 class MedianBlurPerturber(_PerturbImage):
@@ -197,6 +197,6 @@ class MedianBlurPerturber(_PerturbImage):
         **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus after applying Gaussian blurring."""
-        _image, _boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
-        return cv2.medianBlur(_image, ksize=self.ksize), _boxes
+        return cv2.medianBlur(perturbed_image, ksize=self.ksize), perturbed_boxes

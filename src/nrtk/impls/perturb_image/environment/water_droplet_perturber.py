@@ -993,28 +993,28 @@ class WaterDropletPerturber(PerturbImage):
         Returns:
             The perturbed image and bounding boxes scaled to perturbed image shape.
         """
-        image, boxes = super().perturb(image=image, boxes=boxes)
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes)
 
         # Reset RNG state when seed is provided to ensure deterministic results across multiple calls
         if self.seed is not None:
             self._initialize_derived_parameters()
 
-        rain_image, mask = self.render(image=image)
+        rain_image, mask = self.render(image=perturbed_image)
         perturbed_image = self.blur(
-            image=image,
+            image=perturbed_image,
             rain_image=rain_image,
             mask=mask,
         )
 
-        if boxes:
-            rescaled_boxes = self._rescale_boxes(
-                boxes=boxes,
+        if perturbed_boxes:
+            perturbed_boxes = self._rescale_boxes(
+                boxes=perturbed_boxes,
                 orig_shape=image.shape,
                 new_shape=perturbed_image.shape,
             )
-            return perturbed_image.astype(np.uint8), rescaled_boxes
+            return perturbed_image.astype(np.uint8), perturbed_boxes
 
-        return perturbed_image.astype(np.uint8), boxes
+        return perturbed_image.astype(np.uint8), perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:

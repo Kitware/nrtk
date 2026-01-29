@@ -84,17 +84,21 @@ class ComposePerturber(PerturbImage):
         Returns:
             The perturbed image and the source bounding boxes.
         """
-        out_img = image
-        out_boxes = boxes
+        perturbed_image = image
+        perturbed_boxes = boxes
 
         # Applies series of perturbations to a the given input image
         for perturber in self.perturbers:
-            out_img, out_boxes = perturber(image=out_img, boxes=out_boxes, **kwargs)
+            perturbed_image, perturbed_boxes = perturber(
+                image=perturbed_image,
+                boxes=perturbed_boxes,
+                **kwargs,
+            )
 
         if len(self.perturbers) == 0:
-            out_img = copy.deepcopy(image)
+            perturbed_image = copy.deepcopy(image)
 
-        return out_img, out_boxes
+        return perturbed_image, perturbed_boxes
 
     @override
     def get_config(self) -> dict[str, Any]:
