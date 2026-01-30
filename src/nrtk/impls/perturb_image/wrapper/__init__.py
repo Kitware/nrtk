@@ -1,18 +1,29 @@
 """Module for wrapper implementations of PerturbImage."""
 
-from collections.abc import Callable
-from typing import Any
+from nrtk.impls.perturb_image.wrapper._compose_perturber import ComposePerturber
 
-import lazy_loader as lazy
+# Override __module__ to reflect the public API path for plugin discovery
+ComposePerturber.__module__ = __name__
 
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
+__all__ = ["ComposePerturber"]
 
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=[
-        "compose_perturber",
-        "albumentations_perturber",
-    ],
-)
+# Albumentations-based perturbers (optional)
+_ALBUMENTATIONS_CLASSES = ["AlbumentationsPerturber"]
+
+try:
+    from nrtk.impls.perturb_image.wrapper._albumentations.albumentations_perturber import (
+        AlbumentationsPerturber as AlbumentationsPerturber,
+    )
+
+    AlbumentationsPerturber.__module__ = __name__
+
+    __all__ += _ALBUMENTATIONS_CLASSES
+except ImportError:
+
+    def __getattr__(name: str) -> None:
+        if name in _ALBUMENTATIONS_CLASSES:
+            raise ImportError(
+                f"{name} requires the `albumentations` and (`graphics` or `headless`) extras. "
+                f"Install with: `pip install nrtk[albumentations,graphics] or nrtk[albumentations,headless]`",
+            )
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -114,7 +114,7 @@ class HuggingFaceMaiteModel(Model):  # pyright: ignore [reportGeneralTypeIssues]
                 The reordered probabilities corresponding to the dataset label indices.
         """
         # Create an empty array to store the reordered probabilities
-        output = []
+        output = list()
         for probs in model_probs:
             dataset_probs = np.zeros_like(probs)
 

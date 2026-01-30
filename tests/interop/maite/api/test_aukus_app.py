@@ -4,7 +4,6 @@ from pathlib import Path
 import py  # type: ignore
 import pytest
 import responses
-from starlette.testclient import TestClient
 
 from nrtk.interop._maite.api.aukus_app import AUKUS_app, Settings
 from nrtk.interop._maite.api.aukus_schema import AukusDatasetSchema
@@ -12,6 +11,10 @@ from nrtk.interop._maite.api.schema import DatasetSchema, NrtkPerturbOutputSchem
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG
+
+# Guard import - starlette.testclient requires httpx which may not be installed
+httpx = pytest.importorskip("httpx")
+from starlette.testclient import TestClient  # noqa: E402
 
 is_usable: bool = import_guard(module_name="fastapi", exception=FastApiImportError, submodules=["encoders"])
 from fastapi.encoders import jsonable_encoder  # noqa: E402
@@ -43,7 +46,7 @@ class TestAukusApp:
             uri=str(DATASET_FOLDER),
             size="11",
             description="AUKUS Test",
-            data_collections=[],
+            data_collections=list(),
             data_format="COCO",
             nrtk_config=str(NRTK_PYBSM_CONFIG),
             image_metadata=[{"gsd": gsd} for gsd in range(11)],
@@ -103,7 +106,7 @@ class TestAukusApp:
             uri=str(DATASET_FOLDER),
             size="11",
             description="AUKUS Test",
-            data_collections=[],
+            data_collections=list(),
             data_format="YOLO",
             nrtk_config=str(NRTK_PYBSM_CONFIG),
             image_metadata=[{"gsd": gsd} for gsd in range(11)],
@@ -139,7 +142,7 @@ class TestAukusApp:
             uri=str(DATASET_FOLDER),
             size="11",
             description="AUKUS Test",
-            data_collections=[],
+            data_collections=list(),
             data_format="COCO",
             nrtk_config="",
             image_metadata=[{"gsd": gsd} for gsd in range(11)],

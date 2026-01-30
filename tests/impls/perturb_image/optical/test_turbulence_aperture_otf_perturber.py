@@ -156,12 +156,12 @@ class TestTurbulenceApertureOTFPerturber:
             ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.1, does_not_raise()),
             (
                 [0.5e-6, 0.6e-6],
-                [],
+                list(),
                 0.1,
                 pytest.raises(ValueError, match=r"mtf_weights is empty"),
             ),
             (
-                [],
+                list(),
                 [0.5, 0.5],
                 0.1,
                 pytest.raises(ValueError, match=r"mtf_wavelengths is empty"),
@@ -245,9 +245,9 @@ class TestTurbulenceApertureOTFPerturber:
         from pybsm.utils import load_database_atmosphere
 
         sensor_and_scenario = {}
-        wavelengths = np.asarray([])
-        weights = np.asarray([])
-        pos_weights = np.asarray([])
+        wavelengths = np.asarray(list())
+        weights = np.asarray(list())
+        pos_weights = np.asarray(list())
         if use_sensor_scenario:
             sensor_and_scenario = create_sample_sensor_and_scenario()
             # Multiple type ignores added for pyright's handling of guarded imports

@@ -8,13 +8,9 @@ Dependencies:
     - numpy: For numerical operations and random number generation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
-    - nrtk.impls.perturb_image.wrapper.albumentations_perturber: Base implementation for Albumentations perturbers.
+    - nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber: Base implementation for Albumentations perturbers.
 
 Example usage:
-    >>> if not RandomScalePerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("RandomScalePerturber is not usable")
     >>> import numpy as np
     >>> limit = 0.5
     >>> perturber = RandomScalePerturber(limit=limit)
@@ -26,15 +22,10 @@ from __future__ import annotations
 
 from typing import Any
 
+import cv2
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.wrapper.albumentations_perturber import AlbumentationsPerturber
-from nrtk.utils._exceptions import AlbumentationsImportError, OpenCVImportError
-from nrtk.utils._import_guard import import_guard
-
-cv2_available: bool = import_guard(module_name="cv2", exception=OpenCVImportError)
-
-import cv2  # noqa: E402
+from nrtk.impls.perturb_image.wrapper import AlbumentationsPerturber
 
 
 class RandomScalePerturber(AlbumentationsPerturber):
@@ -80,9 +71,6 @@ class RandomScalePerturber(AlbumentationsPerturber):
             seed:
                 Random seed for reproducible results. Defaults to 1 for deterministic behavior.
         """
-        if not self.is_usable():
-            raise AlbumentationsImportError
-
         self._allowed_interpolations = {
             cv2.INTER_NEAREST,
             cv2.INTER_NEAREST_EXACT,

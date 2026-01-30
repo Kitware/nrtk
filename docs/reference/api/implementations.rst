@@ -68,10 +68,10 @@ scaling, cropping, and translation.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.geometric.random_crop_perturber.RandomCropPerturber
-   ~nrtk.impls.perturb_image.geometric.random_rotation_perturber.RandomRotationPerturber
-   ~nrtk.impls.perturb_image.geometric.random_scale_perturber.RandomScalePerturber
-   ~nrtk.impls.perturb_image.geometric.random_translation_perturber.RandomTranslationPerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomCropPerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomTranslationPerturber
 
 Environment Perturbers
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -96,13 +96,13 @@ Optical perturbers simulate physics-based sensor and optical effects.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber
    ~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber
    ~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber
    ~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber
    ~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber
-   ~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber
+   ~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber
    ~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber
+   ~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber
 
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^
@@ -127,8 +127,8 @@ libraries.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.wrapper.albumentations_perturber.AlbumentationsPerturber
-   ~nrtk.impls.perturb_image.wrapper.compose_perturber.ComposePerturber
+   ~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber
+   ~nrtk.impls.perturb_image.wrapper.ComposePerturber
 
 Utility Components
 ^^^^^^^^^^^^^^^^^^

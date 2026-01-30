@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 import numpy as np
 import py  # type: ignore
 import pytest
-from starlette.testclient import TestClient
 
 from nrtk.interop._maite.api.app import app
 from nrtk.interop._maite.api.schema import NrtkPerturbInputSchema
@@ -18,6 +17,10 @@ from nrtk.interop._maite.datasets.object_detection import (
 from nrtk.utils._exceptions import FastApiImportError
 from nrtk.utils._import_guard import import_guard, is_available
 from tests.interop.maite import BAD_NRTK_CONFIG, DATASET_FOLDER, LABEL_FILE, NRTK_PYBSM_CONFIG
+
+# Guard import - starlette.testclient requires httpx which may not be installed
+httpx = pytest.importorskip("httpx")
+from starlette.testclient import TestClient  # noqa: E402
 
 app_deps_available: bool = import_guard(module_name="fastapi", exception=FastApiImportError, submodules=["encoders"])
 from fastapi.encoders import jsonable_encoder  # noqa: E402
@@ -47,7 +50,7 @@ if is_usable:
         ),
     ]
 else:
-    TEST_RETURN_VALUE = []
+    TEST_RETURN_VALUE = list()
 
 
 @pytest.fixture

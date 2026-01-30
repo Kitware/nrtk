@@ -150,3 +150,6 @@ docs/examples/pybsm/data
 
 # cosign private key
 cosign.key
+
+# pytest junit output files from tox
+.junit.*.xml

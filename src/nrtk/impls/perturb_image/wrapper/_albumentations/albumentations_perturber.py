@@ -10,14 +10,8 @@ Dependencies:
     - albumentations: For the underlying perturbations
 
 Example usage:
-    >>> if not AlbumentationsPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("AlbumentationsPerturber is not usable")
-    >>> perturber = "RandomRain"
-    >>> parameters = {"drop_length": 40, "drop_width": 10}
     >>> image = np.ones((256, 256, 3))
-    >>> perturber = AlbumentationsPerturber(perturber=perturber, parameters=parameters)
+    >>> perturber = AlbumentationsPerturber(perturber="RandomRain", parameters={"drop_length": 40, "drop_width": 10})
     >>> perturbed_image, _ = perturber(image=image)
 """
 
@@ -28,23 +22,14 @@ __all__ = ["AlbumentationsPerturber"]
 from collections.abc import Hashable, Iterable
 from typing import Any
 
+import albumentations
 import numpy as np
+from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import AlbumentationsImportError, OpenCVImportError
-from nrtk.utils._import_guard import import_guard
-
-albumentations_available: bool = import_guard(
-    module_name="albumentations",
-    exception=AlbumentationsImportError,
-    submodules=["core.bbox_utils"],
-)
-cv2_available: bool = import_guard(module_name="cv2", exception=OpenCVImportError)
-
-import albumentations as A  # noqa N812, F401
-from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, convert_bboxes_to_albumentations  # noqa E402
+from nrtk.utils._exceptions import AlbumentationsImportError
 
 
 class AlbumentationsPerturber(PerturbImage):
@@ -93,15 +78,15 @@ class AlbumentationsPerturber(PerturbImage):
         self.perturber = perturber
         self.parameters = parameters
 
-        if not hasattr(A, self.perturber):
+        if not hasattr(albumentations, self.perturber):
             raise ValueError(f'Given perturber "{self.perturber}" is not available in Albumentations')
 
-        transformer = getattr(A, self.perturber)
+        transformer = getattr(albumentations, self.perturber)
 
-        if not issubclass(transformer, A.BasicTransform):
+        if not issubclass(transformer, albumentations.BasicTransform):
             raise ValueError(f'Given perturber "{self.perturber}" does not inherit "BasicTransform"')
 
-        self.transform: A.Compose = A.Compose(
+        self.transform: albumentations.Compose = albumentations.Compose(
             [transformer(**self.parameters) if self.parameters else transformer()],
         )
 
@@ -187,10 +172,3 @@ class AlbumentationsPerturber(PerturbImage):
         cfg["parameters"] = self.parameters
         cfg["seed"] = self.seed
         return cfg
-
-    @classmethod
-    @override
-    def is_usable(cls) -> bool:
-        """Returns true if the required albumentations module is available."""
-        # Requires opencv to be installed
-        return albumentations_available and cv2_available

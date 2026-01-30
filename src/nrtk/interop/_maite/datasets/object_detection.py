@@ -106,8 +106,8 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
 
         for _, img_id in enumerate(kwcoco_dataset.imgs.keys()):
             bboxes = np.empty((0, 4))
-            labels = []
-            scores = []
+            labels = list()
+            scores = list()
 
             if img_id in kwcoco_dataset.gid_to_aids and len(kwcoco_dataset.gid_to_aids[img_id]) > 0:
                 det_ids = kwcoco_dataset.gid_to_aids[img_id]

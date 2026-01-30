@@ -1,9 +1,7 @@
-import unittest.mock as mock
 from collections.abc import Hashable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import cv2
 import numpy as np
@@ -13,16 +11,18 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.geometric.random_scale_perturber import RandomScalePerturber
-from nrtk.utils._exceptions import AlbumentationsImportError
+from nrtk.impls.perturb_image.geometric.random import RandomScalePerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 rng = np.random.default_rng()
 
 
-@pytest.mark.skipif(not RandomScalePerturber.is_usable(), reason=str(AlbumentationsImportError()))
-class TestRandomScalePerturber:
+@pytest.mark.albumentations
+class TestRandomScalePerturber(PerturberTestsMixin):
+    impl_class = RandomScalePerturber
+
     @pytest.mark.parametrize(
         ("limit", "interpolation", "probability", "expectation"),
         [
@@ -325,12 +325,3 @@ class TestRandomScalePerturber:
             assert i.probability == probability
             assert i.parameters == parameters
             assert i.seed == seed
-
-
-@mock.patch.object(RandomScalePerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not RandomScalePerturber.is_usable()
-    with pytest.raises(AlbumentationsImportError):
-        RandomScalePerturber()

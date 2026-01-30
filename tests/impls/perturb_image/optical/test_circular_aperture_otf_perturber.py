@@ -126,14 +126,14 @@ class TestCircularApertureOTFPerturber:
             ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0, True, does_not_raise()),
             (
                 [0.5e-6, 0.6e-6],
-                [],
+                list(),
                 0.003,
                 0.0,
                 False,
                 pytest.raises(ValueError, match=r"mtf_weights is empty"),
             ),
             (
-                [],
+                list(),
                 [0.5, 0.5],
                 0.003,
                 0.0,

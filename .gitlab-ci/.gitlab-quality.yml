@@ -18,14 +18,14 @@
 pyright-internal:
   extends: .quality-setup
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+    EXTRAS: "pybsm maite tools headless pillow skimage albumentations waterdroplet diffusion"
   script:
     - poetry run pyright
 
 pyright-external:
   extends: .quality-setup
   variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+    EXTRAS: "pybsm maite tools headless pillow skimage albumentations waterdroplet diffusion"
   before_script:
     - !reference [.quality-setup, before_script]
     - apt-get update && apt-get install bc

@@ -7,7 +7,7 @@
   stage: docs
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry sync --only main,docs,tests,linting --extras "pybsm headless maite waterdroplet"
+    - poetry sync --only main,docs,tests,linting --extras "pybsm headless maite tools skimage pillow albumentations waterdroplet diffusion"
 
 # Job to check the release notes folder
 release-notes:

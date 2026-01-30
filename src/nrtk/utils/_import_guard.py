@@ -55,7 +55,7 @@ def _expand_submodules(submodules: Sequence[str] | None) -> Sequence[str]:
     Returns:
         Sequence[str]: Expanded list of submodules.
     """
-    expanded = []
+    expanded = list()
     if submodules:
         for submodule in submodules:
             parts = submodule.split(".")

@@ -128,7 +128,7 @@ class TestPerturberMultivariateFactory(PerturberFactoryMixin):
         "empty_factory_kwargs",
         [
             pytest.param(
-                {"theta_keys": ["param1"], "thetas": [[]]},
+                {"theta_keys": ["param1"], "thetas": [list()]},
                 id="empty thetas",
             ),
         ],

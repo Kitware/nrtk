@@ -10,7 +10,7 @@ Dependencies:
 
 from __future__ import annotations
 
-__all__ = []
+__all__ = list()
 
 import copy
 from abc import ABC, abstractmethod

@@ -15,8 +15,8 @@ from smqtk_core.configuration import (
 )
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
-from nrtk.impls.perturb_image.geometric.random_crop_perturber import RandomCropPerturber
-from nrtk.impls.perturb_image.wrapper.compose_perturber import ComposePerturber
+from nrtk.impls.perturb_image.geometric.random import RandomCropPerturber
+from nrtk.impls.perturb_image.wrapper import ComposePerturber
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._nop_perturber import _NOPPerturber
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
@@ -34,6 +34,7 @@ m_dummy = mock.Mock(spec=PerturbImage)
 m_dummy = _perturb
 
 
+@pytest.mark.core
 class TestComposePerturber:
     def test_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
@@ -153,6 +154,6 @@ class TestComposePerturber:
         out_image = perturber_assertions(perturb=inst.perturb, image=image)
 
         cfg = dict()
-        cfg["perturbers"] = []
+        cfg["perturbers"] = list()
         assert (out_image == image).all()
         assert inst.get_config() == cfg

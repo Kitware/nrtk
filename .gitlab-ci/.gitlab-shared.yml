@@ -17,8 +17,6 @@
       when: on_success
     - when: never  # explicit fail-exclude terminal condition.
   variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
     PY_COLORS: "1"
   before_script:
     # Setup git-lfs
@@ -39,13 +37,7 @@
     - pip --version
     - poetry --version
     - poetry check
-  cache:
-    key:
-      files:
-        - poetry.lock
-    paths:
-    - .cache
-    policy: pull-push
+  cache: []
 
 .opencv-headless:
   script:
@@ -79,8 +71,3 @@
       else
         echo "No OpenCV packages were present. Skipping installation."
       fi
-
-.python-versions:
-  parallel:
-    matrix:
-      - PYTHON_VERSION: [ "3.10", "3.11", "3.12", "3.13" ]

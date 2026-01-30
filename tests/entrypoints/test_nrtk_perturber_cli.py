@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 import py  # type: ignore
 import pytest
-from click.testing import CliRunner
 
 import nrtk.entrypoints._impl.nrtk_perturber_cli
 from nrtk.entrypoints import nrtk_perturber_cli
@@ -14,6 +13,10 @@ from nrtk.entrypoints._impl.nrtk_perturber_cli import kwcoco_available, maite_av
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
 from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_BLUR_CONFIG, NRTK_PYBSM_CONFIG
+
+# Guard import - click may not be installed in all test environments
+click = pytest.importorskip("click")
+from click.testing import CliRunner  # noqa: E402
 
 _ = import_guard(
     module_name="maite",

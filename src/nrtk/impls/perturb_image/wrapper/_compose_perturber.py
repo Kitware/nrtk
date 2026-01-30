@@ -10,7 +10,7 @@ Dependencies:
 
 Example usage:
     >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
-    >>> from nrtk.impls.perturb_image.geometric.random_crop_perturber import RandomCropPerturber
+    >>> from nrtk.impls.perturb_image.geometric.random import RandomCropPerturber
     >>> image = np.ones((256, 256, 3))
     >>> perturbers = [RandomCropPerturber(), BrightnessPerturber(factor=0.5)]
     >>> perturber = ComposePerturber(perturbers=perturbers)

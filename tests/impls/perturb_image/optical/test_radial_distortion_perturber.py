@@ -78,7 +78,7 @@ class TestRadialDistortionPerturber:
     @pytest.mark.parametrize(
         ("k"),
         [
-            ([]),
+            (list(),),
             ([1]),
             ([1, 1, 1, 1]),
         ],

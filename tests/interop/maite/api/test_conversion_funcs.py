@@ -39,7 +39,7 @@ class TestAPIConversionFunctions:
                     "dataset_dir": "",  # Not used in this test
                     "label_file": "",  # Not used in this test
                     "output_dir": "",  # Not used in this test
-                    "image_metadata": [],  # Not used in this test
+                    "image_metadata": list(),  # Not used in this test
                     "config_file": str(NRTK_PYBSM_CONFIG),
                 },
                 {
@@ -98,7 +98,7 @@ class TestAPIConversionFunctions:
                     "dataset_dir": "",  # Not used in this test
                     "label_file": "",  # Not used in this test
                     "output_dir": "",  # Not used in this test
-                    "image_metadata": [],  # Not used in this test
+                    "image_metadata": list(),  # Not used in this test
                     "config_file": "",
                 }
             ),
@@ -120,7 +120,7 @@ class TestAPIConversionFunctions:
                     "dataset_dir": "",  # Not used in this test
                     "label_file": "",  # Not used in this test
                     "output_dir": "",  # Not used in this test
-                    "image_metadata": [],  # Not used in this test
+                    "image_metadata": list(),  # Not used in this test
                     "config_file": str(BAD_NRTK_CONFIG),
                 }
             ),
@@ -131,7 +131,7 @@ class TestAPIConversionFunctions:
                     "dataset_dir": "",  # Not used in this test
                     "label_file": "",  # Not used in this test
                     "output_dir": "",  # Not used in this test
-                    "image_metadata": [],  # Not used in this test
+                    "image_metadata": list(),  # Not used in this test
                     "config_file": str(EMPTY_NRTK_CONFIG),
                 }
             ),

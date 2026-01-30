@@ -1,9 +1,7 @@
-import unittest.mock as mock
 from collections.abc import Hashable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -12,16 +10,18 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.geometric.random_rotation_perturber import RandomRotationPerturber
-from nrtk.utils._exceptions import AlbumentationsImportError
+from nrtk.impls.perturb_image.geometric.random import RandomRotationPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 rng = np.random.default_rng()
 
 
-@pytest.mark.skipif(not RandomRotationPerturber.is_usable(), reason=str(AlbumentationsImportError()))
-class TestRandomRotationPerturber:
+@pytest.mark.albumentations
+class TestRandomRotationPerturber(PerturberTestsMixin):
+    impl_class = RandomRotationPerturber
+
     @pytest.mark.parametrize(
         ("limit", "probability", "fill", "expectation"),
         [
@@ -274,12 +274,3 @@ class TestRandomRotationPerturber:
             assert i.fill == fill
             assert i.parameters == parameters
             assert i.seed == seed
-
-
-@mock.patch.object(RandomRotationPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not RandomRotationPerturber.is_usable()
-    with pytest.raises(AlbumentationsImportError):
-        RandomRotationPerturber()

@@ -129,7 +129,7 @@ class RandomTranslationPerturber(PerturbImage):
             final_image[:translate_y, :translate_x, ...] = translated_image[:translate_y, :translate_x, ...]
 
         # Adjust bounding boxes
-        perturbed_boxes = []
+        perturbed_boxes = list()
         if boxes is not None:
             for bbox, metadata in boxes:
                 # Compute the shifted_min coords for the bounding box to align with

@@ -187,9 +187,9 @@ description of the extra.
     :mod:`~nrtk.impls.perturb_image.photometric.enhance` perturbers.
 
     **albumentations**: installs `nrtk-albumentations <https://github.com/Kitware/nrtk-albumentations>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.wrapper.albumentations_perturber`,
-    :mod:`~nrtk.impls.perturb_image.geometric.random_rotation_perturber`, and
-    :mod:`~nrtk.impls.perturb_image.geometric.random_scale_perturber`.
+    :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`,
+    :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and
+    :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `numba <https://numba.pydata.org/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.environment.water_droplet_perturber` perturber and utility functions.

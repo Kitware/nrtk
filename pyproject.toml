@@ -49,12 +49,8 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 "nrtk.impls.perturb_image.photometric.blur" = "nrtk.impls.perturb_image.photometric.blur"
 "nrtk.impls.perturb_image.photometric.enhance" = "nrtk.impls.perturb_image.photometric.enhance"
 "nrtk.impls.perturb_image.photometric.noise" = "nrtk.impls.perturb_image.photometric.noise"
-"nrtk.impls.perturb_image.wrapper.albumentations_perturber" = "nrtk.impls.perturb_image.wrapper.albumentations_perturber"
-"nrtk.impls.perturb_image.wrapper.compose_perturber" = "nrtk.impls.perturb_image.wrapper.compose_perturber"
-"nrtk.impls.perturb_image.geometric.random_crop_perturber" = "nrtk.impls.perturb_image.geometric.random_crop_perturber"
-"nrtk.impls.perturb_image.geometric.random_rotation_perturber" = "nrtk.impls.perturb_image.geometric.random_rotation_perturber"
-"nrtk.impls.perturb_image.geometric.random_scale_perturber" = "nrtk.impls.perturb_image.geometric.random_scale_perturber"
-"nrtk.impls.perturb_image.geometric.random_translation_perturber" = "nrtk.impls.perturb_image.geometric.random_translation_perturber"
+"nrtk.impls.perturb_image.wrapper" = "nrtk.impls.perturb_image.wrapper"
+"nrtk.impls.perturb_image.geometric.random" = "nrtk.impls.perturb_image.geometric.random"
 "nrtk.impls.perturb_image.environment.haze_perturber" = "nrtk.impls.perturb_image.environment.haze_perturber"
 "nrtk.impls.perturb_image.environment.water_droplet_perturber" = "nrtk.impls.perturb_image.environment.water_droplet_perturber"
 "nrtk.impls.perturb_image.generative.diffusion_perturber" = "nrtk.impls.perturb_image.generative.diffusion_perturber"
@@ -69,7 +65,7 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 [project.optional-dependencies]
 graphics = ["opencv-python>=4.6"]
 headless = ["opencv-python-headless>=4.6"]
-pybsm = ["pybsm>=0.14.1"]
+pybsm = ["pybsm>=0.14.2"]
 maite = [
     "maite>=0.9.2,<0.10.0",
     "fastapi>=0.110.0",
@@ -79,19 +75,14 @@ maite = [
     "python-json-logger>=3.0.0",
 ]
 tools = ["kwcoco>=0.2.18", "Pillow>=10.3.0"]
-scikit-image = [
+skimage = [
     "scikit-image>=0.20; python_version < '3.12'",
     "scikit-image>=0.22; python_version >= '3.12'"
 ]
-Pillow = ["Pillow>=10.3.0"]
+pillow = ["Pillow>=10.3.0"]
 albumentations = ["nrtk-albumentations>=2.2.1"]
 waterdroplet = ["scipy>=1.10.0", "numba>=0.56.4"]
 diffusion = ["torch>=2.2.0", "diffusers>=0.21.0", "accelerate>=0.20.0", "Pillow>=10.3.0", "transformers>=4.52.1", "protobuf>=3.2"]
-notebook-testing = [
-    "datasets>=3.3.2", "matplotlib>=3.7.1", "numba>=0.56.4", "tabulate>=0.9.0", "torch>=2.2.0",
-    "torchmetrics>=1.0.0", "torchvision>=0.21.0", "transformers>=4.52.1", "ultralytics>=8.3.85",
-    "jupytext>=1.16.7", "nrtk-albumentations>=2.2.0"
-]
 
 [tool.poetry]
 # Poetry-specific configuration
@@ -123,10 +114,12 @@ docs = [
 
 # Testing
 tests = [
+    # pytest unittesting and coverage
     "coverage>=6.5.0",
     "pytest>=7.2.0",
     "pytest-cov>=4.0.0",
-    "syrupy>=4.0.0",
+    "pytest-xdist>=3.8.0",
+    "syrupy>=5.0.0",
     # Jupyter notebook testing
     "notebook>=7.2.2",
     "papermill>=2.4.0",
@@ -140,7 +133,6 @@ tests = [
 [tool.pytest.ini_options]
 addopts = [
     "-lv",                              # Show local in trace-backs.
-    "--doctest-modules",                # Increased verbosity.
     "--tb=long",                        # Trace-back print mode.
     "--cov=./src/nrtk",          # Cover our package specifically
     "--cov=./tests",                    # Also cover our tests for dead spots
@@ -148,13 +140,21 @@ addopts = [
     "--cov-report=xml:coverage.xml",    # for external tool reporting
     "--snapshot-warn-unused",           # Prevent test failure when skipping tests
 ]
+# NOTE: --doctest-modules removed from addopts. To run doctests, use:
+#   pytest --doctest-modules src/nrtk
+# Doctests require optional dependencies to be installed.
 testpaths = [
     "tests",
-    "src/nrtk",
 ]
 doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
     "IGNORE_EXCEPTION_DETAIL",
+]
+markers = [
+    "core: Run tests that only require core functionality",
+    "opencv: Run tests that require the graphics or headless extra",
+    "albumentations: Run tests that require the albumentations extra",
+    "notebooks: Run notebook-related tests (pyright checks)",
 ]
 
 [tool.coverage.run]
@@ -170,6 +170,7 @@ extend-exclude = [
     "scripts",
     "docs/_build",
     "docs/_implementations",
+    ".tox",
     ".dev",
 ]
 
@@ -253,5 +254,6 @@ exclude = [
     "**/__pycache__",
     "docs/_build",
     "docs/_implementations",
+    ".tox",
     ".dev",
     ]

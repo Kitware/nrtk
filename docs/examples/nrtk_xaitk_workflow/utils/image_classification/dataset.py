@@ -68,7 +68,7 @@ def create_data_subset(
     # Calculate expected number of samples based on the fraction parameter
     expected_total_samples = math.floor(fraction * total_examples)
 
-    sample_indices = []
+    sample_indices = list()
     # For each label, sample based on the minimum number of samples
     min_samples_per_label = math.floor(fraction * expected_total_samples)
     for lbl in label_counts:

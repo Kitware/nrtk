@@ -12,9 +12,6 @@ __all__: list[str]
 __getattr__, __dir__, __all__ = lazy.attach(
     __name__,
     submodules=[
-        "random_crop_perturber",
-        "random_rotation_perturber",
-        "random_scale_perturber",
-        "random_translation_perturber",
+        "random",
     ],
 )

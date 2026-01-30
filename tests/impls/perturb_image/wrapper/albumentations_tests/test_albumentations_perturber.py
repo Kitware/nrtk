@@ -12,13 +12,14 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.wrapper.albumentations_perturber import AlbumentationsPerturber
+from nrtk.impls.perturb_image.wrapper import AlbumentationsPerturber
 from nrtk.utils._exceptions import AlbumentationsImportError
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 
-@pytest.mark.skipif(not AlbumentationsPerturber.is_usable(), reason=str(AlbumentationsImportError()))
+@pytest.mark.opencv
+@pytest.mark.albumentations
 class TestAlbumentationsPerturber:
     @pytest.mark.parametrize(
         ("metadata", "expectation"),

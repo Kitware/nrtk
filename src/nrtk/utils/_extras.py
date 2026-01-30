@@ -27,7 +27,6 @@ import nrtk
 
 _IMPORT_NAME_OVERRIDES = {
     "Pillow": "PIL",
-    "scikit-image": "skimage",
     "opencv-python": "cv2",
     "opencv-python-headless": "cv2",
     "nrtk-albumentations": "albumentations",

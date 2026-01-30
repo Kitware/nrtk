@@ -8,14 +8,18 @@ from PIL import Image
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.geometric.random_translation_perturber import RandomTranslationPerturber
+from nrtk.impls.perturb_image.geometric.random import RandomTranslationPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
 
 rng = np.random.default_rng()
 
 
-class TestRandomTranslationPerturber:
+@pytest.mark.required
+class TestRandomTranslationPerturber(PerturberTestsMixin):
+    impl_class = RandomTranslationPerturber
+
     @pytest.mark.parametrize(
         ("input_test_box", "expected"),
         [
@@ -28,7 +32,7 @@ class TestRandomTranslationPerturber:
             ),
             (
                 [(AxisAlignedBoundingBox(min_vertex=(2, 0), max_vertex=(2, 1)), {"meta": 1})],
-                (np.array([[2, 3, 0], [5, 6, 0], [8, 9, 0]], dtype=np.uint8), []),
+                (np.array([[2, 3, 0], [5, 6, 0], [8, 9, 0]], dtype=np.uint8), list()),
             ),
         ],
     )
@@ -85,7 +89,7 @@ class TestRandomTranslationPerturber:
             perturb=inst.perturb,
             image=image,
             boxes=None,
-            expected=(out_image, []),
+            expected=(out_image, list()),
         )
         # Test callable
         inst = RandomTranslationPerturber()
@@ -93,7 +97,7 @@ class TestRandomTranslationPerturber:
             perturb=inst,
             image=image,
             boxes=None,
-            expected=(out_image, []),
+            expected=(out_image, list()),
         )
 
     @pytest.mark.parametrize(
@@ -119,7 +123,7 @@ class TestRandomTranslationPerturber:
             perturb=inst.perturb,
             image=image,
             boxes=None,
-            expected=(out_image, []),
+            expected=(out_image, list()),
         )
         # Test callable
         inst = RandomTranslationPerturber(seed=seed)
@@ -127,13 +131,13 @@ class TestRandomTranslationPerturber:
             perturb=inst,
             image=image,
             boxes=None,
-            expected=(out_image, []),
+            expected=(out_image, list()),
         )
 
     @pytest.mark.parametrize(
         ("image", "max_translation_limit", "boxes", "expectation"),
         [
-            (np.ones((256, 256, 3), dtype=np.float32), (100, 200), [], does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (100, 200), list(), does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (100, 200),
@@ -143,7 +147,7 @@ class TestRandomTranslationPerturber:
                 ],
                 does_not_raise(),
             ),
-            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), [], does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), list(), does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (0, 0),
@@ -153,7 +157,7 @@ class TestRandomTranslationPerturber:
                 ],
                 does_not_raise(),
             ),
-            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), [], does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), list(), does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (256, 256),
@@ -166,13 +170,13 @@ class TestRandomTranslationPerturber:
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (257, 100),
-                [],
+                list(),
                 pytest.raises(ValueError, match=r"Max translation limit should be less than or equal to \(256, 256\)"),
             ),
             (
                 np.ones((512, 512, 3), dtype=np.float32),
                 (100, 513),
-                [],
+                list(),
                 pytest.raises(ValueError, match=r"Max translation limit should be less than or equal to \(512, 512\)"),
             ),
         ],

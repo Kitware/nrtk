@@ -81,7 +81,7 @@ def fuzzy_snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
 
 
 class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
-    _file_extension = "tiff"
+    file_extension = "tiff"
 
     def __init__(self, *, rtol: float = 1e-4, atol: float = 1e-5, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -130,7 +130,7 @@ class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
         min_psnr: Minimum PSNR value in dB required to pass (default: 48.13)
     """
 
-    _file_extension = "tiff"
+    file_extension = "tiff"
 
     def __init__(self, *, min_psnr: float = 48.13, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -191,7 +191,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
         min_ssim: Minimum SSIM value in [0, 1] required to pass (default: 0.985).
     """
 
-    _file_extension = "tiff"
+    file_extension = "tiff"
 
     def __init__(self, *, min_ssim: float = 0.985, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -261,7 +261,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
             img_b = img_b[:, :, np.newaxis]
 
         channels = img_a.shape[2]
-        ssim_values = []
+        ssim_values = list()
 
         for c in range(channels):
             a_c = img_a[:, :, c]
