@@ -155,6 +155,7 @@ markers = [
     "opencv: Run tests that require the graphics or headless extra",
     "albumentations: Run tests that require the albumentations extra",
     "notebooks: Run notebook-related tests (pyright checks)",
+    "pillow: Run tests that require the pillow extra",
 ]
 
 [tool.coverage.run]

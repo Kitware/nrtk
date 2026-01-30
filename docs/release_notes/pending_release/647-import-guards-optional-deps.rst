@@ -20,6 +20,12 @@
 * Restructured albumentations wrapper perturbers into private ``_albumentations/`` package
   with public exports from ``nrtk.impls.perturb_image.wrapper``.
 
+* Added import guards for enhancement perturbers (``BrightnessPerturber``, ``ColorPerturber``,
+  ``ContrastPerturber``, ``SharpnessPerturber``). Attempting to use these classes without
+  ``Pillow`` installed now raises a clear ``ImportError`` with install instructions instead of
+  an opaque failure. Restructured into private ``_enhance/`` package with public exports from
+  ``nrtk.impls.perturb_image.photometric.enhance``.
+
 * Added ``tox.ini`` configuration for running tests with specific optional dependency combinations.
 
 * Split the ``tox:pytest`` CI job into separate per-Python-version jobs
