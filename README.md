@@ -266,18 +266,13 @@ to facilitate dataset exploration. This tool uses the
 
 ## Contacts
 
-**Principal Investigator**: Brian Hu (Kitware) @brian.hu
+**Current Maintainers**: Brandon RichardWebster (@bjrichardwebster), Emily
+Veenhuis (@eveenhuis)
 
-**Project Manager / Product Owner**: Keith Fieldhouse (Kitware)
-@keith.fieldhouse
-
-**Scrum Master / Maintainer**: Brandon RichardWebster (Kitware)
-@b.richardwebster
-
-**Deputy Scrum Master / Deputy Maintainer**: Emily Veenhuis (Kitware)
-@emily.veenhuis
-
-**Program Representative**: Austin Whitesell (MITRE) @awhitesell
+We welcome contributions to NRTK! Please start discussions by opening an issue
+or pull request on GitHub. This keeps the conversation visible and helps the
+whole community benefit. Our preferred channels are public, but if you'd
+like to reach out privately first, feel free to contact us at nrtk@kitware.com.
 
 <!-- :auto contacts: -->
 
