@@ -26,6 +26,8 @@ directory, save perturbed images to
 ``/output/data/result/``, and load a config file named ``nrtk_config.json``. The ``dataset`` directory
 and ``nrtk_config.json`` file must be in the directory mounted to ``/input/``.
 
+Note: Ensure the ``output`` directory is writtable by non-root users.
+
 Input Arguments
 ---------------
 
