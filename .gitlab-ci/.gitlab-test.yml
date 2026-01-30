@@ -16,13 +16,11 @@
     - !reference [.shared-setup, before_script]
     - pip install --root-user-action=ignore --user -U "tox>=4.2" -q
 
-tox:pytest:
+.tox:pytest:
   extends: .test-setup
-  image: python:${PYTHON_VERSION}
   parallel:
     matrix:
-      - PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13"]
-        TOX_ENV: [core, opencv, albumentations, doctest, notebooks, unmarked, unmarked-all]
+      - TOX_ENV: [core, opencv, albumentations, doctest, notebooks, unmarked, unmarked-all]
   script:
     # Convert PYTHON_VERSION (3.10) to tox factor (py310) and run specific env
     - tox -e "py${PYTHON_VERSION//./}-${TOX_ENV}"
@@ -34,13 +32,46 @@ tox:pytest:
       junit: ".junit.*.xml"
     expire_in: 1 day
 
+tox:pytest:py3.10:
+  extends: .tox:pytest
+  image: python:3.10
+  variables:
+    PYTHON_VERSION: "3.10"
+
+tox:pytest:py3.11:
+  extends: .tox:pytest
+  image: python:3.11
+  variables:
+    PYTHON_VERSION: "3.11"
+
+tox:pytest:py3.12:
+  extends: .tox:pytest
+  image: python:3.12
+  variables:
+    PYTHON_VERSION: "3.12"
+
+tox:pytest:py3.13:
+  extends: .tox:pytest
+  image: python:3.13
+  variables:
+    PYTHON_VERSION: "3.13"
+
 tox:coverage:
   extends: .test-setup
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?%)/'
   dependencies:
-    - tox:pytest
+    - tox:pytest:py3.10
+    - tox:pytest:py3.11
+    - tox:pytest:py3.12
+    - tox:pytest:py3.13
   needs:
-    - job: tox:pytest
+    - job: tox:pytest:py3.10
+      artifacts: true
+    - job: tox:pytest:py3.11
+      artifacts: true
+    - job: tox:pytest:py3.12
+      artifacts: true
+    - job: tox:pytest:py3.13
       artifacts: true
   before_script:
     - !reference [.shared-setup, before_script]
@@ -65,7 +96,7 @@ tox:coverage:
         path: coverage.xml
     expire_in: 1 day
 
-tox:notebooks:
+.tox:notebooks:
   extends: .test-setup
   image: python:3.10
   dependencies: []
@@ -77,6 +108,11 @@ tox:notebooks:
       when: on_success
     - when: never  # explicit fail-exclude terminal condition.
   allow_failure: true
+  script:
+    - tox -r -m papermill -- "${NOTEBOOK_DIR}/${NOTEBOOK_FILE}" /dev/null
+
+tox:notebooks:examples:
+  extends: .tox:notebooks
   parallel:
     matrix:
       - NOTEBOOK_DIR: "docs/examples"
@@ -88,6 +124,11 @@ tox:notebooks:
           "pybsm_default_config.ipynb",
           "generative_perturbers.ipynb"
         ]
+
+tox:notebooks:maite:
+  extends: .tox:notebooks
+  parallel:
+    matrix:
       - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
           "nrtk_affine_perturbers_demo.ipynb",
@@ -102,10 +143,3 @@ tox:notebooks:
           "jatic-perturbations-saliency.ipynb",
           "nrtk_water_droplet_perturber_demo.ipynb"
         ]
-      - NOTEBOOK_DIR: "docs/examples/nrtk_xaitk_workflow"
-        NOTEBOOK_FILE: [
-          "image_classification_perturbation_saliency.ipynb",
-          "object_detection_perturbation_saliency.ipynb"
-        ]
-  script:
-    - tox -r -m papermill -- "${NOTEBOOK_DIR}/${NOTEBOOK_FILE}" /dev/null

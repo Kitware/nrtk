@@ -22,6 +22,9 @@
 
 * Added ``tox.ini`` configuration for running tests with specific optional dependency combinations.
 
+* Split the ``tox:pytest`` CI job into separate per-Python-version jobs
+  (``tox:pytest:py3.10`` through ``tox:pytest:py3.13``) for clearer pipeline organization.
+
 * Fixed notebooks to use correct kernel names and data paths for CI compatibility.
 
 * Added ``pytest.importorskip`` guards to test files for graceful skipping when optional

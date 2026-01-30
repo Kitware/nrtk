@@ -18,7 +18,6 @@ is_usable = all(is_available(dep) for dep in deps)
         ("docs/examples/optical_perturbers.ipynb", 0),
         ("docs/examples/photometric_perturbers.ipynb", 0),
         ("docs/examples/pybsm_default_config.ipynb", 0),
-        # Suppressing type checking errors related to xaitk-* imports
         ("docs/examples/maite/jatic-perturbations-saliency.ipynb", 0),
         ("docs/examples/maite/nrtk_affine_perturbers_demo.ipynb", 0),
         ("docs/examples/maite/nrtk_brightness_perturber_demo.ipynb", 0),
