@@ -83,8 +83,8 @@ Environment perturbers simulate atmospheric and weather-related effects that occ
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.environment.haze_perturber.HazePerturber
-   ~nrtk.impls.perturb_image.environment.water_droplet_perturber.WaterDropletPerturber
+   ~nrtk.impls.perturb_image.environment.HazePerturber
+   ~nrtk.impls.perturb_image.environment.WaterDropletPerturber
 
 Optical Perturbers
 ^^^^^^^^^^^^^^^^^^
