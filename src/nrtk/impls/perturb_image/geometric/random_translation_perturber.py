@@ -21,6 +21,7 @@ from __future__ import annotations
 __all__ = ["RandomTranslationPerturber"]
 
 from collections.abc import Hashable, Iterable, Sequence
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
@@ -168,7 +169,7 @@ class RandomTranslationPerturber(PerturbImage):
 
                 # Apply the shifted coordinates to the output bounding box
                 adjusted_box = AxisAlignedBoundingBox(min_vertex=shifted_min, max_vertex=shifted_max)
-                perturbed_boxes.append((adjusted_box, metadata))
+                perturbed_boxes.append((adjusted_box, deepcopy(metadata)))
 
         perturbed_image = final_image
         return perturbed_image, perturbed_boxes
