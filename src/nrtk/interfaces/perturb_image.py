@@ -24,7 +24,7 @@ Example:
 
 from __future__ import annotations
 
-__all__ = []
+__all__ = list()
 
 import abc
 from collections.abc import Hashable, Iterable, Sequence
@@ -32,8 +32,9 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike
-from smqtk_core.plugfigurable import Plugfigurable
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+
+from nrtk.interfaces._plugfigurable import Plugfigurable
 
 
 class PerturbImage(Plugfigurable):
