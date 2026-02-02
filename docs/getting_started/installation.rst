@@ -170,9 +170,12 @@ description of the extra.
     :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
-    :ref:`PybsmPerturber`, :ref:`PybsmOTFPerturber`,
-    :ref:`TurbulenceApertureOTFPerturber`, :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`,
-    :ref:`CircularApertureOTFPerturber`, and :ref:`DefocusOTFPerturber`.
+    :class:`~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber`,
+    and :class:`~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber`.
 
     **maite**: installs `MAITE <https://github.com/mit-ll-ai-technology/maite>`_ and its associated dependencies.
     Required for everything in :ref:`Interoperability`.
@@ -335,10 +338,7 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :ref:`JitterOTFPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :ref:`PyBSMOTFPerturber`
-      - ``pybsm``
-      - ``pyBSM``
-    * - :ref:`PyBSMPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber`
       - ``pybsm``
       - ``pyBSM``
     * - :ref:`RadialDistortionPerturber`

@@ -56,7 +56,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :ref:`PyBSMPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
