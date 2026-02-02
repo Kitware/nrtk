@@ -33,15 +33,16 @@ Interactive Risk Matrix
        :class: sphinx-datatable
        :name: subset-example
 
-       "Operational Risk","NRTK Perturbation(s)","Key Parameters","severity","dropdown"
-       ":ref:`High Frequency Vibration <high-frequency-vibration>` ","JitterOTF","amplitudes","high","Optical"
-       ":ref:`Target Out of Focus <target-out-of-focus>`","DefocusOTF","strength","low","Optical"
-       ":ref:`Noise and Resolution <noise-and-resolution>`","pyBSM","sensor, scenario","high","Optical"
-       ":ref:`Lens Water Droplet <lens-water-droplet>`","WaterDroplet","strength, size, num_of_droplets","low","Environment"
+       "Operational Risk","NRTK Perturbation(s)","Key Parameters","Severity","dropdown"
        ":ref:`Extreme Illumination <extreme-illumination>`","Brightness","factor","low","Photometric"
-       ":ref:`Mist, Fog, or Snow  <mist-fog-snow>`","Haze","factor, depth_map","low","Environment"
-       ":ref:`Turbulence <turbulence>`","TurbulenceApertureOTF","sensor, scenario","high","Optical"
-       ":ref:`Radial Distortion  <radial-distortion>`","RadialDistortion","coefficients","high","Optical"
+       ":ref:`High Frequency Vibration <high-frequency-vibration>`","JitterOTF","s_x, s_y (jitter amplitudes)","high","Optical"
+       ":ref:`Lens Water Droplet <lens-water-droplet>`","WaterDroplet","size_range, num_drops","high","Environment"
+       ":ref:`Mist, Fog, or Snow <mist-fog-snow>`","Haze","factor, depth_map","high","Environment"
+       ":ref:`Noise <noise-and-resolution>`","Scikit-image","seed, amount","low","Optical"
+       ":ref:`Radial Distortion <radial-distortion>`","RadialDistortion","k (distortion coefficients)","low","Optical"
+       ":ref:`Resolution/Optics <noise-and-resolution>`","pyBSM","f, D, p (in sensor)","low","Optical"
+       ":ref:`Target out of Focus <target-out-of-focus>`","DefocusOTF","w_x, w_y (strength)","low","Optical"
+       ":ref:`Turbulence <turbulence>`","TurbulenceApertureOTF","altitude, D, int_time","high","Optical"
 
 
 ----
