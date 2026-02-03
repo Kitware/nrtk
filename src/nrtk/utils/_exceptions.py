@@ -70,12 +70,6 @@ class PydanticSettingsImportError(ImportError):
         super().__init__("pydantic_settings must be installed. Please install via `nrtk[maite]`.")
 
 
-class ScikitImageImportError(ImportError):
-    def __init__(self) -> None:
-        # Call the base class constructor with the parameters it needs
-        super().__init__("scikit-image must be installed. Please install via `nrtk[scikit-image]`.")
-
-
 class WaterDropletImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs

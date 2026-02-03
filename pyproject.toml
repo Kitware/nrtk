@@ -156,6 +156,7 @@ markers = [
     "waterdroplet: Run tests that require the waterdroplet extra",
     "notebooks: Run notebook-related tests (pyright checks)",
     "pillow: Run tests that require the pillow extra",
+    "skimage: Run tests that require the skimage extra",
 ]
 
 [tool.coverage.run]
