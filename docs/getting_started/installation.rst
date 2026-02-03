@@ -183,7 +183,7 @@ description of the extra.
     **tools**: installs `KWCOCO <https://github.com/Kitware/kwcoco>`_ and
     `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for :ref:`nrtk-perturber`.
 
-    **scikit-image**: installs `scikit-image <https://scikit-image.org/>`_. Required for
+    **skimage**: installs `scikit-image <https://scikit-image.org/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.photometric.noise` perturbers.
 
     **Pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
@@ -279,25 +279,25 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``graphics`` or ``headless``
       - ``OpenCV``
     * - :ref:`GaussianNoisePerturber`
-      - ``scikit-image``
+      - ``skimage``
       - ``scikit-image``
     * - :ref:`MedianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
     * - :ref:`PepperNoisePerturber`
-      - ``scikit-image``
+      - ``skimage``
       - ``scikit-image``
     * - :ref:`SaltAndPepperNoisePerturber`
-      - ``scikit-image``
+      - ``skimage``
       - ``scikit-image``
     * - :ref:`SaltNoisePerturber`
-      - ``scikit-image``
+      - ``skimage``
       - ``scikit-image``
     * - :ref:`SharpnessPerturber`
       - ``Pillow``
       - ``Pillow``
     * - :ref:`SpeckleNoisePerturber`
-      - ``scikit-image``
+      - ``skimage``
       - ``scikit-image``
     * - **Geometric Perturbers**
       -
