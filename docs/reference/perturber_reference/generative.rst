@@ -14,7 +14,7 @@ traditional image processing techniques.
      - Required Inputs
      - Optional Parameters
 
-   * - :ref:`DiffusionPerturber`
+   * - :class:`~nrtk.impls.perturb_image.generative.DiffusionPerturber`
      - Image (converts to RGB)
      - * ``model_name``
        * ``prompt``

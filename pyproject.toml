@@ -52,7 +52,7 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 "nrtk.impls.perturb_image.wrapper" = "nrtk.impls.perturb_image.wrapper"
 "nrtk.impls.perturb_image.geometric.random" = "nrtk.impls.perturb_image.geometric.random"
 "nrtk.impls.perturb_image.environment" = "nrtk.impls.perturb_image.environment"
-"nrtk.impls.perturb_image.generative.diffusion_perturber" = "nrtk.impls.perturb_image.generative.diffusion_perturber"
+"nrtk.impls.perturb_image.generative" = "nrtk.impls.perturb_image.generative"
 "nrtk.impls.perturb_image.optical.radial_distortion_perturber" = "nrtk.impls.perturb_image.optical.radial_distortion_perturber"
 "nrtk.impls.perturb_image.optical.pybsm_perturber" = "nrtk.impls.perturb_image.optical.pybsm_perturber"
 "nrtk.impls.perturb_image.optical.jitter_otf_perturber" = "nrtk.impls.perturb_image.optical.jitter_otf_perturber"
@@ -157,6 +157,7 @@ markers = [
     "notebooks: Run notebook-related tests (pyright checks)",
     "pillow: Run tests that require the pillow extra",
     "skimage: Run tests that require the skimage extra",
+    "diffusion: Run tests that require the diffusion extra",
 ]
 
 [tool.coverage.run]

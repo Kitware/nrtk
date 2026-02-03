@@ -114,7 +114,7 @@ Generative perturbers use AI models to transform images through learned represen
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.generative.diffusion_perturber.DiffusionPerturber
+   ~nrtk.impls.perturb_image.generative.DiffusionPerturber
 
 Wrapper Perturbers
 ^^^^^^^^^^^^^^^^^^

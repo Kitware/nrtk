@@ -13,10 +13,7 @@ Dependencies:
     - smqtk_image_io for bounding box handling
 
 Example:
-    >>> if not DiffusionPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("DiffusionPerturber is not usable")
+    >>> import numpy as np
     >>> diffusion_perturber = DiffusionPerturber(
     ...     model_name="timbrooks/instruct-pix2pix", prompt="add rain to the image"
     ... )
@@ -31,6 +28,8 @@ Note:
 
 from __future__ import annotations
 
+from nrtk.interfaces.perturb_image import PerturbImage
+
 __all__ = ["DiffusionPerturber"]
 
 import warnings
@@ -38,31 +37,15 @@ from collections.abc import Hashable, Iterable
 from typing import Any, cast
 
 import numpy as np
-from smqtk_image_io.bbox import AxisAlignedBoundingBox
-from typing_extensions import override
-
-from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import DiffusionImportError
-from nrtk.utils._import_guard import import_guard
-
-torch_available: bool = import_guard(module_name="torch", exception=DiffusionImportError, fake_spec=True)
-transformers_available: bool = import_guard(module_name="transformers", exception=DiffusionImportError)
-diffusion_available: bool = import_guard(
-    module_name="diffusers",
-    exception=DiffusionImportError,
-    submodules=[
-        "pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix",
-        "schedulers.scheduling_euler_ancestral_discrete",
-    ],
-)
-pillow_available: bool = import_guard(module_name="PIL", exception=DiffusionImportError, submodules=["Image"])
-import torch  # noqa: E402
-from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (  # noqa: E402
+import torch
+from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_instruct_pix2pix import (
     StableDiffusionInstructPix2PixPipeline,
 )
-from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler  # noqa: E402
-from PIL.Image import Image, Resampling, fromarray  # noqa: E402
-from transformers import CLIPTextModel  # noqa: E402
+from diffusers.schedulers.scheduling_euler_ancestral_discrete import EulerAncestralDiscreteScheduler
+from PIL.Image import Image, Resampling, fromarray
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from transformers import CLIPTextModel
+from typing_extensions import override
 
 
 class DiffusionPerturber(PerturbImage):
@@ -123,9 +106,6 @@ class DiffusionPerturber(PerturbImage):
                 Device for computation, e.g., "cpu" or "cuda". If None, selects
                 CUDA if available, otherwise CPU. Default is None.
         """
-        if not self.is_usable():
-            raise DiffusionImportError
-
         super().__init__()
 
         self.model_name = model_name
@@ -358,9 +338,3 @@ class DiffusionPerturber(PerturbImage):
             "image_guidance_scale": self.image_guidance_scale,
             "device": self.device,
         }
-
-    @classmethod
-    @override
-    def is_usable(cls) -> bool:
-        """Returns true if the necessary dependencies (torch, diffusers, and PIL) are available."""
-        return torch_available and diffusion_available and pillow_available

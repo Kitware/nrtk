@@ -4,12 +4,6 @@ class AlbumentationsImportError(ImportError):
         super().__init__("albumentations must be installed. Please install via `nrtk[albumentations]`.")
 
 
-class DiffusionImportError(ImportError):
-    def __init__(self) -> None:
-        # Call the base class constructor with the parameters it needs
-        super().__init__("torch, diffusers, and PIL must be installed. Please install via `nrtk[diffusion]`.")
-
-
 class FastApiImportError(ImportError):
     def __init__(self) -> None:
         # Call the base class constructor with the parameters it needs

@@ -26,6 +26,13 @@
   an opaque failure. Restructured into private ``_enhance/`` package with public exports from
   ``nrtk.impls.perturb_image.photometric.enhance``.
 
+* Added import guards for diffusion perturbers (``DiffusionPerturber``).
+  Attempting to use this class without ``torch``, ``diffusers``, ``Pillow``, or
+  ``transformers`` installed now raises a clear ``ImportError`` with install
+  instructions instead of an opaque failure. Restructured into private
+  ``_diffusion_perturber`` module with public exports from
+  ``nrtk.impls.perturb_image.generative``.
+
 * Added ``tox.ini`` configuration for running tests with specific optional dependency combinations.
 
 * Split the ``tox:pytest`` CI job into separate per-Python-version jobs
