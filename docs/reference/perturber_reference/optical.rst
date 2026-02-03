@@ -15,7 +15,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
      - Required Inputs
      - Optional Parameters
 
-   * - :ref:`CircularApertureOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -25,7 +25,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :ref:`DefocusOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -35,7 +35,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :ref:`DetectorOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -46,7 +46,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :ref:`JitterOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -65,13 +65,13 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :ref:`RadialDistortionPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber`
      - Image (RGB/Grayscale)
      - * ``k``
        * ``color_fill``
        * ``boxes``
 
-   * - :ref:`TurbulenceApertureOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``

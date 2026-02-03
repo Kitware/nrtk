@@ -14,14 +14,14 @@ transformation capabilities.
      - Required Inputs
      - Optional Parameters
 
-   * - :ref:`AlbumentationsPerturber`
+   * - :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`
      - Image (format varies by transform)
      - * ``perturber``
        * ``parameters``
        * ``seed``
        * ``boxes``
 
-   * - :ref:`ComposePerturber`
+   * - :class:`~nrtk.impls.perturb_image.wrapper.ComposePerturber`
      - Image (format varies by perturbers)
      - * ``perturbers``
        * ``boxes``

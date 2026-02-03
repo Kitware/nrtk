@@ -1,17 +1,22 @@
 """Module for generative implementations of PerturbImage."""
 
-from collections.abc import Callable
-from typing import Any
+_DIFFUSION_CLASSES = ["DiffusionPerturber"]
 
-import lazy_loader as lazy
+try:
+    from nrtk.impls.perturb_image.generative._diffusion_perturber import (
+        DiffusionPerturber as DiffusionPerturber,
+    )
 
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
+    # Override __module__ to reflect the public API path for plugin discovery
+    DiffusionPerturber.__module__ = __name__
 
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=[
-        "diffusion_perturber",
-    ],
-)
+    __all__ = _DIFFUSION_CLASSES
+except ImportError:
+    __all__: list[str] = list()
+
+    def __getattr__(name: str) -> None:
+        if name in _DIFFUSION_CLASSES:
+            raise ImportError(
+                f"{name} requires the `diffusion` extra. Install with: `pip install nrtk[diffusion]`",
+            )
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

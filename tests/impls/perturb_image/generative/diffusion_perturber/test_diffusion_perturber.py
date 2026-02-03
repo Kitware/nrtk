@@ -6,7 +6,6 @@ ensuring proper interface compliance, configuration handling, and expected behav
 
 from __future__ import annotations
 
-import socket
 import warnings
 from collections.abc import Hashable, Iterable
 from unittest.mock import MagicMock, patch
@@ -17,33 +16,16 @@ from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
-from nrtk.impls.perturb_image.generative.diffusion_perturber import DiffusionPerturber
-from nrtk.utils._exceptions import DiffusionImportError
+from nrtk.impls.perturb_image.generative import DiffusionPerturber
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 
-def internet_available() -> bool:
-    """Check if internet is available by trying to connect to a known host."""
-    try:
-        socket.create_connection(("8.8.8.8", 53), timeout=1)
-        return True
-    except (TimeoutError, OSError):
-        return False
-
-
-def cuda_available() -> bool:
-    """Check if CUDA is available."""
-    try:
-        import torch
-    except ImportError:
-        return False
-
-    return torch.cuda.is_available()
-
-
-@pytest.mark.skipif(not DiffusionPerturber.is_usable(), reason=str(DiffusionImportError()))
-class TestDiffusionPerturber:
+@pytest.mark.diffusion
+class TestDiffusionPerturber(PerturberTestsMixin):
     """Test class for DiffusionPerturber functionality."""
+
+    impl_class = DiffusionPerturber
 
     @pytest.mark.parametrize(
         ("boxes"),
@@ -57,9 +39,9 @@ class TestDiffusionPerturber:
         ],
     )
     @pytest.mark.parametrize("device", ["cuda", "cpu", None])
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.torch")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.EulerAncestralDiscreteScheduler")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.torch")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.EulerAncestralDiscreteScheduler")
     def test_perturb_with_boxes(
         self,
         mock_scheduler_class: MagicMock,
@@ -109,9 +91,9 @@ class TestDiffusionPerturber:
         assert perturbed_image.shape == (256, 256, 3)
         assert output_boxes == boxes
 
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.torch")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.EulerAncestralDiscreteScheduler")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.torch")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.EulerAncestralDiscreteScheduler")
     def test_default_seed_reproducibility(
         self,
         mock_scheduler_class: MagicMock,
@@ -161,9 +143,9 @@ class TestDiffusionPerturber:
             (np.random.default_rng(2).integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
         ],
     )
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.torch")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.EulerAncestralDiscreteScheduler")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.torch")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.EulerAncestralDiscreteScheduler")
     def test_reproducibility(
         self,
         mock_scheduler_class: MagicMock,
@@ -252,7 +234,7 @@ class TestDiffusionPerturber:
             assert perturber.image_guidance_scale == image_guidance_scale
             assert perturber.device == device
 
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
     def test_pipeline_loading_error(self, mock_pipeline_class: MagicMock) -> None:
         """Test that pipeline loading errors are properly handled."""
         mock_pipeline_class.from_pretrained.side_effect = Exception("Model not found")
@@ -273,9 +255,9 @@ class TestDiffusionPerturber:
             (None, False, "cpu", True),
         ],
     )
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.EulerAncestralDiscreteScheduler")
-    @patch("nrtk.impls.perturb_image.generative.diffusion_perturber.torch")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.StableDiffusionInstructPix2PixPipeline")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.EulerAncestralDiscreteScheduler")
+    @patch("nrtk.impls.perturb_image.generative._diffusion_perturber.torch")
     def test_device_selection_and_warnings(
         self,
         mock_torch: MagicMock,
@@ -307,54 +289,3 @@ class TestDiffusionPerturber:
                 assert not w, f"Expected no UserWarnings, but got: {[str(warn.message) for warn in w]}"
 
         mock_pipeline.to.assert_called_with(expected_device)
-
-    # @pytest.mark.parametrize(
-    #     ("prompt", "image_guidance_scale", "text_guidance_scale", "seed"),
-    #     [
-    #         ("add rain to the image", 2.0, 8.0, 42),
-    #     ],
-    # )
-    # @pytest.mark.skipif(not internet_available(), reason="Internet connection not available.")
-    # @pytest.mark.skipif(not cuda_available(), reason="CUDA not available.")
-    # def test_regression(
-    #     self,
-    #     snapshot: SnapshotAssertion,
-    #     prompt: str,
-    #     image_guidance_scale: float,
-    #     text_guidance_scale: float,
-    #     seed: int,
-    # ) -> None:
-    #     """Test the full perturber pipeline to ensure it runs."""
-    #     perturber = DiffusionPerturber(
-    #         prompt=prompt,
-    #         num_inference_steps=2,  # just a few steps to test the pipeline
-    #         image_guidance_scale=image_guidance_scale,
-    #         text_guidance_scale=text_guidance_scale,
-    #         seed=seed,
-    #     )
-
-    #     image = np.full((256, 256, 3), 128, dtype=np.uint8)
-    #     perturbed_image = perturber_assertions(perturber.perturb, image)
-
-    #     # make sure the image has been modified
-    #     assert not np.array_equal(image, perturbed_image)
-
-    #     assert TIFFImageSnapshotExtension.ndarray2bytes(perturbed_image) == snapshot(
-    #         extension_class=TIFFImageSnapshotExtension,
-    #     )
-
-
-@pytest.mark.parametrize(
-    "target",
-    [
-        "nrtk.impls.perturb_image.generative.diffusion_perturber.torch_available",
-        "nrtk.impls.perturb_image.generative.diffusion_perturber.diffusion_available",
-        "nrtk.impls.perturb_image.generative.diffusion_perturber.pillow_available",
-    ],
-)
-def test_missing_deps(target: str) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    with patch(target, False):
-        assert not DiffusionPerturber.is_usable()
-        with pytest.raises(DiffusionImportError):
-            DiffusionPerturber()

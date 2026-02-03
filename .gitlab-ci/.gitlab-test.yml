@@ -20,7 +20,7 @@
   extends: .test-setup
   parallel:
     matrix:
-      - TOX_ENV: [core, opencv, albumentations, pillow, waterdroplet, skimage, doctest, notebooks, unmarked, unmarked-all]
+      - TOX_ENV: [core, opencv, albumentations, pillow, waterdroplet, skimage, diffusion, doctest, notebooks, unmarked, unmarked-all]
   script:
     # Convert PYTHON_VERSION (3.10) to tox factor (py310) and run specific env
     - tox -e "py${PYTHON_VERSION//./}-${TOX_ENV}"

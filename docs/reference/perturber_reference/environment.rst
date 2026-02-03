@@ -14,14 +14,14 @@ quality.
      - Required Inputs
      - Optional Parameters
 
-   * - :ref:`HazePerturber`
+   * - :class:`~nrtk.impls.perturb_image.environment.HazePerturber`
      - Image (RGB/Grayscale)
      - * ``factor``
        * ``depth_map``
        * ``sky_color``
        * ``boxes``
 
-   * - :ref:`WaterDropletPerturber`
+   * - :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber`
      - Image (RGB/Grayscale)
      - * ``size_range``
        * ``num_drops``
