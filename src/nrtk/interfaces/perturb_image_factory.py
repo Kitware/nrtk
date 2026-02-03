@@ -16,15 +16,15 @@ Example usage:
 
 from __future__ import annotations
 
-__all__ = []
+__all__ = list()
 
 import abc
 from collections.abc import Iterator, Sequence
 from typing import Any
 
-from smqtk_core.plugfigurable import Plugfigurable
 from typing_extensions import Self, override
 
+from nrtk.interfaces._plugfigurable import Plugfigurable
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
