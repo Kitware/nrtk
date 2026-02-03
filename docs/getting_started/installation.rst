@@ -195,7 +195,7 @@ description of the extra.
     :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `numba <https://numba.pydata.org/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.environment.water_droplet_perturber` perturber and utility functions.
+    :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber` perturber and utility functions.
 
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
     `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.

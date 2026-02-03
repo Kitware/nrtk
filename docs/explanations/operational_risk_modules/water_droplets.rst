@@ -43,7 +43,7 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.environment.water_droplet_perturber import WaterDropletPerturber
+   from nrtk.impls.perturb_image.environment import WaterDropletPerturber
 
    perturber = WaterDropletPerturber(
        num_drops=20,
@@ -115,7 +115,7 @@ Limitations and Next Steps
 ---------------------------
 
 * API Reference:
-  :class:`WaterDropletPerturber<nrtk.impls.perturb_image.environment.water_droplet_perturber.WaterDropletPerturber>`
+  :class:`WaterDropletPerturber<nrtk.impls.perturb_image.environment.WaterDropletPerturber>`
 * Applies **frame-by-frame** — droplet positions are randomized each call, so there's no
   temporal consistency across video frames (suitable for static image robustness testing).
 * Requires optional dependencies: install via ``pip install nrtk[waterdroplet]``.
