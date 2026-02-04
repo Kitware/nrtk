@@ -18,9 +18,34 @@
 
 .tox:pytest:
   extends: .test-setup
+  tags:
+    - $RUNNER_TAG
   parallel:
     matrix:
-      - TOX_ENV: [core, opencv, albumentations, pillow, pybsm, waterdroplet, skimage, diffusion, doctests, notebooks, unmarked, unmarked-all]
+      - TOX_ENV: core
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: opencv
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: albumentations
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: pillow
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: skimage
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: unmarked
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: pybsm
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: waterdroplet
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: diffusion
+        RUNNER_TAG: autoscaler
+      - TOX_ENV: unmarked-all
+        RUNNER_TAG: autoscaler
+      - TOX_ENV: doctests
+        RUNNER_TAG: autoscaler
+      - TOX_ENV: notebooks
+        RUNNER_TAG: autoscaler
   script:
     # Convert PYTHON_VERSION (3.10) to tox factor (py310) and run specific env
     - tox -e "py${PYTHON_VERSION//./}-${TOX_ENV}"
@@ -58,6 +83,8 @@ tox:pytest:py3.13:
 
 .tox:coverage:version:
   extends: .test-setup
+  tags:
+    - small-cpu
   before_script:
     - !reference [.shared-setup, before_script]
     # Install dependencies (coverage is in the tests dependency group)
@@ -116,6 +143,8 @@ tox:coverage:py3.13:
 
 tox:coverage:
   extends: .test-setup
+  tags:
+    - small-cpu
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?%)/'
   dependencies:
     - tox:coverage:py3.10
@@ -155,6 +184,8 @@ tox:coverage:
 
 .tox:notebooks:
   extends: .test-setup
+  tags:
+    - autoscaler
   image: python:3.10
   dependencies: []
   rules:
