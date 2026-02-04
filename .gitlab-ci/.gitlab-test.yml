@@ -20,7 +20,7 @@
   extends: .test-setup
   parallel:
     matrix:
-      - TOX_ENV: [core, opencv, albumentations, pillow, waterdroplet, skimage, diffusion, doctest, notebooks, unmarked, unmarked-all]
+      - TOX_ENV: [core, opencv, albumentations, pillow, waterdroplet, skimage, diffusion, doctests, notebooks, unmarked, unmarked-all]
   script:
     # Convert PYTHON_VERSION (3.10) to tox factor (py310) and run specific env
     - tox -e "py${PYTHON_VERSION//./}-${TOX_ENV}"
@@ -56,30 +56,87 @@ tox:pytest:py3.13:
   variables:
     PYTHON_VERSION: "3.13"
 
+.tox:coverage:version:
+  extends: .test-setup
+  before_script:
+    - !reference [.shared-setup, before_script]
+    # Install dependencies (coverage is in the tests dependency group)
+    - poetry sync --only tests -q
+  script:
+    # Combine all the coverage reports from the pytest matrix for this
+    # Python version into a single database file.
+    - poetry run coverage combine ./.coverage.*
+    # Rename combined file so the final coverage job can distinguish versions.
+    - mv .coverage ".coverage.${PYTHON_VERSION}"
+  artifacts:
+    when: always
+    paths:
+      - ".coverage.*"
+    expire_in: 1 day
+
+tox:coverage:py3.10:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.10"
+  dependencies:
+    - tox:pytest:py3.10
+  needs:
+    - job: tox:pytest:py3.10
+      artifacts: true
+
+tox:coverage:py3.11:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.11"
+  dependencies:
+    - tox:pytest:py3.11
+  needs:
+    - job: tox:pytest:py3.11
+      artifacts: true
+
+tox:coverage:py3.12:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.12"
+  dependencies:
+    - tox:pytest:py3.12
+  needs:
+    - job: tox:pytest:py3.12
+      artifacts: true
+
+tox:coverage:py3.13:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.13"
+  dependencies:
+    - tox:pytest:py3.13
+  needs:
+    - job: tox:pytest:py3.13
+      artifacts: true
+
 tox:coverage:
   extends: .test-setup
   coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?%)/'
   dependencies:
-    - tox:pytest:py3.10
-    - tox:pytest:py3.11
-    - tox:pytest:py3.12
-    - tox:pytest:py3.13
+    - tox:coverage:py3.10
+    - tox:coverage:py3.11
+    - tox:coverage:py3.12
+    - tox:coverage:py3.13
   needs:
-    - job: tox:pytest:py3.10
+    - job: tox:coverage:py3.10
       artifacts: true
-    - job: tox:pytest:py3.11
+    - job: tox:coverage:py3.11
       artifacts: true
-    - job: tox:pytest:py3.12
+    - job: tox:coverage:py3.12
       artifacts: true
-    - job: tox:pytest:py3.13
+    - job: tox:coverage:py3.13
       artifacts: true
   before_script:
     - !reference [.shared-setup, before_script]
     # Install dependencies (coverage is in the tests dependency group)
     - poetry sync --only tests -q
   script:
-    # Combine all the coverage reports from the pytest matrix into a single
-    # database file.
+    # Combine all per-version coverage reports into a single database file.
     - poetry run coverage combine ./.coverage.*
     # This converts the now combined `.coverage` database file into a single
     # `coverage.xml` file
@@ -109,7 +166,7 @@ tox:coverage:
     - when: never  # explicit fail-exclude terminal condition.
   allow_failure: true
   script:
-    - tox -r -m papermill -- "${NOTEBOOK_DIR}/${NOTEBOOK_FILE}" /dev/null
+    - tox -r -e papermill -- "${NOTEBOOK_DIR}/${NOTEBOOK_FILE}" /dev/null
 
 tox:notebooks:examples:
   extends: .tox:notebooks
