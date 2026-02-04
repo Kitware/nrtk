@@ -14,7 +14,7 @@ handle. The degradation depends on viewing geometry, atmospheric conditions, and
 making it highly variable across operational scenarios. This variability makes turbulence a
 critical friction to assess during robustness testing.
 
-NRTK's TurbulenceApertureOTFPerturber models these effects using physics-based simulation
+NRTK's TurbulenceAperturePerturber models these effects using physics-based simulation
 that accounts for turbulence strength, wind speed, and viewing geometry. While it does not
 capture all aspects of real turbulence (such as anisoplanatic effects), it provides an efficient
 means to probe model sensitivity to atmospheric degradation during early-stage robustness
@@ -43,9 +43,9 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import TurbulenceApertureOTFPerturber
+   from nrtk.impls.perturb_image.optical.otf import TurbulenceAperturePerturber
 
-   perturber = TurbulenceApertureOTFPerturber(
+   perturber = TurbulenceAperturePerturber(
        cn2_at_1m=5.0e-13,   # refractive index structure parameter
        altitude=50.0,       # sensor height above ground (m)
        slant_range=70.7,    # line-of-sight distance to target (m)
@@ -101,7 +101,7 @@ Limitations and Next Steps
 ---------------------------
 
 * API Reference:
-  :class:`TurbulenceApertureOTFPerturber<nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber>`
+  :class:`TurbulenceAperturePerturber<nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber>`
 * Models **isoplanatic turbulence** only; does not capture anisoplanatic effects across
   the field of view or temporal flickering in video sequences.
 * Requires ``img_gsd`` parameter when calling ``perturb()`` to properly scale effects.

@@ -6,13 +6,10 @@ Classes:
 
 Dependencies:
     - pyBSM for OTF-related functionalities.
-    - nrtk.impls.perturb_image.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+    - nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin for base functionality.
 
 Example usage:
-    >>> if not PybsmPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("PybsmPerturber is not usable")
+    >>> import numpy as np
     >>> sensor_and_scenario = {"f": 4, "altitude": 9000}
     >>> perturber = PybsmPerturber(**sensor_and_scenario)
     >>> image = np.ones((256, 256, 3))
@@ -28,21 +25,15 @@ from collections.abc import Hashable, Iterable
 from typing import Any
 
 import numpy as np
+from pybsm.simulation import ImageSimulator, SystemOTFSimulator
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
+from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
 from nrtk.utils._constants import DEFAULT_PYBSM_PARAMS
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
-
-from pybsm.simulation import ImageSimulator, SystemOTFSimulator  # noqa: E402
 
 
-class PybsmPerturber(PybsmOTFPerturber):
+class PybsmPerturber(PybsmPerturberMixin):
     """Implements image perturbation using pyBSM sensor and scenario configurations.
 
     The `PybsmPerturber` class applies realistic perturbations to images by leveraging
@@ -206,11 +197,7 @@ class PybsmPerturber(PybsmOTFPerturber):
                 A flag to indicate whether atmospheric interpolation should be used.
                 Defaults to False.
 
-
-
         Raises:
-            ImportError:
-                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
             ValueError:
                 If reflectance_range length != 2
             ValueError:

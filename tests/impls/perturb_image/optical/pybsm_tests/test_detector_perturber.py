@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -14,23 +12,25 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.detector_otf_perturber import DetectorOTFPerturber
-from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.impls.perturb_image.optical.otf import DetectorPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.utils.test_pybsm import create_sample_sensor_and_scenario
 
 
-@pytest.mark.skipif(not DetectorOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
-class TestDetectorOTFPerturber:
+@pytest.mark.pybsm
+class TestDetectorPerturber(PerturberTestsMixin):
+    impl_class = DetectorPerturber
+
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
         sensor_and_scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = DetectorOTFPerturber(interp=True, **sensor_and_scenario)
-        inst2 = DetectorOTFPerturber(interp=True, **sensor_and_scenario)
+        inst = DetectorPerturber(interp=True, **sensor_and_scenario)
+        inst2 = DetectorPerturber(interp=True, **sensor_and_scenario)
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -72,7 +72,7 @@ class TestDetectorOTFPerturber:
         if f is not None:
             sensor_and_scenario["f"] = f
 
-        inst = DetectorOTFPerturber(interp=interp, **sensor_and_scenario)
+        inst = DetectorPerturber(interp=interp, **sensor_and_scenario)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
 
@@ -100,7 +100,7 @@ class TestDetectorOTFPerturber:
         sensor_and_scenario = {}
         if use_sensor_scenario:
             sensor_and_scenario = create_sample_sensor_and_scenario()
-        perturber = DetectorOTFPerturber(**sensor_and_scenario)
+        perturber = DetectorPerturber(**sensor_and_scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber.perturb(image=img, **kwargs)
@@ -134,7 +134,7 @@ class TestDetectorOTFPerturber:
         if f is not None:
             sensor_and_scenario["f"] = f
 
-        inst = DetectorOTFPerturber(interp=interp, **sensor_and_scenario)
+        inst = DetectorPerturber(interp=interp, **sensor_and_scenario)
         for i in configuration_test_helper(inst):
             if w_x is not None:
                 assert i.w_x == w_x
@@ -202,7 +202,7 @@ class TestDetectorOTFPerturber:
         if f is not None:
             sensor_and_scenario["f"] = f
 
-        inst = DetectorOTFPerturber(interp=interp, **sensor_and_scenario)
+        inst = DetectorPerturber(interp=interp, **sensor_and_scenario)
 
         out_img = pybsm_perturber_assertions(perturb=inst, image=img, expected=None, **img_md)
         ssim_tiff_snapshot.assert_match(out_img)
@@ -220,15 +220,6 @@ class TestDetectorOTFPerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = DetectorOTFPerturber()
+        inst = DetectorPerturber()
         _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
-
-
-@mock.patch.object(DetectorOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not DetectorOTFPerturber.is_usable()
-    with pytest.raises(PyBSMImportError):
-        DetectorOTFPerturber()

@@ -1,7 +1,7 @@
-"""Implements PybsmOTFPerturber which is a base class for the pybsm and otf perturber classes.
+"""Mixin class providing shared functionality for pyBSM perturbers.
 
 Classes:
-    PybsmOTFPerturber: Applies OTF-based perturbations to images using pyBSM.
+    PybsmPerturberMixin: Base class for OTF-based perturbations using pyBSM.
 
 Dependencies:
     - pyBSM for OTF and radiance calculations.
@@ -10,7 +10,9 @@ Dependencies:
 
 from __future__ import annotations
 
-__all__ = list()
+from nrtk.interfaces.perturb_image import PerturbImage
+
+__all__: list[str] = []
 
 import copy
 from abc import ABC, abstractmethod
@@ -19,27 +21,16 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
+from pybsm.simulation import ImageSimulator
+from pybsm.simulation.scenario import Scenario
+from pybsm.simulation.sensor import Sensor
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.utils._constants import DEFAULT_PYBSM_PARAMS
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(
-    module_name="pybsm",
-    exception=PyBSMImportError,
-    submodules=["simulation", "simulation.scenario", "simulation.sensor"],
-)
-
-from pybsm.simulation import ImageSimulator  # noqa: E402
-from pybsm.simulation.scenario import Scenario  # noqa: E402
-from pybsm.simulation.sensor import Sensor  # noqa: E402
 
 
-class PybsmOTFPerturber(PerturbImage, ABC):
+class PybsmPerturberMixin(PerturbImage, ABC):
     """Base handles common functionality shared across all pybsm-based OTF perturbers.
 
     This class handles common functionality shared across all pybsm-based OTF perturbers:
@@ -47,7 +38,6 @@ class PybsmOTFPerturber(PerturbImage, ABC):
     - Default parameter handling
     - Image perturbation workflow (GSD extraction, simulation, box rescaling)
     - Configuration management base functionality
-    - Dependency checking
 
     Attributes:
         sensor (Sensor):
@@ -219,12 +209,7 @@ class PybsmOTFPerturber(PerturbImage, ABC):
                 A flag to indicate whether atmospheric interpolation should be used.
                 Defaults to False.
             kwargs: sensor and/or scenario values to modify
-        Raises:
-            ImportError:
-                pyBSM is not found
         """
-        if not self.is_usable():
-            raise PyBSMImportError
         super().__init__()
         self._simulator: ImageSimulator
 
@@ -237,13 +222,13 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         if qe is not None:
             qe = np.asarray(qe)
 
-        if ihaze not in PybsmOTFPerturber.ihaze_values:
+        if ihaze not in PybsmPerturberMixin.ihaze_values:
             raise ValueError(
-                f"Invalid ihaze value ({ihaze}) must be in {PybsmOTFPerturber.ihaze_values}",
+                f"Invalid ihaze value ({ihaze}) must be in {PybsmPerturberMixin.ihaze_values}",
             )
-        if altitude <= PybsmOTFPerturber.altitude_values[-1] and altitude not in PybsmOTFPerturber.altitude_values:
+        if altitude <= PybsmPerturberMixin.altitude_values[-1] and altitude not in PybsmPerturberMixin.altitude_values:
             raise ValueError(f"Invalid altitude value ({altitude})")
-        if ground_range not in PybsmOTFPerturber.ground_range_values:
+        if ground_range not in PybsmPerturberMixin.ground_range_values:
             raise ValueError(f"Invalid ground range value ({ground_range})")
 
         self._check_opt_trans_wavelengths(opt_trans_wavelengths)
@@ -298,8 +283,6 @@ class PybsmOTFPerturber(PerturbImage, ABC):
         # Store kwargs for retrieval
         self.thetas: dict[str, Any] = copy.deepcopy(kwargs)
         self._use_default_psf = False
-
-        # self._simulator = self._create_simulator()
 
     def _check_opt_trans_wavelengths(self, opt_trans_wavelengths: np.ndarray) -> None:
         """Validates the `opt_trans_wavelengths` array to ensure it meets the required criteria.
@@ -411,11 +394,6 @@ class PybsmOTFPerturber(PerturbImage, ABC):
             "cn2_at_1m": self.cn2_at_1m,
             "interp": self.interp,
         }
-
-    @classmethod
-    def is_usable(cls) -> bool:
-        """Check if dependencies are available."""
-        return pybsm_available
 
     @property
     def scenario_name(self) -> str:

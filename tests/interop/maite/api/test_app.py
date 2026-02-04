@@ -92,7 +92,7 @@ class TestApp:
         np.testing.assert_equal(
             factory_config,
             {
-                "perturber": "nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber",
+                "perturber": "nrtk.impls.perturb_image.optical.PybsmPerturber",
                 "theta_keys": ["f", "D", "p_x"],
                 "perturber_kwargs": {
                     "sensor_name": "L32511x",

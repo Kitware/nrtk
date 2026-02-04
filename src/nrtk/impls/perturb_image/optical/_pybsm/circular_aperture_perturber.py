@@ -1,21 +1,18 @@
-"""Implements CircularApertureOTFPerturber for circular aperture OTF perturbations with sensor and scenario configs.
+"""Implements CircularAperturePerturber for circular aperture OTF perturbations.
 
 Classes:
-    CircularApertureOTFPerturber: Implements OTF-based perturbations using a circular aperture
+    CircularAperturePerturber: Implements OTF-based perturbations using a circular aperture
     model, allowing for detailed wavelength and aperture-based image modifications.
 
 Dependencies:
     - pyBSM for OTF-related functionalities.
-    - nrtk.impls.perturb_image.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+    - nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin for base functionality.
 
 Example usage:
-    >>> if not CircularApertureOTFPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("CircularApertureOTFPerturber is not usable")
+    >>> import numpy as np
     >>> D = 0.004
     >>> eta = 0.1
-    >>> perturber = CircularApertureOTFPerturber(D=D, eta=eta)
+    >>> perturber = CircularAperturePerturber(D=D, eta=eta)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
     >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)
@@ -26,28 +23,22 @@ Notes:
 
 from __future__ import annotations
 
-__all__ = ["CircularApertureOTFPerturber"]
+__all__ = ["CircularAperturePerturber"]
 
 from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from pybsm.simulation import CircularApertureSimulator, ImageSimulator
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
-
-from pybsm.simulation import CircularApertureSimulator, ImageSimulator  # noqa: E402
+from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
 
 
-class CircularApertureOTFPerturber(PybsmOTFPerturber):
-    """Applies OTF-based image perturbation using a circular aperture model with sensor and scenario configurations.
+class CircularAperturePerturber(PybsmPerturberMixin):
+    """Applies OTF-based image perturbation using a circular aperture model.
 
-    The `CircularApertureOTFPerturber` class uses a circular aperture model to simulate
+    The `CircularAperturePerturber` class uses a circular aperture model to simulate
     image perturbations, allowing for wavelength-specific and sensor-specific modifications
     based on the sensor and scenario configurations.
 
@@ -64,7 +55,7 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
         interp: bool = True,
         **kwargs: Any,
     ) -> None:
-        """Initializes the CircularApertureOTFPerturber.
+        """Initializes the CircularAperturePerturber.
 
         Args:
             mtf_wavelengths:
@@ -94,8 +85,6 @@ class CircularApertureOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            ImportError:
-                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
             ValueError:
                 If mtf_wavelengths and mtf_weights are not equal length
             ValueError:

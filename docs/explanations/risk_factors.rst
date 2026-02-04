@@ -35,14 +35,14 @@ Interactive Risk Matrix
 
        "Operational Risk","NRTK Perturbation(s)","Key Parameters","Severity","dropdown"
        ":ref:`Extreme Illumination <extreme-illumination>`","Brightness","factor","low","Photometric"
-       ":ref:`High Frequency Vibration <high-frequency-vibration>`","JitterOTF","s_x, s_y (jitter amplitudes)","high","Optical"
+       ":ref:`High Frequency Vibration <high-frequency-vibration>`","Jitter","s_x, s_y (jitter amplitudes)","high","Optical"
        ":ref:`Lens Water Droplet <lens-water-droplet>`","WaterDroplet","size_range, num_drops","high","Environment"
        ":ref:`Mist, Fog, or Snow <mist-fog-snow>`","Haze","factor, depth_map","high","Environment"
        ":ref:`Noise <noise-and-resolution>`","Scikit-image","seed, amount","low","Optical"
        ":ref:`Radial Distortion <radial-distortion>`","RadialDistortion","k (distortion coefficients)","low","Optical"
        ":ref:`Resolution/Optics <noise-and-resolution>`","pyBSM","f, D, p (in sensor)","low","Optical"
-       ":ref:`Target out of Focus <target-out-of-focus>`","DefocusOTF","w_x, w_y (strength)","low","Optical"
-       ":ref:`Turbulence <turbulence>`","TurbulenceApertureOTF","altitude, D, int_time","high","Optical"
+       ":ref:`Target out of Focus <target-out-of-focus>`","Defocus","w_x, w_y (strength)","low","Optical"
+       ":ref:`Turbulence <turbulence>`","TurbulenceAperture","altitude, D, int_time","high","Optical"
 
 
 ----
@@ -291,7 +291,7 @@ Vibrations in the sensor platform (e.g. from wind) induce jitter and blurring.
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`JitterOTFPerturber <nrtk.impls.perturb_image.optical.jitter_otf_perturber>`                  |
+| **NRTK Perturbation**   | :ref:`JitterPerturber <nrtk.impls.perturb_image.optical.otf>`                  |
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Learn More**          | :doc:`operational_risk_modules/high_frequency_vibration`                                           |
 +-------------------------+----------------------------------------------------------------------------------------------------+
@@ -315,7 +315,7 @@ Target is out of focus (due to sensor optics settings, rather than atmospheric /
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`DefocusOTFPerturber <nrtk.impls.perturb_image.optical.defocus_otf_perturber>`                |
+| **NRTK Perturbation**   | :ref:`DefocusPerturber <nrtk.impls.perturb_image.optical.otf>`                |
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Learn More**          | :doc:`operational_risk_modules/defocus`                                                            |
 +-------------------------+----------------------------------------------------------------------------------------------------+
@@ -339,7 +339,7 @@ The sensor data exhibits noise as a result of poor lighting, high ISO settings, 
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea                                                                                        |
 +-------------------------+----------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`PybsmPerturber <nrtk.impls.perturb_image.optical.pybsm_perturber>`                           |
+| **NRTK Perturbation**   | :ref:`PybsmPerturber <nrtk.impls.perturb_image.optical.otf>`                           |
 +-------------------------+----------------------------------------------------------------------------------------------------+
 | **Learn More**          | :doc:`operational_risk_modules/sensor_noise_resolution`                                            |
 +-------------------------+----------------------------------------------------------------------------------------------------+
@@ -361,7 +361,7 @@ Localized distortion due to atmospheric conditions.
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 | **Affected Domains**    | Ground, Sea, UAV                                                                                                     |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
-| **NRTK Perturbation**   | :ref:`TurbulenceApertureOTFPerturber <nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber>`           |
+| **NRTK Perturbation**   | :ref:`TurbulenceAperturePerturber <nrtk.impls.perturb_image.optical.otf>`           |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+
 | **Learn More**          | :doc:`operational_risk_modules/atmospheric_turbulence`                                                               |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------+

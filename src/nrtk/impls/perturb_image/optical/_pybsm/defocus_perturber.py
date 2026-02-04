@@ -1,49 +1,39 @@
-"""Implements DefocusOTFPerturber for optical defocus simulation via OTF using pybsm.
+"""Implements DefocusPerturber for optical defocus simulation via OTF using pybsm.
 
 Classes:
-    DefocusOTFPerturber: Simulates defocus effects in images using OTF and PSF calculations.
+    DefocusPerturber: Simulates defocus effects in images using OTF and PSF calculations.
 
 Dependencies:
     - pyBSM for OTF-related functionalities.
-    - nrtk.impls.perturb_image.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+    - nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin for base functionality.
 
 Example usage:
-    >>> if not DefocusOTFPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("DefocusOTFPerturber is not usable")
+    >>> import numpy as np
     >>> w_x = 4.0e-6
     >>> w_y = 4.5e-6
-    >>> perturber = DefocusOTFPerturber(w_x=w_x, w_y=w_y)
+    >>> perturber = DefocusPerturber(w_x=w_x, w_y=w_y)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
     >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)
-
 """
 
 from __future__ import annotations
 
-__all__ = ["DefocusOTFPerturber"]
+__all__ = ["DefocusPerturber"]
 
 from typing import Any
 
 import numpy as np
+from pybsm.simulation import DefocusSimulator, ImageSimulator
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
-
-from pybsm.simulation import DefocusSimulator, ImageSimulator  # noqa: E402
+from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
 
 
-class DefocusOTFPerturber(PybsmOTFPerturber):
+class DefocusPerturber(PybsmPerturberMixin):
     """Implements image perturbation using defocus and Optical Transfer Function (OTF).
 
-    DefocusOTFPerturber applies optical defocus perturbations to input images based on
+    DefocusPerturber applies optical defocus perturbations to input images based on
     specified sensor and scenario configurations. The perturbation uses the Optical
     Transfer Function (OTF) and Point Spread Function (PSF) for simulation.
 
@@ -58,7 +48,7 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
         interp: bool = True,
         **kwargs: Any,
     ) -> None:
-        """Initializes a DefocusOTFPerturber instance with the specified parameters.
+        """Initializes a DefocusPerturber instance with the specified parameters.
 
         Args:
             w_x:
@@ -80,10 +70,6 @@ class DefocusOTFPerturber(PybsmOTFPerturber):
 
             If any of w_x or w_y are absent and sensor/scenario objects are also absent,
             the absent value(s) will default to 0.0 for both.
-
-        Raises:
-            ImportError:
-                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
         super().__init__(interp=interp, **kwargs)

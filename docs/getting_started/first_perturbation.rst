@@ -8,7 +8,7 @@ Example: A First Look at NRTK Perturbations
 -------------------------------------------
 
 Via the pyBSM package, NRTK exposes a large set of Optical Transfer Functions (OTFs). These OTFs can simulate different
-environmental and sensor-based effects. For example, the :ref:`JitterOTFPerturber <JitterOTFPerturber>` simulates
+environmental and sensor-based effects. For example, the :ref:`JitterPerturber <JitterPerturber>` simulates
 different levels of sensor jitter. By modifying its input parameters, you can observe how sensor jitter affects image
 quality.
 
@@ -16,7 +16,7 @@ quality.
 Input Image
 ^^^^^^^^^^^
 
-Below is an example of an input image that will undergo a Jitter OTF perturbation. This image represents the initial
+Below is an example of an input image that will undergo a Jitter perturbation. This image represents the initial
 state before any transformation.
 
 .. figure:: ../images/input.jpg
@@ -31,14 +31,14 @@ Below is some example code that applies a Jitter OTF transformation:
 
 .. code-block:: python
 
-    from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
+    from nrtk.impls.perturb_image.optical.otf import JitterPerturber
     import numpy as np
     from PIL import Image
 
     INPUT_IMG_FILE = 'docs/images/input.jpg'
     image = np.array(Image.open(INPUT_IMG_FILE))
 
-    otf = JitterOTFPerturber(s_x=8e-6, s_y=8e-6)
+    otf = JitterPerturber(s_x=8e-6, s_y=8e-6)
     out_image = otf(image=image)
 
 This code uses default values and provides a sample input image. However, you can adjust the parameters and use your
@@ -51,8 +51,8 @@ specific values for these parameters.
 Resulting Image
 ^^^^^^^^^^^^^^^
 
-The output image below shows the effects of the Jitter OTF on the original input. This result illustrates the Gaussian
-blur introduced due to simulated sensor jitter.
+The output image below shows the effects of the Jitter perturbation on the original input. This result illustrates
+the Gaussian blur introduced due to simulated sensor jitter.
 
 .. figure:: ../images/output-jitter.jpg
 

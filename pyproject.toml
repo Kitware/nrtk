@@ -54,11 +54,8 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 "nrtk.impls.perturb_image.environment" = "nrtk.impls.perturb_image.environment"
 "nrtk.impls.perturb_image.generative" = "nrtk.impls.perturb_image.generative"
 "nrtk.impls.perturb_image.optical.radial_distortion_perturber" = "nrtk.impls.perturb_image.optical.radial_distortion_perturber"
-"nrtk.impls.perturb_image.optical.pybsm_perturber" = "nrtk.impls.perturb_image.optical.pybsm_perturber"
-"nrtk.impls.perturb_image.optical.jitter_otf_perturber" = "nrtk.impls.perturb_image.optical.jitter_otf_perturber"
-"nrtk.impls.perturb_image.optical.detector_otf_perturber" = "nrtk.impls.perturb_image.optical.detector_otf_perturber"
-"nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber" = "nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber"
-"nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber" = "nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber"
+"nrtk.impls.perturb_image.optical" = "nrtk.impls.perturb_image.optical"
+"nrtk.impls.perturb_image.optical.otf" = "nrtk.impls.perturb_image.optical.otf"
 "nrtk.impls.perturb_image_factory" = "nrtk.impls.perturb_image_factory"
 
 [project.optional-dependencies]
@@ -158,6 +155,7 @@ markers = [
     "pillow: Run tests that require the pillow extra",
     "skimage: Run tests that require the skimage extra",
     "diffusion: Run tests that require the diffusion extra",
+    "pybsm: Run tests that require the pybsm extra",
 ]
 
 [tool.coverage.run]

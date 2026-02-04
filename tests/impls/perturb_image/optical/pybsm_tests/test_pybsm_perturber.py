@@ -1,9 +1,7 @@
-import unittest.mock as mock
 from collections.abc import Hashable, Iterable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -12,17 +10,19 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
-from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.impls.perturb_image.optical import PybsmPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.utils.test_pybsm import create_sample_sensor_and_scenario
 
 np.random.seed(42)  # noqa: NPY002
 
 
-@pytest.mark.skipif(not PybsmPerturber.is_usable(), reason=str(PyBSMImportError()))
-class TestPyBSMPerturber:
+@pytest.mark.pybsm
+class TestPyBSMPerturber(PerturberTestsMixin):
+    impl_class = PybsmPerturber
+
     def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE))
@@ -210,11 +210,3 @@ class TestPyBSMPerturber:
         inst = PybsmPerturber(**sensor_and_scenario)
         _, out_boxes = inst.perturb(image=image, boxes=boxes, img_gsd=(3.19 / 160))
         assert out_boxes == snapshot
-
-    @mock.patch.object(PybsmPerturber, "is_usable")
-    def test_missing_deps(self, mock_is_usable: MagicMock) -> None:
-        """Test that an exception is raised when required dependencies are not installed."""
-        mock_is_usable.return_value = False
-        assert not PybsmPerturber.is_usable()
-        with pytest.raises(PyBSMImportError):
-            PybsmPerturber()

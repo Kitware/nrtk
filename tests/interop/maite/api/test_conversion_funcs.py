@@ -5,7 +5,9 @@ from typing import Any
 import numpy as np
 import pytest
 
-from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
+pytest.importorskip("pybsm")
+
+from nrtk.impls.perturb_image.optical import PybsmPerturber
 from nrtk.interop._maite.api.converters import build_factory
 from nrtk.interop._maite.api.schema import NrtkPerturbInputSchema
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError

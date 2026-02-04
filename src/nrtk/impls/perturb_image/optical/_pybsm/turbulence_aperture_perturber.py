@@ -1,21 +1,18 @@
-"""Implements TurbulenceApertureOTFPerturber for turbulence aperture-based OTF image perturbations using pyBSM.
+"""Implements TurbulenceAperturePerturber for turbulence aperture-based OTF image perturbations using pyBSM.
 
 Classes:
-    TurbulenceApertureOTFPerturber: Applies OTF-based perturbations with turbulence and aperture
+    TurbulenceAperturePerturber: Applies OTF-based perturbations with turbulence and aperture
     effects to images, utilizing pyBSM functionalities.
 
 Dependencies:
     - pyBSM for OTF-related functionalities.
-    - nrtk.impls.perturb_image.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+    - nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin for base functionality.
 
 Example usage:
-    >>> if not TurbulenceApertureOTFPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("TurbulenceApertureOTFPerturber is not usable")
+    >>> import numpy as np
     >>> D = 0.4e-4
     >>> altitude = 1000
-    >>> perturber = TurbulenceApertureOTFPerturber(D=D, altitude=altitude)
+    >>> perturber = TurbulenceAperturePerturber(D=D, altitude=altitude)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
     >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)  # doctest: +SKIP
@@ -26,28 +23,22 @@ Notes:
 
 from __future__ import annotations
 
-__all__ = ["TurbulenceApertureOTFPerturber"]
+__all__ = ["TurbulenceAperturePerturber"]
 
 from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from pybsm.simulation import ImageSimulator, TurbulenceApertureSimulator
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
-
-from pybsm.simulation import ImageSimulator, TurbulenceApertureSimulator  # noqa: E402
+from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
 
 
-class TurbulenceApertureOTFPerturber(PybsmOTFPerturber):
+class TurbulenceAperturePerturber(PybsmPerturberMixin):
     """Implements OTF-based image perturbation with turbulence and aperture effects.
 
-    The `TurbulenceApertureOTFPerturber` class simulates image degradation due to atmospheric
+    The `TurbulenceAperturePerturber` class simulates image degradation due to atmospheric
     turbulence and optical aperture effects, using pyBSM sensor and scenario configurations.
     It supports adjustable wavelengths, weights, and other environmental parameters for
     realistic perturbations.
@@ -71,7 +62,7 @@ class TurbulenceApertureOTFPerturber(PybsmOTFPerturber):
         interp: bool = True,
         **kwargs: Any,
     ) -> None:
-        """Initializes the TurbulenceApertureOTFPerturber.
+        """Initializes the TurbulenceAperturePerturber.
 
         Args:
             mtf_wavelengths:
@@ -128,10 +119,6 @@ class TurbulenceApertureOTFPerturber(PybsmOTFPerturber):
             in the otf calculation.
 
         Raises:
-            ImportError:
-                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
-            ImportError:
-                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
             ValueError:
                 If mtf_wavelengths and mtf_weights are not equal length
             ValueError:
@@ -183,7 +170,7 @@ class TurbulenceApertureOTFPerturber(PybsmOTFPerturber):
 
     @override
     def _create_simulator(self) -> ImageSimulator:  # noqa C901
-        """Create TurbulenceApertureOTFPerturber with explicit parameters."""
+        """Create TurbulenceAperturePerturber with explicit parameters."""
         if self._use_default_psf:
             self.sensor.D = 40e-3
             self.sensor.int_time = 30e-3

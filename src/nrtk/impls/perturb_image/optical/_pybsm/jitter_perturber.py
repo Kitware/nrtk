@@ -1,19 +1,16 @@
-"""Implements JitterOTFPerturber which applies jitter perturbations using pyBSM with sensor and scenario configs.
+"""Implements JitterPerturber which applies jitter perturbations using pyBSM.
 
 Classes:
-    JitterOTFPerturber: Applies OTF-based jitter perturbations to images using pyBSM.
+    JitterPerturber: Applies OTF-based jitter perturbations to images using pyBSM.
 
 Dependencies:
     - pyBSM for OTF-related functionalities.
-    - nrtk.impls.perturb_image.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+    - nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin for base functionality.
 
 Example usage:
-    >>> if not JitterOTFPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("JitterOTFPerturber is not usable")
+    >>> import numpy as np
     >>> s_x = 0.01
-    >>> perturber = JitterOTFPerturber(s_x=s_x)
+    >>> perturber = JitterPerturber(s_x=s_x)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
     >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)
@@ -21,25 +18,18 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["JitterPerturber"]
+
 from typing import Any
 
-__all__ = ["JitterOTFPerturber"]
-
-
 import numpy as np
+from pybsm.simulation import ImageSimulator, JitterSimulator
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
-
-from pybsm.simulation import ImageSimulator, JitterSimulator  # noqa: E402
+from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
 
 
-class JitterOTFPerturber(PybsmOTFPerturber):
+class JitterPerturber(PybsmPerturberMixin):
     """Implements image perturbation using jitter and Optical Transfer Function (OTF).
 
     This class applies realistic perturbations to images based on sensor and scenario configurations,
@@ -57,7 +47,7 @@ class JitterOTFPerturber(PybsmOTFPerturber):
         interp: bool = True,
         **kwargs: Any,
     ) -> None:
-        """Initializes the JitterOTFPerturber.
+        """Initializes the JitterPerturber.
 
         Args:
             s_x:
@@ -80,10 +70,6 @@ class JitterOTFPerturber(PybsmOTFPerturber):
 
             If s_x and s_y are ever provided by the user, those values will be used
             in the otf calculation.
-
-        Raises:
-            ImportError:
-                If pyBSM is not found
         """
         super().__init__(interp=interp, **kwargs)
         self._use_default_psf = not kwargs

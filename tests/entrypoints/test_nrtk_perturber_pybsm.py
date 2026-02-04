@@ -3,8 +3,10 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("pybsm")
+
 from nrtk.entrypoints import nrtk_perturber
-from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
+from nrtk.impls.perturb_image.optical import PybsmPerturber
 from nrtk.impls.perturb_image_factory import PerturberMultivariateFactory
 from nrtk.interop._maite.datasets.object_detection import COCOMAITEObjectDetectionDataset, maite_available
 from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError

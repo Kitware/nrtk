@@ -1,21 +1,18 @@
-"""Implements DetectorOTFPerturber which applies detector perturbations using sensor and scenario settings.
+"""Implements DetectorPerturber which applies detector perturbations using sensor and scenario settings.
 
 Classes:
-    DetectorOTFPerturber: Applies OTF-based perturbations to images using specified
+    DetectorPerturber: Applies OTF-based perturbations to images using specified
     sensor and scenario configurations.
 
 Dependencies:
     - pyBSM for OTF-related functionalities.
-    - nrtk.impls.perturb_image.optical.pybsm_otf_perturber.PybsmOTFPerturber for base functionality.
+    - nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin for base functionality.
 
 Example usage:
-    >>> if not DetectorOTFPerturber.is_usable():
-    ...     import pytest
-    ...
-    ...     pytest.skip("DetectorOTFPerturber is not usable")
+    >>> import numpy as np
     >>> w_x = 4.0e-6
     >>> w_y = 4.5e-6
-    >>> perturber = DetectorOTFPerturber(w_x=w_x, w_y=w_y)
+    >>> perturber = DetectorPerturber(w_x=w_x, w_y=w_y)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
     >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)
@@ -26,27 +23,21 @@ Notes:
 
 from __future__ import annotations
 
-__all__ = ["DetectorOTFPerturber"]
+__all__ = ["DetectorPerturber"]
 
 from typing import Any
 
 import numpy as np
+from pybsm.simulation import DetectorSimulator, ImageSimulator
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.optical.pybsm_otf_perturber import PybsmOTFPerturber
-from nrtk.utils._exceptions import PyBSMImportError
-from nrtk.utils._import_guard import import_guard
-
-# Import checks
-pybsm_available: bool = import_guard(module_name="pybsm", exception=PyBSMImportError, submodules=["simulation"])
-
-from pybsm.simulation import DetectorSimulator, ImageSimulator  # noqa: E402
+from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
 
 
-class DetectorOTFPerturber(PybsmOTFPerturber):
+class DetectorPerturber(PybsmPerturberMixin):
     """Implements OTF-based image perturbation using detector specifications and atmospheric conditions.
 
-    The `DetectorOTFPerturber` class uses sensor and scenario configurations to apply realistic
+    The `DetectorPerturber` class uses sensor and scenario configurations to apply realistic
     perturbations to images. This includes adjusting for detector width, focal length, and atmospheric
     conditions using pyBSM functionalities.
 
@@ -62,7 +53,7 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
         interp: bool = True,
         **kwargs: Any,
     ) -> None:
-        """Initializes the DetectorOTFPerturber.
+        """Initializes the DetectorPerturber.
 
         Args:
             w_x:
@@ -88,10 +79,6 @@ class DetectorOTFPerturber(PybsmOTFPerturber):
 
             If any of w_x, w_y, or f are absent and sensor/scenario objects are also absent,
             the absent value(s) will default to 4um for w_x/w_y and 50mm for f.
-
-        Raises:
-            ImportError:
-                If pyBSM is not found, install via `pip install nrtk[pybsm]`.
         """
         # Initialize base class (which handles kwargs application to sensor/scenario)
         super().__init__(interp=interp, **kwargs)

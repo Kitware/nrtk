@@ -13,7 +13,7 @@ directional, defocus blur is radially symmetric and uniformly affects all
 details at the target distance. This makes it a distinct degradation mode that should be
 tested separately.
 
-NRTK's DefocusOTFPerturber models optical defocus using the Optical Transfer Function (OTF)
+NRTK's DefocusPerturber models optical defocus using the Optical Transfer Function (OTF)
 to simulate the characteristic blur pattern of an out-of-focus optical system. This provides
 a physics-based approach to testing model sensitivity to focus errors during robustness
 screening.
@@ -40,9 +40,9 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.optical.defocus_otf_perturber import DefocusOTFPerturber
+   from nrtk.impls.perturb_image.optical.otf import DefocusPerturber
 
-   perturber = DefocusOTFPerturber(
+   perturber = DefocusPerturber(
        w_x=5.0e-6,  # blur spot radius in x direction (m)
        w_y=5.0e-6,  # blur spot radius in y direction (m)
    )
@@ -78,7 +78,7 @@ Limitations and Next Steps
 ---------------------------
 
 * API Reference:
-  :class:`DefocusOTFPerturber<nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber>`
+  :class:`DefocusPerturber<nrtk.impls.perturb_image.optical.otf.DefocusPerturber>`
 * Models **uniform defocus** across the image; does not simulate depth-dependent focus
   effects or bokeh patterns from specific aperture shapes.
 * Requires ``img_gsd`` parameter when calling ``perturb()`` to properly scale effects.

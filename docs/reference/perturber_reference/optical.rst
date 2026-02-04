@@ -15,7 +15,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
      - Required Inputs
      - Optional Parameters
 
-   * - :class:`~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -25,7 +25,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :class:`~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.otf.DefocusPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -35,7 +35,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :class:`~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.otf.DetectorPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -46,7 +46,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :class:`~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -56,7 +56,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``boxes``
        * ``img_gsd``
 
-   * - :class:`~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.PybsmPerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``
@@ -71,7 +71,7 @@ realistic, sensor-driven robustness evaluations. For detailed information about 
        * ``color_fill``
        * ``boxes``
 
-   * - :class:`~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber`
+   * - :class:`~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber`
      - Image (RGB/Grayscale)
      - * ``sensor``
        * ``scenario``

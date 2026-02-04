@@ -170,12 +170,12 @@ description of the extra.
     :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
-    :class:`~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber`,
-    :class:`~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber`,
-    :class:`~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber`,
-    :class:`~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber`,
-    :class:`~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber`,
-    and :class:`~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber`.
+    :class:`~nrtk.impls.perturb_image.optical.PybsmPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.DetectorPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber`,
+    and :class:`~nrtk.impls.perturb_image.optical.otf.DefocusPerturber`.
 
     **maite**: installs `MAITE <https://github.com/mit-ll-ai-technology/maite>`_ and its associated dependencies.
     Required for everything in :ref:`Interoperability`.
@@ -326,25 +326,25 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - **Optical Perturbers**
       -
       -
-    * - :class:`~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :class:`~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.DefocusPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :class:`~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.DetectorPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :class:`~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :class:`~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.PybsmPerturber`
       - ``pybsm``
       - ``pyBSM``
     * - :class:`~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber`
       - ---
       - ---
-    * - :class:`~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber`
       - ``pybsm``
       - ``pyBSM``
     * - **Generative Perturbers**

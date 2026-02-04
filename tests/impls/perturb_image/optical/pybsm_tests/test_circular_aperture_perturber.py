@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import unittest.mock as mock
 from collections.abc import Hashable, Iterable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -14,25 +12,25 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber import (
-    CircularApertureOTFPerturber,
-)
-from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.impls.perturb_image.optical.otf import CircularAperturePerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.utils.test_pybsm import create_sample_sensor_and_scenario
 
 
-@pytest.mark.skipif(not CircularApertureOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
-class TestCircularApertureOTFPerturber:
+@pytest.mark.pybsm
+class TestCircularAperturePerturber(PerturberTestsMixin):
+    impl_class = CircularAperturePerturber
+
     def test_interp_consistency(self) -> None:
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
         sensor_and_scenario = create_sample_sensor_and_scenario()
         # Test perturb interface directly
-        inst = CircularApertureOTFPerturber(interp=True, **sensor_and_scenario)
-        inst2 = CircularApertureOTFPerturber(interp=False, **sensor_and_scenario)
+        inst = CircularAperturePerturber(interp=True, **sensor_and_scenario)
+        inst2 = CircularAperturePerturber(interp=False, **sensor_and_scenario)
         out_image = pybsm_perturber_assertions(
             perturb=inst.perturb,
             image=image,
@@ -69,7 +67,7 @@ class TestCircularApertureOTFPerturber:
         sensor_and_scenario = create_sample_sensor_and_scenario()
         sensor_and_scenario["D"] = D
         sensor_and_scenario["eta"] = eta
-        inst = CircularApertureOTFPerturber(
+        inst = CircularAperturePerturber(
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
             interp=interp,
@@ -93,7 +91,7 @@ class TestCircularApertureOTFPerturber:
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        inst = CircularApertureOTFPerturber()
+        inst = CircularAperturePerturber()
         img_gsd = 3.19 / 160.0
         out_image = pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=None, img_gsd=img_gsd)
         pybsm_perturber_assertions(perturb=inst.perturb, image=image, expected=out_image, img_gsd=img_gsd)
@@ -115,7 +113,7 @@ class TestCircularApertureOTFPerturber:
     ) -> None:
         """Test variations of additional params."""
         sensor_and_scenario = create_sample_sensor_and_scenario()
-        perturber = CircularApertureOTFPerturber(**sensor_and_scenario)
+        perturber = CircularAperturePerturber(**sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber(image=image, **kwargs)
@@ -164,7 +162,7 @@ class TestCircularApertureOTFPerturber:
     ) -> None:
         """Test variations of additional params."""
         with expectation:
-            _ = CircularApertureOTFPerturber(
+            _ = CircularAperturePerturber(
                 mtf_wavelengths=mtf_wavelengths,
                 mtf_weights=mtf_weights,
                 D=D,
@@ -186,7 +184,7 @@ class TestCircularApertureOTFPerturber:
         eta: float,
     ) -> None:
         """Test configuration stability."""
-        inst = CircularApertureOTFPerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights, D=D, eta=eta)
+        inst = CircularAperturePerturber(mtf_wavelengths=mtf_wavelengths, mtf_weights=mtf_weights, D=D, eta=eta)
         for i in configuration_test_helper(inst):
             assert i.mtf_wavelengths is not None
             assert i.mtf_weights is not None
@@ -198,7 +196,7 @@ class TestCircularApertureOTFPerturber:
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
         sensor_and_scenario = create_sample_sensor_and_scenario()
-        inst = CircularApertureOTFPerturber(**sensor_and_scenario)
+        inst = CircularAperturePerturber(**sensor_and_scenario)
         for i in configuration_test_helper(inst):
             assert i.mtf_wavelengths is not None
             assert i.mtf_weights is not None
@@ -222,7 +220,7 @@ class TestCircularApertureOTFPerturber:
         sensor_and_scenario = create_sample_sensor_and_scenario()
         sensor_and_scenario["D"] = D
         sensor_and_scenario["eta"] = eta
-        inst = CircularApertureOTFPerturber(
+        inst = CircularAperturePerturber(
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
             **sensor_and_scenario,
@@ -275,7 +273,7 @@ class TestCircularApertureOTFPerturber:
         if eta is not None:
             sensor_and_scenario["eta"] = eta
 
-        inst = CircularApertureOTFPerturber(
+        inst = CircularAperturePerturber(
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
             interp=interp,
@@ -300,15 +298,6 @@ class TestCircularApertureOTFPerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = CircularApertureOTFPerturber()
+        inst = CircularAperturePerturber()
         _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
-
-
-@mock.patch.object(CircularApertureOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not CircularApertureOTFPerturber.is_usable()
-    with pytest.raises(PyBSMImportError):
-        CircularApertureOTFPerturber()

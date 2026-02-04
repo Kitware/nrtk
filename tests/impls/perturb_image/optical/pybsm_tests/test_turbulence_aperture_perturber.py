@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import unittest.mock as mock
 from collections.abc import Hashable, Iterable, Sequence
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -14,17 +12,17 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber import (
-    TurbulenceApertureOTFPerturber,
-)
-from nrtk.utils._exceptions import PyBSMImportError
+from nrtk.impls.perturb_image.optical.otf import TurbulenceAperturePerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
 from tests.utils.test_pybsm import create_sample_sensor, create_sample_sensor_and_scenario
 
 
-@pytest.mark.skipif(not TurbulenceApertureOTFPerturber.is_usable(), reason=str(PyBSMImportError()))
-class TestTurbulenceApertureOTFPerturber:
+@pytest.mark.pybsm
+class TestTurbulenceAperturePerturber(PerturberTestsMixin):
+    impl_class = TurbulenceAperturePerturber
+
     @pytest.mark.parametrize(
         (
             "use_sensor_scenario",
@@ -112,7 +110,7 @@ class TestTurbulenceApertureOTFPerturber:
         if aircraft_speed is not None:
             sensor_and_scenario["aircraft_speed"] = aircraft_speed
 
-        inst = TurbulenceApertureOTFPerturber(
+        inst = TurbulenceAperturePerturber(
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
             interp=interp,
@@ -145,7 +143,7 @@ class TestTurbulenceApertureOTFPerturber:
         sensor_and_scenario = {}
         if use_sensor_scenario:
             sensor_and_scenario = create_sample_sensor_and_scenario()
-        perturber = TurbulenceApertureOTFPerturber(**sensor_and_scenario)
+        perturber = TurbulenceAperturePerturber(**sensor_and_scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
             _ = perturber.perturb(image=img, **kwargs)
@@ -195,7 +193,7 @@ class TestTurbulenceApertureOTFPerturber:
     ) -> None:
         """Raise appropriate errors for specific parameters."""
         with expectation:
-            _ = TurbulenceApertureOTFPerturber(
+            _ = TurbulenceAperturePerturber(
                 mtf_wavelengths=mtf_wavelengths,
                 mtf_weights=mtf_weights,
                 cn2_at_1m=cn2_at_1m,
@@ -311,7 +309,7 @@ class TestTurbulenceApertureOTFPerturber:
         if aircraft_speed is not None:
             sensor_and_scenario["aircraft_speed"] = aircraft_speed
 
-        inst = TurbulenceApertureOTFPerturber(
+        inst = TurbulenceAperturePerturber(
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
             interp=interp,
@@ -448,7 +446,7 @@ class TestTurbulenceApertureOTFPerturber:
         if aircraft_speed is not None:
             sensor_and_scenario["aircraft_speed"] = aircraft_speed
 
-        inst = TurbulenceApertureOTFPerturber(
+        inst = TurbulenceAperturePerturber(
             mtf_wavelengths=mtf_wavelengths,
             mtf_weights=mtf_weights,
             interp=interp,
@@ -471,15 +469,6 @@ class TestTurbulenceApertureOTFPerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = TurbulenceApertureOTFPerturber()
+        inst = TurbulenceAperturePerturber()
         _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes, img_gsd=(3.19 / 160))
         assert boxes == out_boxes
-
-
-@mock.patch.object(TurbulenceApertureOTFPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not TurbulenceApertureOTFPerturber.is_usable()
-    with pytest.raises(PyBSMImportError):
-        TurbulenceApertureOTFPerturber()

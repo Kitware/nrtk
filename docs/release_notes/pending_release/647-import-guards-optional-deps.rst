@@ -59,3 +59,12 @@
   ``_compute_refraction_mapping_impl``, ``_PointsInPolygonProtocol``,
   ``_ComputeRefractionMappingProtocol``) to drop the leading underscores,
   since the module itself is already private.
+
+* Added import guards for pyBSM optical perturbers (``PybsmPerturber``,
+  ``CircularAperturePerturber``, ``DefocusPerturber``,
+  ``DetectorPerturber``, ``JitterPerturber``,
+  ``TurbulenceAperturePerturber``).
+  Attempting to use these classes without ``pybsm`` installed
+  now raises a clear ``ImportError`` with install instructions instead of an
+  opaque failure. Restructured into private ``_pybsm/`` package with
+  public exports from ``nrtk.impls.perturb_image.optical.otf``.

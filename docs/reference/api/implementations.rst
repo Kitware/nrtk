@@ -96,13 +96,13 @@ Optical perturbers simulate physics-based sensor and optical effects.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber
-   ~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber
-   ~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber
-   ~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber
-   ~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber
+   ~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber
+   ~nrtk.impls.perturb_image.optical.otf.DefocusPerturber
+   ~nrtk.impls.perturb_image.optical.otf.DetectorPerturber
+   ~nrtk.impls.perturb_image.optical.otf.JitterPerturber
+   ~nrtk.impls.perturb_image.optical.PybsmPerturber
    ~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber
-   ~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber
+   ~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber
 
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^
