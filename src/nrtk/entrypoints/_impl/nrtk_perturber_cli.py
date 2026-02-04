@@ -2,6 +2,7 @@
 
 import json
 import logging
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 from typing import TextIO
@@ -71,21 +72,31 @@ def nrtk_perturber_cli(
 
     The perturbed images are stored in subfolders named after the chosen perturbation parameter keys and values.
 
-    Args:
-        dataset_dir:
-            Root directory of dataset.
-        output_dir:
-            Directory to write the perturbed images to.
-        config_file:
-            Configuration file specifying the PerturbImageFactory configuration.
-        verbose:
-            Display progress messages. Default is false.
+    To run the container, use the following command:
 
-    Raises:
-        ValueError:
-            COCO annotations file is not found
-        KWCocoImportError:
-            KWCOCO is not available
+    docker run -v /path/to/input:/input/:ro -v /path/to/output:/output/ nrtk-perturber [OPTIONS]
+
+    The /input/ directory mount will contain all files consumed by the entrypoint script and the /output/ directory
+    will contain all files produced by the entrypoint script.
+
+
+    Command Line Options:
+
+        --dataset_dir: Root directory of dataset.
+
+        --output_dir: Directory to write the perturbed images to.
+
+        --config_file: Configuration file specifying the PerturbImageFactory configuration.
+
+        --verbose: Display progress messages. Default is false.
+
+    If no command line options are given, the entrypoint script will use the following environment variables as inputs:
+
+        INPUT_DATASET_PATH: Root directory of dataset. Default is /input/data/dataset/.
+
+        OUTPUT_DATASET_PATH: Directory to write out the perturbed images. Default is /output/data/result/.
+
+        CONFIG_FILE: Path to JSON configuration file. Default is /input/nrtk_config.json.
     """
     _set_logging(verbose)
 
@@ -94,7 +105,9 @@ def nrtk_perturber_cli(
     # Load COCO dataset
     coco_file = Path(dataset_dir) / "annotations.json"
     if not coco_file.is_file():
-        raise ValueError("Could not identify annotations file. Expected at '[dataset_dir]/annotations.json'")
+        logger.error("Could not identify annotations file. Expected at '[dataset_dir]/annotations.json'")
+        sys.exit(101)
+
     logger.info(f"Loading kwcoco annotations from {coco_file}")
     if not kwcoco_available:
         raise KWCocoImportError

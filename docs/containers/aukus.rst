@@ -61,6 +61,12 @@ Note: The values for ``dataset_dir`` and ``config_file`` should be written from 
 perspective of the container (i.e. ``/path/on/container/dataset_dir/`` instead of
 ``/path/on/local/machine/dataset_dir/``)
 
+Error Codes
+-----------
+
+``101``: Could not identify annotations file for COCO dataset.
+
+
 Limitations
 -----------
 
