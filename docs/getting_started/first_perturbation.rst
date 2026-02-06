@@ -1,17 +1,24 @@
-First Perturbation
-==================
+Applying an Operational Risk Perturbation
+=========================================
 
-In this example, we'll generate your first perturbation. Afterwards, :doc:`the NRTK tutorial </examples/nrtk_tutorial>`
-provides a deeper look at perturbation and the other main components of NRTK.
+In real-world deployments, cameras mounted on vehicles, drones, or handheld platforms experience
+vibration that blurs images and degrades model performance. Most vision models are trained on
+clean, stable imagery, leading to even mild jitter causing missed detections or poor accuracy.
 
-Example: A First Look at NRTK Perturbations
--------------------------------------------
+In this guide, you'll use NRTK's :ref:`JitterOTFPerturber <JitterOTFPerturber>` to apply your
+first physics-based perturbation and see how sensor jitter affects an image. This is a good
+starting point if you want to:
 
-Via the pyBSM package, NRTK exposes a large set of Optical Transfer Functions (OTFs). These OTFs can simulate different
-environmental and sensor-based effects. For example, the :ref:`JitterOTFPerturber <JitterOTFPerturber>` simulates
-different levels of sensor jitter. By modifying its input parameters, you can observe how sensor jitter affects image
-quality.
+* Understand what an **operational risk perturbation** looks like in practice
+* See how a few lines of code can **simulate a real-world degradation**
+* Get a feel for NRTK's perturbation workflow before exploring more perturbers
 
+Example: Jitter Perturbation
+----------------------------
+
+In this example, we'll apply a jitter perturbation to an image. Afterwards,
+:doc:`the NRTK tutorial </examples/nrtk_tutorial>` provides a deeper look at perturbations and
+the other main components of NRTK.
 
 Input Image
 ^^^^^^^^^^^
@@ -61,9 +68,12 @@ blur introduced due to simulated sensor jitter.
 Next Steps
 ----------
 
+Now that you've applied a single perturbation, the :doc:`NRTK End-to-End Overview </examples/nrtk_tutorial>`
+walks through a complete workflow—image perturbation, perturbation factories, and model evaluation.
+
 For broader context or foundational theory, see:
 
-- :doc:`NRTK Tutorial </examples/nrtk_tutorial>` - Step-by-step tutorial to get started
-- :doc:`/explanations/nrtk_explanation` - Conceptual guide to NRTK's architecture and approach
-- :doc:`/explanations/risk_factors` - Conceptual guide to understand how NRTK's perturbations map to
-  real-world risk factors
+- :doc:`High-Frequency Vibration Module </explanations/operational_risk_modules/high_frequency_vibration>` —
+  Full operational risk details, parameter sweeps, and visual comparison
+- :doc:`/explanations/nrtk_explanation` — Conceptual guide to NRTK's architecture and approach
+- :doc:`/explanations/risk_factors` — How NRTK's perturbations map to real-world risk factors

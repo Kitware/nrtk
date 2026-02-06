@@ -72,8 +72,8 @@ introduction possible.
 
 .. :auto quick-start:
 
-Quick Start
-^^^^^^^^^^^
+Clone & Install
+^^^^^^^^^^^^^^^
 
 .. prompt:: bash
 
@@ -106,7 +106,7 @@ specified in the :file:`pyproject.toml` file, with versions specified
 .. :auto build-docs:
 
 Building the Documentation
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 The documentation for nrtk is maintained as a collection of
 `reStructuredText`_ documents in the :file:`docs/` folder of the project.
 The :program:`Sphinx` documentation tool can process this documentation
@@ -133,7 +133,7 @@ additional dependencies such as :program:`TeX` or :program:`LaTeX`).
 .. :auto live-preview:
 
 Live Preview
-""""""""""""
+^^^^^^^^^^^^
 
 While writing documentation in a markup format such as `reStructuredText`_, it
 is very helpful to preview the formatted version of the text.

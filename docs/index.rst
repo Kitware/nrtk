@@ -6,45 +6,19 @@
 Welcome to NRTK's documentation!
 ================================
 
-
-======================================================================================================================
+**Version**: |release| | **Date**: |today|
 
 **The Natural Robustness Toolkit (NRTK) is an open source toolkit for generating operationally realistic perturbations
 to evaluate the natural robustness of computer vision algorithms.**
 
-.. container:: nrtk-quickstart-button-container
-
-   .. button-ref:: getting_started/quickstart
-      :color: primary
-      :class: nrtk-quickstart-button
-
-      🚀 Get Started with NRTK QuickStart Hub
-
-======================================================================================================================
-
-Welcome to the documentation for NRTK, a tool created for developers and Test and Evaluation
-(T&E) engineers seeking to rigorously evaluate and enhance the robustness of computer vision models.
-This toolkit simulates a wide range of real-world perturbations, focusing on sensor-specific
-variables such as changes in camera focal length and aperture diameter. It enables detailed
-analysis of how these factors affect algorithm performance and expand existing datasets. Whether
-you're dealing with subtle shifts in optical settings or more pronounced environmental changes,
-this toolkit gives you the insights and capabilities necessary to ensure your innovative computer
-vision solutions are resilient and reliable under diverse conditions.
-
-This documentation is structured to provide you with straightforward and practical instructions and
-examples, so that you can effectively leverage the toolkit to enhance the robustness and
-reliability of your computer vision applications in facing real-world challenges.
+NRTK enables developers and T&E engineers to simulate sensor-specific and environmental perturbations—such as
+changes in focal length, aperture, and atmospheric conditions—to rigorously assess computer vision model robustness
+without costly real-world data collection.
 
 .. grid:: 1 2 2 2
-   :gutter: 4
+   :gutter: 3
    :padding: 2 2 0 0
    :class-container: sd-text-center
-
-   .. grid-item-card:: Getting Started
-      :link: getting_started/index
-      :link-type: doc
-
-      New to NRTK? Installation, quick start, and introductory tutorials.
 
    .. grid-item-card:: Tutorials
       :link: tutorials/index
@@ -70,29 +44,9 @@ reliability of your computer vision applications in facing real-world challenges
 
       Perturbers, APIs, schemas, and implementation details.
 
-   .. grid-item-card:: Interoperability
-      :link: interoperability/maite/jatic_interoperability
-      :link-type: doc
-
-      MAITE Adapters for T&E workflows
-
-   .. grid-item-card:: Containerization
-      :link: containers/aukus
-      :link-type: doc
-
-      Container images for NRTK workflows.
-
-   .. grid-item-card:: Development
-      :link: development/index
-      :link-type: doc
-
-      Contributing guidelines and development resources.
-
-   .. grid-item-card:: Release Notes
-      :link: release_notes/index
-      :link-type: doc
-
-      Version history and changelog.
+.. note::
+   New to NRTK? :doc:`Getting Started </getting_started/quickstart>` walks you through
+   installation and your first operational risk perturbation.
 
 Why NRTK?
 ---------
@@ -140,7 +94,7 @@ necessarily representing the official policies or endorsements, either expressed
    :maxdepth: 2
    :hidden:
 
-   getting_started/index
+   getting_started/quickstart
    tutorials/index
    how_to_guides/index
    explanations/index
@@ -150,10 +104,3 @@ necessarily representing the official policies or endorsements, either expressed
    containers/aukus
    development/index
    release_notes/index
-
-Indices and Tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
