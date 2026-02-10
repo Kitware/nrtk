@@ -12,6 +12,7 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 rng = np.random.default_rng()
 
 
+@pytest.mark.core
 class TestRadialDistortionPerturber:
     @pytest.mark.parametrize(
         ("image"),

@@ -7,50 +7,37 @@ from unittest.mock import MagicMock
 import numpy as np
 import py  # type: ignore
 import pytest
+from fastapi.encoders import jsonable_encoder
+from starlette.testclient import TestClient
 
-from nrtk.interop._maite.api.app import app
-from nrtk.interop._maite.api.schema import NrtkPerturbInputSchema
-from nrtk.interop._maite.datasets.object_detection import (
+from nrtk.interop._maite.api._app import app
+from nrtk.interop._maite.api._nrtk_perturb_input_schema import NRTKPerturbInputSchema
+from nrtk.interop._maite.datasets import (
     MAITEObjectDetectionDataset,
     MAITEObjectDetectionTarget,
 )
-from nrtk.utils._exceptions import FastApiImportError
-from nrtk.utils._import_guard import import_guard, is_available
 from tests.interop.maite import BAD_NRTK_CONFIG, DATASET_FOLDER, LABEL_FILE, NRTK_PYBSM_CONFIG
 
-# Guard import - starlette.testclient requires httpx which may not be installed
-httpx = pytest.importorskip("httpx")
-from starlette.testclient import TestClient  # noqa: E402
-
-app_deps_available: bool = import_guard(module_name="fastapi", exception=FastApiImportError, submodules=["encoders"])
-from fastapi.encoders import jsonable_encoder  # noqa: E402
-
-deps = ["kwcoco", "maite"]
-is_usable = all(is_available(dep) for dep in deps)
 random = np.random.default_rng()
 
-if is_usable:
-    # MAITE is required for MAITEObjectDetectionDataset
-    TEST_RETURN_VALUE = [  # repeated test return value for 3 tests, saved to var to save space
-        (
-            "perturb1",
-            MAITEObjectDetectionDataset(
-                imgs=[random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 11,
-                dets=[
-                    MAITEObjectDetectionTarget(
-                        boxes=random.random((2, 4)),
-                        labels=random.random(2),
-                        scores=random.random(2),
-                    ),
-                ]
-                * 11,
-                datum_metadata=[{"id": idx} for idx in range(11)],
-                dataset_id="dummy dataset",
-            ),
+TEST_RETURN_VALUE = [  # repeated test return value for 3 tests, saved to var to save space
+    (
+        "perturb1",
+        MAITEObjectDetectionDataset(
+            imgs=[random.integers(0, 255, size=(3, 3, 3), dtype=np.uint8)] * 11,
+            dets=[
+                MAITEObjectDetectionTarget(
+                    boxes=random.random((2, 4)),
+                    labels=random.random(2),
+                    scores=random.random(2),
+                ),
+            ]
+            * 11,
+            datum_metadata=[{"id": idx} for idx in range(11)],
+            dataset_id="dummy dataset",
         ),
-    ]
-else:
-    TEST_RETURN_VALUE = list()
+    ),
+]
 
 
 @pytest.fixture
@@ -60,17 +47,14 @@ def test_client() -> Generator:
         yield client
 
 
-@pytest.mark.skipif(
-    not app_deps_available,
-    reason="fastapi and/or pydantic not found. Please install via `nrtk[maite]`",
-)
+@pytest.mark.maite
 class TestApp:
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk[tools]' not installed.")
+    @pytest.mark.tools
     @mock.patch("nrtk.interop._maite.api.app.nrtk_perturber", return_value=TEST_RETURN_VALUE)
     def test_handle_post_pybsm(self, patch: MagicMock, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Check for an appropriate response to a "good" request."""
         # Test data to be sent in the POST request
-        test_data = NrtkPerturbInputSchema(
+        test_data = NRTKPerturbInputSchema(
             id="0",
             name="Example",
             dataset_dir=str(DATASET_FOLDER),
@@ -164,10 +148,10 @@ class TestApp:
         # Check that the correct number of images are in the dir
         assert len(os.listdir(os.path.join(str(image_dir)))) == 11
 
-    @pytest.mark.skipif(not is_usable, reason="Extra 'nrtk[tools]' not installed.")
+    @pytest.mark.tools
     def test_bad_gsd_post(self, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Test that an error response is appropriately propagated to the user."""
-        test_data = NrtkPerturbInputSchema(
+        test_data = NRTKPerturbInputSchema(
             id="0",
             name="Example",
             dataset_dir=str(DATASET_FOLDER),
@@ -188,7 +172,7 @@ class TestApp:
 
     def test_no_config_post(self, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Test that an error response is appropriately propagated to the user."""
-        test_data = NrtkPerturbInputSchema(
+        test_data = NRTKPerturbInputSchema(
             id="0",
             name="Example",
             dataset_dir=str(DATASET_FOLDER),
@@ -209,7 +193,7 @@ class TestApp:
 
     def test_bad_config_post(self, test_client: TestClient, tmpdir: py.path.local) -> None:
         """Test that an error response is appropriately propagated to the user."""
-        test_data = NrtkPerturbInputSchema(
+        test_data = NRTKPerturbInputSchema(
             id="0",
             name="Example",
             dataset_dir=str(DATASET_FOLDER),
@@ -230,25 +214,3 @@ class TestApp:
             response.json()["detail"]
             == "Configuration dictionary given does not have an implementation type specification."
         )
-
-    @mock.patch("nrtk.interop._maite.api.app.fastapi_available", False)
-    def test_missing_deps(self, test_client: TestClient, tmpdir: py.path.local) -> None:
-        """Test that an exception is raised when required dependencies are not installed."""
-        test_data = NrtkPerturbInputSchema(
-            id="0",
-            name="Example",
-            dataset_dir=str(DATASET_FOLDER),
-            label_file=str(LABEL_FILE),
-            output_dir=str(tmpdir),
-            image_metadata=[{"id": idx, "gsd": idx} for idx in range(11)],
-            config_file=str(NRTK_PYBSM_CONFIG),
-        )
-
-        # Send a POST request to the API endpoint
-        response = test_client.post("/", json=jsonable_encoder(test_data))
-
-        # Check response status code
-        assert response.status_code == 400
-
-        # Check that we got the correct error message
-        assert response.json()["detail"] == str(FastApiImportError())

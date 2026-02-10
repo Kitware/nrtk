@@ -8,6 +8,8 @@ _OTF_CLASSES = [
     "TurbulenceAperturePerturber",
 ]
 
+__all__: list[str] = list()
+
 try:
     from nrtk.impls.perturb_image.optical._pybsm.circular_aperture_perturber import (
         CircularAperturePerturber as CircularAperturePerturber,
@@ -32,13 +34,14 @@ try:
     JitterPerturber.__module__ = __name__
     TurbulenceAperturePerturber.__module__ = __name__
 
-    __all__ = _OTF_CLASSES
+    __all__ += _OTF_CLASSES
 except ImportError:
-    __all__: list[str] = list()
+    pass
 
-    def __getattr__(name: str) -> None:
-        if name in _OTF_CLASSES:
-            raise ImportError(
-                f"{name} requires the `pybsm` extra. Install with: `pip install nrtk[pybsm]`",
-            )
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __getattr__(name: str) -> None:
+    if name in _OTF_CLASSES:
+        raise ImportError(
+            f"{name} requires the `pybsm` extra. Install with: `pip install nrtk[pybsm]`",
+        )
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

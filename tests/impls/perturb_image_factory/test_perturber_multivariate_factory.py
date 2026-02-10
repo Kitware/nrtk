@@ -60,6 +60,7 @@ from tests.fakes import FakePerturber
 from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
+@pytest.mark.core
 class TestPerturberMultivariateFactory(PerturberFactoryMixin):
     """Tests for PerturberMultivariateFactory. See module docstring for test cases."""
 

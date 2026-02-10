@@ -17,10 +17,10 @@ Developed with assistance from AI (ChatGPT and GitHub Copilot).
 import importlib
 import sys
 from collections import OrderedDict, defaultdict
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, TextIO
 
-import pkg_resources
 import yaml
 
 import nrtk
@@ -67,9 +67,8 @@ def _identify_cv2_package_versions() -> dict[str, str]:
     installed = {}
     for candidate in ("opencv-python", "opencv-python-headless"):
         try:
-            dist = pkg_resources.get_distribution(candidate)
-            installed[candidate] = dist.version
-        except pkg_resources.DistributionNotFound:  # noqa: PERF203
+            installed[candidate] = version(candidate)
+        except PackageNotFoundError:  # noqa: PERF203
             continue
     return installed
 

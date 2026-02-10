@@ -2,6 +2,8 @@
 
 _PILLOW_CLASSES = ["BrightnessPerturber", "ColorPerturber", "ContrastPerturber", "SharpnessPerturber"]
 
+__all__: list[str] = list()
+
 try:
     from nrtk.impls.perturb_image.photometric._enhance.brightness_perturber import (
         BrightnessPerturber as BrightnessPerturber,
@@ -22,13 +24,14 @@ try:
     ContrastPerturber.__module__ = __name__
     SharpnessPerturber.__module__ = __name__
 
-    __all__ = _PILLOW_CLASSES
+    __all__ += _PILLOW_CLASSES
 except ImportError:
-    __all__: list[str] = list()
+    pass
 
-    def __getattr__(name: str) -> None:
-        if name in _PILLOW_CLASSES:
-            raise ImportError(
-                f"{name} requires the `pillow` extra. Install with: `pip install nrtk[pillow]`",
-            )
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __getattr__(name: str) -> None:
+    if name in _PILLOW_CLASSES:
+        raise ImportError(
+            f"{name} requires the `pillow` extra. Install with: `pip install nrtk[pillow]`",
+        )
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

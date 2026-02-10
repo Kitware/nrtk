@@ -15,7 +15,7 @@ class TestAlbumentationsImportGuard(ImportGuardTestsMixin):
     CLASSES = ["AlbumentationsPerturber"]
     ERROR_MATCH = (
         r"{class_name} requires the `albumentations` and \(`graphics` or `headless`\) extras\. "
-        r"Install with: `pip install nrtk\[albumentations,graphics\] or nrtk\[albumentations,headless\]`"
+        r"Install with: `pip install nrtk\[albumentations,graphics\]` or `pip install nrtk\[albumentations,headless\]`"
     )
 
 
