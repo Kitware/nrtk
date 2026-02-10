@@ -28,6 +28,7 @@ __all__ = list()
 
 import abc
 from collections.abc import Hashable, Iterable, Sequence
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
@@ -71,7 +72,7 @@ class PerturbImage(Plugfigurable):
             Iterable of tuples containing the bounding boxes for detections in the image. If an implementation
                 modifies the size of an image, it is expected to modify the bounding boxes as well.
         """
-        return np.copy(image), boxes
+        return np.copy(image), deepcopy(boxes)
 
     def _rescale_boxes(
         self,
@@ -98,7 +99,7 @@ class PerturbImage(Plugfigurable):
         y_factor, x_factor = np.array(new_shape)[0:2] / np.array(orig_shape)[0:2]
         if x_factor == y_factor == 1:
             # no scaling needed
-            return boxes
+            return deepcopy(boxes)
 
         scaled_boxes = list()
         for box, score_dict in boxes:
@@ -108,7 +109,7 @@ class PerturbImage(Plugfigurable):
                 min_vertex=(x0 * x_factor, y0 * y_factor),
                 max_vertex=(x1 * x_factor, y1 * y_factor),
             )
-            scaled_boxes.append((scaled_box, score_dict))
+            scaled_boxes.append((scaled_box, deepcopy(score_dict)))
 
         return scaled_boxes
 
