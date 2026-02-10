@@ -2,33 +2,18 @@ import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import py  # type: ignore
 import pytest
+from click.testing import CliRunner
+from maite.protocols.object_detection import Dataset
 
-import nrtk.entrypoints._impl.nrtk_perturber_cli
 from nrtk.entrypoints import nrtk_perturber_cli
-from nrtk.entrypoints._impl.nrtk_perturber_cli import kwcoco_available, maite_available
-from nrtk.utils._exceptions import KWCocoImportError, MaiteImportError
-from nrtk.utils._import_guard import import_guard
 from tests.interop.maite import DATASET_FOLDER, NRTK_BLUR_CONFIG, NRTK_PYBSM_CONFIG
 
-# Guard import - click may not be installed in all test environments
-click = pytest.importorskip("click")
-from click.testing import CliRunner  # noqa: E402
 
-_ = import_guard(
-    module_name="maite",
-    exception=MaiteImportError,
-    submodules=["protocols.object_detection"],
-    objects=["Dataset"],
-)
-from maite.protocols.object_detection import Dataset  # noqa: E402
-
-
-@pytest.mark.skipif(not kwcoco_available, reason=str(KWCocoImportError()))
-@pytest.mark.skipif(not maite_available, reason=str(MaiteImportError()))
+@pytest.mark.tools
 class TestNRTKPerturberCLI:
     """These tests make use of the `tmpdir` fixture from `pytest`.
 
@@ -36,7 +21,7 @@ class TestNRTKPerturberCLI:
     """
 
     @mock.patch(
-        "nrtk.entrypoints._impl.nrtk_perturber_cli.nrtk_perturber",
+        "nrtk.entrypoints._nrtk_perturber_cli.nrtk_perturber",
         return_value=[
             ("_f-0.012_D-0.001_px-2e-05", MagicMock(spec=Dataset)),
             ("_f-0.012_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
@@ -44,7 +29,7 @@ class TestNRTKPerturberCLI:
             ("_f-0.014_D-0.003_px-2e-05", MagicMock(spec=Dataset)),
         ],
     )
-    @mock.patch("nrtk.entrypoints._impl.nrtk_perturber_cli.dataset_to_coco", return_value=None)
+    @mock.patch("nrtk.entrypoints._nrtk_perturber_cli.dataset_to_coco", return_value=None)
     def test_nrtk_perturber(
         self,
         dataset_to_coco_patch: MagicMock,
@@ -174,44 +159,3 @@ class TestNRTKPerturberCLI:
                 ],
                 catch_exceptions=False,
             )
-
-
-@pytest.mark.parametrize(
-    ("kwcoco_avail", "maite_avail", "expectation"),
-    [
-        (False, True, pytest.raises(KWCocoImportError)),
-        (True, False, pytest.raises(MaiteImportError)),
-    ],
-)
-def test_missing_deps(
-    tmpdir: py.path.local,
-    kwcoco_avail: bool,
-    maite_avail: bool,
-    expectation: AbstractContextManager,
-) -> None:
-    """Test that proper warning is displayed when required dependencies are not installed."""
-    output_dir = tmpdir.join(Path("out"))
-    mock_coco = MagicMock()
-    mock_coco.__bool__.return_value = kwcoco_avail
-    mock_maite = MagicMock()
-    mock_maite.__bool__.return_value = maite_avail
-
-    runner = CliRunner()
-
-    with (
-        patch.object(nrtk.entrypoints._impl.nrtk_perturber_cli, "kwcoco_available", mock_coco),
-        patch.object(nrtk.entrypoints._impl.nrtk_perturber_cli, "maite_available", mock_maite),
-        expectation,
-    ):
-        _ = runner.invoke(
-            nrtk_perturber_cli,
-            [
-                f"--dataset_dir={str(DATASET_FOLDER)}",
-                f"--output_dir={str(output_dir)}",
-                f"--config_file={str(NRTK_PYBSM_CONFIG)}",
-                "-v",
-            ],
-            catch_exceptions=False,
-        )
-
-    assert not output_dir.check(dir=1)

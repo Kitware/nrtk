@@ -17,7 +17,7 @@ class TestGeometricImportGuard(ImportGuardTestsMixin):
     ALWAYS_AVAILABLE = ["RandomCropPerturber", "RandomTranslationPerturber"]
     ERROR_MATCH = (
         r"{class_name} requires the `albumentations` and \(`graphics` or `headless`\) extras\. "
-        r"Install with: `pip install nrtk\[albumentations,graphics\] or nrtk\[albumentations,headless\]`"
+        r"Install with: `pip install nrtk\[albumentations,graphics\]` or `pip install nrtk\[albumentations,headless\]`"
     )
     # The geometric perturbers import AlbumentationsPerturber from the wrapper module,
     # which has its own import guard. We must reset the wrapper module so that when

@@ -32,15 +32,15 @@
         RUNNER_TAG: small-cpu
       - TOX_ENV: skimage
         RUNNER_TAG: small-cpu
-      - TOX_ENV: unmarked
-        RUNNER_TAG: small-cpu
       - TOX_ENV: pybsm
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: maite
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: tools
         RUNNER_TAG: medium-cpu
       - TOX_ENV: waterdroplet
         RUNNER_TAG: medium-cpu
       - TOX_ENV: diffusion
-        RUNNER_TAG: autoscaler
-      - TOX_ENV: unmarked-all
         RUNNER_TAG: autoscaler
       - TOX_ENV: doctests
         RUNNER_TAG: autoscaler

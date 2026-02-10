@@ -16,7 +16,7 @@ from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assert
 rng = np.random.default_rng()
 
 
-@pytest.mark.required
+@pytest.mark.core
 class TestRandomTranslationPerturber(PerturberTestsMixin):
     impl_class = RandomTranslationPerturber
 

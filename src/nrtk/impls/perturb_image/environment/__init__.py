@@ -19,10 +19,12 @@ try:
 
     __all__ += _WATERDROPLET_CLASSES
 except ImportError:
+    pass
 
-    def __getattr__(name: str) -> None:
-        if name in _WATERDROPLET_CLASSES:
-            raise ImportError(
-                f"{name} requires the `waterdroplet` extra. Install with: `pip install nrtk[waterdroplet]`",
-            )
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __getattr__(name: str) -> None:
+    if name in _WATERDROPLET_CLASSES:
+        raise ImportError(
+            f"{name} requires the `waterdroplet` extra. Install with: `pip install nrtk[waterdroplet]`",
+        )
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

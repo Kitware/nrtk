@@ -19,11 +19,13 @@ try:
 
     __all__ += _ALBUMENTATIONS_CLASSES
 except ImportError:
+    pass
 
-    def __getattr__(name: str) -> None:
-        if name in _ALBUMENTATIONS_CLASSES:
-            raise ImportError(
-                f"{name} requires the `albumentations` and (`graphics` or `headless`) extras. "
-                f"Install with: `pip install nrtk[albumentations,graphics] or nrtk[albumentations,headless]`",
-            )
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __getattr__(name: str) -> None:
+    if name in _ALBUMENTATIONS_CLASSES:
+        raise ImportError(
+            f"{name} requires the `albumentations` and (`graphics` or `headless`) extras. "
+            f"Install with: `pip install nrtk[albumentations,graphics]` or `pip install nrtk[albumentations,headless]`",
+        )
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

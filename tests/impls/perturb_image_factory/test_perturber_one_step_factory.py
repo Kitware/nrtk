@@ -34,6 +34,7 @@ from tests.fakes import FakePerturber
 from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
+@pytest.mark.core
 class TestPerturberOneStepFactory(PerturberFactoryMixin):
     """Tests for PerturberOneStepFactory. See module docstring for test cases."""
 

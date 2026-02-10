@@ -68,3 +68,18 @@
   now raises a clear ``ImportError`` with install instructions instead of an
   opaque failure. Restructured into private ``_pybsm/`` package with
   public exports from ``nrtk.impls.perturb_image.optical.otf``.
+
+* Added import guards for MAITE interop module. Attempting to use
+  ``MAITEImageClassificationAugmentation`` or
+  ``MAITEObjectDetectionAugmentation`` without the ``maite`` extra
+  now raises a clear ``ImportError`` with install instructions.
+  Restructured with public exports from ``nrtk.interop``.
+
+* Added import guards for ``nrtk.entrypoints``. ``nrtk_perturber``
+  requires the ``maite`` extra and ``nrtk_perturber_cli`` requires
+  both ``maite`` and ``tools`` extras. Clear ``ImportError`` messages
+  are raised when the extras are not installed.
+
+* Added import guards for the MAITE REST API (``nrtk.interop._maite.api``).
+  ``handle_post`` and ``handle_aukus_post`` require ``maite`` and ``tools``
+  extras.
