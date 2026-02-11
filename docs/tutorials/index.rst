@@ -4,13 +4,11 @@ Tutorials
 
 Ready to go deeper? Use these guided, end-to-end walkthroughs to learn NRTK by doing.
 These tutorials assume you've completed the steps in the
-:doc:`Installation </getting_started/installation>` and
+:doc:`Advanced Installation </getting_started/installation>` and
 :doc:`Getting Started </getting_started/quickstart>` sections.
 
-----
-
 Start Here
------------
+----------
 
 .. grid:: 1
    :gutter: 3
@@ -22,9 +20,10 @@ Start Here
       :class-card: sd-border-2
       :columns: 12
 
-      **The essential first tutorial.** Walk through NRTK's three core
-      capabilities—image perturbation, perturbation factories for parameter
-      sweeps, and model evaluation—in a single end-to-end notebook.
+      It is highly recommended to start with this tutorial if you haven't
+      already. It walks through NRTK's three core capabilities—image
+      perturbation, perturbation factories for parameter sweeps, and model
+      evaluation—in a single end-to-end notebook.
 
       +++
 
@@ -65,7 +64,6 @@ Continue Learning
 .. toctree::
    :hidden:
 
-   /examples/nrtk_tutorial
    testing_and_evaluation_notebooks
    /examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency
    /examples/nrtk_xaitk_workflow/object_detection_perturbation_saliency

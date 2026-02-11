@@ -1,40 +1,45 @@
 Applying an Operational Risk Perturbation
 =========================================
 
-In real-world deployments, cameras mounted on vehicles, drones, or handheld platforms experience
-vibration that blurs images and degrades model performance. Most vision models are trained on
-clean, stable imagery, leading to even mild jitter causing missed detections or poor accuracy.
+Real-world deployments expose AI models to environmental and sensor-level
+degradations that rarely appear in training data. Validating robustness to
+these conditions is a core part of Artificial Intelligence Test & Evaluation
+(AI T&E).
 
-In this guide, you'll use NRTK's :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber` to apply your
-first physics-based perturbation and see how sensor jitter affects an image. This is a good
-starting point if you want to:
+In this guide, you'll use NRTK's
+:class:`JitterPerturber <nrtk.impls.perturb_image.optical.otf.JitterPerturber>`
+to apply a physics-based **jitter perturbation** that simulates high-frequency
+vibration — the kind of sensor blur caused by wind, vehicle movement, or
+mechanical instability on mounted cameras. By the end, you'll be able to:
 
 * Understand what an **operational risk perturbation** looks like in practice
 * See how a few lines of code can **simulate a real-world degradation**
 * Get a feel for NRTK's perturbation workflow before exploring more perturbers
 
+When to Use This
+----------------
+
+* You want to simulate **platform vibration** from wind, vehicle movement, or
+  mechanical instability.
+* You need a **physics-based perturbation** that models realistic motion blur
+  effects.
+* You're doing early **screening of robustness** to vibration before running
+  heavier T&E analysis (see the full T&E Simulation Guide →
+  :doc:`JitterPerturber T&E guide </examples/maite/nrtk_jitter_perturber_demo>`).
+* You want to test model performance at **reduced effective resolution** due to
+  motion.
+
 Example: Jitter Perturbation
 ----------------------------
 
-In this example, we'll apply a jitter perturbation to an image. Afterwards,
-:doc:`the NRTK tutorial </examples/nrtk_tutorial>` provides a deeper look at perturbations and
-the other main components of NRTK.
+JitterPerturber requires the ``pybsm`` extra. If you haven't already, install it:
 
-Input Image
-^^^^^^^^^^^
+.. code-block:: bash
 
-Below is an example of an input image that will undergo a Jitter perturbation. This image represents the initial
-state before any transformation.
+    pip install nrtk[pybsm]
 
-.. figure:: ../images/input.jpg
-
-   Figure 1: Input image.
-
-
-Code Sample
-^^^^^^^^^^^
-
-Below is some example code that applies a Jitter OTF transformation:
+The following example loads an image, applies a jitter perturbation, and saves
+the result:
 
 .. code-block:: python
 
@@ -42,38 +47,132 @@ Below is some example code that applies a Jitter OTF transformation:
     import numpy as np
     from PIL import Image
 
-    INPUT_IMG_FILE = 'docs/images/input.jpg'
-    image = np.array(Image.open(INPUT_IMG_FILE))
+    # Load your image
+    image = np.array(Image.open("your_image.jpg"))
 
-    otf = JitterPerturber(s_x=8e-6, s_y=8e-6)
-    out_image = otf(image=image)
+    # Apply jitter perturbation
+    # img_gsd = ground sample distance (meters/pixel) for your sensor
+    perturber = JitterPerturber(s_x=8e-6, s_y=8e-6)
+    perturbed_image, _ = perturber(image=image, img_gsd=0.03)
 
-This code uses default values and provides a sample input image. However, you can adjust the parameters and use your
-own image to visualize the perturbation. The ``s_x`` and ``s_y`` parameters (the root-mean-squared jitter amplitudes in
-radians, in the x and y directions) are the primary way to customize a jitter perturber. Larger jitter amplitudes
-generate a larger Gaussian blur kernel. The
-:doc:`how-to guide on OTF perturbations </examples/optical_perturbers>` will provide more detail on selecting
-specific values for these parameters.
+    # Save the result
+    Image.fromarray(perturbed_image).save("perturbed_output.jpg")
 
-Resulting Image
-^^^^^^^^^^^^^^^
+The ``s_x`` and ``s_y`` parameters control jitter amplitude — see
+:ref:`key-parameters-jitter` below for details and visual comparisons.
 
-The output image below shows the effects of the Jitter perturbation on the original input. This result illustrates
-the Gaussian blur introduced due to simulated sensor jitter.
+Here's what the perturbation looks like in practice:
 
-.. figure:: ../images/output-jitter.jpg
+.. list-table::
+   :widths: 50 50
+   :header-rows: 1
 
-   Figure 2: Output image.
+   * - Baseline Image (No Jitter)
+     - Image with Simulated Sensor Jitter
+   * - .. image:: ../images/input.jpg
+          :width: 300px
+     - .. image:: ../images/output-jitter.jpg
+          :width: 300px
 
-Next Steps
+Notice how the jitter perturbation introduces motion blur that reduces edge
+sharpness and suppresses fine detail. In deployed systems, this kind of degradation
+can increase missed detections, reduce confidence scores, and lower mAP — precisely
+the kinds of robustness gaps T&E aims to surface before fielding. The severity of
+this degradation is controlled by the jitter amplitude parameters, explored below.
+
+.. _key-parameters-jitter:
+
+Key Parameters
+--------------
+
+* ``s_x``, ``s_y`` — Root-mean-squared jitter amplitudes in x and y directions
+  (radians). These represent the standard deviation of angular positional error
+  due to platform vibration. Larger values produce a stronger Gaussian blur.
+
+  .. list-table::
+     :widths: 33 33 33
+     :header-rows: 1
+
+     * - Light (0, 3e-4)
+       - Medium (0, 5e-4)
+       - Heavy (0, 1e-3)
+     * - .. image:: /images/operational_risk_modules/jitter_light.png
+            :width: 200px
+       - .. image:: /images/operational_risk_modules/jitter_medium.png
+            :width: 200px
+       - .. image:: /images/operational_risk_modules/jitter_heavy.png
+            :width: 200px
+
+For a deeper dive into optical perturber parameters and OTF modeling, see the
+:doc:`Optical Perturbers notebook </examples/optical_perturbers>`.
+
+Other Operational Risks
+-----------------------
+
+NRTK provides perturbers for a range of real-world degradations beyond
+vibration. Each module below includes a description, code example, parameter
+comparison, and links to further resources.
+
+.. grid:: 1 2 3 3
+   :gutter: 3
+
+   .. grid-item-card:: 🌫️ Haze
+      :link: /explanations/operational_risk_modules/haze
+      :link-type: doc
+
+      Simulates reduced visibility from fog, mist, or light snow.
+
+   .. grid-item-card:: 🌀 Atmospheric Turbulence
+      :link: /explanations/operational_risk_modules/atmospheric_turbulence
+      :link-type: doc
+
+      Simulates blur and distortion from unstable air masses.
+
+   .. grid-item-card:: ☀️ Extreme Illumination
+      :link: /explanations/operational_risk_modules/extreme_illumination
+      :link-type: doc
+
+      Simulates under- or overexposure from harsh lighting conditions.
+
+   .. grid-item-card:: 🔍 Target Out of Focus
+      :link: /explanations/operational_risk_modules/defocus
+      :link-type: doc
+
+      Simulates optical defocus from autofocus failures or focus errors.
+
+   .. grid-item-card:: 🔭 Radial Distortion
+      :link: /explanations/operational_risk_modules/radial_distortion
+      :link-type: doc
+
+      Simulates barrel or pincushion distortion from wide-angle lenses.
+
+   .. grid-item-card:: 📡 Sensor Noise & Resolution
+      :link: /explanations/operational_risk_modules/sensor_noise_resolution
+      :link-type: doc
+
+      Simulates thermal noise, electronic noise, and resolution loss.
+
+   .. grid-item-card:: 💧 Water Droplets
+      :link: /explanations/operational_risk_modules/water_droplets
+      :link-type: doc
+
+      Simulates lens contamination from rain or water spray.
+
+References
 ----------
 
-Now that you've applied a single perturbation, the :doc:`NRTK End-to-End Overview </examples/nrtk_tutorial>`
-walks through a complete workflow—image perturbation, perturbation factories, and model evaluation.
-
-For broader context or foundational theory, see:
-
-- :doc:`High-Frequency Vibration Module </explanations/operational_risk_modules/high_frequency_vibration>` —
-  Full operational risk details, parameter sweeps, and visual comparison
-- :doc:`/explanations/nrtk_explanation` — Conceptual guide to NRTK's architecture and approach
-- :doc:`/explanations/risk_factors` — How NRTK's perturbations map to real-world risk factors
+* **API Reference:**
+  :class:`JitterPerturber <nrtk.impls.perturb_image.optical.otf.JitterPerturber>`
+* **Full Explanation:**
+  :doc:`High-Frequency Vibration Module </explanations/operational_risk_modules/high_frequency_vibration>`
+  — Physics background, OTF modeling details, and limitations
+* **T&E Simulation Guide:**
+  :doc:`JitterPerturber T&E guide </examples/maite/nrtk_jitter_perturber_demo>`
+  — Detailed analysis, validation, datasets, and recommended parameter sweeps
+* **End-to-End Tutorial:**
+  :doc:`NRTK End-to-End Overview </examples/nrtk_tutorial>`
+  — Complete workflow covering perturbation, factories, and model evaluation
+* **Concepts:** :doc:`/explanations/nrtk_explanation`
+  — Conceptual guide to NRTK's architecture and approach
+* **Risk Matrix:** :doc:`/explanations/risk_factors`
+  — Map real-world operational risks to NRTK perturbations

@@ -64,9 +64,26 @@ else:
         # Git not available or not in a repo - use release version
         switcher_version = release
 
+# -- Contextual date label for landing page ----------------------------------
+# Provide a contextual label for the build date shown on the landing page.
+# Sphinx's |today| already shows the build date for each specific version.
+if rtd_version == "latest":
+    date_label = "Latest Build"
+elif rtd_version == "stable":
+    date_label = "Stable Release"
+elif rtd_version:
+    date_label = f"{rtd_version} Docs Built"
+else:
+    date_label = "Date"
+
+rst_prolog = f"""
+.. |date_label| replace:: **{date_label}**
+"""
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+today_fmt = "%B %d, %Y"  # e.g., "February 11, 2026"
 
 extensions = [
     "sphinx.ext.autodoc",

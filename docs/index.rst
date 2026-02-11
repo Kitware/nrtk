@@ -6,7 +6,7 @@
 Welcome to NRTK's documentation!
 ================================
 
-**Version**: |release| | **Date**: |today|
+**Version**: |release| | |date_label|: |today|
 
 **The Natural Robustness Toolkit (NRTK) is an open source toolkit for generating operationally realistic perturbations
 to evaluate the natural robustness of computer vision algorithms.**
@@ -14,6 +14,16 @@ to evaluate the natural robustness of computer vision algorithms.**
 NRTK enables developers and T&E engineers to simulate sensor-specific and environmental perturbations—such as
 changes in focal length, aperture, and atmospheric conditions—to rigorously assess computer vision model robustness
 without costly real-world data collection.
+
+.. tip::
+   🚀 **New to NRTK?** :doc:`Getting Started </getting_started/quickstart>` walks you through
+   installation, your first operational risk perturbation, and connecting your scenario to the right tools.
+
+----
+
+Already familiar with NRTK or experienced with T&E workflows for computer vision?
+Explore tutorials, task-based guides, and the full API reference to integrate
+operational risk perturbations into your evaluation pipelines.
 
 .. grid:: 1 2 2 2
    :gutter: 3
@@ -43,10 +53,6 @@ without costly real-world data collection.
       :link-type: doc
 
       Perturbers, APIs, schemas, and implementation details.
-
-.. note::
-   New to NRTK? :doc:`Getting Started </getting_started/quickstart>` walks you through
-   installation and your first operational risk perturbation.
 
 Why NRTK?
 ---------
