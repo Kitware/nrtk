@@ -20,6 +20,7 @@ from __future__ import annotations
 __all__ = ["RandomCropPerturber"]
 
 from collections.abc import Hashable, Iterable
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
@@ -90,7 +91,7 @@ class RandomCropPerturber(PerturbImage):
                     intersected_box.max_vertex[1] - crop_x,
                 )
                 adjusted_box = AxisAlignedBoundingBox(min_vertex=shifted_min, max_vertex=shifted_max)
-                adjusted_bboxes.append((adjusted_box, metadata))
+                adjusted_bboxes.append((adjusted_box, deepcopy(metadata)))
         return adjusted_bboxes
 
     def perturb(

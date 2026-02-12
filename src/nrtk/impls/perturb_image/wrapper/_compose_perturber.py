@@ -97,6 +97,7 @@ class ComposePerturber(PerturbImage):
 
         if len(self.perturbers) == 0:
             perturbed_image = copy.deepcopy(image)
+            perturbed_boxes = copy.deepcopy(boxes)
 
         return perturbed_image, perturbed_boxes
 

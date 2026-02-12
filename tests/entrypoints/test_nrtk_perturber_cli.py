@@ -143,19 +143,19 @@ class TestNRTKPerturberCLI:
         assert "Could not identify metadata file, assuming no metadata." in caplog.text
 
     @mock.patch("pathlib.Path.is_file", return_value=False)
-    def test_missing_annotations(self, tmpdir: py.path.local) -> None:
+    def test_missing_annotations(self, tmpdir: py.path.local, caplog: pytest.LogCaptureFixture) -> None:
         """Check that an exception is appropriately raised if the annotations file is missing."""
         output_dir = tmpdir.join(Path("out"))
 
         runner = CliRunner()
-        with pytest.raises(ValueError, match=r"Could not identify annotations file."):
-            runner.invoke(
-                nrtk_perturber_cli,
-                [
-                    f"--dataset_dir={str(DATASET_FOLDER)}",
-                    f"--output_dir={str(output_dir)}",
-                    f"--config_file={str(NRTK_PYBSM_CONFIG)}",
-                    "-v",
-                ],
-                catch_exceptions=False,
-            )
+        result = runner.invoke(
+            nrtk_perturber_cli,
+            [
+                f"--dataset_dir={str(DATASET_FOLDER)}",
+                f"--output_dir={str(output_dir)}",
+                f"--config_file={str(NRTK_PYBSM_CONFIG)}",
+                "-v",
+            ],
+        )
+        assert result.exit_code == 101
+        assert "Could not identify annotations file. Expected at '[dataset_dir]/annotations.json" in caplog.text

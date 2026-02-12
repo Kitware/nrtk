@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import unittest.mock as mock
 from collections.abc import Hashable, Iterable
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -24,10 +25,10 @@ from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 def _perturb(
     image: np.ndarray,
-    boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,  # noqa: ARG001
+    boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
     kwargs: dict[str, Any] | None = None,  # noqa: ARG001
-) -> tuple[np.ndarray, None]:  # pragma: no cover
-    return np.copy(image) + 1, None
+) -> tuple[np.ndarray, Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:  # pragma: no cover
+    return np.copy(image) + 1, deepcopy(boxes)
 
 
 m_dummy = mock.Mock(spec=PerturbImage)

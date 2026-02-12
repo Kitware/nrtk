@@ -32,7 +32,10 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
             ),
             (
                 [(AxisAlignedBoundingBox(min_vertex=(2, 0), max_vertex=(2, 1)), {"meta": 1})],
-                (np.array([[2, 3, 0], [5, 6, 0], [8, 9, 0]], dtype=np.uint8), list()),
+                (
+                    np.array([[2, 3, 0], [5, 6, 0], [8, 9, 0]], dtype=np.uint8),
+                    [(AxisAlignedBoundingBox(min_vertex=(1, 0), max_vertex=(1, 1)), {"meta": 1})],
+                ),
             ),
         ],
     )

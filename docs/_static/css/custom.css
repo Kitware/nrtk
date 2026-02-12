@@ -210,28 +210,16 @@ header form.bd-search:not(#pst-search-dialog form.bd-search) {
     max-width: 100%;
 }
 
-/* Section-isolated sidebar navigation
- * Show only the current section's navigation tree in the sidebar
- * When on a child page, show siblings by targeting the parent's current state
+/* Full sidebar navigation — all sections visible, only current expanded
+ * pydata_sphinx_theme's collapse_navigation handles expand/collapse natively.
+ * We just bold the active page link for visibility.
  */
-
-/* Hide all top-level sections by default */
-nav.bd-links ul.bd-sidenav > li.toctree-l1 {
-    display: none !important;
+nav.bd-links ul.bd-sidenav > li.toctree-l1 > a {
+    font-weight: normal;
 }
 
-/* Show the current section (has .current class when active or contains active child) */
-nav.bd-links ul.bd-sidenav > li.toctree-l1.current {
-    display: block !important;
-}
-
-/* Ensure all children within the current section are visible */
-nav.bd-links ul.bd-sidenav > li.toctree-l1.current ul {
-    display: block !important;
-}
-
-nav.bd-links ul.bd-sidenav > li.toctree-l1.current li {
-    display: list-item !important;
+nav.bd-links ul.bd-sidenav > li.toctree-l1.current > a {
+    font-weight: 700;
 }
 
 /* Sticky left sidebar - stays fixed while scrolling

@@ -61,7 +61,7 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 [project.optional-dependencies]
 graphics = ["opencv-python>=4.6"]
 headless = ["opencv-python-headless>=4.6"]
-pybsm = ["pybsm>=0.14.2"]
+pybsm = ["pybsm>=0.14.3"]
 maite = [
     "maite>=0.9.2,<0.10.0",
 ]

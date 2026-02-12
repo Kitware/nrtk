@@ -1,5 +1,5 @@
-NRTK QuickStart Hub
-===================
+Getting Started
+===============
 
 The Natural Robustness Toolkit (NRTK) helps you test AI model robustness by
 simulating real-world operational conditions. Quickly install, run, and link
@@ -31,7 +31,7 @@ your scenario to the right tools.
 
             See :ref:`perturber-dependencies` for optional dev extras.
 
-      **2. Run Your First Perturbation**
+      **2. Run a Sample Perturbation**
 
       .. code-block:: python
 
@@ -56,46 +56,10 @@ your scenario to the right tools.
 
          ➔ Interactive Risk Matrix
 
-----
+.. toctree::
+   :hidden:
 
-🔍 Explore More
----------------
-
-.. container:: explore-more-grid
-
-   .. grid:: 1 2 4 4
-      :gutter: 2
-
-      .. grid-item-card:: 🚀 Getting Started
-         :link: first_perturbation
-         :link-type: doc
-
-      .. grid-item-card:: 📚 NRTK Concepts
-         :link: /explanations/nrtk_explanation
-         :link-type: doc
-
-      .. grid-item-card:: 🔌 Core API Interfaces
-         :link: /reference/api/interfaces
-         :link-type: doc
-
-      .. grid-item-card:: ⚙️ NRTK Implementations
-         :link: /reference/api/implementations
-         :link-type: doc
-
-      .. grid-item-card:: 📋 User Input Requirements
-         :link: /reference/perturber_reference/index
-         :link-type: doc
-
-      .. grid-item-card:: ✅ Validation and Trust
-         :link: validation_and_trust
-         :link-type: doc
-
-      .. grid-item-card:: 📊 Testing & Evaluation Guides
-         :link: /tutorials/testing_and_evaluation_notebooks
-         :link-type: doc
-
-      .. grid-item-card:: 📟 NRTK CLI Tool
-         :link: /reference/containers
-         :link-type: doc
-
-----
+   installation
+   first_perturbation
+   /examples/nrtk_tutorial
+   where_to_go_next

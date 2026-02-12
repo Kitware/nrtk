@@ -154,6 +154,7 @@ html_theme_options = {
 html_sidebars = {
     "index": list(),  # No sidebar on main landing page
     "getting_started/**": ["sidebar-nav-bs"],
+    "examples/**": ["sidebar-nav-bs"],
     "tutorials/**": ["sidebar-nav-bs"],
     "how_to_guides/**": ["sidebar-nav-bs"],
     "explanations/**": ["sidebar-nav-bs"],
