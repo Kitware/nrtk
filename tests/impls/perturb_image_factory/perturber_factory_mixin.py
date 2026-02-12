@@ -120,7 +120,7 @@ class PerturberFactoryMixin:
         """
         factory = self._make_factory(**empty_factory_kwargs)
         assert len(factory) == 0
-        assert list(factory) == list()
+        assert list(factory) == []
 
     # ============================== Indexing ==============================
 

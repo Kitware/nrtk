@@ -1,5 +1,5 @@
-* Added ``D`` and ``eta`` parameters for ``CircularApertureOTFPerturber``.
+* Added ``D`` and ``eta`` parameters for ``CircularAperturePerturber``.
 
-* Updated ``TestCircularApertureOTFPerturber`` to account for new parameters.
+* Updated ``TestCircularAperturePerturber`` to account for new parameters.
 
 * Updated ``otf_visualization.ipynb`` to account for the new parameters.

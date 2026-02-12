@@ -14,13 +14,13 @@ variations.
      - Required Inputs
      - Optional Parameters
 
-   * - :ref:`RandomCropPerturber`
+   * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomCropPerturber`
      - Image (RGB/Grayscale)
      - * ``crop_size``
        * ``seed``
        * ``boxes``
 
-   * - :ref:`RandomRotationPerturber`
+   * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`
      - Image (RGB)
      - * ``limit``
        * ``probability``
@@ -28,7 +28,7 @@ variations.
        * ``seed``
        * ``boxes``
 
-   * - :ref:`RandomScalePerturber`
+   * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`
      - Image (RGB)
      - * ``limit``
        * ``interpolation``
@@ -36,7 +36,7 @@ variations.
        * ``seed``
        * ``boxes``
 
-   * - :ref:`RandomTranslationPerturber`
+   * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomTranslationPerturber`
      - Image (RGB/Grayscale)
      - * ``seed``
        * ``color_fill``

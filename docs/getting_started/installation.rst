@@ -162,17 +162,20 @@ NRTK has multiple optional extras to expand functionality. The list below contai
 description of the extra.
 
     **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :ref:`AlbumentationsPerturber`,
-    :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
+    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`,
+    :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :ref:`AlbumentationsPerturber`,
-    :ref:`RandomRotationPerturber`, and :ref:`RandomScalePerturber`.
+    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`,
+    :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
-    :ref:`PybsmPerturber`, :ref:`PybsmOTFPerturber`,
-    :ref:`TurbulenceApertureOTFPerturber`, :ref:`JitterOTFPerturber`, :ref:`DetectorOTFPerturber`,
-    :ref:`CircularApertureOTFPerturber`, and :ref:`DefocusOTFPerturber`.
+    :class:`~nrtk.impls.perturb_image.optical.PybsmPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.DetectorPerturber`,
+    :class:`~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber`,
+    and :class:`~nrtk.impls.perturb_image.optical.otf.DefocusPerturber`.
 
     **maite**: installs `MAITE <https://github.com/mit-ll-ai-technology/maite>`_ and its associated dependencies.
     Required for everything in :ref:`Interoperability`.
@@ -180,25 +183,23 @@ description of the extra.
     **tools**: installs `KWCOCO <https://github.com/Kitware/kwcoco>`_ and
     `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for :ref:`nrtk-perturber`.
 
-    **scikit-image**: installs `scikit-image <https://scikit-image.org/>`_. Required for
+    **skimage**: installs `scikit-image <https://scikit-image.org/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.photometric.noise` perturbers.
 
-    **Pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
+    **pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.photometric.enhance` perturbers.
 
     **albumentations**: installs `nrtk-albumentations <https://github.com/Kitware/nrtk-albumentations>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.wrapper.albumentations_perturber`,
-    :mod:`~nrtk.impls.perturb_image.geometric.random_rotation_perturber`, and
-    :mod:`~nrtk.impls.perturb_image.geometric.random_scale_perturber`.
+    :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`,
+    :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and
+    :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **waterdroplet**: installs `scipy <https://scipy.org/>`_ and `numba <https://numba.pydata.org/>`_. Required for
-    :mod:`~nrtk.impls.perturb_image.environment.water_droplet_perturber` perturber and utility functions.
+    :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber` perturber and utility functions.
 
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
     `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
-    Required for :ref:`DiffusionPerturber`.
-
-    **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
+    Required for :class:`~nrtk.impls.perturb_image.generative.DiffusionPerturber`.
 
 Installing with OpenCV
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -260,106 +261,103 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - **Photometric Perturbers**
       -
       -
-    * - :ref:`AverageBlurPerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.blur.AverageBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
-    * - :ref:`BrightnessPerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber`
+      - ``pillow``
       - ``Pillow``
+    * - :class:`~nrtk.impls.perturb_image.photometric.enhance.ColorPerturber`
+      - ``pillow``
       - ``Pillow``
-    * - :ref:`ColorPerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.enhance.ContrastPerturber`
+      - ``pillow``
       - ``Pillow``
-      - ``Pillow``
-    * - :ref:`ContrastPerturber`
-      - ``Pillow``
-      - ``Pillow``
-    * - :ref:`GaussianBlurPerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
-    * - :ref:`GaussianNoisePerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.noise.GaussianNoisePerturber`
+      - ``skimage``
       - ``scikit-image``
-      - ``scikit-image``
-    * - :ref:`MedianBlurPerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.blur.MedianBlurPerturber`
       - ``graphics`` or ``headless``
       - ``OpenCV``
-    * - :ref:`PepperNoisePerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.noise.PepperNoisePerturber`
+      - ``skimage``
       - ``scikit-image``
+    * - :class:`~nrtk.impls.perturb_image.photometric.noise.SaltAndPepperNoisePerturber`
+      - ``skimage``
       - ``scikit-image``
-    * - :ref:`SaltAndPepperNoisePerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.noise.SaltNoisePerturber`
+      - ``skimage``
       - ``scikit-image``
-      - ``scikit-image``
-    * - :ref:`SaltNoisePerturber`
-      - ``scikit-image``
-      - ``scikit-image``
-    * - :ref:`SharpnessPerturber`
+    * - :class:`~nrtk.impls.perturb_image.photometric.enhance.SharpnessPerturber`
+      - ``pillow``
       - ``Pillow``
-      - ``Pillow``
-    * - :ref:`SpeckleNoisePerturber`
-      - ``scikit-image``
+    * - :class:`~nrtk.impls.perturb_image.photometric.noise.SpeckleNoisePerturber`
+      - ``skimage``
       - ``scikit-image``
     * - **Geometric Perturbers**
       -
       -
-    * - :ref:`RandomCropPerturber`
+    * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomCropPerturber`
       - ---
       - ---
-    * - :ref:`RandomRotationPerturber`
+    * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
       - ``nrtk-albumentations``, ``OpenCV``
-    * - :ref:`RandomScalePerturber`
+    * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
       - ``nrtk-albumentations``, ``OpenCV``
-    * - :ref:`RandomTranslationPerturber`
+    * - :class:`~nrtk.impls.perturb_image.geometric.random.RandomTranslationPerturber`
       - ---
       - ---
     * - **Environment Perturbers**
       -
       -
-    * - :ref:`HazePerturber`
+    * - :class:`~nrtk.impls.perturb_image.environment.HazePerturber`
       - ---
       - ---
-    * - :ref:`WaterDropletPerturber`
+    * - :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber`
       - ``waterdroplet``
       - ``scipy``, ``numba``
     * - **Optical Perturbers**
       -
       -
-    * - :ref:`CircularApertureOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :ref:`DefocusOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.DefocusPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :ref:`DetectorOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.DetectorPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :ref:`JitterOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :ref:`PyBSMOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.PybsmPerturber`
       - ``pybsm``
       - ``pyBSM``
-    * - :ref:`PyBSMPerturber`
-      - ``pybsm``
-      - ``pyBSM``
-    * - :ref:`RadialDistortionPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber`
       - ---
       - ---
-    * - :ref:`TurbulenceApertureOTFPerturber`
+    * - :class:`~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber`
       - ``pybsm``
       - ``pyBSM``
     * - **Generative Perturbers**
       -
       -
-    * - :ref:`DiffusionPerturber`
+    * - :class:`~nrtk.impls.perturb_image.generative.DiffusionPerturber`
       - ``diffusion``
       - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
-    * - **Wrapper Perturbers**
+    * - **Utility Perturbers**
       -
       -
-    * - :ref:`AlbumentationsPerturber`
+    * - :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
       - ``nrtk-albumentations``, ``OpenCV``
-    * - :ref:`ComposePerturber`
+    * - :class:`~nrtk.impls.perturb_image.ComposePerturber`
       - ---
       - ---
 

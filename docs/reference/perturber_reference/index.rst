@@ -17,7 +17,7 @@ NRTK perturbers are organized into six functional categories based on their purp
   Model physics-based sensor and optical phenomena
 - :doc:`Generative Perturbers <generative>`:
   Apply AI-based transformations (e.g. diffusion models)
-- :doc:`Wrapper Perturbers <wrapper>`:
+- :doc:`Utility Perturbers <utility>`:
   Enable composition and third-party library integration
 
 .. toctree::
@@ -29,4 +29,4 @@ NRTK perturbers are organized into six functional categories based on their purp
    environment
    optical
    generative
-   wrapper
+   utility

@@ -32,6 +32,7 @@ from tests.fakes import FakePerturber, PerturberFakeFactory
 from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
+@pytest.mark.core
 class TestPerturbImageFactory(PerturberFactoryMixin):
     """Tests for PerturbImageFactory interface."""
 

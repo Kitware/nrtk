@@ -14,68 +14,68 @@ image quality degradation.
      - Required Inputs
      - Optional Parameters
 
-   * - :ref:`AverageBlurPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.blur.AverageBlurPerturber`
      - Image (RGB/Grayscale)
      - * ``ksize``
        * ``boxes``
 
-   * - :ref:`BrightnessPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber`
      - Image (RGB)
      - * ``factor``
        * ``boxes``
 
-   * - :ref:`ColorPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.enhance.ColorPerturber`
      - Image (RGB)
      - * ``factor``
        * ``boxes``
 
-   * - :ref:`ContrastPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.enhance.ContrastPerturber`
      - Image (RGB)
      - * ``factor``
        * ``boxes``
 
-   * - :ref:`GaussianBlurPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
      - Image (RGB/Grayscale)
      - * ``ksize``
        * ``boxes``
 
-   * - :ref:`GaussianNoisePerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.noise.GaussianNoisePerturber`
      - Image (RGB/Grayscale)
      - * ``rng``
        * ``mean``
        * ``var``
        * ``boxes``
 
-   * - :ref:`MedianBlurPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.blur.MedianBlurPerturber`
      - Image (RGB/Grayscale)
      - * ``ksize``
        * ``boxes``
 
-   * - :ref:`PepperNoisePerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.noise.PepperNoisePerturber`
      - Image (RGB/Grayscale)
      - * ``rng``
        * ``amount``
        * ``boxes``
 
-   * - :ref:`SaltAndPepperNoisePerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.noise.SaltAndPepperNoisePerturber`
      - Image (RGB/Grayscale)
      - * ``rng``
        * ``amount``
        * ``salt_vs_pepper``
        * ``boxes``
 
-   * - :ref:`SaltNoisePerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.noise.SaltNoisePerturber`
      - Image (RGB/Grayscale)
      - * ``rng``
        * ``amount``
        * ``boxes``
 
-   * - :ref:`SharpnessPerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.enhance.SharpnessPerturber`
      - Image (RGB)
      - * ``factor``
        * ``boxes``
 
-   * - :ref:`SpeckleNoisePerturber`
+   * - :class:`~nrtk.impls.perturb_image.photometric.noise.SpeckleNoisePerturber`
      - Image (RGB/Grayscale)
      - * ``rng``
        * ``mean``

@@ -1,18 +1,30 @@
 """Module for environment implementations of PerturbImage."""
 
-from collections.abc import Callable
-from typing import Any
+from nrtk.impls.perturb_image.environment._haze_perturber import HazePerturber
 
-import lazy_loader as lazy
+# Override __module__ to reflect the public API path for plugin discovery
+HazePerturber.__module__ = __name__
 
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
+__all__ = ["HazePerturber"]
 
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=[
-        "haze_perturber",
-        "water_droplet_perturber",
-    ],
-)
+# Water droplet perturber (optional - requires scipy and numba)
+_WATERDROPLET_CLASSES = ["WaterDropletPerturber"]
+
+try:
+    from nrtk.impls.perturb_image.environment._water_droplet_perturber import (
+        WaterDropletPerturber as WaterDropletPerturber,
+    )
+
+    WaterDropletPerturber.__module__ = __name__
+
+    __all__ += _WATERDROPLET_CLASSES
+except ImportError:
+    pass
+
+
+def __getattr__(name: str) -> None:
+    if name in _WATERDROPLET_CLASSES:
+        raise ImportError(
+            f"{name} requires the `waterdroplet` extra. Install with: `pip install nrtk[waterdroplet]`",
+        )
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -78,6 +78,6 @@ Glossary
      A list of values (or list of lists) containing the values for the perturber parameter. A single list is used
      for generic factories and a list of lists is used for the multivariate factory.
 
-   wrapper perturber
-     Wrapper perturbers enable composition of multiple perturbations or provide integration with third-party
+   utility perturber
+     Utility perturbers enable composition of multiple perturbations or provide integration with third-party
      augmentation libraries.

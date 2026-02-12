@@ -43,7 +43,7 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.optical.pybsm_perturber import PybsmPerturber
+   from nrtk.impls.perturb_image.optical import PybsmPerturber
    import numpy as np
 
    # Simulate moderate sensor noise (thermal + electronic)
@@ -141,7 +141,7 @@ Limitations and Next Steps
 ---------------------------
 
 * API Reference:
-  :class:`PybsmPerturber <nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber>`
+  :class:`PybsmPerturber <nrtk.impls.perturb_image.optical.PybsmPerturber>`
 * Provides **full physics-based sensor simulation**, including noise, resolution, and optical
   effects. For more detailed analysis, validation details, datasets, and recommended parameter
   sweeps, see the

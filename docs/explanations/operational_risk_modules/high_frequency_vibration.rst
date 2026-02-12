@@ -13,7 +13,7 @@ that the model has not learned to generalize to. This makes the risk both freque
 environments (ground vehicles, maritime platforms, handheld cameras) and highly impactful on
 performance metrics such as detection mAP and tracking stability.
 
-NRTK's JitterOTFPerturber simulates this risk by modeling the optical transfer function (OTF)
+NRTK's JitterPerturber simulates this risk by modeling the optical transfer function (OTF)
 effects of platform vibration. This physics-based approach provides an efficient way to probe
 model sensitivity to motion blur during early-stage robustness screening.
 
@@ -33,7 +33,7 @@ Use This When...
 * You need a **physics-based perturbation** that models realistic motion blur effects.
 * You're doing early **screening of robustness** to vibration before running heavier T&E analysis
   (see the full T&E
-  Simulation Guide → :doc:`JitterOTFPerturber T&E guide </examples/maite/nrtk_jitter_perturber_demo>`).
+  Simulation Guide → :doc:`JitterPerturber T&E guide </examples/maite/nrtk_jitter_perturber_demo>`).
 * You want to test model performance at **reduced effective resolution** due to motion.
 
 Minimal Code Example
@@ -41,9 +41,9 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
+   from nrtk.impls.perturb_image.optical.otf import JitterPerturber
 
-   perturber = JitterOTFPerturber(
+   perturber = JitterPerturber(
        s_x=0.0,  # no jitter in x direction
        s_y=5e-4   # medium jitter in y direction
    )
@@ -72,10 +72,10 @@ Key Parameters
 Limitations and Next Steps
 ---------------------------
 
-* API Reference: :class:`JitterOTFPerturber <nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber>`
+* API Reference: :class:`JitterPerturber <nrtk.impls.perturb_image.optical.otf.JitterPerturber>`
 * Models **platform jitter** via optical transfer function; does not simulate rolling shutter
   effects or complex motion patterns. For more detailed analysis, validation details, datasets,
   and recommended parameter sweeps, see the
-  :doc:`JitterOTFPerturber T&E guide </examples/maite/nrtk_jitter_perturber_demo>`.
+  :doc:`JitterPerturber T&E guide </examples/maite/nrtk_jitter_perturber_demo>`.
 * See :doc:`/validation_and_trust` for cross-perturber validation status.
 * Related Risks: :ref:`target-out-of-focus`, :ref:`turbulence`

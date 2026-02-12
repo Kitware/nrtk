@@ -8,14 +8,18 @@ from PIL import Image
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.geometric.random_translation_perturber import RandomTranslationPerturber
+from nrtk.impls.perturb_image.geometric.random import RandomTranslationPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
-from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
+from tests.impls.perturb_image.perturber_utils import bbox_perturber_assertions
 
 rng = np.random.default_rng()
 
 
-class TestRandomTranslationPerturber:
+@pytest.mark.core
+class TestRandomTranslationPerturber(PerturberTestsMixin):
+    impl_class = RandomTranslationPerturber
+
     @pytest.mark.parametrize(
         ("input_test_box", "expected"),
         [
@@ -206,7 +210,7 @@ class TestRandomTranslationPerturber:
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
-        kwargs = dict()
+        kwargs = {}
         if max_translation_limit is not None:
             kwargs = {"max_translation_limit": max_translation_limit}
         out_img, _ = bbox_perturber_assertions(

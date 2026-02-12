@@ -1,24 +1,33 @@
 """Module for optical implementations of PerturbImage."""
 
-from collections.abc import Callable
-from typing import Any
-
-import lazy_loader as lazy
-
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
-
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=[
-        "pybsm_perturber",
-        "circular_aperture_otf_perturber",
-        "defocus_otf_perturber",
-        "detector_otf_perturber",
-        "jitter_otf_perturber",
-        "turbulence_aperture_otf_perturber",
-        "pybsm_otf_perturber",
-        "radial_distortion_perturber",
-    ],
+from nrtk.impls.perturb_image.optical.radial_distortion_perturber import (
+    RadialDistortionPerturber as RadialDistortionPerturber,
 )
+
+RadialDistortionPerturber.__module__ = __name__
+
+_PYBSM_CLASSES = [
+    "PybsmPerturber",
+]
+
+__all__: list[str] = ["RadialDistortionPerturber"]
+
+try:
+    from nrtk.impls.perturb_image.optical._pybsm_perturber import (
+        PybsmPerturber as PybsmPerturber,
+    )
+
+    # Override __module__ to reflect the public API path for plugin discovery
+    PybsmPerturber.__module__ = __name__
+
+    __all__ += _PYBSM_CLASSES
+except ImportError:
+    pass
+
+
+def __getattr__(name: str) -> None:
+    if name in _PYBSM_CLASSES:
+        raise ImportError(
+            f"{name} requires the `pybsm` extra. Install with: `pip install nrtk[pybsm]`",
+        )
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

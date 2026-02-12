@@ -5,8 +5,8 @@ import pytest
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
-from nrtk.utils._nop_perturber import _NOPPerturber
-from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from nrtk.impls.perturb_image._nop_perturber import _NOPPerturber
+from tests.impls.perturb_image.perturber_utils import perturber_assertions
 
 rng = np.random.default_rng()
 

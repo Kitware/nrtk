@@ -40,6 +40,7 @@ class _StubType:
 _MODULE = "nrtk.interfaces._plugfigurable"
 
 
+@pytest.mark.core
 @patch(f"{_MODULE}.get_ns_entrypoints")
 @patch(f"{_MODULE}._collect_types_in_module", return_value={_StubType})
 def test_safe_discover_skips_broken_entrypoint(
@@ -59,6 +60,7 @@ def test_safe_discover_skips_broken_entrypoint(
     mock_collect.assert_called_once_with(good_module)
 
 
+@pytest.mark.core
 @patch(f"{_MODULE}.get_ns_entrypoints")
 @patch(f"{_MODULE}._collect_types_in_module")
 def test_safe_discover_logs_broken_entrypoint(
@@ -89,6 +91,7 @@ class _ConcretePlugfigurable(Plugfigurable):
         return {}  # pragma: no cover
 
 
+@pytest.mark.core
 @patch(f"{_MODULE}.discover_via_env_var", return_value=set())
 @patch(f"{_MODULE}.get_ns_entrypoints")
 @patch(f"{_MODULE}.discover_via_subclasses", return_value={_ConcretePlugfigurable})

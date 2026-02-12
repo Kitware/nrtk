@@ -41,7 +41,7 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.environment.haze_perturber import HazePerturber
+   from nrtk.impls.perturb_image.environment import HazePerturber
 
    perturber = HazePerturber(factor=1.0)  # medium haze
    img_out = perturber(image=img_in)
@@ -73,7 +73,7 @@ Key Parameters
 Limitations and Next Steps
 ---------------------------
 
-* API Reference: :class:`HazePerturber <nrtk.impls.perturb_image.environment.haze_perturber.HazePerturber>`
+* API Reference: :class:`HazePerturber <nrtk.impls.perturb_image.environment.HazePerturber>`
 * Approximates **atmospheric scattering** only; it does not model full physics or
   wavelength-dependent effects. For more detailed analysis, validation details, datasets,
   and recommended parameter sweeps, see the

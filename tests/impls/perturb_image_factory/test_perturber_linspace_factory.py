@@ -37,6 +37,7 @@ from tests.fakes import FakePerturber
 from tests.impls.perturb_image_factory import PerturberFactoryMixin
 
 
+@pytest.mark.core
 class TestPerturberLinspaceFactory(PerturberFactoryMixin):
     """Tests for PerturberLinspaceFactory. See module docstring for test cases."""
 

@@ -7,8 +7,13 @@ not take down the entire discovery pass.
 
 from __future__ import annotations
 
+__all__ = ["Plugfigurable"]
+
+import contextlib
+import io
 import logging
 import types
+import warnings
 from typing import TypeVar, cast
 
 from smqtk_core.plugfigurable import Plugfigurable as _Plugfigurable
@@ -35,9 +40,15 @@ def _safe_discover_via_entrypoints(entrypoint_ns: str) -> set[type]:
     type_set: set[type] = set()
     for ep in get_ns_entrypoints(entrypoint_ns):
         try:
-            m = ep.load()
+            with (
+                warnings.catch_warnings(),
+                contextlib.redirect_stdout(io.StringIO()),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                warnings.simplefilter("ignore")
+                m = ep.load()
         except Exception:  # noqa: BLE001 - intentionally broad to tolerate any broken entrypoint
-            LOG.debug(  # noqa: FKA100, RUF100 - %-style logging format
+            LOG.debug(  # noqa: FKA100 - %-style logging format
                 "Skipping broken entrypoint %r (%s)",
                 ep,
                 entrypoint_ns,
@@ -62,5 +73,5 @@ class Plugfigurable(_Plugfigurable):
         }
         return cast(
             set[type[Self]],
-            filter_plugin_types(cls, candidate_types),  # noqa: FKA100, RUF100 - upstream smqtk-core signature
+            filter_plugin_types(cls, candidate_types),  # noqa: FKA100 - upstream smqtk-core signature
         )

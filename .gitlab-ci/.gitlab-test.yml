@@ -6,124 +6,172 @@
 .test-setup:
   extends: .shared-setup
   stage: test
+  tags:
+    - autoscaler
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - !reference [.shared-setup, rules]
-  variables:
-    FORCE_COLOR: "1"
   before_script:
     - !reference [.shared-setup, before_script]
-    # Install dependencies: if EXTRAS equals "extras", install additional optional deps.
-    - |
-      if [ -n "$EXTRAS" ]; then
-        poetry sync --only main,tests --extras "$EXTRAS"
-      else
-        poetry sync --only main,tests
-      fi
-    - !reference [.opencv-headless, script]
+    - pip install --root-user-action=ignore --user -U "tox>=4.2" -q
 
-# ------------------------------------------------------------------------------
-# Job 1: Run without extras
-pytest-core:
-  extends: [.test-setup, .python-versions]
-  image: python:${PYTHON_VERSION}
-  variables:
-    JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
-  script:
-    - poetry run pytest --junit-xml="${JUNIT_TARGET}" -rs
-
-# ------------------------------------------------------------------------------
-# Job 2: Run with 'test' extras
-pytest-extras:
-  extends: pytest-core
-  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-  variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
-    UNDERSCORE_EXTRAS: "${EXTRAS// /_}"
-    COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}_${UNDERSCORE_EXTRAS}"
-    JUNIT_TARGET: ".junit-py${PYTHON_VERSION}_${UNDERSCORE_EXTRAS}.xml"
-  tags:
-    # - single-gpu
-    - single-gpu-g4dn.xlarge
-  script:
-    - !reference [pytest-core, script]
-    - mv .coverage "${COVERAGE_TARGET}"
-  artifacts:
-    paths:
-      - ${COVERAGE_TARGET}
-    reports:
-      junit: "${JUNIT_TARGET}"
-    expire_in: 1 day
-
-.notebooks:
+.tox:pytest:
   extends: .test-setup
-  dependencies: []
-  rules:
-    # If changes are made to an active merge request.
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: on_success
-    - when: never  # explicit fail-exclude terminal condition.
-  allow_failure: true
-  # Using default container image defined above
-  script:
-    - cd "${NOTEBOOK_DIR}"
-    - poetry run papermill
-        --progress-bar -k python3 --stdout-file - --stderr-file -
-        "${NOTEBOOK_FILE}" /dev/null
-  cache: []
-
-notebooks:
-  extends: .notebooks
-  rules: !reference [.notebooks, rules]
-  variables:
-    EXTRAS: "pybsm maite tools headless Pillow scikit-image albumentations waterdroplet diffusion notebook-testing"
+  tags:
+    - $RUNNER_TAG
   parallel:
     matrix:
-      # Sequences combinatorically combine within a list entry
-      - NOTEBOOK_DIR: "docs/examples"
-        NOTEBOOK_FILE: [
-          "albumentations_perturber.ipynb",
-          "generative_perturbers.ipynb",
-          "nrtk_tutorial.ipynb",
-          "optical_perturbers.ipynb",
-          "photometric_perturbers.ipynb",
-          "pybsm_default_config.ipynb"
-        ]
-      # XAITK/NRTK workflow excluded for computational reasons
-      - NOTEBOOK_DIR: "docs/examples/maite"
-        NOTEBOOK_FILE: [
-          "jatic-perturbations-saliency.ipynb",
-          "nrtk_affine_perturbers_demo.ipynb",
-          "nrtk_brightness_perturber_demo.ipynb",
-          "nrtk_focus_perturber_demo.ipynb",
-          "nrtk_haze_perturber_demo.ipynb",
-          "nrtk_jitter_perturber_demo.ipynb",
-          "nrtk_lens_flare_demo.ipynb",
-          "nrtk_radial_distortion_perturber_demo.ipynb",
-          "nrtk_sensor_transformation_demo.ipynb",
-          "nrtk_turbulence_perturber_demo.ipynb",
-          "nrtk_water_droplet_perturber_demo.ipynb"
-        ]
-coverage:
-  extends: .test-setup
-  dependencies:
-    - pytest-extras
-  needs:
-    - job: pytest-extras
-      artifacts: true
-  allow_failure: true
+      - TOX_ENV: core
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: opencv
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: albumentations
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: pillow
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: skimage
+        RUNNER_TAG: small-cpu
+      - TOX_ENV: pybsm
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: maite
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: tools
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: waterdroplet
+        RUNNER_TAG: medium-cpu
+      - TOX_ENV: diffusion
+        RUNNER_TAG: autoscaler
+      - TOX_ENV: doctests
+        RUNNER_TAG: autoscaler
+      - TOX_ENV: notebooks
+        RUNNER_TAG: autoscaler
   script:
-    # Combine all the coverage reports from the pytest matrix into a single
-    # database file.
-    - poetry run coverage combine ./.coverage*
+    # Convert PYTHON_VERSION (3.10) to tox factor (py310) and run specific env
+    - tox -e "py${PYTHON_VERSION//./}-${TOX_ENV}"
+  artifacts:
+    when: always
+    paths:
+     - ".coverage.*"
+    reports:
+      junit: ".junit.*.xml"
+    expire_in: 1 day
+
+tox:pytest:py3.10:
+  extends: .tox:pytest
+  image: python:3.10
+  variables:
+    PYTHON_VERSION: "3.10"
+
+tox:pytest:py3.11:
+  extends: .tox:pytest
+  image: python:3.11
+  variables:
+    PYTHON_VERSION: "3.11"
+
+tox:pytest:py3.12:
+  extends: .tox:pytest
+  image: python:3.12
+  variables:
+    PYTHON_VERSION: "3.12"
+
+tox:pytest:py3.13:
+  extends: .tox:pytest
+  image: python:3.13
+  variables:
+    PYTHON_VERSION: "3.13"
+
+.tox:coverage:version:
+  extends: .test-setup
+  tags:
+    - small-cpu
+  before_script:
+    - !reference [.shared-setup, before_script]
+    # Install dependencies (coverage is in the tests dependency group)
+    - poetry sync --only tests -q
+  script:
+    # Combine all the coverage reports from the pytest matrix for this
+    # Python version into a single database file.
+    - poetry run coverage combine ./.coverage.*
+    # Rename combined file so the final coverage job can distinguish versions.
+    - mv .coverage ".coverage.${PYTHON_VERSION}"
+  artifacts:
+    when: always
+    paths:
+      - ".coverage.*"
+    expire_in: 1 day
+
+tox:coverage:py3.10:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.10"
+  dependencies:
+    - tox:pytest:py3.10
+  needs:
+    - job: tox:pytest:py3.10
+      artifacts: true
+
+tox:coverage:py3.11:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.11"
+  dependencies:
+    - tox:pytest:py3.11
+  needs:
+    - job: tox:pytest:py3.11
+      artifacts: true
+
+tox:coverage:py3.12:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.12"
+  dependencies:
+    - tox:pytest:py3.12
+  needs:
+    - job: tox:pytest:py3.12
+      artifacts: true
+
+tox:coverage:py3.13:
+  extends: .tox:coverage:version
+  variables:
+    PYTHON_VERSION: "3.13"
+  dependencies:
+    - tox:pytest:py3.13
+  needs:
+    - job: tox:pytest:py3.13
+      artifacts: true
+
+tox:coverage:
+  extends: .test-setup
+  tags:
+    - small-cpu
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?%)/'
+  dependencies:
+    - tox:coverage:py3.10
+    - tox:coverage:py3.11
+    - tox:coverage:py3.12
+    - tox:coverage:py3.13
+  needs:
+    - job: tox:coverage:py3.10
+      artifacts: true
+    - job: tox:coverage:py3.11
+      artifacts: true
+    - job: tox:coverage:py3.12
+      artifacts: true
+    - job: tox:coverage:py3.13
+      artifacts: true
+  before_script:
+    - !reference [.shared-setup, before_script]
+    # Install dependencies (coverage is in the tests dependency group)
+    - poetry sync --only tests -q
+  script:
+    # Combine all per-version coverage reports into a single database file.
+    - poetry run coverage combine ./.coverage.*
     # This converts the now combined `.coverage` database file into a single
     # `coverage.xml` file
     - poetry run coverage xml
     # 90% is defined under JATIC SDP requirements
-    - poetry run coverage report --precision=2 --fail-under=90
+    - poetry run coverage report --precision=2 --fail-under=90 --skip-covered
   artifacts:
     when: always
     paths:
@@ -133,3 +181,53 @@ coverage:
         coverage_format: cobertura
         path: coverage.xml
     expire_in: 1 day
+
+.tox:notebooks:
+  extends: .test-setup
+  tags:
+    - autoscaler
+  image: python:3.10
+  dependencies: []
+  rules:
+    # If changes are made to an active merge request.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+  allow_failure: true
+  script:
+    - tox -r -e papermill -- "${NOTEBOOK_DIR}/${NOTEBOOK_FILE}" /dev/null
+
+tox:notebooks:examples:
+  extends: .tox:notebooks
+  parallel:
+    matrix:
+      - NOTEBOOK_DIR: "docs/examples"
+        NOTEBOOK_FILE: [
+          "albumentations_perturber.ipynb",
+          "nrtk_tutorial.ipynb",
+          "optical_perturbers.ipynb",
+          "photometric_perturbers.ipynb",
+          "pybsm_default_config.ipynb",
+          "generative_perturbers.ipynb"
+        ]
+
+tox:notebooks:maite:
+  extends: .tox:notebooks
+  parallel:
+    matrix:
+      - NOTEBOOK_DIR: "docs/examples/maite"
+        NOTEBOOK_FILE: [
+          "nrtk_affine_perturbers_demo.ipynb",
+          "nrtk_brightness_perturber_demo.ipynb",
+          "nrtk_focus_perturber_demo.ipynb",
+          "nrtk_haze_perturber_demo.ipynb",
+          "nrtk_jitter_perturber_demo.ipynb",
+          "nrtk_lens_flare_demo.ipynb",
+          "nrtk_radial_distortion_perturber_demo.ipynb",
+          "nrtk_sensor_transformation_demo.ipynb",
+          "nrtk_turbulence_perturber_demo.ipynb",
+          "jatic-perturbations-saliency.ipynb",
+          "nrtk_water_droplet_perturber_demo.ipynb"
+        ]

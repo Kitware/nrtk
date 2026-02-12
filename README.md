@@ -122,9 +122,9 @@ Jupyter notebooks provided in the `./docs/examples/` directory.
 
 Via the pyBSM package, NRTK exposes a large set of Optical Transfer Functions
 (OTFs). These OTFs can simulate different environmental and sensor-based
-effects. For example, the :ref:`JitterOTFPerturber <JitterOTFPerturber>`
-simulates different levels of sensor jitter. By modifying its input parameters,
-you can observe how sensor jitter affects image quality.
+effects. For example, the :ref:`JitterPerturber <JitterPerturber>` simulates
+different levels of sensor jitter. By modifying its input parameters, you can
+observe how sensor jitter affects image quality.
 
 #### Input Image
 
@@ -138,14 +138,14 @@ perturbation. This image represents the initial state before any transformation.
 Below is some example code that applies a Jitter OTF transformation::
 
 ```
-from nrtk.impls.perturb_image.optical.jitter_otf_perturber import JitterOTFPerturber
+from nrtk.impls.perturb_image.optical.otf import JitterPerturber
 import numpy as np
 from PIL import Image
 
 INPUT_IMG_FILE = 'docs/images/input.jpg'
 image = np.array(Image.open(INPUT_IMG_FILE))
 
-otf = JitterOTFPerturber(sx=8e-6, sy=8e-6, name="test_name")
+otf = JitterPerturber(sx=8e-6, sy=8e-6, name="test_name")
 out_image = otf(image)
 ```
 
@@ -271,8 +271,8 @@ Veenhuis (@eveenhuis)
 
 We welcome contributions to NRTK! Please start discussions by opening an issue
 or pull request on GitHub. This keeps the conversation visible and helps the
-whole community benefit. Our preferred channels are public, but if you'd
-like to reach out privately first, feel free to contact us at nrtk@kitware.com.
+whole community benefit. Our preferred channels are public, but if you'd like to
+reach out privately first, feel free to contact us at nrtk@kitware.com.
 
 <!-- :auto contacts: -->
 

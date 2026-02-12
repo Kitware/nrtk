@@ -68,10 +68,10 @@ scaling, cropping, and translation.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.geometric.random_crop_perturber.RandomCropPerturber
-   ~nrtk.impls.perturb_image.geometric.random_rotation_perturber.RandomRotationPerturber
-   ~nrtk.impls.perturb_image.geometric.random_scale_perturber.RandomScalePerturber
-   ~nrtk.impls.perturb_image.geometric.random_translation_perturber.RandomTranslationPerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomCropPerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber
+   ~nrtk.impls.perturb_image.geometric.random.RandomTranslationPerturber
 
 Environment Perturbers
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -83,8 +83,8 @@ Environment perturbers simulate atmospheric and weather-related effects that occ
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.environment.haze_perturber.HazePerturber
-   ~nrtk.impls.perturb_image.environment.water_droplet_perturber.WaterDropletPerturber
+   ~nrtk.impls.perturb_image.environment.HazePerturber
+   ~nrtk.impls.perturb_image.environment.WaterDropletPerturber
 
 Optical Perturbers
 ^^^^^^^^^^^^^^^^^^
@@ -96,13 +96,13 @@ Optical perturbers simulate physics-based sensor and optical effects.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.optical.pybsm_perturber.PybsmPerturber
-   ~nrtk.impls.perturb_image.optical.circular_aperture_otf_perturber.CircularApertureOTFPerturber
-   ~nrtk.impls.perturb_image.optical.defocus_otf_perturber.DefocusOTFPerturber
-   ~nrtk.impls.perturb_image.optical.detector_otf_perturber.DetectorOTFPerturber
-   ~nrtk.impls.perturb_image.optical.jitter_otf_perturber.JitterOTFPerturber
-   ~nrtk.impls.perturb_image.optical.turbulence_aperture_otf_perturber.TurbulenceApertureOTFPerturber
+   ~nrtk.impls.perturb_image.optical.otf.CircularAperturePerturber
+   ~nrtk.impls.perturb_image.optical.otf.DefocusPerturber
+   ~nrtk.impls.perturb_image.optical.otf.DetectorPerturber
+   ~nrtk.impls.perturb_image.optical.otf.JitterPerturber
+   ~nrtk.impls.perturb_image.optical.PybsmPerturber
    ~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber
+   ~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber
 
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^
@@ -114,12 +114,12 @@ Generative perturbers use AI models to transform images through learned represen
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.generative.diffusion_perturber.DiffusionPerturber
+   ~nrtk.impls.perturb_image.generative.DiffusionPerturber
 
-Wrapper Perturbers
+Utility Perturbers
 ^^^^^^^^^^^^^^^^^^
 
-Wrapper perturbers enable composition of multiple perturbations or provide integration with third-party augmentation
+Utility perturbers enable composition of multiple perturbations or provide integration with third-party augmentation
 libraries.
 
 .. autosummary::
@@ -127,8 +127,8 @@ libraries.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.wrapper.albumentations_perturber.AlbumentationsPerturber
-   ~nrtk.impls.perturb_image.wrapper.compose_perturber.ComposePerturber
+   ~nrtk.impls.perturb_image.AlbumentationsPerturber
+   ~nrtk.impls.perturb_image.ComposePerturber
 
 Utility Components
 ^^^^^^^^^^^^^^^^^^
@@ -140,7 +140,7 @@ Utility functions that support perturbation operations.
    :template: custom-function-template.rst
    :nosignatures:
 
-   ~nrtk.utils.default_sensor_scenario
+   ~nrtk.impls.perturb_image.optical.otf.load_default_config
 
 ---------------------
 Perturbation Factory

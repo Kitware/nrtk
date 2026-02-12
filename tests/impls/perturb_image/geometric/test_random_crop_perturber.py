@@ -9,14 +9,18 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.geometric.random_crop_perturber import RandomCropPerturber
+from nrtk.impls.perturb_image.geometric.random import RandomCropPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
-from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
+from tests.impls.perturb_image.perturber_utils import bbox_perturber_assertions
 
 rng = np.random.default_rng()
 
 
-class TestRandomCropPerturber:
+@pytest.mark.core
+class TestRandomCropPerturber(PerturberTestsMixin):
+    impl_class = RandomCropPerturber
+
     @pytest.mark.parametrize(
         ("input_test_box", "expected"),
         [

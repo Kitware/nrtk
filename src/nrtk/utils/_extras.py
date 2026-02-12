@@ -14,20 +14,21 @@ Includes warnings suppression and automatic git staging of updated files when ru
 Developed with assistance from AI (ChatGPT and GitHub Copilot).
 """
 
+__all__ = ["print_extras_status"]
+
 import importlib
 import sys
 from collections import OrderedDict, defaultdict
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, TextIO
 
-import pkg_resources
 import yaml
 
 import nrtk
 
 _IMPORT_NAME_OVERRIDES = {
     "Pillow": "PIL",
-    "scikit-image": "skimage",
     "opencv-python": "cv2",
     "opencv-python-headless": "cv2",
     "nrtk-albumentations": "albumentations",
@@ -68,9 +69,8 @@ def _identify_cv2_package_versions() -> dict[str, str]:
     installed = {}
     for candidate in ("opencv-python", "opencv-python-headless"):
         try:
-            dist = pkg_resources.get_distribution(candidate)
-            installed[candidate] = dist.version
-        except pkg_resources.DistributionNotFound:  # noqa: PERF203
+            installed[candidate] = version(candidate)
+        except PackageNotFoundError:  # noqa: PERF203 - try-except needed per-package in loop
             continue
     return installed
 
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     with args.pyproject.open("rb") as f:
         pyproject: dict[str, Any] = tomllib.load(f)
 
-    extras: dict[str, list[str]] = pyproject.get("project", dict()).get("optional-dependencies", dict())  # noqa: FKA100, RUF100
+    extras: dict[str, list[str]] = pyproject.get("project", {}).get("optional-dependencies", {})  # noqa: FKA100 - positional args are standard dict.get() API
 
     with args.output.open("w") as f:
         yaml.dump(extras, f, sort_keys=True)
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     else:
         try:
             # subprocess call is safe: git path resolved via shutil.which, args.output is validated file path
-            subprocess.run([git_path, "add", str(args.output)], check=True)  # noqa: S603
+            subprocess.run([git_path, "add", str(args.output)], check=True)  # noqa: S603 - git path resolved via shutil.which, args.output is a validated file path
             print(f"✅ Staged: {args.output}")
         except subprocess.CalledProcessError as e:
             print(f"⚠️  Failed to stage {args.output} (git add error): {e}")

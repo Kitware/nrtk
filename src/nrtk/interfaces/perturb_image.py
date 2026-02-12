@@ -24,7 +24,7 @@ Example:
 
 from __future__ import annotations
 
-__all__ = list()
+__all__ = []
 
 import abc
 from collections.abc import Hashable, Iterable, Sequence
@@ -101,7 +101,7 @@ class PerturbImage(Plugfigurable):
             # no scaling needed
             return deepcopy(boxes)
 
-        scaled_boxes = list()
+        scaled_boxes = []
         for box, score_dict in boxes:
             x0, y0 = box.min_vertex
             x1, y1 = box.max_vertex

@@ -9,6 +9,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
+@pytest.mark.core
 @pytest.mark.parametrize(
     ("input_bboxes", "orig_shape", "new_shape", "expected_bboxes"),
     [
@@ -54,6 +55,7 @@ def test_rescale_boxes(
         assert np.allclose(out_box.max_vertex, expeted_box.max_vertex)
 
 
+@pytest.mark.core
 @pytest.mark.parametrize(
     ("vertices", "expected_box"),
     [
