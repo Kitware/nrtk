@@ -16,11 +16,11 @@ from smqtk_core.configuration import (
 )
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
+from nrtk.impls.perturb_image import ComposePerturber
 from nrtk.impls.perturb_image.geometric.random import RandomCropPerturber
-from nrtk.impls.perturb_image.wrapper import ComposePerturber
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._nop_perturber import _NOPPerturber
-from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.fakes import FakePerturber
+from tests.impls.perturb_image.perturber_utils import perturber_assertions
 
 
 def _perturb(
@@ -69,7 +69,7 @@ class TestComposePerturber:
         # Test callable
         perturber_assertions(perturb=inst, image=image, expected=out_image)
 
-    @pytest.mark.parametrize("perturbers", [[_NOPPerturber()], [_NOPPerturber(), _NOPPerturber()]])
+    @pytest.mark.parametrize("perturbers", [[FakePerturber()], [FakePerturber(), FakePerturber()]])
     def test_configuration(self, perturbers: list[PerturbImage]) -> None:
         """Test configuration stability."""
         inst = ComposePerturber(perturbers=perturbers)
@@ -79,7 +79,7 @@ class TestComposePerturber:
 
     @pytest.mark.parametrize(
         "perturbers",
-        [[_NOPPerturber()], [_NOPPerturber(), _NOPPerturber()]],
+        [[FakePerturber()], [FakePerturber(), FakePerturber()]],
     )
     def test_hydration(
         self,
@@ -115,7 +115,7 @@ class TestComposePerturber:
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = ComposePerturber(perturbers=[_NOPPerturber(), _NOPPerturber()])
+        inst = ComposePerturber(perturbers=[FakePerturber(), FakePerturber()])
         _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes
 
@@ -154,7 +154,7 @@ class TestComposePerturber:
         inst = ComposePerturber()
         out_image = perturber_assertions(perturb=inst.perturb, image=image)
 
-        cfg = dict()
-        cfg["perturbers"] = list()
+        cfg = {}
+        cfg["perturbers"] = []
         assert (out_image == image).all()
         assert inst.get_config() == cfg

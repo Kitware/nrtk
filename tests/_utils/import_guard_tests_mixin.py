@@ -90,6 +90,24 @@ def _remove_modules_by_prefix(prefixes: list[str]) -> None:
             sys.modules.pop(mod, None)
 
 
+def _save_and_mock_deps(deps_to_mock: list[str], saved: dict[str, Any]) -> None:
+    """Save and evict each dep and its submodules, then inject ``None`` sentinels."""
+    for dep in deps_to_mock:
+        # Save and evict the dep AND all its submodules (e.g. "maite.protocols.*")
+        # so that cached submodule entries can't bypass the None sentinel on the parent.
+        for mod in list(sys.modules.keys()):
+            if mod == dep or mod.startswith(dep + "."):
+                saved[mod] = sys.modules.pop(mod, None)
+        sys.modules[dep] = None  # type: ignore[assignment]  # None → ImportError on import
+
+
+def _evict_dep_tree(dep: str) -> None:
+    """Remove *dep* and all its submodules from ``sys.modules``."""
+    for mod in list(sys.modules.keys()):
+        if mod == dep or mod.startswith(dep + "."):
+            sys.modules.pop(mod, None)
+
+
 def _restore_modules(saved: dict[str, Any], deps_to_mock: list[str], prefixes: list[str]) -> None:
     """Undo all ``sys.modules`` mutations made during the test.
 
@@ -101,7 +119,7 @@ def _restore_modules(saved: dict[str, Any], deps_to_mock: list[str], prefixes: l
     """
     _remove_modules_by_prefix(prefixes=prefixes)
     for dep in deps_to_mock:
-        sys.modules.pop(dep, None)
+        _evict_dep_tree(dep)
     for mod, m in saved.items():
         if m is not None:
             sys.modules[mod] = m
@@ -149,10 +167,7 @@ def mock_missing_deps(
             prefixes.extend(_get_module_prefixes(module))
 
     _clear_modules_by_prefix(prefixes=prefixes, saved=saved)
-
-    for dep in deps_to_mock:
-        saved[dep] = sys.modules.pop(dep, None)  # save the real module (if loaded)
-        sys.modules[dep] = None  # type: ignore[assignment]  # None → ImportError on import
+    _save_and_mock_deps(deps_to_mock=deps_to_mock, saved=saved)
 
     try:
         yield
@@ -194,8 +209,8 @@ class ImportGuardTestsMixin:
     DEPS_TO_MOCK: list[str]
     CLASSES: list[str]
     ERROR_MATCH: str
-    ALWAYS_AVAILABLE: list[str] = list()
-    ADDITIONAL_MODULES: list[str] = list()
+    ALWAYS_AVAILABLE: list[str] = []
+    ADDITIONAL_MODULES: list[str] = []
 
     def _get_module(self) -> ModuleType:
         """Import and return the module with mocked missing dependencies."""
@@ -232,6 +247,6 @@ class ImportGuardTestsMixin:
             module = self._get_module()
             with pytest.raises(
                 AttributeError,
-                match=rf"module '{self.MODULE_PATH}' has no attribute 'NotARealClass'",
+                match=r"NotARealClass",
             ):
                 _ = module.NotARealClass

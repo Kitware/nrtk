@@ -4,16 +4,18 @@ This module provides helper functions for loading and managing default PyBSM sen
 and scenario configurations from JSON configuration files.
 
 Functions:
-    default_sensor_scenario: Load default sensor and scenario configurations from config files.
+    load_default_config: Load default sensor and scenario configurations from config files.
 
 Example usage:
-    from nrtk.utils import default_sensor_scenario
+    from nrtk.impls.perturb_image.optical._pybsm import load_default_config
 
-    # Load UAV configuration
-    sensor, scenario = default_sensor_scenario(config_type="uav")
+    # Load Blackfly configuration
+    sensor, scenario = load_default_config(preset="blackfly")
 """
 
 from __future__ import annotations
+
+__all__ = ["load_default_config"]
 
 import json
 from pathlib import Path
@@ -22,24 +24,19 @@ from typing import Any
 import numpy as np
 
 
-def default_sensor_scenario(*, config_type: str, data_dir: str | None = None) -> dict[str, Any]:  # noqa C901
+def load_default_config(*, preset: str, data_dir: str | None = None) -> dict[str, Any]:  # noqa: C901 - config file resolution with multiple fallback paths
     """Load default sensor and scenario configurations for a given configuration type.
 
     This function loads pre-defined sensor and scenario configurations from JSON files
     located in the data directory. The configuration files should contain 'sensor' and
     'scenario' keys with the appropriate PyBSM configuration parameters.
 
-    Currently supported configuration types:
-    - "uav": Unmanned Aerial Vehicle configuration with typical parameters for
-             drone-based imaging systems
-
-    Future configuration types may include:
-    - "satellite": Satellite-based imaging system configuration
-    - "uav_high": High-altitude UAV configuration
-    - "ground": Ground-based imaging system configuration
+    Currently supported presets:
+    - "blackfly": Blackfly camera configuration for low-flying UAV imaging systems
+    - "sample": Sample configuration for testing
 
     Args:
-        config_type:
+        preset:
             String identifier for the configuration type to load. Must be one of the supported configuration types.
         data_dir:
             Optional path to the directory containing configuration files. If None, the function will search in default
@@ -60,21 +57,19 @@ def default_sensor_scenario(*, config_type: str, data_dir: str | None = None) ->
     """
     # Define supported configuration types
     supported_configs = {
-        "uav": "uav_default_config_nrtk.json",
-        # "satellite": "satellite_default_config_nrtk.json",
-        # "uav_high": "uav_high_default_config_nrtk.json",
-        # "ground": "ground_default_config_nrtk.json",
+        "blackfly": "blackfly.json",
+        "sample": "sample.json",
     }
 
     # Validate configuration type
-    if config_type not in supported_configs:
+    if preset not in supported_configs:
         available_configs = ", ".join(supported_configs.keys())
         raise ValueError(
-            f"Unsupported configuration type: '{config_type}'. Available configurations: {available_configs}",
+            f"Unsupported configuration type: '{preset}'. Available configurations: {available_configs}",
         )
 
     # Determine configuration file path
-    config_filename = supported_configs[config_type]
+    config_filename = supported_configs[preset]
 
     # If data_dir is provided, use it as the primary location
     if data_dir is not None:

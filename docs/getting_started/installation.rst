@@ -162,11 +162,11 @@ NRTK has multiple optional extras to expand functionality. The list below contai
 description of the extra.
 
     **graphics**: installs the graphics version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`,
+    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`,
     :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **headless**: installs the headless version of ``opencv-python``. ``graphics`` or ``headless`` is required for
-    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`,
+    :mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers, :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`,
     :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
     **pybsm**: installs `pyBSM <https://pybsm.readthedocs.io/en/latest/index.html>`_. Required for
@@ -186,11 +186,11 @@ description of the extra.
     **skimage**: installs `scikit-image <https://scikit-image.org/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.photometric.noise` perturbers.
 
-    **Pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
+    **pillow**: installs `Pillow <https://pillow.readthedocs.io/en/stable/>`_. Required for
     :mod:`~nrtk.impls.perturb_image.photometric.enhance` perturbers.
 
     **albumentations**: installs `nrtk-albumentations <https://github.com/Kitware/nrtk-albumentations>`_. Required for
-    :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`,
+    :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`,
     :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber`, and
     :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber`.
 
@@ -200,8 +200,6 @@ description of the extra.
     **diffusion**: installs `torch <https://pytorch.org/>`_, `diffusers <https://github.com/huggingface/diffusers>`_,
     `accelerate <https://github.com/huggingface/accelerate>`_, and `Pillow <https://pillow.readthedocs.io/en/stable/>`_.
     Required for :class:`~nrtk.impls.perturb_image.generative.DiffusionPerturber`.
-
-    **notebook-testing**: installs various dependencies required for running any notebook in ``docs/examples``.
 
 Installing with OpenCV
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -267,13 +265,13 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``graphics`` or ``headless``
       - ``OpenCV``
     * - :class:`~nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber`
-      - ``Pillow``
+      - ``pillow``
       - ``Pillow``
     * - :class:`~nrtk.impls.perturb_image.photometric.enhance.ColorPerturber`
-      - ``Pillow``
+      - ``pillow``
       - ``Pillow``
     * - :class:`~nrtk.impls.perturb_image.photometric.enhance.ContrastPerturber`
-      - ``Pillow``
+      - ``pillow``
       - ``Pillow``
     * - :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
       - ``graphics`` or ``headless``
@@ -294,7 +292,7 @@ The following table lists the perturbers and the extra/dependencies required to 
       - ``skimage``
       - ``scikit-image``
     * - :class:`~nrtk.impls.perturb_image.photometric.enhance.SharpnessPerturber`
-      - ``Pillow``
+      - ``pillow``
       - ``Pillow``
     * - :class:`~nrtk.impls.perturb_image.photometric.noise.SpeckleNoisePerturber`
       - ``skimage``
@@ -353,13 +351,13 @@ The following table lists the perturbers and the extra/dependencies required to 
     * - :class:`~nrtk.impls.perturb_image.generative.DiffusionPerturber`
       - ``diffusion``
       - ``torch``, ``diffusers``, ``accelerate``, ``Pillow``
-    * - **Wrapper Perturbers**
+    * - **Utility Perturbers**
       -
       -
-    * - :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`
+    * - :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`
       - ``albumentations``, and (``graphics`` or ``headless``)
       - ``nrtk-albumentations``, ``OpenCV``
-    * - :class:`~nrtk.impls.perturb_image.wrapper.ComposePerturber`
+    * - :class:`~nrtk.impls.perturb_image.ComposePerturber`
       - ---
       - ---
 

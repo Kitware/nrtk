@@ -5,6 +5,7 @@ import pytest
 from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
 
 
+@pytest.mark.maite
 class TestDatasetsMAITEImportGuard(ImportGuardTestsMixin):
     MODULE_PATH = "nrtk.interop._maite.datasets"
     DEPS_TO_MOCK = ["maite"]
@@ -19,6 +20,7 @@ class TestDatasetsMAITEImportGuard(ImportGuardTestsMixin):
     )
 
 
+@pytest.mark.maite
 class TestDatasetsToolsImportGuard(ImportGuardTestsMixin):
     MODULE_PATH = "nrtk.interop._maite.datasets"
     DEPS_TO_MOCK = ["kwcoco"]

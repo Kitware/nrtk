@@ -12,11 +12,10 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.otf import CircularAperturePerturber
+from nrtk.impls.perturb_image.optical.otf import CircularAperturePerturber, load_default_config
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.utils.test_pybsm import create_sample_sensor_and_scenario
+from tests.impls.perturb_image.perturber_utils import pybsm_perturber_assertions
 
 
 @pytest.mark.pybsm
@@ -27,7 +26,7 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         # Test perturb interface directly
         inst = CircularAperturePerturber(interp=True, **sensor_and_scenario)
         inst2 = CircularAperturePerturber(interp=False, **sensor_and_scenario)
@@ -64,7 +63,7 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario["D"] = D
         sensor_and_scenario["eta"] = eta
         inst = CircularAperturePerturber(
@@ -112,7 +111,7 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         perturber = CircularAperturePerturber(**sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
@@ -124,14 +123,14 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
             ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.003, 0.0, True, does_not_raise()),
             (
                 [0.5e-6, 0.6e-6],
-                list(),
+                [],
                 0.003,
                 0.0,
                 False,
                 pytest.raises(ValueError, match=r"mtf_weights is empty"),
             ),
             (
-                list(),
+                [],
                 [0.5, 0.5],
                 0.003,
                 0.0,
@@ -195,7 +194,7 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
 
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         inst = CircularAperturePerturber(**sensor_and_scenario)
         for i in configuration_test_helper(inst):
             assert i.mtf_wavelengths is not None
@@ -217,7 +216,7 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
         eta: float,
     ) -> None:
         """Test configuration stability."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario["D"] = D
         sensor_and_scenario["eta"] = eta
         inst = CircularAperturePerturber(
@@ -266,7 +265,7 @@ class TestCircularAperturePerturber(PerturberTestsMixin):
 
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
 
         if D is not None:
             sensor_and_scenario["D"] = D

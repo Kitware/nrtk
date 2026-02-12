@@ -161,9 +161,9 @@ class VisDroneObjectDetectionDataset(Dataset):
         annotation_filename = image_filename.replace(".jpg", ".txt")
         ann_path = os.path.join(self.annotations_dir, annotation_filename)
 
-        boxes_list = list()
-        labels_list = list()
-        scores_list = list()  # If you have real scores for GT, otherwise 1.0
+        boxes_list = []
+        labels_list = []
+        scores_list = []  # If you have real scores for GT, otherwise 1.0
 
         # Parse annotations if file exists
         if os.path.isfile(ann_path):
@@ -242,7 +242,7 @@ def stratified_sample_dataset(
 
     # Determine the number of samples per label based on their proportion in the dataset
     total_samples = sum(len(indices) for indices in label_to_indices.values())
-    selected_indices = list()
+    selected_indices = []
 
     for indices in label_to_indices.values():
         num_samples = max(1, int((len(indices) / total_samples) * subset_size))

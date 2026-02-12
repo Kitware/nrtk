@@ -8,7 +8,7 @@ from __future__ import annotations
 
 _MAITE_TOOLS_CLASSES = ["handle_post", "handle_aukus_post"]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.interop._maite.api._app import handle_post as handle_post

@@ -28,6 +28,7 @@ tools:
 - uvicorn>=0.29.0
 - pydantic>=2.6.4
 - pydantic-settings>=2.2.1
+- python-json-logger>=3.0.0
 waterdroplet:
 - scipy>=1.10.0
 - numba>=0.56.4

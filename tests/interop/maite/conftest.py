@@ -5,7 +5,7 @@ from pathlib import Path
 
 # Mapping of test filenames to the extra modules they require beyond maite
 _FILE_DEPENDENCIES: dict[str, list[str]] = {
-    "test_converters.py": ["kwcoco", "pybsm"],
+    "test_converters.py": ["kwcoco"],
     "test_app.py": ["kwcoco", "httpx"],
     "test_aukus_app.py": ["kwcoco", "httpx"],
     "test_coco_maite_object_detection_dataset.py": ["kwcoco"],

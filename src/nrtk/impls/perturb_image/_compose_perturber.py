@@ -59,7 +59,7 @@ class ComposePerturber(PerturbImage):
         """
         super().__init__()
         if perturbers is None:
-            perturbers = list()
+            perturbers = []
         self.perturbers = perturbers
 
     @override

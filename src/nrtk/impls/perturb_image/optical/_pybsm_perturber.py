@@ -29,8 +29,8 @@ from pybsm.simulation import ImageSimulator, SystemOTFSimulator
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
+from nrtk.impls.perturb_image.optical._pybsm._constants import DEFAULT_PYBSM_PARAMS
 from nrtk.impls.perturb_image.optical._pybsm.pybsm_perturber_mixin import PybsmPerturberMixin
-from nrtk.utils._constants import DEFAULT_PYBSM_PARAMS
 
 
 class PybsmPerturber(PybsmPerturberMixin):
@@ -53,7 +53,7 @@ class PybsmPerturber(PybsmPerturberMixin):
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_PYBSM_PARAMS["reflectance_range"],
         rng_seed: int | None = 1,
         sensor_name: str = "Sensor",
-        D: float = 275e-3,  # noqa:N803
+        D: float = 275e-3,  # noqa: N803 - physics convention for aperture diameter
         f: float = 4,
         p_x: float = 0.008e-3,
         p_y: float | None = None,  # Defaults to None since the default value is dependent on p_x

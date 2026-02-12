@@ -3,7 +3,7 @@
 import pytest
 
 from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
-from tests.impls.perturb_image.wrapper.test_albumentations_optional_deps import (
+from tests.impls.perturb_image.test_albumentations_optional_deps import (
     MODULE_PATH as ALBUMENTATIONS_MODULE_PATH,
 )
 

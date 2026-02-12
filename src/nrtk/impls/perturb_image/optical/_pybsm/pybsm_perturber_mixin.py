@@ -27,7 +27,7 @@ from pybsm.simulation.sensor import Sensor
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.utils._constants import DEFAULT_PYBSM_PARAMS
+from nrtk.impls.perturb_image.optical._pybsm._constants import DEFAULT_PYBSM_PARAMS
 
 
 class PybsmPerturberMixin(PerturbImage, ABC):
@@ -61,11 +61,11 @@ class PybsmPerturberMixin(PerturbImage, ABC):
         + list(range(85000, 300001, 5000))
     )
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901 - sensor/scenario initialization with unavoidable branching
         self,
         *,
         sensor_name: str = DEFAULT_PYBSM_PARAMS["sensor_name"],
-        D: float = DEFAULT_PYBSM_PARAMS["D"],  # noqa:N803
+        D: float = DEFAULT_PYBSM_PARAMS["D"],  # noqa: N803 - physics convention for aperture diameter
         f: float = DEFAULT_PYBSM_PARAMS["f"],
         p_x: float = DEFAULT_PYBSM_PARAMS["p_x"],
         p_y: float | None = DEFAULT_PYBSM_PARAMS["p_y"],  # Defaults to None since the default value is dependent on p_x
@@ -348,7 +348,7 @@ class PybsmPerturberMixin(PerturbImage, ABC):
 
         _, blur_img, noisy_img = self._simulator.simulate_image(image, gsd=img_gsd)
 
-        if self._simulator.add_noise and noisy_img is not None:  # noqa: SIM108
+        if self._simulator.add_noise and noisy_img is not None:  # noqa: SIM108 - ternary is less readable with compound condition
             perturbed_image = noisy_img
         else:
             perturbed_image = blur_img
@@ -531,7 +531,7 @@ class PybsmPerturberMixin(PerturbImage, ABC):
         return self.sensor.f
 
     @property
-    def D(self) -> float:  # noqa N802
+    def D(self) -> float:  # noqa: N802 - physics convention for aperture diameter
         """Getter for D."""
         return self.sensor.D
 
@@ -573,7 +573,7 @@ class PybsmPerturberMixin(PerturbImage, ABC):
     @property
     def interp(self) -> bool | None:
         """Getter for interp."""
-        return self.scenario._interp  # noqa:SLF001
+        return self.scenario._interp  # noqa: SLF001 - Scenario has no public interp property
 
     @property
     def params(self) -> dict[str, Any]:

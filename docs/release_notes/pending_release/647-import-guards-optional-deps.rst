@@ -17,8 +17,8 @@
   moved to private ``_random/`` package with public exports from
   ``nrtk.impls.perturb_image.geometric.random``.
 
-* Restructured albumentations wrapper perturbers into private ``_albumentations/`` package
-  with public exports from ``nrtk.impls.perturb_image.wrapper``.
+* Restructured albumentations perturbers into private ``_albumentations/`` package
+  with public exports from ``nrtk.impls.perturb_image``.
 
 * Added import guards for enhancement perturbers (``BrightnessPerturber``, ``ColorPerturber``,
   ``ContrastPerturber``, ``SharpnessPerturber``). Attempting to use these classes without
@@ -83,3 +83,9 @@
 * Added import guards for the MAITE REST API (``nrtk.interop._maite.api``).
   ``handle_post`` and ``handle_aukus_post`` require ``maite`` and ``tools``
   extras.
+
+* **Breaking:** Renamed the ``scikit-image`` extra to ``skimage``. Update install
+  commands from ``pip install nrtk[scikit-image]`` to ``pip install nrtk[skimage]``.
+
+* **Breaking:** Renamed the ``Pillow`` extra to ``pillow`` (lowercase). Update install
+  commands from ``pip install nrtk[Pillow]`` to ``pip install nrtk[pillow]``.

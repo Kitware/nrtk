@@ -5,6 +5,7 @@ import pytest
 from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
 
 
+@pytest.mark.maite
 class TestEntrypointsMaiteImportGuard(ImportGuardTestsMixin):
     """Test that nrtk_perturber raises ImportError when maite is missing."""
 
@@ -14,6 +15,7 @@ class TestEntrypointsMaiteImportGuard(ImportGuardTestsMixin):
     ERROR_MATCH = r"{class_name} requires the `maite`"
 
 
+@pytest.mark.maite
 class TestEntrypointsToolsImportGuard(ImportGuardTestsMixin):
     """Test that nrtk_perturber_cli raises ImportError when kwcoco is missing."""
 

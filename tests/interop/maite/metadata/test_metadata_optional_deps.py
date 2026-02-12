@@ -5,6 +5,7 @@ import pytest
 from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
 
 
+@pytest.mark.maite
 class TestMetadataImportGuard(ImportGuardTestsMixin):
     MODULE_PATH = "nrtk.interop._maite.metadata"
     DEPS_TO_MOCK = ["maite"]

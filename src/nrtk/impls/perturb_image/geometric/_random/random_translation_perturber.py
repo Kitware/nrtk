@@ -65,7 +65,7 @@ class RandomTranslationPerturber(PerturbImage):
         self.color_fill: np.ndarray[np.int64, Any] = np.array(color_fill)
 
     @override
-    def perturb(  # noqa: C901
+    def perturb(  # noqa: C901 - translation logic with directional boundary checks
         self,
         *,
         image: np.ndarray[Any, Any],
@@ -130,7 +130,7 @@ class RandomTranslationPerturber(PerturbImage):
             final_image[:translate_y, :translate_x, ...] = translated_image[:translate_y, :translate_x, ...]
 
         # Adjust bounding boxes
-        perturbed_boxes = list()
+        perturbed_boxes = []
         if boxes is not None:
             for bbox, metadata in boxes:
                 # Compute the shifted_min coords for the bounding box to align with

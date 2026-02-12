@@ -46,14 +46,14 @@ class TurbulenceAperturePerturber(PybsmPerturberMixin):
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901 - sensor/scenario initialization with unavoidable branching
         self,
         *,
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
         altitude: float | None = None,
         slant_range: float | None = None,
-        D: float | None = None,  # noqa: N803
+        D: float | None = None,  # noqa: N803 - physics convention for aperture diameter
         ha_wind_speed: float | None = None,
         cn2_at_1m: float | None = None,
         int_time: float | None = None,
@@ -169,7 +169,7 @@ class TurbulenceAperturePerturber(PybsmPerturberMixin):
         self._simulator = self._create_simulator()
 
     @override
-    def _create_simulator(self) -> ImageSimulator:  # noqa C901
+    def _create_simulator(self) -> ImageSimulator:  # noqa: C901 - override branching for default vs user-provided params
         """Create TurbulenceAperturePerturber with explicit parameters."""
         if self._use_default_psf:
             self.sensor.D = 40e-3

@@ -45,12 +45,12 @@ class CircularAperturePerturber(PybsmPerturberMixin):
     See https://pybsm.readthedocs.io/en/latest/explanation.html for image formation concepts and parameter details.
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901 - sensor/scenario initialization with unavoidable branching
         self,
         *,
         mtf_wavelengths: Sequence[float] | None = None,
         mtf_weights: Sequence[float] | None = None,
-        D: float | None = None,  # noqa N802
+        D: float | None = None,  # noqa: N803 - physics convention for aperture diameter
         eta: float | None = None,
         interp: bool = True,
         **kwargs: Any,

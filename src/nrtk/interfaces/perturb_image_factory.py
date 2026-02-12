@@ -16,7 +16,7 @@ Example usage:
 
 from __future__ import annotations
 
-__all__ = list()
+__all__ = []
 
 import abc
 from collections.abc import Iterator, Sequence
@@ -66,7 +66,7 @@ class PerturbImageFactory(Plugfigurable):
             raise TypeError("Passed a perturber instance, expected type")
         self.perturber = perturber
         self.n = -1
-        self.perturber_kwargs: dict[str, Any] = dict() if perturber_kwargs is None else perturber_kwargs
+        self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
     def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
         """Returns PerturberImage implementation with given input args."""

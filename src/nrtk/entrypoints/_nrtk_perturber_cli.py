@@ -1,5 +1,7 @@
 """This module contains nrtk_perturber_cli, which is a CLI script for running nrtk_perturber."""
 
+__all__ = ["nrtk_perturber_cli"]
+
 import json
 import logging
 import sys
@@ -7,7 +9,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TextIO
 
-import click  # type: ignore
+import click
 from kwcoco.coco_dataset import CocoDataset
 from maite.protocols import DatumMetadata
 from smqtk_core.configuration import from_config_dict

@@ -129,7 +129,7 @@ class TestPerturberMultivariateFactory(PerturberFactoryMixin):
         "empty_factory_kwargs",
         [
             pytest.param(
-                {"theta_keys": ["param1"], "thetas": [list()]},
+                {"theta_keys": ["param1"], "thetas": [[]]},
                 id="empty thetas",
             ),
         ],
@@ -196,7 +196,7 @@ class TestPerturberMultivariateFactory(PerturberFactoryMixin):
     def test_rejects_empty_theta_keys(self) -> None:
         """Empty theta_keys raises ValueError."""
         with pytest.raises(ValueError, match=r"theta_keys.*empty|at least one"):
-            self._make_factory(theta_keys=list(), thetas=list())
+            self._make_factory(theta_keys=[], thetas=[])
 
     def test_rejects_mismatched_theta_keys_and_thetas_length(self) -> None:
         """Mismatched theta_keys/thetas lengths raises ValueError."""

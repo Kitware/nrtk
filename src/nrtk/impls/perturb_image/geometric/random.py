@@ -13,10 +13,10 @@ __all__ = ["RandomCropPerturber", "RandomTranslationPerturber"]
 _ALBUMENTATIONS_CLASSES = ["RandomRotationPerturber", "RandomScalePerturber"]
 
 try:
-    from nrtk.impls.perturb_image.wrapper._albumentations.random_rotation_perturber import (
+    from nrtk.impls.perturb_image._albumentations.random_rotation_perturber import (
         RandomRotationPerturber as RandomRotationPerturber,
     )
-    from nrtk.impls.perturb_image.wrapper._albumentations.random_scale_perturber import (
+    from nrtk.impls.perturb_image._albumentations.random_scale_perturber import (
         RandomScalePerturber as RandomScalePerturber,
     )
 

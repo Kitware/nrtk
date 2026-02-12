@@ -11,7 +11,7 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.geometric.random import RandomTranslationPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
+from tests.impls.perturb_image.perturber_utils import bbox_perturber_assertions
 
 rng = np.random.default_rng()
 
@@ -92,7 +92,7 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
             perturb=inst.perturb,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
         # Test callable
         inst = RandomTranslationPerturber()
@@ -100,7 +100,7 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
             perturb=inst,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
 
     @pytest.mark.parametrize(
@@ -126,7 +126,7 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
             perturb=inst.perturb,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
         # Test callable
         inst = RandomTranslationPerturber(seed=seed)
@@ -134,13 +134,13 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
             perturb=inst,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
 
     @pytest.mark.parametrize(
         ("image", "max_translation_limit", "boxes", "expectation"),
         [
-            (np.ones((256, 256, 3), dtype=np.float32), (100, 200), list(), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (100, 200), [], does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (100, 200),
@@ -150,7 +150,7 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
                 ],
                 does_not_raise(),
             ),
-            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), list(), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (0, 0), [], does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (0, 0),
@@ -160,7 +160,7 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
                 ],
                 does_not_raise(),
             ),
-            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), list(), does_not_raise()),
+            (np.ones((256, 256, 3), dtype=np.float32), (256, 256), [], does_not_raise()),
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (256, 256),
@@ -173,13 +173,13 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
             (
                 np.ones((256, 256, 3), dtype=np.float32),
                 (257, 100),
-                list(),
+                [],
                 pytest.raises(ValueError, match=r"Max translation limit should be less than or equal to \(256, 256\)"),
             ),
             (
                 np.ones((512, 512, 3), dtype=np.float32),
                 (100, 513),
-                list(),
+                [],
                 pytest.raises(ValueError, match=r"Max translation limit should be less than or equal to \(512, 512\)"),
             ),
         ],
@@ -210,7 +210,7 @@ class TestRandomTranslationPerturber(PerturberTestsMixin):
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         inst = RandomTranslationPerturber()
-        kwargs = dict()
+        kwargs = {}
         if max_translation_limit is not None:
             kwargs = {"max_translation_limit": max_translation_limit}
         out_img, _ = bbox_perturber_assertions(

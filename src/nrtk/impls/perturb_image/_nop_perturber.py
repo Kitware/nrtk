@@ -19,6 +19,8 @@ Example:
 
 from __future__ import annotations
 
+__all__ = []
+
 from collections.abc import Hashable, Iterable
 from copy import deepcopy
 from typing import Any

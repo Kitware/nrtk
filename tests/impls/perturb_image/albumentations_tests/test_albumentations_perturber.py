@@ -1,9 +1,7 @@
-import unittest.mock as mock
 from collections.abc import Hashable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Any
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -12,10 +10,9 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.wrapper import AlbumentationsPerturber
-from nrtk.utils._exceptions import AlbumentationsImportError
+from nrtk.impls.perturb_image import AlbumentationsPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
-from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.perturb_image.perturber_utils import perturber_assertions
 
 
 @pytest.mark.opencv
@@ -58,7 +55,7 @@ class TestAlbumentationsPerturber:
     ) -> None:
         """Raise appropriate errors for invalid perturber or arguments."""
         if "parameters" not in metadata:
-            metadata["parameters"] = dict()
+            metadata["parameters"] = {}
         with expectation:
             AlbumentationsPerturber(perturber=metadata["perturber"], parameters=metadata["parameters"])
 
@@ -176,18 +173,9 @@ class TestAlbumentationsPerturber:
         inst = AlbumentationsPerturber()
         out_image = perturber_assertions(perturb=inst.perturb, image=image)
 
-        cfg = dict()
+        cfg = {}
         cfg["perturber"] = "NoOp"
         cfg["parameters"] = None
         cfg["seed"] = None
         assert (out_image == image).all()
         assert inst.get_config() == cfg
-
-
-@mock.patch.object(AlbumentationsPerturber, "is_usable")
-def test_missing_deps(mock_is_usable: MagicMock) -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    mock_is_usable.return_value = False
-    assert not AlbumentationsPerturber.is_usable()
-    with pytest.raises(AlbumentationsImportError):
-        AlbumentationsPerturber(perturber="RandomRain")

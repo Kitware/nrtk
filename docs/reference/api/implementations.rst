@@ -116,10 +116,10 @@ Generative perturbers use AI models to transform images through learned represen
 
    ~nrtk.impls.perturb_image.generative.DiffusionPerturber
 
-Wrapper Perturbers
+Utility Perturbers
 ^^^^^^^^^^^^^^^^^^
 
-Wrapper perturbers enable composition of multiple perturbations or provide integration with third-party augmentation
+Utility perturbers enable composition of multiple perturbations or provide integration with third-party augmentation
 libraries.
 
 .. autosummary::
@@ -127,8 +127,8 @@ libraries.
    :template: custom-class-template.rst
    :nosignatures:
 
-   ~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber
-   ~nrtk.impls.perturb_image.wrapper.ComposePerturber
+   ~nrtk.impls.perturb_image.AlbumentationsPerturber
+   ~nrtk.impls.perturb_image.ComposePerturber
 
 Utility Components
 ^^^^^^^^^^^^^^^^^^
@@ -140,7 +140,7 @@ Utility functions that support perturbation operations.
    :template: custom-function-template.rst
    :nosignatures:
 
-   ~nrtk.utils.default_sensor_scenario
+   ~nrtk.impls.perturb_image.optical.otf.load_default_config
 
 ---------------------
 Perturbation Factory

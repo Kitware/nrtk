@@ -1,11 +1,6 @@
 import pytest
 
-from nrtk.utils._import_guard import is_available
-
 from .test_notebook_utils import list_error_messages, pyright_analyze
-
-deps = ["jupytext"]
-is_usable = all(is_available(dep) for dep in deps)
 
 
 @pytest.mark.notebooks

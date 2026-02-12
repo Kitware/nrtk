@@ -12,11 +12,10 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.otf import TurbulenceAperturePerturber
+from nrtk.impls.perturb_image.optical.otf import TurbulenceAperturePerturber, load_default_config
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.utils.test_pybsm import create_sample_sensor, create_sample_sensor_and_scenario
+from tests.impls.perturb_image.perturber_utils import pybsm_perturber_assertions
 
 
 @pytest.mark.pybsm
@@ -91,7 +90,7 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
 
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
 
         if altitude is not None:
             sensor_and_scenario["altitude"] = altitude
@@ -127,7 +126,7 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
             (True, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 True,
-                dict(),
+                {},
                 pytest.raises(ValueError, match=r"'img_gsd' must be provided"),
             ),
             (False, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
@@ -142,7 +141,7 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
         """Test that exceptions are appropriately raised based on available metadata."""
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
         perturber = TurbulenceAperturePerturber(**sensor_and_scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
@@ -154,12 +153,12 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
             ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.1, does_not_raise()),
             (
                 [0.5e-6, 0.6e-6],
-                list(),
+                [],
                 0.1,
                 pytest.raises(ValueError, match=r"mtf_weights is empty"),
             ),
             (
-                list(),
+                [],
                 [0.5, 0.5],
                 0.1,
                 pytest.raises(ValueError, match=r"mtf_wavelengths is empty"),
@@ -243,18 +242,18 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
         from pybsm.utils import load_database_atmosphere
 
         sensor_and_scenario = {}
-        wavelengths = np.asarray(list())
-        weights = np.asarray(list())
-        pos_weights = np.asarray(list())
+        wavelengths = np.asarray([])
+        weights = np.asarray([])
+        pos_weights = np.asarray([])
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
             # Multiple type ignores added for pyright's handling of guarded imports
             atm = load_database_atmosphere(
                 altitude=sensor_and_scenario["altitude"],
                 ground_range=sensor_and_scenario["ground_range"],
                 ihaze=sensor_and_scenario["ihaze"],
             )
-            sensor_params = create_sample_sensor()
+            sensor_params = load_default_config(preset="sample")
 
             sensor = Sensor(
                 name=sensor_params["sensor_name"],
@@ -427,7 +426,7 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
 
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
 
         if altitude is not None:
             sensor_and_scenario["altitude"] = altitude

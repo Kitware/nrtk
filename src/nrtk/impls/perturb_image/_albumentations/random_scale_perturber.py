@@ -8,7 +8,7 @@ Dependencies:
     - numpy: For numerical operations and random number generation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
-    - nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber: Base implementation for Albumentations perturbers.
+    - nrtk.impls.perturb_image.AlbumentationsPerturber: Base implementation for Albumentations perturbers.
 
 Example usage:
     >>> import numpy as np
@@ -20,12 +20,14 @@ Example usage:
 
 from __future__ import annotations
 
+__all__ = ["RandomScalePerturber"]
+
 from typing import Any
 
 import cv2
 from typing_extensions import override
 
-from nrtk.impls.perturb_image.wrapper import AlbumentationsPerturber
+from nrtk.impls.perturb_image import AlbumentationsPerturber
 
 
 class RandomScalePerturber(AlbumentationsPerturber):
@@ -45,7 +47,7 @@ class RandomScalePerturber(AlbumentationsPerturber):
             Random seed for reproducibility. Defaults to 1.
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901 - validation branches cannot be reduced further
         self,
         *,
         limit: float | tuple[float, float] = 0.0,
@@ -109,7 +111,7 @@ class RandomScalePerturber(AlbumentationsPerturber):
     @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomRotationPerturber instance."""
-        cfg = dict()
+        cfg = {}
         cfg["limit"] = self.limit
         cfg["interpolation"] = self.interpolation
         cfg["probability"] = self.probability

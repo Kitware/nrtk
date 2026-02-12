@@ -12,11 +12,10 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.otf import DefocusPerturber
+from nrtk.impls.perturb_image.optical.otf import DefocusPerturber, load_default_config
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
-from tests.utils.test_pybsm import create_sample_sensor_and_scenario
+from tests.impls.perturb_image.perturber_utils import bbox_perturber_assertions, pybsm_perturber_assertions
 
 
 @pytest.mark.pybsm
@@ -27,7 +26,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         # Test perturb interface directly
         inst = DefocusPerturber(interp=True, **sensor_and_scenario)
         inst2 = DefocusPerturber(interp=False, **sensor_and_scenario)
@@ -52,7 +51,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario["w_x"] = w_x
         sensor_and_scenario["w_y"] = w_y
         inst = DefocusPerturber(interp=interp, **sensor_and_scenario)
@@ -95,7 +94,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
         expectation: AbstractContextManager,
     ) -> None:
         """Test variations of additional params."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         perturber = DefocusPerturber(**sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
@@ -132,7 +131,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
         """Ensure results are reproducible."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario["w_x"] = w_x
         sensor_and_scenario["w_y"] = w_y
         inst = DefocusPerturber(**sensor_and_scenario)
@@ -165,7 +164,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
 
     def test_sensor_scenario_configuration(self) -> None:
         """Test configuration stability."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         inst = DefocusPerturber(**sensor_and_scenario)
         for i in configuration_test_helper(inst):
             assert i.w_x == sensor_and_scenario["w_x"]
@@ -181,7 +180,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
         interp: bool,
     ) -> None:
         """Test configuration stability."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario["w_x"] = w_x
         sensor_and_scenario["w_y"] = w_y
         inst = DefocusPerturber(interp=interp, **sensor_and_scenario)
@@ -221,7 +220,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
 
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
 
         if w_x is not None:
             sensor_and_scenario["w_x"] = w_x
@@ -249,7 +248,7 @@ class TestDefocusPerturber(PerturberTestsMixin):
         """Test that bounding boxes do not change during perturb."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         # Test perturb interface directly
         inst = DefocusPerturber(interp=True, **sensor_and_scenario)
         bbox_perturber_assertions(

@@ -29,7 +29,6 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
 from nrtk.interfaces.perturb_image import PerturbImage
-from nrtk.utils._exceptions import AlbumentationsImportError
 
 
 class AlbumentationsPerturber(PerturbImage):
@@ -71,9 +70,6 @@ class AlbumentationsPerturber(PerturbImage):
             ValueError:
                 Given perturber does not inherit BasicTransform.
         """
-        if not self.is_usable():
-            raise AlbumentationsImportError
-
         super().__init__()
         self.perturber = perturber
         self.parameters = parameters
@@ -139,8 +135,8 @@ class AlbumentationsPerturber(PerturbImage):
         perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         # Create bboxes and labels in a format usable by Albumentations
-        bboxes = list()
-        labels = list()
+        bboxes = []
+        labels = []
         if perturbed_boxes:
             for box in perturbed_boxes:
                 bboxes.append(AlbumentationsPerturber._aabb_to_bbox(box=box[0], image=perturbed_image))

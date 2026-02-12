@@ -44,7 +44,7 @@ def handle_post(data: NRTKPerturbInputSchema) -> NRTKPerturbOutputSchema:
         augmented_datasets = nrtk_perturber(maite_dataset=input_dataset, perturber_factory=perturber_factory)
 
         # Format output
-        datasets_out = list()
+        datasets_out = []
         img_filenames = [Path("images") / img_path.name for img_path in input_dataset.get_img_path_list()]
         for perturb_params, aug_dataset in augmented_datasets:
             full_output_dir = Path(data.output_dir) / perturb_params

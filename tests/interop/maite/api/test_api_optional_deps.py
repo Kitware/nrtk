@@ -5,6 +5,7 @@ import pytest
 from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
 
 
+@pytest.mark.maite
 class TestAPIImportGuard(ImportGuardTestsMixin):
     MODULE_PATH = "nrtk.interop._maite.api"
     DEPS_TO_MOCK = ["fastapi"]

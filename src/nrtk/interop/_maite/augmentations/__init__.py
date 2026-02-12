@@ -12,7 +12,7 @@ _MAITE_CLASSES = [
     "MAITEObjectDetectionAugmentation",
 ]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.interop._maite.augmentations._maite_image_classification_augmentation import (

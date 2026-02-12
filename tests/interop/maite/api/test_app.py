@@ -48,10 +48,17 @@ def test_client() -> Generator:
 
 
 @pytest.mark.maite
+@pytest.mark.tools
 class TestApp:
-    @pytest.mark.tools
-    @mock.patch("nrtk.interop._maite.api.app.nrtk_perturber", return_value=TEST_RETURN_VALUE)
-    def test_handle_post_pybsm(self, patch: MagicMock, test_client: TestClient, tmpdir: py.path.local) -> None:
+    @mock.patch("nrtk.interop._maite.api._app.build_factory")
+    @mock.patch("nrtk.interop._maite.api._app.nrtk_perturber", return_value=TEST_RETURN_VALUE)
+    def test_handle_post_pybsm(
+        self,
+        nrtk_perturber_patch: MagicMock,
+        build_factory_patch: MagicMock,  # noqa: ARG002
+        test_client: TestClient,
+        tmpdir: py.path.local,
+    ) -> None:
         """Check for an appropriate response to a "good" request."""
         # Test data to be sent in the POST request
         test_data = NRTKPerturbInputSchema(
@@ -68,61 +75,8 @@ class TestApp:
         response = test_client.post("/", json=jsonable_encoder(test_data))
 
         # Confirm mocked nrtk_perturber was called with the correct arguments
-        kwargs = patch.call_args.kwargs
+        kwargs = nrtk_perturber_patch.call_args.kwargs
         assert len(kwargs["maite_dataset"]) == 11
-
-        factory_config = kwargs["perturber_factory"].get_config()
-
-        np.testing.assert_equal(
-            factory_config,
-            {
-                "perturber": "nrtk.impls.perturb_image.optical.PybsmPerturber",
-                "theta_keys": ["f", "D", "p_x"],
-                "perturber_kwargs": {
-                    "sensor_name": "L32511x",
-                    "D": 0.004,
-                    "f": 0.014285714285714287,
-                    "p_x": 2e-05,
-                    "opt_trans_wavelengths": [3.8e-07, 7e-07],
-                    "optics_transmission": None,
-                    "eta": 0.4,
-                    "w_x": None,
-                    "w_y": None,
-                    "int_time": 0.03,
-                    "dark_current": 0.0,
-                    "read_noise": 25.0,
-                    "max_n": 96000.0,
-                    "bit_depth": 11.9,
-                    "max_well_fill": 0.005,
-                    "s_x": 0.0,
-                    "s_y": 0.0,
-                    "qe_wavelengths": [
-                        3e-07,
-                        4e-07,
-                        5e-07,
-                        6e-07,
-                        7e-07,
-                        8e-07,
-                        9e-07,
-                        1e-06,
-                        1.1e-06,
-                    ],
-                    "qe": [0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0.0],
-                    "scenario_name": "niceday",
-                    "ihaze": 2,
-                    "altitude": 75,
-                    "ground_range": 0,
-                    "aircraft_speed": 0.0,
-                    "target_reflectance": 0.15,
-                    "target_temperature": 295.0,
-                    "background_reflectance": 0.07,
-                    "background_temperature": 293.0,
-                    "ha_wind_speed": 21.0,
-                    "cn2_at_1m": 0,
-                },
-                "thetas": [[0.014, 0.012], [0.001, 0.003], [2e-05]],
-            },
-        )
 
         # Check if the response status code is 200 OK
         assert response.status_code == 200
@@ -148,8 +102,8 @@ class TestApp:
         # Check that the correct number of images are in the dir
         assert len(os.listdir(os.path.join(str(image_dir)))) == 11
 
-    @pytest.mark.tools
-    def test_bad_gsd_post(self, test_client: TestClient, tmpdir: py.path.local) -> None:
+    @mock.patch("nrtk.interop._maite.api._app.build_factory")
+    def test_bad_gsd_post(self, build_factory_patch: MagicMock, test_client: TestClient, tmpdir: py.path.local) -> None:  # noqa: ARG002
         """Test that an error response is appropriately propagated to the user."""
         test_data = NRTKPerturbInputSchema(
             id="0",

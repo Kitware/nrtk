@@ -3,7 +3,7 @@
 _MAITE_CLASSES = ["nrtk_perturber"]
 _MAITE_TOOLS_CLASSES = ["nrtk_perturber_cli"]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.entrypoints._nrtk_perturber import nrtk_perturber as nrtk_perturber

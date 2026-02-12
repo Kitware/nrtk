@@ -152,7 +152,7 @@ html_theme_options = {
 # The search-button in navbar_end provides search functionality
 # Use sidebar-nav-bs.html for section-isolated navigation (like pandas docs)
 html_sidebars = {
-    "index": list(),  # No sidebar on main landing page
+    "index": [],  # No sidebar on main landing page
     "getting_started/**": ["sidebar-nav-bs"],
     "examples/**": ["sidebar-nav-bs"],
     "tutorials/**": ["sidebar-nav-bs"],

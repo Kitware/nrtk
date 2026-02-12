@@ -11,8 +11,8 @@ from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.photometric.noise import GaussianNoisePerturber
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
+from tests.impls.perturb_image.perturber_utils import perturber_assertions
 from tests.impls.perturb_image.photometric.noise.noise_perturber_test_utils import rng_assertions
-from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
 
 test_rng = np.random.default_rng()
 

@@ -48,16 +48,16 @@ def nrtk_perturber(*, maite_dataset: Dataset, perturber_factory: PerturbImageFac
     # Iterate through the different perturber factory parameter combinations and
     # save the perturbed images to disk
     logger.info("Starting perturber sweep")
-    augmented_datasets: list[Dataset] = list()  # pyright: ignore [reportInvalidTypeForm]
-    output_perturb_params: list[str] = list()
+    augmented_datasets: list[Dataset] = []  # pyright: ignore [reportInvalidTypeForm]
+    output_perturb_params: list[str] = []
     for i, (perturber_combo, perturber) in enumerate(zip(perturber_combinations, perturber_factory, strict=False)):
         output_perturb_params.append("".join(f"_{k!s}-{v!s}" for k, v in perturber_combo.items()))
 
         logger.info(f"Starting perturbation for {output_perturb_params[i]}")
 
-        aug_imgs = list()
-        aug_dets = list()
-        aug_metadata = list()
+        aug_imgs = []
+        aug_dets = []
+        aug_metadata = []
 
         maite_perturber = MAITEObjectDetectionAugmentation(augment=perturber, augment_id=output_perturb_params[i])
 

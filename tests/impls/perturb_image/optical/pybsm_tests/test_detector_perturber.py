@@ -12,11 +12,10 @@ from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.otf import DetectorPerturber
+from nrtk.impls.perturb_image.optical.otf import DetectorPerturber, load_default_config
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.utils.test_pybsm import create_sample_sensor_and_scenario
+from tests.impls.perturb_image.perturber_utils import pybsm_perturber_assertions
 
 
 @pytest.mark.pybsm
@@ -27,7 +26,7 @@ class TestDetectorPerturber(PerturberTestsMixin):
         """Run on a dummy image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
         img_gsd = 3.19 / 160.0
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         # Test perturb interface directly
         inst = DetectorPerturber(interp=True, **sensor_and_scenario)
         inst2 = DetectorPerturber(interp=True, **sensor_and_scenario)
@@ -63,7 +62,7 @@ class TestDetectorPerturber(PerturberTestsMixin):
 
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
 
         if w_x is not None:
             sensor_and_scenario["w_x"] = w_x
@@ -84,7 +83,7 @@ class TestDetectorPerturber(PerturberTestsMixin):
             (True, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
             (
                 True,
-                dict(),
+                {},
                 pytest.raises(ValueError, match=r"'img_gsd' must be provided for this perturber"),
             ),
             (False, {"img_gsd": 3.19 / 160.0}, does_not_raise()),
@@ -99,7 +98,7 @@ class TestDetectorPerturber(PerturberTestsMixin):
         """Test that exceptions are appropriately raised based on available metadata."""
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
         perturber = DetectorPerturber(**sensor_and_scenario)
         img = np.array(Image.open(INPUT_IMG_FILE_PATH))
         with expectation:
@@ -125,7 +124,7 @@ class TestDetectorPerturber(PerturberTestsMixin):
         """Test configuration stability."""
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
 
         if w_x is not None:
             sensor_and_scenario["w_x"] = w_x
@@ -188,7 +187,7 @@ class TestDetectorPerturber(PerturberTestsMixin):
 
         sensor_and_scenario = {}
         if use_sensor_scenario:
-            sensor_and_scenario = create_sample_sensor_and_scenario()
+            sensor_and_scenario = load_default_config(preset="sample")
             # For the small f override, set scenario to a shorter altiude/range
             # to avoid downsampling image to a single pixel
             if f is not None:

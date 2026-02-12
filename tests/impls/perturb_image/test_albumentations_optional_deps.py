@@ -4,7 +4,7 @@ import pytest
 
 from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
 
-MODULE_PATH = "nrtk.impls.perturb_image.wrapper"
+MODULE_PATH = "nrtk.impls.perturb_image"
 
 
 class TestAlbumentationsImportGuard(ImportGuardTestsMixin):
@@ -29,7 +29,7 @@ def test_albumentations_public_imports() -> None:
     is missing, this test FAILS (not skips) to indicate a CI/environment configuration error.
     """
     try:
-        from nrtk.impls.perturb_image.wrapper import AlbumentationsPerturber
+        from nrtk.impls.perturb_image import AlbumentationsPerturber
 
         del AlbumentationsPerturber
     except ImportError as e:

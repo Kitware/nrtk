@@ -57,9 +57,9 @@ class MAITEImageClassificationAugmentation(Augmentation):  # pyright:  ignore [r
         imgs, anns, metadata = batch
 
         # iterate over (parallel) elements in batch
-        aug_imgs = list()  # list of individual augmented inputs
-        aug_anns = list()  # list of individual augmented annotations
-        aug_metadata = list()  # list of individual augmented image-level metadata
+        aug_imgs = []  # list of individual augmented inputs
+        aug_anns = []  # list of individual augmented annotations
+        aug_metadata = []  # list of individual augmented image-level metadata
 
         for img, ann, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
@@ -73,7 +73,7 @@ class MAITEImageClassificationAugmentation(Augmentation):  # pyright:  ignore [r
             aug_ann = copy.deepcopy(ann)
             aug_anns.append(aug_ann)
 
-            perturber_configs = list()
+            perturber_configs = []
             if "nrtk_perturber_config" in md:
                 md_configs = md["nrtk_perturber_config"]
                 if TYPE_CHECKING and not isinstance(md_configs, Iterable):  # pragma: no cover

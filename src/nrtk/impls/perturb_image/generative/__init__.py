@@ -2,7 +2,7 @@
 
 _DIFFUSION_CLASSES = ["DiffusionPerturber"]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.impls.perturb_image.generative._diffusion_perturber import (

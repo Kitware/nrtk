@@ -1,16 +1,12 @@
+__all__ = ["setup_logging"]
+
 import logging
 import time
 
-from nrtk.utils._exceptions import MaiteImportError
-from nrtk.utils._import_guard import import_guard
-
-json_logging_available: bool = import_guard(
-    module_name="pythonjsonlogger",
-    exception=MaiteImportError,
-    submodules=["json"],
-    objects=["JSONFormatter"],
-)
-from pythonjsonlogger.json import JsonFormatter  # noqa: E402
+try:
+    from pythonjsonlogger.json import JsonFormatter
+except ImportError:
+    JsonFormatter = None
 
 
 def setup_logging(*, name: str, loglevel: int = logging.WARN) -> logging.Logger:
@@ -19,7 +15,7 @@ def setup_logging(*, name: str, loglevel: int = logging.WARN) -> logging.Logger:
     logger = logging.getLogger(name)
 
     logger.setLevel(loglevel)
-    if json_logging_available:
+    if JsonFormatter is not None:
         log_handler = logging.StreamHandler()
         formatter = JsonFormatter(
             fmt="%(asctime)s %(levelname)s %(name)s %(message)s",

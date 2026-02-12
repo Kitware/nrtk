@@ -10,7 +10,7 @@ _MAITE_CLASSES = [
     "NRTKDatumMetadata",
 ]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.interop._maite.metadata._nrtk_datum_metadata import (

@@ -2,7 +2,7 @@
 
 _PILLOW_CLASSES = ["BrightnessPerturber", "ColorPerturber", "ContrastPerturber", "SharpnessPerturber"]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.impls.perturb_image.photometric._enhance.brightness_perturber import (

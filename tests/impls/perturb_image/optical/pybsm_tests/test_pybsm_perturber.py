@@ -11,10 +11,10 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
 
 from nrtk.impls.perturb_image.optical import PybsmPerturber
+from nrtk.impls.perturb_image.optical.otf import load_default_config
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import pybsm_perturber_assertions
-from tests.utils.test_pybsm import create_sample_sensor_and_scenario
+from tests.impls.perturb_image.perturber_utils import pybsm_perturber_assertions
 
 np.random.seed(42)  # noqa: NPY002
 
@@ -27,7 +27,7 @@ class TestPyBSMPerturber(PerturberTestsMixin):
         """Regression testing results to detect API changes."""
         image = np.array(Image.open(INPUT_IMG_FILE))
         img_gsd = 3.19 / 160.0
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
 
         sensor_and_scenario["ground_range"] = 10000
 
@@ -54,7 +54,7 @@ class TestPyBSMPerturber(PerturberTestsMixin):
         """Ensure results are reproducible with default seed (no seed parameter provided)."""
         # Test perturb interface directly without providing rng_seed (uses default=1)
         image = np.array(Image.open(INPUT_IMG_FILE))
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario[param_name] = param_value
         # For type: ignore below, see https://github.com/microsoft/pyright/issues/5545#issuecomment-1644027877
         inst = PybsmPerturber(**sensor_and_scenario)
@@ -86,7 +86,7 @@ class TestPyBSMPerturber(PerturberTestsMixin):
         """Ensure results are reproducible when explicit seed is provided."""
         # Test perturb interface directly
         image = np.array(Image.open(INPUT_IMG_FILE))
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         sensor_and_scenario[param_name] = param_value
         # For type: ignore below, see https://github.com/microsoft/pyright/issues/5545#issuecomment-1644027877
         inst = PybsmPerturber(rng_seed=rng_seed, **sensor_and_scenario)
@@ -108,7 +108,7 @@ class TestPyBSMPerturber(PerturberTestsMixin):
 
     def test_configuration(self) -> None:  # noqa: C901
         """Test configuration stability."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         inst = PybsmPerturber(**sensor_and_scenario)
         for i in configuration_test_helper(inst):
             assert i.sensor is not None
@@ -182,7 +182,7 @@ class TestPyBSMPerturber(PerturberTestsMixin):
     )
     def test_kwargs(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
         """Test variations of additional params."""
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         perturber = PybsmPerturber(reflectance_range=np.array([0.05, 0.5]), **sensor_and_scenario)
         image = np.array(Image.open(INPUT_IMG_FILE))
         with expectation:
@@ -206,7 +206,7 @@ class TestPyBSMPerturber(PerturberTestsMixin):
     ) -> None:
         """Test that bounding boxes scale as expected during perturb."""
         image = np.array(Image.open(INPUT_IMG_FILE))
-        sensor_and_scenario = create_sample_sensor_and_scenario()
+        sensor_and_scenario = load_default_config(preset="sample")
         inst = PybsmPerturber(**sensor_and_scenario)
         _, out_boxes = inst.perturb(image=image, boxes=boxes, img_gsd=(3.19 / 160))
         assert out_boxes == snapshot

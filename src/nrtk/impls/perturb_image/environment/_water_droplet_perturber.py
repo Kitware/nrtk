@@ -105,8 +105,8 @@ def compute_refraction_mapping_impl(
     normal: np.ndarray,
     n_air: float,
     n_water: float,
-    M: int,  # noqa: N803
-    B: int,  # noqa: N803
+    M: int,  # noqa: N803 - physics convention for glass-plane distance
+    B: int,  # noqa: N803 - physics convention for background-plane distance
     center: np.ndarray,
     radius: float,
     intrinsic: np.ndarray,
@@ -224,8 +224,8 @@ class ComputeRefractionMappingProtocol(Protocol):
         normal: np.ndarray,
         n_air: float,
         n_water: float,
-        M: int,  # noqa: N803
-        B: int,  # noqa: N803
+        M: int,  # noqa: N803 - physics convention for glass-plane distance
+        B: int,  # noqa: N803 - physics convention for background-plane distance
         center: np.ndarray,
         radius: float,
         intrinsic: np.ndarray,
@@ -236,8 +236,10 @@ class ComputeRefractionMappingProtocol(Protocol):
 _points_in_polygon: PointsInPolygonProtocol
 _compute_refraction_mapping: ComputeRefractionMappingProtocol
 
-_points_in_polygon = numba.njit(cache=True)(points_in_polygon_impl)  # type: ignore[union-attr]  # pragma: no cover - fallback when numba not installed
-_compute_refraction_mapping = numba.njit(  # type: ignore[union-attr]  # pragma: no cover - fallback when numba not installed
+_points_in_polygon = numba.njit(cache=True)(  # pragma: no cover
+    points_in_polygon_impl,
+)
+_compute_refraction_mapping = numba.njit(  # pragma: no cover
     cache=True,
     parallel=True,
 )(compute_refraction_mapping_impl)
@@ -435,10 +437,10 @@ class WaterDropletPerturber(PerturbImage):
 
         self.normal: np.ndarray[Any, Any] = np.array([0.0, -1.0 * np.cos(self.psi), np.sin(self.psi)])
 
-        self.g_centers = list()
-        self.g_radius = list()
-        self.centers = list()
-        self.radius = list()
+        self.g_centers = []
+        self.g_radius = []
+        self.centers = []
+        self.radius = []
 
     @staticmethod
     def ccw_sort(points: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
@@ -493,7 +495,7 @@ class WaterDropletPerturber(PerturbImage):
 
         def _get_curve(*, points: np.ndarray, r: float) -> np.ndarray:
             """Get the segments and curve data."""
-            segments = list()
+            segments = []
             for i in range(len(points) - 1):
                 seg = Bezier(
                     p1=points[i, :2],
@@ -555,7 +557,7 @@ class WaterDropletPerturber(PerturbImage):
         x: int,
         y: int,
         psi: float,
-        M: int,  # noqa: N803
+        M: int,  # noqa: N803 - physics convention for glass-plane distance
         intrinsic: np.ndarray,
     ) -> np.ndarray:
         """Convert 2D pixel coordinates from an image (x, y) into a 3D point in the glass coordinate system.
@@ -581,7 +583,7 @@ class WaterDropletPerturber(PerturbImage):
         v = w * (yy - intrinsic[1, 2]) / intrinsic[1, 1]
         return np.dstack((u, v, w)).reshape((x, y, 3))
 
-    def _get_sphere_raindrop(self, *, width: int, height: int, gls: np.ndarray[Any, Any]) -> None:  # noqa: C901
+    def _get_sphere_raindrop(self, *, width: int, height: int, gls: np.ndarray[Any, Any]) -> None:  # noqa: C901 - physics simulation with inherent branching
         """Simulate and store information about raindrops on the windshield.
 
         How it works:
@@ -597,10 +599,10 @@ class WaterDropletPerturber(PerturbImage):
             gls:
                 Glass (3D) coordinate system mapping matrix.
         """
-        self.g_centers: list[Any] = list()
-        self.g_radius: list[Any] = list()
-        self.centers: list[Any] = list()
-        self.radius: list[Any] = list()
+        self.g_centers: list[Any] = []
+        self.g_radius: list[Any] = []
+        self.centers: list[Any] = []
+        self.radius: list[Any] = []
 
         left_upper = gls[0][0]
         left_bottom = gls[0][height - 1]

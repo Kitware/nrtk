@@ -12,7 +12,7 @@ from syrupy.assertion import SnapshotAssertion
 from nrtk.impls.perturb_image.geometric.random import RandomCropPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import bbox_perturber_assertions
+from tests.impls.perturb_image.perturber_utils import bbox_perturber_assertions
 
 rng = np.random.default_rng()
 
@@ -33,7 +33,7 @@ class TestRandomCropPerturber(PerturberTestsMixin):
             ),
             (
                 [(AxisAlignedBoundingBox(min_vertex=(2, 0), max_vertex=(2, 1)), {"meta": 1})],
-                (np.array([[1, 2], [4, 5]], dtype=np.uint8), list()),
+                (np.array([[1, 2], [4, 5]], dtype=np.uint8), []),
             ),
         ],
     )
@@ -84,7 +84,7 @@ class TestRandomCropPerturber(PerturberTestsMixin):
             perturb=inst.perturb,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
         # Test callable
         inst = RandomCropPerturber(crop_size=(20, 20))
@@ -92,7 +92,7 @@ class TestRandomCropPerturber(PerturberTestsMixin):
             perturb=inst,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
 
     @pytest.mark.parametrize(
@@ -118,7 +118,7 @@ class TestRandomCropPerturber(PerturberTestsMixin):
             perturb=inst.perturb,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
         inst = RandomCropPerturber(crop_size=(20, 20), seed=seed)
         # Test callable
@@ -126,7 +126,7 @@ class TestRandomCropPerturber(PerturberTestsMixin):
             perturb=inst,
             image=image,
             boxes=None,
-            expected=(out_image, list()),
+            expected=(out_image, []),
         )
 
     def test_identity_operation(self) -> None:
@@ -142,8 +142,8 @@ class TestRandomCropPerturber(PerturberTestsMixin):
         bbox_perturber_assertions(
             perturb=inst.perturb,
             image=image,
-            boxes=list(),
-            expected=(out_image, list()),
+            boxes=[],
+            expected=(out_image, []),
         )
 
     def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:

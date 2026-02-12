@@ -2,7 +2,7 @@
 
 _CV2_CLASSES = ["AverageBlurPerturber", "GaussianBlurPerturber", "MedianBlurPerturber"]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.impls.perturb_image.photometric._blur.average_blur_perturber import (

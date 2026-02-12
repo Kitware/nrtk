@@ -72,7 +72,7 @@ class RandomCropPerturber(PerturbImage):
         crop_h: int,
     ) -> Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]:
         """Compute the intersect-shifted bbox coordinates."""
-        adjusted_bboxes = list()
+        adjusted_bboxes = []
         for bbox, metadata in boxes:
             crop_box = AxisAlignedBoundingBox(
                 min_vertex=(crop_y, crop_x),
@@ -138,7 +138,7 @@ class RandomCropPerturber(PerturbImage):
         perturbed_image = perturbed_image[crop_y : crop_y + crop_h, crop_x : crop_x + crop_w].copy()
 
         if perturbed_boxes is None:
-            return perturbed_image, list()
+            return perturbed_image, []
 
         # Adjust bounding boxes
         perturbed_boxes = RandomCropPerturber._compute_bboxes(

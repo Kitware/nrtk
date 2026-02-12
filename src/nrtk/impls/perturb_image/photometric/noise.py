@@ -8,7 +8,7 @@ _SKIMAGE_CLASSES = [
     "SpeckleNoisePerturber",
 ]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.impls.perturb_image.photometric._noise.gaussian_noise_perturber import (

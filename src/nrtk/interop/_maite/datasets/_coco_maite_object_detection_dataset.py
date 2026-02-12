@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from kwcoco import CocoDataset  # type: ignore
+from kwcoco import CocoDataset
 from maite.protocols import DatasetMetadata, DatumMetadata
 from maite.protocols.object_detection import (
     Dataset,
@@ -23,7 +23,7 @@ from maite.protocols.object_detection import (
     InputType,
     TargetType,
 )
-from PIL import Image  # type: ignore
+from PIL import Image
 from typing_extensions import ReadOnly
 
 from nrtk.interop._maite.datasets._maite_object_detection_dataset import (
@@ -51,7 +51,7 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
             Metadata of this dataset.
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901 - COCO dataset initialization with unavoidable branching
         self,
         *,
         kwcoco_dataset: CocoDataset,  # pyright: ignore [reportGeneralTypeIssues]
@@ -77,13 +77,13 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
         """
         self._kwcoco_dataset = kwcoco_dataset
 
-        self._image_ids = list()
-        self._annotations = dict()
+        self._image_ids = []
+        self._annotations = {}
 
         for _, img_id in enumerate(kwcoco_dataset.imgs.keys()):
             bboxes = np.empty((0, 4))
-            labels = list()
-            scores = list()
+            labels = []
+            scores = []
 
             if img_id in kwcoco_dataset.gid_to_aids and len(kwcoco_dataset.gid_to_aids[img_id]) > 0:
                 det_ids = kwcoco_dataset.gid_to_aids[img_id]
@@ -143,8 +143,8 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
 
         image_md: COCOMetadata = {  # pyright: ignore [reportAssignmentType]
             "id": image_id,
-            "ann_ids": (list(gid_to_aids[image_id]) if image_id in gid_to_aids else list()),
-            "image_info": dict(width=width, height=height, file_name=str(img_file_path)),
+            "ann_ids": (list(gid_to_aids[image_id]) if image_id in gid_to_aids else []),
+            "image_info": {"width": width, "height": height, "file_name": str(img_file_path)},
         }
 
         # Forward input metadata, checking for clobbering
@@ -210,7 +210,7 @@ def dataset_to_coco(
     if len(img_filenames) != len(dataset):
         raise ValueError(f"Image filename and dataset length mismatch ({len(img_filenames)} != {len(dataset)})")
 
-    mod_metadata = list()
+    mod_metadata = []
 
     annotations = _create_annotations(dataset_categories)
 

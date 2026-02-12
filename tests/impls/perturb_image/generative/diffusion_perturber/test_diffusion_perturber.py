@@ -18,7 +18,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image.generative import DiffusionPerturber
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.perturb_image.perturber_utils import perturber_assertions
 
 
 @pytest.mark.diffusion

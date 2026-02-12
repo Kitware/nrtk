@@ -37,7 +37,7 @@ def build_factory(data: NRTKPerturbInputSchema) -> PerturbImageFactory:
         return from_config_dict(config=config["PerturberFactory"], type_iter=PerturbImageFactory.get_impls())
 
 
-def load_COCOMAITE_dataset(  # noqa: N802
+def load_COCOMAITE_dataset(  # noqa: N802 - name matches COCOMAITE class acronym
     data: NRTKPerturbInputSchema,
 ) -> COCOMAITEObjectDetectionDataset:
     """Returns a COCOMAITEObjectDetectionDataset based on dataset parameters in data.
@@ -65,5 +65,5 @@ def load_COCOMAITE_dataset(  # noqa: N802
         #
         # The above ValueError aims to try and error out when the only required key is not present, as that
         # is our only indicator that the metadata is not a DatumMetadataType
-        image_metadata=data.image_metadata,  # type: ignore
+        image_metadata=data.image_metadata,  # type: ignore[arg-type]  # Pydantic dict vs TypedDict mismatch (see above)
     )

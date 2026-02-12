@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = []
+
 import abc
 from typing import Any, Protocol, runtime_checkable
 
@@ -69,7 +71,7 @@ class EnhancePerturberMixin(PerturbImage):
 
         # Convert back to floating point dtype if needed
         if np.issubdtype(dtype, np.floating):
-            image_np = image.astype(dtype) / 255
+            image_np = image_np.astype(dtype) / 255
 
         return image_np
 

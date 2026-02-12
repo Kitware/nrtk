@@ -98,11 +98,11 @@ class MaiteYOLODetector(Model):
         Returns:
             Iterable[Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]]: Detections for each image.
         """
-        preds = list()
+        preds = []
         for img in imgs:
             detections = self([img])
             for det in detections:
-                results = list()
+                results = []
                 for bbox, label, score in zip(det.boxes, det.labels, det.scores, strict=False):
                     score_dict = dict.fromkeys(range(10), 0.0)  # Ensure all class labels exist
                     score_dict[int(label.item())] = float(score.item())

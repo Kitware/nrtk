@@ -22,6 +22,7 @@ def test_aukus_client() -> Generator:
 
 
 @pytest.mark.maite
+@pytest.mark.tools
 class TestAukusApp:
     @responses.activate
     def test_handle_aukus_post(self, test_aukus_client: TestClient, tmpdir: py.path.local) -> None:
@@ -40,7 +41,7 @@ class TestAukusApp:
             uri=str(DATASET_FOLDER),
             size="11",
             description="AUKUS Test",
-            data_collections=list(),
+            data_collections=[],
             data_format="COCO",
             nrtk_config=str(NRTK_PYBSM_CONFIG),
             image_metadata=[{"gsd": gsd} for gsd in range(11)],
@@ -100,7 +101,7 @@ class TestAukusApp:
             uri=str(DATASET_FOLDER),
             size="11",
             description="AUKUS Test",
-            data_collections=list(),
+            data_collections=[],
             data_format="YOLO",
             nrtk_config=str(NRTK_PYBSM_CONFIG),
             image_metadata=[{"gsd": gsd} for gsd in range(11)],
@@ -136,7 +137,7 @@ class TestAukusApp:
             uri=str(DATASET_FOLDER),
             size="11",
             description="AUKUS Test",
-            data_collections=list(),
+            data_collections=[],
             data_format="COCO",
             nrtk_config="",
             image_metadata=[{"gsd": gsd} for gsd in range(11)],

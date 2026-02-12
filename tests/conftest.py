@@ -261,7 +261,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
             img_b = img_b[:, :, np.newaxis]
 
         channels = img_a.shape[2]
-        ssim_values = list()
+        ssim_values = []
 
         for c in range(channels):
             a_c = img_a[:, :, c]

@@ -16,7 +16,7 @@ from nrtk.impls.perturb_image.environment._water_droplet_perturber import (
 )
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
-from tests.impls.perturb_image.test_perturber_utils import perturber_assertions
+from tests.impls.perturb_image.perturber_utils import perturber_assertions
 
 rng = np.random.default_rng(2345)
 reproduce_rng = np.random.default_rng(23456)

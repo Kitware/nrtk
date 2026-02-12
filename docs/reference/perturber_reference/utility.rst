@@ -1,8 +1,8 @@
-##################
-Wrapper Perturbers
-##################
+###################
+Utility Perturbers
+###################
 
-Wrapper perturbers enable composition of multiple perturbations or provide integration with third-party augmentation
+Utility perturbers enable composition of multiple perturbations or provide integration with third-party augmentation
 libraries. These perturbers facilitate complex perturbation pipelines and leverage external tools for additional
 transformation capabilities.
 
@@ -14,14 +14,14 @@ transformation capabilities.
      - Required Inputs
      - Optional Parameters
 
-   * - :class:`~nrtk.impls.perturb_image.wrapper.AlbumentationsPerturber`
+   * - :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber`
      - Image (format varies by transform)
      - * ``perturber``
        * ``parameters``
        * ``seed``
        * ``boxes``
 
-   * - :class:`~nrtk.impls.perturb_image.wrapper.ComposePerturber`
+   * - :class:`~nrtk.impls.perturb_image.ComposePerturber`
      - Image (format varies by perturbers)
      - * ``perturbers``
        * ``boxes``

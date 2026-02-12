@@ -78,7 +78,7 @@ class TestPerturbImageFactory(PerturberFactoryMixin):
         "empty_factory_kwargs",
         [
             pytest.param(
-                {"theta_key": "param1", "theta_values": list()},
+                {"theta_key": "param1", "theta_values": []},
                 id="empty theta_values",
             ),
         ],

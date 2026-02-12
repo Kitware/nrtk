@@ -66,9 +66,9 @@ class MAITEObjectDetectionAugmentation(Augmentation):  # pyright: ignore [report
         imgs, anns, metadata = batch
 
         # iterate over (parallel) elements in batch
-        aug_imgs = list()  # list of individual augmented inputs
-        aug_dets = list()  # list of individual object detection targets
-        aug_metadata = list()  # list of individual image-level metadata
+        aug_imgs = []  # list of individual augmented inputs
+        aug_dets = []  # list of individual object detection targets
+        aug_metadata = []  # list of individual image-level metadata
 
         for img, img_anns, md in zip(imgs, anns, metadata, strict=False):  # pyright: ignore [reportArgumentType]
             # Perform augmentation
@@ -112,7 +112,7 @@ class MAITEObjectDetectionAugmentation(Augmentation):  # pyright: ignore [report
                 ),
             )
 
-            perturber_configs = list()
+            perturber_configs = []
             if "nrtk_perturber_config" in md:
                 md_configs = md["nrtk_perturber_config"]
                 if TYPE_CHECKING and not isinstance(md_configs, Iterable):  # pragma: no cover

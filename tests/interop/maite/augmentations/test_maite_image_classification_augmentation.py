@@ -7,7 +7,7 @@ from maite.protocols.image_classification import DatumMetadataType
 
 from nrtk.interfaces.perturb_image import PerturbImage
 from nrtk.interop import MAITEImageClassificationAugmentation
-from nrtk.utils._nop_perturber import _NOPPerturber
+from tests.fakes import FakePerturber
 from tests.interop.maite.perturber_fixtures import ResizePerturber
 
 random = np.random.default_rng()
@@ -18,7 +18,7 @@ class TestMAITEImageClassificationAugmentation:
     @pytest.mark.parametrize(
         "perturber",
         [
-            _NOPPerturber(),
+            FakePerturber(),
             ResizePerturber(w=64, h=512),
         ],
         ids=["no-op perturber", "resize"],
@@ -69,7 +69,7 @@ class TestMAITEImageClassificationAugmentation:
     @pytest.mark.parametrize(
         "perturbers",
         [
-            [_NOPPerturber(), ResizePerturber(w=64, h=512)],
+            [FakePerturber(), ResizePerturber(w=64, h=512)],
         ],
     )
     def test_multiple_augmentations(

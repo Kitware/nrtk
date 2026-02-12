@@ -18,7 +18,7 @@ _MAITE_CLASSES = [
 # kwcoco/Pillow-dependent classes (require tools extra)
 _MAITE_TOOLS_CLASSES = ["COCOMAITEObjectDetectionDataset", "dataset_to_coco"]
 
-__all__: list[str] = list()
+__all__: list[str] = []
 
 try:
     from nrtk.interop._maite.datasets._maite_image_classification_dataset import (

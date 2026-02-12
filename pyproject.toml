@@ -49,11 +49,10 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 "nrtk.impls.perturb_image.photometric.blur" = "nrtk.impls.perturb_image.photometric.blur"
 "nrtk.impls.perturb_image.photometric.enhance" = "nrtk.impls.perturb_image.photometric.enhance"
 "nrtk.impls.perturb_image.photometric.noise" = "nrtk.impls.perturb_image.photometric.noise"
-"nrtk.impls.perturb_image.wrapper" = "nrtk.impls.perturb_image.wrapper"
+"nrtk.impls.perturb_image" = "nrtk.impls.perturb_image"
 "nrtk.impls.perturb_image.geometric.random" = "nrtk.impls.perturb_image.geometric.random"
 "nrtk.impls.perturb_image.environment" = "nrtk.impls.perturb_image.environment"
 "nrtk.impls.perturb_image.generative" = "nrtk.impls.perturb_image.generative"
-"nrtk.impls.perturb_image.optical.radial_distortion_perturber" = "nrtk.impls.perturb_image.optical.radial_distortion_perturber"
 "nrtk.impls.perturb_image.optical" = "nrtk.impls.perturb_image.optical"
 "nrtk.impls.perturb_image.optical.otf" = "nrtk.impls.perturb_image.optical.otf"
 "nrtk.impls.perturb_image_factory" = "nrtk.impls.perturb_image_factory"
@@ -73,6 +72,7 @@ tools = [
     "uvicorn>=0.29.0",
     "pydantic>=2.6.4",
     "pydantic-settings>=2.2.1",
+    "python-json-logger>=3.0.0",
 ]
 skimage = [
     "scikit-image>=0.20; python_version < '3.12'",
@@ -116,13 +116,12 @@ docs = [
 tests = [
     # pytest unittesting
     "pytest>=7.2.0",
-    "pytest-cov>=4.0.0",
-    "pytest-xdist>=3.8.0",
-    "syrupy>=5.0.0",
-    # nrtk.interop._maite testing dependencies
-    "starlette>=0.49.1", # CVE-2025-62727
-    "responses>=0.25.0",
-    "Pillow>=10.3.0", # CVE-2024-28219
+    "pytest-cov>=4.0.0", # reports code coverage
+    "pytest-xdist>=3.8.0", # allows -n auto|# to be used to run pytests in parallel
+    "syrupy>=5.0.0", # required for snapshot/regression testing
+    "Pillow>=10.3.0", # CVE-2024-28219  # required for custom conftest.py fixtures
+    "responses>=0.25.0", # rquired to test FastAPI (used by entrypoint app)
+    "httpx>=0.22.0", # required by starlette.testclient.TestClient (optional dep of starlette, not installed by default)
 ]
 
 [tool.pytest.ini_options]
@@ -195,7 +194,8 @@ preview = true  # needed for RUF027
 explicit-preview-rules = true
 
 # From program suggested config
-ignore = ["ANN101","ANN102","C408","C416"]
+ignore = ["C416"]
+external = ["FKA100"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

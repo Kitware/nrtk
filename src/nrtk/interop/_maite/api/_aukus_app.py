@@ -78,7 +78,7 @@ def handle_aukus_post(data: AukusDatasetSchema) -> list[AukusDatasetSchema]:
     out = requests.post(settings.NRTK_IP, json=jsonable_encoder(nrtk_input), timeout=3600).json()
 
     # Process the result and construct return JSONs
-    return_jsons = list()
+    return_jsons = []
     for i in range(len(out["datasets"])):
         dataset = out["datasets"][i]
         dataset_json = copy.deepcopy(data)

@@ -1,18 +1,6 @@
-"""package housing the interfaces of nrtk."""
+"""Package housing the interfaces of nrtk."""
 
-from collections.abc import Callable
-from typing import Any
+from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
 
-import lazy_loader as lazy
-
-__getattr__: Callable[[str], Any]
-__dir__: Callable[[], list[str]]
-__all__: list[str]
-
-__getattr__, __dir__, __all__ = lazy.attach(
-    __name__,
-    submodules=[
-        "perturb_image_factory",
-        "perturb_image",
-    ],
-)
+__all__ = ["PerturbImage", "PerturbImageFactory"]
