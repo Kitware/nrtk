@@ -177,18 +177,17 @@ class TestNRTKPerturberCLI:
 
     @mock.patch("pathlib.Path.is_file", return_value=False)
     def test_missing_annotations(self, is_file_patch: MagicMock, config_file: Path, tmpdir: py.path.local) -> None:  # noqa: ARG002
-        """Check that an exception is appropriately raised if the annotations file is missing."""
+        """Check that the CLI exits with code 101 if the annotations file is missing."""
         output_dir = tmpdir.join(Path("out"))
 
         runner = CliRunner()
-        with pytest.raises(ValueError, match=r"Could not identify annotations file."):
-            runner.invoke(
-                nrtk_perturber_cli,
-                [
-                    f"--dataset_dir={str(DATASET_FOLDER)}",
-                    f"--output_dir={str(output_dir)}",
-                    f"--config_file={str(config_file)}",
-                    "-v",
-                ],
-                catch_exceptions=False,
-            )
+        result = runner.invoke(
+            nrtk_perturber_cli,
+            [
+                f"--dataset_dir={str(DATASET_FOLDER)}",
+                f"--output_dir={str(output_dir)}",
+                f"--config_file={str(config_file)}",
+                "-v",
+            ],
+        )
+        assert result.exit_code == 101

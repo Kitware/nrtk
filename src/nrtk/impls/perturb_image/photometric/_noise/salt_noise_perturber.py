@@ -49,5 +49,5 @@ class SaltNoisePerturber(SaltPepperNoisePerturberMixin):
         **kwargs: Any,
     ) -> tuple[np.ndarray[Any, Any], Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None]:
         """Return image stimulus with salt noise."""
-        super().perturb(image=image, boxes=boxes, **kwargs)
-        return self._perturb(image=image, mode="salt", amount=self.amount), boxes
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+        return self._perturb(image=perturbed_image, mode="salt", amount=self.amount), perturbed_boxes
