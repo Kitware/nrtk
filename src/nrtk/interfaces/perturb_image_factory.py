@@ -11,7 +11,7 @@ Dependencies:
 Example usage:
     factory = PerturbImageFactory(perturber=SomePerturbImageClass, theta_key="altitude")
     for perturber in factory:
-        perturber(perturbed_image)
+        perturber(image=perturbed_image)
 """
 
 from __future__ import annotations
@@ -22,27 +22,43 @@ import abc
 from collections.abc import Iterator, Sequence
 from typing import Any
 
-from smqtk_core import Plugfigurable
-from typing_extensions import Self
+from typing_extensions import Self, override
 
+from nrtk.interfaces._plugfigurable import Plugfigurable
 from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class PerturbImageFactory(Plugfigurable):
-    """Factory class for producing PerturbImage instances of a specified type and configuration."""
+    """Factory class for producing PerturbImage instances of a specified type and configuration.
 
-    def __init__(self, perturber: type[PerturbImage], theta_key: str) -> None:
+    Attributes:
+        perturber (type[PerturbImage]): python implementation type of the PerturbImage interface to produce
+        theta_key (str): perturber parameter to vary between instances
+    """
+
+    def __init__(
+        self,
+        *,
+        perturber: type[PerturbImage],
+        theta_key: str,
+        perturber_kwargs: dict[str, Any] | None = None,
+    ) -> None:
         """Initialize the factory to produce PerturbImage instances of the given type.
 
         Initialize the factory to produce PerturbImage instances of the given type,
         varying the given `theta_key` parameter.
 
-        :param perturber: Python implementation type of the PerturbImage interface
-            to produce.
+        Args:
+            perturber:
+                Python implementation type of the PerturbImage interface to produce.
+            theta_key:
+                Perturber parameter to vary between instances.
+            perturber_kwargs:
+                Default kwargs to be used by the perturber. Defaults to {}.
 
-        :param theta_key: Perturber parameter to vary between instances.
-
-        :raises TypeError: Given a perturber instance instead of type.
+        Raises:
+            TypeError:
+                Given a perturber instance instead of type.
         """
         self._theta_key = theta_key
 
@@ -50,6 +66,12 @@ class PerturbImageFactory(Plugfigurable):
             raise TypeError("Passed a perturber instance, expected type")
         self.perturber = perturber
         self.n = -1
+        self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
+
+    def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
+        """Returns PerturberImage implementation with given input args."""
+        input_kwargs = self.perturber_kwargs | kwargs
+        return self.perturber(**input_kwargs)
 
     @property
     @abc.abstractmethod
@@ -62,23 +84,24 @@ class PerturbImageFactory(Plugfigurable):
         return self._theta_key
 
     def __len__(self) -> int:
-        """Number of perturber instances this factory will generate."""
+        """Return the number of perturber instances this factory will generate."""
         return len(self.thetas)
 
     def __iter__(self) -> Iterator[PerturbImage]:
-        """Iterator for this factory."""
+        """Return an iterator for this factory."""
         self.n = 0
         return self
 
     def __next__(self) -> PerturbImage:
-        """:raises StopIteration: Iterator exhausted.
+        """Return the next perturber instance.
 
-        Returns:
-            Next perturber instance.
+        Raises:
+            StopIteration:
+                Iterator exhausted.
         """
         if self.n < len(self.thetas):
             kwargs = {self.theta_key: self.thetas[self.n]}
-            func = self.perturber(**kwargs)
+            func = self._create_perturber(kwargs=kwargs)
             self.n: int = self.n + 1
             return func
         raise StopIteration
@@ -86,19 +109,14 @@ class PerturbImageFactory(Plugfigurable):
     def __getitem__(self, idx: int) -> PerturbImage:
         """Get the perturber for a specific index.
 
-        :param idx: Index of desired perturber.
-
-        :raises IndexError: The given index does not exist.
-
-        Returns:
-            Perturber corresponding to the given index.
+        Args:
+            idx: Index of desired perturber (supports negative indices).
         """
-        if idx < 0 or idx >= len(self.thetas):
-            raise IndexError
         kwargs = {self.theta_key: self.thetas[idx]}
 
-        return self.perturber(**kwargs)
+        return self._create_perturber(kwargs=kwargs)
 
+    @override
     @classmethod
     def from_config(
         cls,
@@ -108,8 +126,8 @@ class PerturbImageFactory(Plugfigurable):
         """Instantiates a PerturbImageFactory from a configuration dictionary.
 
         Args:
-            config_dict (dict[str, Any]): Configuration dictionary with parameters for instantiation.
-            merge_default (bool, optional): Whether to merge with default configuration. Defaults to True.
+            config_dict: Configuration dictionary with parameters for instantiation.
+            merge_default: Whether to merge with default configuration. Defaults to True.
 
         Returns:
             An instance of the PerturbImageFactory class.
@@ -148,12 +166,9 @@ class PerturbImageFactory(Plugfigurable):
         return cfg
 
     def get_config(self) -> dict[str, Any]:
-        """Returns the configuration of the factory instance.
-
-        Returns:
-            dict[str, Any]: Configuration dictionary containing the perturber type and theta_key.
-        """
+        """Returns the configuration of the factory instance."""
         return {
             "perturber": self.perturber.get_type_string(),
             "theta_key": self.theta_key,
+            "perturber_kwargs": self.perturber_kwargs,
         }

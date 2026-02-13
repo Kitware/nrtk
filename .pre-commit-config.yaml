@@ -4,6 +4,7 @@ repos:
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
+    exclude: ^docs/_templates/
   - id: check-added-large-files
     args:
       # the unit here is acutally KiB (1024 bytes)
@@ -16,7 +17,18 @@ repos:
     args: [--wrap=80, --number]
     types: [markdown]
     additional_dependencies:
-    - mdformat-tables
+      - mdformat-tables
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.3.0
+  hooks:
+  - id: flake8
+    args:
+      - '--select=FKA1'
+      - '--kwargs-max-positional-arguments=2'
+      - --kwargs-ignore-function-pattern-extend
+      - ^np\..*|^pytest\..*|^random\..*|^mock\.patch.*|^patch|^re\..*|^json\..*|^os\.path\..*|^warnings\..*|^math\..*|^open|^click.option|^yaml\..*|^sys\..*|\.get$|\.replace$|\.transpose$|\.reshape$|^runner\.invoke$|^dict\.fromkeys$|^binom$
+    additional_dependencies:
+      - flake8-force-keyword-arguments
 - repo: local
   hooks:
     - id: ruff-lint
@@ -27,7 +39,7 @@ repos:
       types_or: [python, pyi, jupyter]
     - id: sphinx-lint
       name: sphinx-lint
-      entry: poetry run sphinx-lint --enable all --disable leaked-markup --jobs 1 --max-line-length 120 -i docs/_implementations -i docs/maite/_implementations -i .dev/ docs
+      entry: poetry run sphinx-lint --enable all --disable leaked-markup --jobs 1 --max-line-length 120 -i .dev/ docs
       types: [rst]
       language: system
     - id: ruff-format

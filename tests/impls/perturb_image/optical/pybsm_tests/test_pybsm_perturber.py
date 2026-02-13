@@ -1,0 +1,237 @@
+from collections.abc import Hashable, Iterable
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
+from typing import Any
+
+import numpy as np
+import pytest
+from PIL import Image
+from smqtk_core.configuration import configuration_test_helper
+from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from syrupy.assertion import SnapshotAssertion
+
+from nrtk.impls.perturb_image.optical import PybsmPerturber
+from nrtk.impls.perturb_image.optical.otf import load_default_config
+from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE
+from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
+from tests.impls.perturb_image.perturber_utils import pybsm_perturber_assertions
+
+
+@pytest.mark.pybsm
+class TestPyBSMPerturber(PerturberTestsMixin):
+    impl_class = PybsmPerturber
+
+    def test_regression(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
+        """Regression testing results to detect API changes."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        img_gsd = 3.19 / 160.0
+        sensor_and_scenario = load_default_config(preset="sample")
+
+        sensor_and_scenario["ground_range"] = 10000
+
+        # Test perturb interface directly - use explicit seed for regression stability
+        inst = PybsmPerturber(seed=1, **sensor_and_scenario)
+        out_img = pybsm_perturber_assertions(
+            perturb=inst,
+            image=image,
+            expected=None,
+            img_gsd=img_gsd,
+        )
+
+        psnr_tiff_snapshot.assert_match(out_img)
+
+    @pytest.mark.parametrize(
+        ("param_name", "param_value"),
+        [
+            ("ground_range", 10000),
+            ("ground_range", 20000),
+            ("altitude", 10000),
+        ],
+    )
+    def test_non_deterministic_default(self, param_name: str, param_value: int) -> None:
+        """Verify different results when seed=None (default)."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        sensor_and_scenario = load_default_config(preset="sample")
+        sensor_and_scenario[param_name] = param_value
+        img_gsd = 3.19 / 160.0
+
+        # Create two instances with default seed=None
+        inst1 = PybsmPerturber(**sensor_and_scenario)
+        inst2 = PybsmPerturber(**sensor_and_scenario)
+        out1, _ = inst1.perturb(image=image, img_gsd=img_gsd)
+        out2, _ = inst2.perturb(image=image, img_gsd=img_gsd)
+        # Results should (almost certainly) be different with non-deterministic default
+        assert not np.array_equal(out1, out2)
+
+    @pytest.mark.parametrize(
+        ("param_name", "param_value", "seed"),
+        [
+            ("ground_range", 30000, 2),
+            ("altitude", 10000, 2),
+            ("ihaze", 2, 2),
+        ],
+    )
+    def test_seed_reproducibility(self, param_name: str, param_value: int, seed: int) -> None:
+        """Verify same results with explicit seed."""
+        # Test perturb interface directly
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        sensor_and_scenario = load_default_config(preset="sample")
+        sensor_and_scenario[param_name] = param_value
+        # For type: ignore below, see https://github.com/microsoft/pyright/issues/5545#issuecomment-1644027877
+        inst = PybsmPerturber(seed=seed, **sensor_and_scenario)
+        img_gsd = 3.19 / 160.0
+        out_image = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            img_gsd=img_gsd,
+        )
+        # Create another instance with same seed and ensure perturbed image is the same
+        inst2 = PybsmPerturber(seed=seed, **sensor_and_scenario)
+        pybsm_perturber_assertions(
+            perturb=inst2.perturb,
+            image=image,
+            expected=out_image,
+            img_gsd=img_gsd,
+        )
+
+    def test_is_static(self) -> None:
+        """Verify is_static resets RNG each call."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        sensor_and_scenario = load_default_config(preset="sample")
+        img_gsd = 3.19 / 160.0
+
+        inst = PybsmPerturber(seed=42, is_static=True, **sensor_and_scenario)
+        out1 = pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=None,
+            img_gsd=img_gsd,
+        )
+        # Same result each call with is_static
+        pybsm_perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out1,
+            img_gsd=img_gsd,
+        )
+
+    def test_is_static_warning(self) -> None:
+        """Verify warning when is_static=True with seed=None."""
+        with pytest.warns(UserWarning, match="is_static=True has no effect"):
+            PybsmPerturber(seed=None, is_static=True)
+
+    @pytest.mark.parametrize(
+        ("seed", "is_static"),
+        [
+            (42, False),
+            (123, True),
+            (None, False),
+        ],
+    )
+    def test_configuration(self, seed: int | None, is_static: bool) -> None:  # noqa: C901
+        """Test configuration stability."""
+        sensor_and_scenario = load_default_config(preset="sample")
+        inst = PybsmPerturber(seed=seed, is_static=is_static, **sensor_and_scenario)
+        for i in configuration_test_helper(inst):
+            assert i.sensor is not None
+            assert i.scenario is not None
+
+            for param_name, param_value in sensor_and_scenario.items():
+                if hasattr(i.sensor, param_name):
+                    if type(param_value) is np.ndarray:
+                        assert np.allclose(i.sensor.__getattribute__(param_name), param_value)
+                    else:
+                        assert i.sensor.__getattribute__(param_name) == param_value
+                if hasattr(i.scenario, param_name):
+                    if type(param_value) is np.ndarray:
+                        assert np.allclose(i.scenario.__getattribute__(param_name), param_value)
+                    else:
+                        assert i.scenario.__getattribute__(param_name) == param_value
+
+            assert np.array_equal(i._reflectance_range, inst._reflectance_range)
+            assert i.seed == seed
+            assert i.is_static == is_static
+
+    @pytest.mark.parametrize(
+        ("reflectance_range", "expectation"),
+        [
+            (np.array([0.05, 0.5]), does_not_raise()),
+            (np.array([0.01, 0.5]), does_not_raise()),
+            (
+                np.array([0.05]),
+                pytest.raises(ValueError, match=r"Reflectance range array must have length of 2"),
+            ),
+            (
+                np.array([0.5, 0.05]),
+                pytest.raises(
+                    ValueError,
+                    match=r"Reflectance range array values must be strictly ascending",
+                ),
+            ),
+        ],
+    )
+    def test_configuration_bounds(self, reflectance_range: np.ndarray, expectation: AbstractContextManager) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            PybsmPerturber(reflectance_range=reflectance_range)
+
+    @pytest.mark.parametrize(
+        ("altitude", "expectation"),
+        [
+            (24500, does_not_raise()),
+            (25000, does_not_raise()),
+            (
+                24499,
+                pytest.raises(ValueError, match=r"Invalid altitude value"),
+            ),
+        ],
+    )
+    def test_altitude_bounds(self, altitude: float, expectation: AbstractContextManager) -> None:
+        """Test that an exception is properly raised (or not) based on argument value."""
+        with expectation:
+            PybsmPerturber(altitude=altitude)
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expectation"),
+        [
+            ({"img_gsd": 3.19 / 160.0}, does_not_raise()),
+            (
+                {},
+                pytest.raises(
+                    ValueError,
+                    match=r"'img_gsd' must be provided for this perturber",
+                ),
+            ),
+        ],
+    )
+    def test_kwargs(self, kwargs: dict[str, Any], expectation: AbstractContextManager) -> None:
+        """Test variations of additional params."""
+        sensor_and_scenario = load_default_config(preset="sample")
+        perturber = PybsmPerturber(reflectance_range=np.array([0.05, 0.5]), **sensor_and_scenario)
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        with expectation:
+            _ = perturber(image=image, **kwargs)
+
+    @pytest.mark.parametrize(
+        "boxes",
+        [
+            None,
+            [(AxisAlignedBoundingBox(min_vertex=(0, 0), max_vertex=(123, 236)), {"test": 0.0})],
+            [
+                (AxisAlignedBoundingBox(min_vertex=(132, 222), max_vertex=(444, 352)), {"test": 0.7}),
+                (AxisAlignedBoundingBox(min_vertex=(231, 111), max_vertex=(333, 212)), {"test2": 1.0}),
+            ],
+        ],
+    )
+    def test_perturb_with_boxes(
+        self,
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]],
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        """Test that bounding boxes scale as expected during perturb."""
+        image = np.array(Image.open(INPUT_IMG_FILE))
+        sensor_and_scenario = load_default_config(preset="sample")
+        inst = PybsmPerturber(**sensor_and_scenario)
+        _, out_boxes = inst.perturb(image=image, boxes=boxes, img_gsd=(3.19 / 160))
+        assert out_boxes == snapshot

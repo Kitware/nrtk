@@ -1,0 +1,375 @@
+0.27.0
+======
+
+This is the final minor release before v1.0, focusing on API stabilization, package
+restructuring, and dependency cleanup. Major changes include the removal of deprecated
+scoring, image metric, and blackbox generator components; consistent renaming of classes,
+parameters, and extras; comprehensive import guards for all optional dependencies; and a
+new random state management system for perturbers. This release also includes entrypoint
+and container improvements, expanded documentation, and numerous bug fixes.
+
+Breaking Changes
+----------------
+
+**Removed Components**
+
+* Removed scoring interfaces and implementations (``ScoreDetections``, ``ScoreClassifications``,
+  ``COCOScorer``, ``NOPScorer``, ``RandomScorer``, ``ClassAgnosticPixelwiseIoUScorer``).
+
+* Removed image metric interfaces and implementations (``ImageMetric``, ``NIIRSImageMetric``,
+  ``SNRImageMetric``).
+
+* Removed blackbox response generator interfaces and implementations
+  (``GenerateBlackboxResponse``, ``GenerateObjectDetectorBlackboxResponse``,
+  ``GenerateClassifierBlackboxResponse``, ``SimpleGenericGenerator``, ``SimplePybsmGenerator``).
+
+* Removed associated example notebooks (``coco_scorer.ipynb``, ``simple_generic_generator.ipynb``,
+  ``simple_pybsm_generator.ipynb``, ``compute_image_metric.ipynb``).
+
+* Removed ``CustomPybsmPerturbImageFactory``.
+
+* Removed ``PybsmSensor`` and ``PybsmScenario`` from ``PerturbImage`` implementations
+  and updated notebooks and scripts that previously used these classes.
+
+* Dissolved the ``wrapper`` submodule. ``ComposePerturber`` and ``AlbumentationsPerturber``
+  are now importable directly from ``nrtk.impls.perturb_image``. The old import path
+  ``nrtk.impls.perturb_image.wrapper`` no longer exists.
+
+* Removed the ``notebook-testing`` extra.
+
+**Renamed Extras**
+
+* Renamed the ``scikit-image`` extra to ``skimage``. Update install commands from
+  ``pip install nrtk[scikit-image]`` to ``pip install nrtk[skimage]``.
+
+* Renamed the ``Pillow`` extra to ``pillow`` (lowercase). Update install commands from
+  ``pip install nrtk[Pillow]`` to ``pip install nrtk[pillow]``.
+
+* The ``maite`` extra no longer includes API dependencies (``fastapi``, ``pydantic``,
+  ``pydantic_settings``, ``uvicorn``). Those have moved to the ``tools`` extra. Users who
+  relied on ``nrtk[maite]`` for REST API functionality should install ``nrtk[tools]`` instead.
+
+**Renamed Classes and Parameters**
+
+* Renamed perturb image factory classes and modules:
+
+  - ``LinspacePerturbImageFactory`` -> ``PerturberLinspaceFactory``
+  - ``MultivariatePerturbImageFactory`` -> ``PerturberMultivariateFactory``
+  - ``OneStepPerturbImageFactory`` -> ``PerturberOneStepFactory``
+  - ``StepPerturbImageFactory`` -> ``PerturberStepFactory``
+
+* Renamed PyBSM optical perturber classes, removing the ``OTF`` suffix:
+
+  - ``DefocusOTFPerturber`` -> ``DefocusPerturber``
+  - ``CircularApertureOTFPerturber`` -> ``CircularAperturePerturber``
+  - ``DetectorOTFPerturber`` -> ``DetectorPerturber``
+  - ``JitterOTFPerturber`` -> ``JitterPerturber``
+  - ``TurbulenceApertureOTFPerturber`` -> ``TurbulenceAperturePerturber``
+  - ``PybsmOTFPerturber`` -> ``PybsmPerturberMixin``
+
+* Renamed ``step`` parameter to ``num`` in ``PerturberLinspaceFactory`` to match
+  ``numpy.linspace`` parameter naming convention.
+
+* Renamed all references of ``additional_params`` to ``kwargs`` in the codebase
+  and documentation.
+
+* Renamed ``rng`` and ``rng_seed`` parameters to ``seed`` across all random perturbers.
+
+* Renamed MAITE interoperability classes for consistent task-type prefixes:
+
+  - ``JATICDetectionAugmentation`` -> ``MAITEObjectDetectionAugmentation``
+  - ``JATICDetectionTarget`` -> ``MAITEObjectDetectionTarget``
+  - ``JATICClassificationAugmentation`` -> ``MAITEImageClassificationAugmentation``
+  - ``AukusdataCollectionSchema`` -> ``AukusDataCollectionSchema``
+
+* Enforced keyword-only arguments (``*``) across all perturber constructors and interface
+  methods. Any code using positional arguments will need to switch to keyword arguments.
+
+**Random State Changes**
+
+* Default seeding changed from deterministic (``seed=1``) to non-deterministic (``seed=None``)
+  for all random perturbers.
+
+* Passing ``numpy.random.Generator`` objects is no longer supported. Use integer seeds instead.
+
+* Changed the default value of the ``to_int`` parameter in ``PerturberStepFactory``
+  from ``True`` to ``False``. Users who require integer values should now explicitly pass
+  ``to_int=True`` when instantiating the factory.
+
+**Package Restructuring**
+
+* Restructured image perturbers based on functionality (environment, geometric, photometric,
+  optical, generative) rather than dependency requirements.
+
+* Made perturb image factory submodules private (prefixed with ``_``) and exposed factory
+  classes directly from the package ``__init__.py``::
+
+    from nrtk.impls.perturb_image_factory import PerturberLinspaceFactory
+    from nrtk.impls.perturb_image_factory import PerturberMultivariateFactory
+    from nrtk.impls.perturb_image_factory import PerturberOneStepFactory
+    from nrtk.impls.perturb_image_factory import PerturberStepFactory
+
+* Moved perturb image factory modules from ``nrtk.impls.perturb_image_factory.generic``
+  subdirectory up to ``nrtk.impls.perturb_image_factory``, removing the unnecessary
+  ``generic`` nesting level.
+
+* Moved ``_NOPPerturber`` from ``nrtk.impls.perturb_image.generic`` to
+  ``nrtk.impls.perturb_image`` (now a private module).
+
+* Made MAITE interop modules private: ``nrtk.interop.maite.*`` is now
+  ``nrtk.interop._maite.*``. Public exports are available from ``nrtk.interop``.
+
+* Moved entrypoint scripts from ``nrtk.interop.maite.utils.bin`` to
+  ``nrtk.entrypoints``.
+
+Updates / New Features
+----------------------
+
+**Random State Management**
+
+* Added ``RandomPerturbImage`` abstract base class for perturbers using random state.
+  This provides standardized seed handling and the new ``is_static`` option.
+
+* Added ``is_static`` parameter to all random perturbers. When ``True`` and a seed
+  is provided, the RNG state is reset after each ``perturb()`` call, ensuring identical
+  results for repeated calls with the same input.
+
+**Perturber Enhancements**
+
+* Added ``clip`` parameter to skimage perturbers.
+
+* Added ``D`` and ``eta`` parameters for ``CircularAperturePerturber``.
+
+* Added a ``theta`` parameter to ``NOPPerturber`` for interface compatibility.
+
+* Added support for negative indexing in perturber factory interfaces and implementations.
+
+* Replaced albumentations dependency with nrtk-albumentations.
+
+**PyBSM Improvements**
+
+* Removed ``PybsmSensor`` and ``PybsmScenario`` classes. Sensor and scenario parameters are
+  now passed directly as keyword arguments to PyBSM-based perturbers.
+
+* Refactored ``**kwargs`` handling from ``PybsmPerturber`` to the shared parent class
+  ``PybsmPerturberMixin``, enabling all PyBSM-based perturbers (``DetectorPerturber``,
+  ``TurbulenceAperturePerturber``, ``CircularAperturePerturber``, ``JitterPerturber``,
+  ``DefocusPerturber``) to accept ``**kwargs`` for modifying sensor and scenario parameters.
+
+* Added ``params`` property to ``PybsmPerturberMixin`` to retrieve kwargs passed during
+  initialization.
+
+* Consolidated pybsm default parameters in a single constants file.
+
+* Relaxed altitude validation to only enforce the lower limit in ``PybsmPerturberMixin``.
+
+* Updated ``pybsm`` optional dependency pin from ``>=0.13.0`` to ``>=0.14.3``.
+
+**Factory Improvements**
+
+* Added ``perturber_kwargs`` to ``PerturbImageFactory`` interface to control perturber arguments.
+
+* Created a generic ``PerturberMultivariateFactory`` from
+  ``CustomPybsmPerturbImageFactory`` and ``_PybsmPerturbImageFactory``.
+
+**WaterDropletPerturber Optimization**
+
+* Replaced ``geopandas`` and ``shapely`` dependencies with a Numba-accelerated ray casting
+  algorithm for point-in-polygon tests. This reduces the dependency footprint and improves
+  performance for high droplet counts.
+
+* Refactored numba JIT functions to separate pure Python implementations
+  (``_points_in_polygon_impl``, ``_compute_refraction_mapping_impl``) from JIT wrappers.
+  This improves testability and code coverage while maintaining performance when numba is
+  available.
+
+* Added Protocol type hints for the JIT-compiled functions to ensure proper static type
+  checking without requiring type ignores at call sites.
+
+* Removed unused ``_to_sphere_section_env`` method that was replaced by the vectorized
+  ``_compute_refraction_mapping`` function.
+
+* Renamed internal functions containing ``__`` to ``_``.
+
+**Import Guards**
+
+All perturber implementations with optional dependencies now have import guards that raise
+clear ``ImportError`` messages indicating which package to install. Internal modules have been
+restructured into private packages with public exports.
+
+* Blur perturbers (``AverageBlurPerturber``, ``GaussianBlurPerturber``, ``MedianBlurPerturber``)
+  now require the ``headless`` or ``graphics`` extra.
+
+* Enhancement perturbers (``BrightnessPerturber``, ``ColorPerturber``, ``ContrastPerturber``,
+  ``SharpnessPerturber``) now require the ``pillow`` extra.
+
+* Noise perturbers (``GaussianNoisePerturber``, ``PepperNoisePerturber``,
+  ``SaltAndPepperNoisePerturber``, ``SaltNoisePerturber``, ``SpeckleNoisePerturber``) now
+  require the ``skimage`` extra.
+
+* ``RandomRotationPerturber`` and ``RandomScalePerturber`` require the ``albumentations``
+  and (``graphics`` or ``headless``) extras.
+
+* PyBSM optical perturbers (``PybsmPerturber``, ``CircularAperturePerturber``,
+  ``DefocusPerturber``, ``DetectorPerturber``, ``JitterPerturber``,
+  ``TurbulenceAperturePerturber``) now require the ``pybsm`` extra.
+
+* ``WaterDropletPerturber`` now requires the ``scipy`` and ``numba`` extras.
+
+* ``DiffusionPerturber`` now requires the ``diffusion`` extra.
+
+* MAITE augmentations, ``nrtk_perturber``, ``nrtk_perturber_cli``, and MAITE REST API handlers
+  require the ``maite`` and/or ``tools`` extras.
+
+* Added fault-tolerant plugin discovery via ``nrtk.interfaces._plugfigurable``.
+  ``PerturbImage.get_impls()`` and ``PerturbImageFactory.get_impls()`` now
+  gracefully skip broken third-party entrypoints instead of crashing.
+
+**Entrypoint & Container Updates**
+
+* Updated failure modes to have a unique exit code and documented each code in ``aukus.rst``.
+
+* Updated ``--help`` command for entrypoint script to cover environment variables, directory
+  mounting, and usage syntax.
+
+* Updated logging to be JSON-formatted.
+
+* Removed ``generate_config_file`` option from entrypoint for streamlined usage.
+
+* Added ``ENV`` instructions to Dockerfile for entrypoint script arguments.
+
+* Updated ``nrtk_perturber_cli`` inputs to be options instead of arguments.
+
+* Updated entrypoint script to be executed as a non-root user.
+
+* Updated ``python:3.11-slim`` image to be referenced by digest.
+
+* Added cosign public key for cosigning docker containers.
+
+* Moved ``containers`` from an external pipeline to a manual stage.
+
+* Added semantic versioning to ``build`` job for containers.
+
+* Added ``--platform linux/amd64`` to ``build`` job for containers.
+
+* Updated ``scan`` job to pull image based on semantic versioning.
+
+* Added initial ``sign`` job for containers.
+
+**Other**
+
+* Updated to MAITE v0.9.0.
+
+* Migrated to ``poetry`` version ``>=2.2.0``.
+
+* Bumped ``smqtk-core`` dependency pin to version ``>=0.21.0``.
+
+* Removed ``numpy`` upper bound and Python-specific versions from pyproject.toml.
+
+* Standardized internal variable names for perturbed image and perturbed boxes across all
+  image perturbers.
+
+Fixes
+-----
+
+* Fixed a bug where input and output bounding boxes shared memory. Added ``deepcopy`` in the
+  ``PerturbImage`` interface and fixed all noise perturbers (``GaussianNoisePerturber``,
+  ``PepperNoisePerturber``, ``SaltAndPepperNoisePerturber``, ``SaltNoisePerturber``,
+  ``SpeckleNoisePerturber``) where the return value of ``super().perturb()`` was discarded,
+  causing output boxes to share identity with the input boxes instead of being deep-copied.
+
+* Fixed ``PerturberOneStepFactory`` to preserve float values by passing ``to_int=False``
+  to parent ``PerturberStepFactory``. Previously, float values like ``theta_value=0.5``
+  were incorrectly converted to ``0`` due to the parent's default ``to_int=True`` behavior.
+
+* Fixed ``!=`` in ``bbox_perturber_assertions()`` which should be ``==``.
+
+* Fixed the formatting of the ``Raises`` section for all docstrings.
+
+* Updated ``smqtk_plugins`` entry points in ``pyproject.toml`` to use fully
+  qualified module paths (``nrtk.impls.*`` instead of ``impls.*``).
+
+* Changed ``np.float128`` to ``np.longdouble`` in ``WaterDropletPerturber`` to support
+  ARM platforms where ``np.float128`` is not available.
+
+Testing & CI
+------------
+
+* Added ``tox.ini`` with isolated test environments for each optional dependency
+  combination (``core``, ``opencv``, ``albumentations``, ``pillow``, ``skimage``,
+  ``pybsm``, ``waterdroplet``, ``diffusion``, ``maite``, ``tools``, ``doctests``).
+  Each environment installs only its required extras and runs the corresponding
+  pytest marker-filtered tests.
+
+* Restructured CI test jobs in ``.gitlab-ci/.gitlab-test.yml``: split the monolithic
+  ``tox:pytest`` job into separate per-Python-version jobs (``tox:pytest:py3.10`` through
+  ``tox:pytest:py3.13``) and added per-environment tox jobs for finer-grained optional
+  dependency testing.
+
+* Added ``pytest.importorskip`` guards to test files for graceful skipping when optional
+  test dependencies (``httpx``, ``click``) are not installed.
+
+* Fixed notebooks to use correct kernel names and data paths for CI compatibility.
+
+* Added pytest fixture which uses the SSIM metric to compare images and optimized
+  ``SSIMImageSnapshotExtension._convolve2d()``.
+
+* Updated regression testing for the following perturbers to use PSNR and SSIM metrics:
+  all ``cv2`` blur perturbers, ``DefocusPerturber``, ``CircularAperturePerturber``,
+  ``WaterDropletPerturber``.
+
+* Trimmed redundant ``WaterDropletPerturber`` regression test parametrizations from three
+  seeds to one and downscaled the test image from 512x512 to 128x128, reducing waterdroplet
+  test suite runtime.
+
+* Refactored ``PerturbImageFactory`` tests to use abstract ``_make_factory`` method pattern,
+  introduced ``PerturberFactoryMixin`` base test class, and made tests self-contained using
+  ``FakePerturber`` and ``PerturberFakeFactory`` from ``tests/fakes.py`` instead of depending
+  on ``nrtk.impls`` perturber implementations. Added ``PerturbImageFactory`` interface tests
+  in ``tests/interfaces/test_perturb_image_factory.py``.
+
+* Replaced ``DummyPerturber`` with ``FakePerturber`` in test utilities. The new class accepts
+  arbitrary keyword arguments, making it more flexible for factory tests.
+
+* Added CI jobs from ``devel-jatic`` and removed ``devel-jatic`` include from
+  ``.gitlab-ci.yml``.
+
+* Disabled caching for notebook jobs to improve job time.
+
+Documentation
+-------------
+
+* Transitioned to the ``PyData`` theme for Sphinx docs.
+
+* Restructured and refined documentation to align with the new perturbation category structure.
+
+* Updated all docstrings to be compliant with Google format and to use perturber callable
+  interface.
+
+* Updated Interactive Risk Matrix with revised key parameters and risk severity levels.
+  Converted risk factor table into Interactive Risk Matrix with ``_static/javascript/custom.js``.
+
+* Added documentation for operational risk modules: extreme illumination, high frequency
+  vibration, sensor noise and resolution, target out-of-focus, radial distortion,
+  atmospheric turbulence, haze, and water droplets.
+
+* Added a new input requirements page and a Validation and Trust page.
+
+* Added ``pybsm_default_config.ipynb`` to the How-To section.
+
+* Removed outdated notebooks, obsolete documentation pages, and mentions of ``pyBSM factory``
+  in ``glossary.rst``.
+
+* Refined how-to notebooks and T&E guide notebooks to align with the new perturber structure.
+  Updated variable names to be accurate for their notebook, updated wording and phrasing in
+  various text sections, and fixed numerous grammatical errors and typos.
+
+* Added link to albumentations how-to in ``risk_factors.rst``.
+
+* Organized perturbers by type on installation page.
+
+* Updated API implementations reference and overrode module names so public classes are
+  displayed in docs instead of private submodules, across all perturber categories,
+  perturbation factories, and utility functions.
+
+* Updated contact list on README.md and added community collaboration paragraph.

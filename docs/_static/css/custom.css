@@ -1,15 +1,9 @@
 /* NRTK Custom Styles */
 
-/* ============================================
-   Font Imports
-   ============================================ */
+/* Font Imports */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
-/* ============================================
-   Quickstart Page Styles
-   ============================================ */
-
-/* Grid card styles - applies to all cards */
+/* Quickstart Page Styles */
 .sd-card-title {
     font-size: 1.25rem !important;
     font-weight: 600 !important;
@@ -29,29 +23,27 @@
     flex: 1 !important;
 }
 
-/* Explore More section - specific styles */
+/* Explore More section */
 .explore-more-grid .sd-card-title {
     font-size: 1.05rem !important;
 }
 
-.explore-more-grid .sd-card {
-    height: 80px !important;
+.explore-more-grid .sd-card,
+.explore-more-grid .sd-card-body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+}
+
+.explore-more-grid .sd-card {
+    height: 80px !important;
 }
 
 .explore-more-grid .sd-card-body {
     padding: 0.5rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
 }
 
-/* ============================================
-   QuickStart Button Styles
-   ============================================ */
-
+/* QuickStart Button Styles */
 .nrtk-quickstart-button-container {
     text-align: center;
     margin: 20px 0;
@@ -77,4 +69,167 @@
     font-size: 1.1em;
     color: white;
     font-weight: 500;
+}
+
+.severity-btn {
+    border: 0.5px solid #333 !important;
+    border-radius: 1px !important;
+}
+
+.severity-btn.active {
+    background-color: #2980b9 !important;
+    color: white !important; /* make text readable */
+    box-shadow: 0 0 5px #000;
+    border: none !important;
+}
+
+#custom-filters-wrapper label {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Adjust this to increase or decrease spacing */
+}
+
+/* Table overrides */
+table td,
+table th {
+    white-space: normal;
+}
+
+/* Ensure images don't exceed paragraph width */
+.bd-article img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Header anchor links - show only on hover */
+.headerlink {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+h1:hover .headerlink,
+h2:hover .headerlink,
+h3:hover .headerlink,
+h4:hover .headerlink,
+h5:hover .headerlink,
+h6:hover .headerlink {
+    opacity: 1;
+}
+
+/* Navbar logo size */
+.navbar-brand img {
+    max-height: 40px;
+    width: auto;
+}
+
+/* Force hide any persistent search fields in navbar - only search button should be visible */
+#pst-search-dialog:not([open]) {
+    display: none !important;
+}
+
+/* Hide search field in navbar center */
+.navbar-center .bd-search,
+.navbar-center form[action="search.html"],
+.navbar-header-items__center .bd-search,
+.navbar-header-items__center form[action="search.html"],
+header .bd-search:not(dialog .bd-search),
+header form.bd-search:not(#pst-search-dialog form.bd-search) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Hide the search button field variant (not the icon button) */
+.search-button-field {
+    display: none !important;
+}
+
+/* Mobile - work with theme's native drawer pattern */
+@media (max-width: 991.98px) {
+    /* Ensure article container has appropriate spacing */
+    .bd-article-container {
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+
+    /* Ensure search button remains visible */
+    .search-button__button,
+    button.search-button__button,
+    .pst-navbar-icon.search-button {
+        display: inline-block !important;
+        visibility: visible !important;
+    }
+}
+
+/* Desktop - resizable sidebar functionality */
+@media (min-width: 1200px) {
+    .bd-sidebar-primary {
+        position: relative;
+    }
+
+    .sidebar-resize-handle {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        cursor: col-resize;
+        background: rgba(41, 128, 185, 0.2);
+        z-index: 1100;
+        transition: all 0.2s ease;
+        pointer-events: auto;
+    }
+
+    .sidebar-resize-handle:hover,
+    .sidebar-resize-handle.resizing {
+        width: 8px;
+        background: rgba(41, 128, 185, 0.5);
+    }
+}
+
+/* Text wrapping for content elements */
+.bd-article p,
+.bd-article li,
+.bd-article dd,
+.bd-article td,
+.bd-article th,
+.bd-article a,
+.bd-article h1,
+.bd-article h2,
+.bd-article h3,
+.bd-article h4,
+.bd-article h5,
+.bd-article h6,
+.bd-article code {
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Code blocks use horizontal scroll */
+.bd-article pre {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* Full sidebar navigation — all sections visible, only current expanded
+ * pydata_sphinx_theme's collapse_navigation handles expand/collapse natively.
+ * We just bold the active page link for visibility.
+ */
+nav.bd-links ul.bd-sidenav > li.toctree-l1 > a {
+    font-weight: normal;
+}
+
+nav.bd-links ul.bd-sidenav > li.toctree-l1.current > a {
+    font-weight: 700;
+}
+
+/* Sticky left sidebar - stays fixed while scrolling
+ * Similar behavior to the right sidebar (table of contents)
+ */
+@media (min-width: 992px) {
+    .bd-sidebar-primary {
+        position: sticky !important;
+        top: 4rem;  /* Account for navbar height */
+        height: calc(100vh - 4rem);
+        overflow-y: auto;
+    }
 }

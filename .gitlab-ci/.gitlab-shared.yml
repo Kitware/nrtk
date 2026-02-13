@@ -1,0 +1,73 @@
+###############################################################################
+# Contains shared job information for the CI/CD Stages
+###############################################################################
+
+.shared-setup:
+  image: python:3.10
+  interruptible: true
+  allow_failure: false
+  needs: []
+  dependencies: []
+  rules:
+    # If changes are make to an active merge request.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    # If changes are pushed to the default branch.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+  variables:
+    PY_COLORS: "1"
+  before_script:
+    # Setup git-lfs
+    - apt-get -qq update
+    - apt-get -qq install -y git-lfs
+
+    # For internal git dependencies
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net".insteadof "ssh://git@gitlab.jatic.net"
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net/".insteadOf "git@gitlab.jatic.net:"
+
+    # Setup poetry
+    - export PATH=${HOME}/.local/bin:${PATH}
+    - pip install --root-user-action=ignore --upgrade pip -q
+    - pip install --root-user-action=ignore --user -U "poetry>=2.2" -q
+    - poetry config --local virtualenvs.in-project true
+    - python --version
+    - poetry -q run python --version
+    - pip --version
+    - poetry --version
+    - poetry check
+  cache: []
+
+.opencv-headless:
+  script:
+    - |
+      echo "Checking for OpenCV packages in the Poetry environment..."
+
+      OPENCV_PACKAGES=(
+        "opencv-python"
+        "opencv-python-headless"
+        "opencv-contrib-python"
+        "opencv-contrib-python-headless"
+      )
+
+      FOUND=false
+      for pkg in "${OPENCV_PACKAGES[@]}"; do
+        if poetry run python -c "import pkg_resources; pkg_resources.get_distribution('$pkg')" 2>/dev/null; then
+          echo "Found: $pkg"
+          FOUND=true
+          break
+        fi
+      done
+
+      echo "Uninstalling all OpenCV variants..."
+      for pkg in "${OPENCV_PACKAGES[@]}"; do
+        poetry run pip uninstall -y "$pkg" || true
+      done
+
+      if [ "$FOUND" = true ]; then
+        echo "Installing opencv-python-headless..."
+        poetry run pip install "opencv-python-headless>=4.6,<4.12"
+      else
+        echo "No OpenCV packages were present. Skipping installation."
+      fi

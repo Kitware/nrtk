@@ -4,17 +4,14 @@ from pathlib import Path
 import py  # type: ignore
 import pytest
 import responses
+from fastapi.encoders import jsonable_encoder
 from starlette.testclient import TestClient
 
-from nrtk.interop.maite.api.aukus_app import AUKUS_app, Settings
-from nrtk.interop.maite.api.aukus_schema import AukusDatasetSchema
-from nrtk.interop.maite.api.schema import DatasetSchema, NrtkPerturbOutputSchema
-from nrtk.utils._exceptions import FastApiImportError
-from nrtk.utils._import_guard import import_guard
+from nrtk.interop._maite.api._aukus_app import AUKUS_app, Settings
+from nrtk.interop._maite.api._aukus_dataset_schema import AukusDatasetSchema
+from nrtk.interop._maite.api._dataset_schema import DatasetSchema
+from nrtk.interop._maite.api._nrtk_perturb_output_schema import NRTKPerturbOutputSchema
 from tests.interop.maite import DATASET_FOLDER, NRTK_PYBSM_CONFIG
-
-is_usable: bool = import_guard("fastapi", FastApiImportError, ["encoders"])
-from fastapi.encoders import jsonable_encoder  # noqa: E402
 
 
 @pytest.fixture
@@ -24,7 +21,8 @@ def test_aukus_client() -> Generator:
         yield client
 
 
-@pytest.mark.skipif(not is_usable, reason="fastapi and/or pydantic not found. Please install via `nrtk[maite]`")
+@pytest.mark.maite
+@pytest.mark.tools
 class TestAukusApp:
     @responses.activate
     def test_handle_aukus_post(self, test_aukus_client: TestClient, tmpdir: py.path.local) -> None:
@@ -62,7 +60,7 @@ class TestAukusApp:
             method="POST",
             url=Settings().NRTK_IP,
             json=jsonable_encoder(
-                NrtkPerturbOutputSchema(
+                NRTKPerturbOutputSchema(
                     message="Data received successfully",
                     datasets=[
                         DatasetSchema(

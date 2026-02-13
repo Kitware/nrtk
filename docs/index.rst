@@ -6,34 +6,47 @@
 Welcome to NRTK's documentation!
 ================================
 
-
-======================================================================================================================
+**Version**: |release| | **Date**: |today|
 
 **The Natural Robustness Toolkit (NRTK) is an open source toolkit for generating operationally realistic perturbations
 to evaluate the natural robustness of computer vision algorithms.**
 
-.. container:: nrtk-quickstart-button-container
+NRTK enables developers and T&E engineers to simulate sensor-specific and environmental perturbations—such as
+changes in focal length, aperture, and atmospheric conditions—to rigorously assess computer vision model robustness
+without costly real-world data collection.
 
-   .. button-ref:: quickstart
-      :color: primary
-      :class: nrtk-quickstart-button
+.. grid:: 1 2 2 2
+   :gutter: 3
+   :padding: 2 2 0 0
+   :class-container: sd-text-center
 
-      🚀 Get Started with NRTK QuickStart Hub
+   .. grid-item-card:: Tutorials
+      :link: tutorials/index
+      :link-type: doc
 
-======================================================================================================================
+      Learn NRTK through guided end-to-end examples.
 
-Welcome to the documentation for NRTK, a tool created for developers and Test and Evaluation
-(T&E) engineers seeking to rigorously evaluate and enhance the robustness of computer vision models.
-This toolkit simulates a wide range of real-world perturbations, focusing on sensor-specific
-variables such as changes in camera focal length and aperture diameter. It provides a detailed
-analysis of how these factors affect algorithm performance and expand existing datasets. Whether
-you're dealing with subtle shifts in optical settings or more pronounced environmental changes,
-this toolkit gives you the insights and capabilities necessary to ensure your innovative computer
-vision solutions are resilient and reliable under diverse conditions.
+   .. grid-item-card:: How-To Guides
+      :link: how_to_guides/index
+      :link-type: doc
 
-This documentation is structured to provide you with straightforward and practical instructions and
-examples, so that you can effectively leverage the toolkit to enhance the robustness and
-reliability of your computer vision applications in facing real-world challenges.
+      Task-based instructions and workflow recipes.
+
+   .. grid-item-card:: Explanations
+      :link: explanations/index
+      :link-type: doc
+
+      Robustness concepts and operational risk factors in computer vision.
+
+   .. grid-item-card:: Reference
+      :link: reference/index
+      :link-type: doc
+
+      Perturbers, APIs, schemas, and implementation details.
+
+.. note::
+   New to NRTK? :doc:`Getting Started </getting_started/quickstart>` walks you through
+   installation and your first operational risk perturbation.
 
 Why NRTK?
 ---------
@@ -51,7 +64,7 @@ deployed on actual hardware facing natural perturbations in the field.
 Testing & Evaluation Tasks
 --------------------------
 
-For T&E engineers focusing on AI model testing, NRTK provides several key functionalities:
+For T&E engineers focusing on AI model testing, NRTK enables several key functionalities:
 
 
 * **Robustness Testing**: Evaluating model performance when inputs are perturbed or under distribution shift
@@ -77,61 +90,17 @@ necessarily representing the official policies or endorsements, either expressed
 
 .. :auto acknowledgment:
 
-Documentation Contents:
-=======================
-
 .. toctree::
-   :maxdepth: 1
-   :caption: Quick Start
+   :maxdepth: 2
+   :hidden:
 
-   quickstart
-   installation
-   getting_started
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Explanation
-
-   nrtk_explanation
-   risk_factors
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Tutorials
-
-   examples/nrtk_tutorial.ipynb
-   testing_and_evaluation_notebooks
-   examples/coco_scorer.ipynb
-
-.. toctree::
-   :maxdepth: 1
-   :caption: How-To
-
-   examples/perturbers.ipynb
-   examples/otf_visualization.ipynb
-   examples/albumentations_perturber.ipynb
-   examples/diffusion_perturber.ipynb
-   examples/nrtk_xaitk_workflow/image_classification_perturbation_saliency.ipynb
-   examples/nrtk_xaitk_workflow/object_detection_perturbation_saliency.ipynb
-   generating_perturbed_datasets
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Reference
-
-   interfaces
-   implementations
-   maite/jatic_interoperability
-   glossary
-   containers
-   release_notes
-   for_nrtk_developers
-
-
-
-Indices and Tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   getting_started/quickstart
+   tutorials/index
+   how_to_guides/index
+   explanations/index
+   validation_and_trust
+   reference/index
+   interoperability/maite/jatic_interoperability
+   containers/aukus
+   development/index
+   release_notes/index

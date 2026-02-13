@@ -1,6 +1,6 @@
 """Utility script for synchronizing NRTK's optional dependencies (extras).
 
-This script extracts the [tool.poetry.extras] section from pyproject.toml and writes it
+This script extracts the [project.optional-dependencies] section from pyproject.toml and writes it
 to a YAML file (_extras.yml), which is used at runtime to detect which optional dependencies
 are installed. It also prints the status of each extra's dependencies, including their versions.
 
@@ -14,23 +14,54 @@ Includes warnings suppression and automatic git staging of updated files when ru
 Developed with assistance from AI (ChatGPT and GitHub Copilot).
 """
 
+__all__ = ["print_extras_status"]
+
 import importlib
 import sys
 from collections import OrderedDict, defaultdict
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, TextIO
 
-import pkg_resources
 import yaml
 
 import nrtk
 
 _IMPORT_NAME_OVERRIDES = {
     "Pillow": "PIL",
-    "scikit-image": "skimage",
     "opencv-python": "cv2",
     "opencv-python-headless": "cv2",
+    "nrtk-albumentations": "albumentations",
 }
+
+
+def _extract_package_name(dep_spec: str) -> str:
+    """Extract package name from PEP 508 dependency specifier.
+
+    PEP 621 optional-dependencies use full PEP 508 strings with version
+    specifiers and markers, whereas Poetry extras used bare package names.
+    This function extracts just the package name for import checking.
+
+    Examples:
+        "numpy>=1.26,<2.0" -> "numpy"
+        "opencv-python>=4.6" -> "opencv-python"
+        "maite>=0.9.0,<0.10.0" -> "maite"
+        "scikit-image>=0.20; python_version < '3.12'" -> "scikit-image"
+
+    Args:
+        dep_spec: PEP 508 dependency specifier string.
+
+    Returns:
+        The package name without version specifiers or markers.
+    """
+    import re
+
+    # PEP 508 package names are everything before version specifiers (<>=!~) or markers (;)
+    # Package names can contain letters, numbers, dots, hyphens, underscores
+    match = re.match(r"^([a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?)", dep_spec.strip())
+    if match:
+        return match.group(1)
+    return dep_spec  # fallback to full string if parsing fails
 
 
 # Detect which OpenCV packages are actually installed
@@ -38,9 +69,8 @@ def _identify_cv2_package_versions() -> dict[str, str]:
     installed = {}
     for candidate in ("opencv-python", "opencv-python-headless"):
         try:
-            dist = pkg_resources.get_distribution(candidate)
-            installed[candidate] = dist.version
-        except pkg_resources.DistributionNotFound:  # noqa: PERF203
+            installed[candidate] = version(candidate)
+        except PackageNotFoundError:  # noqa: PERF203 - try-except needed per-package in loop
             continue
     return installed
 
@@ -65,7 +95,9 @@ def _get_extras_status(
 
     for extra, deps in extras.items():
         extra_status: OrderedDict[str, tuple[bool, str | None]] = OrderedDict()
-        for dep in deps:
+        for dep_spec in deps:
+            # Extract package name from PEP 508 specifier (e.g., "numpy>=1.26" -> "numpy")
+            dep = _extract_package_name(dep_spec)
             import_name = _IMPORT_NAME_OVERRIDES.get(dep, dep.replace("-", "_"))
             ok, ver = _try_import(import_name)
             if dep.startswith("opencv-python"):
@@ -110,7 +142,9 @@ def print_extras_status(file: TextIO = sys.stdout) -> None:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Extract [tool.poetry.extras] from pyproject.toml and write to YAML.")
+    parser = argparse.ArgumentParser(
+        description="Extract [project.optional-dependencies] from pyproject.toml and write to YAML.",
+    )
     parser.add_argument(
         "--pyproject",
         type=Path,
@@ -133,7 +167,7 @@ if __name__ == "__main__":
     with args.pyproject.open("rb") as f:
         pyproject: dict[str, Any] = tomllib.load(f)
 
-    extras: dict[str, list[str]] = pyproject.get("tool", {}).get("poetry", {}).get("extras", {})
+    extras: dict[str, list[str]] = pyproject.get("project", {}).get("optional-dependencies", {})  # noqa: FKA100 - positional args are standard dict.get() API
 
     with args.output.open("w") as f:
         yaml.dump(extras, f, sort_keys=True)
@@ -149,7 +183,7 @@ if __name__ == "__main__":
     else:
         try:
             # subprocess call is safe: git path resolved via shutil.which, args.output is validated file path
-            subprocess.run([git_path, "add", str(args.output)], check=True)  # noqa: S603
+            subprocess.run([git_path, "add", str(args.output)], check=True)  # noqa: S603 - git path resolved via shutil.which, args.output is a validated file path
             print(f"✅ Staged: {args.output}")
         except subprocess.CalledProcessError as e:
             print(f"⚠️  Failed to stage {args.output} (git add error): {e}")

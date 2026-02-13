@@ -1,5 +1,10 @@
+###############################################################################
+###############################################################################
+# Stage -- VCRM Test Suite
+###############################################################################
+
 vcrm:
-  stage: test
+  stage: vcrm
   image: python:3.10
   interruptible: true
   allow_failure: true
@@ -26,7 +31,7 @@ vcrm:
     # Setup poetry
     - export PATH=${HOME}/.local/bin:${PATH}
     - pip install --root-user-action=ignore --upgrade pip -q
-    - pip install --root-user-action=ignore --user -U "poetry<2.0" tox -q
+    - pip install --root-user-action=ignore --user -U "poetry>=2.2" tox -q
 
     # Show version details for debugging
     - python --version

@@ -12,10 +12,7 @@ __all__: list[str]
 __getattr__, __dir__, __all__ = lazy.attach(
     __name__,
     submodules=[
-        "gen_object_detector_blackbox_response",
-        "image_metric",
-        "perturb_image",
+        "perturb",
         "perturb_image_factory",
-        "score_detections",
     ],
 )

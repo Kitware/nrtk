@@ -1,16 +1,15 @@
-# :auto build-system:
 [build-system]
-requires = ["poetry-core>=1.8.5,<2.0"]
+requires = ["poetry-core>=2.2.0"]
 build-backend = "poetry.core.masonry.api"
-# :auto build-system:
 
-# :auto package-meta:
-[tool.poetry]
+[project]
 name = "nrtk"
+version = "0.27.0"
+description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{include = "nrtk", from="src"}]
-documentation = "https://nrtk.readthedocs.io/"
+authors = [{name = "Kitware, Inc.", email = "nrtk@kitware.com"}]
+requires-python = ">=3.10,<3.14"
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
@@ -23,191 +22,118 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
 ]
-# :auto package-meta:
-# package-specific meta, don't put this in "generated package-meta"
-authors = ["Kitware, Inc. <nrtk@kitware.com>"]
-version = "0.26.0"
-description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
-
-[tool.poetry.dependencies]
-# :auto python-version:
-python = ">=3.10,<3.14"
-# :auto python-version:
-lazy-loader = ">=0.4"
-
-# Python capped to <3.14 because of:
-# https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
-numpy = [
-    {version = "^1.26", python = "<3.13" }, # CVE-2021-34141
-    {version = ">=2.1", python = ">=3.13" } # numpy==2.1 is the first release supporting python 3.13
-]
-smqtk-classifier = ">=0.20.0"
-smqtk-core = ">=0.20"
-smqtk-detection = ">=0.23.0"
-smqtk-image-io = ">=0.18.0"
-tqdm = ">=4.64"
-pycocotools = ">=2.0.10"
-setuptools = ">=78.1.1"
-typing-extensions = ">=4.5.0"
-
-pybsm = {version = ">=0.13.0", optional = true}
-opencv-python = {version = ">=4.6", optional = true}
-opencv-python-headless = {version = ">=4.6", optional = true}
-
-Pillow = {version=">=10.3.0", optional=true} # CVE-2024-28219
-
-scikit-image = [
-    {version = ">=0.20", python = "<3.12", optional=true},
-    {version = ">=0.22", python = ">=3.12", optional=true}
+dependencies = [
+    "lazy-loader>=0.4",
+    # Python capped to <3.14 because of:
+    # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
+    # CVE-2021-34141 (numpy < 1.26)
+    "numpy>=1.26",
+    "smqtk-classifier>=0.20.0",
+    "smqtk-core>=0.21",
+    "smqtk-detection>=0.23.0",
+    "smqtk-image-io>=0.18.0",
+    "tqdm>=4.66.3",  # GHSA-g7vv-2v7x-gj9p
+    "pycocotools>=2.0.10",
+    "setuptools>=78.1.1",
+    "typing-extensions>=4.5.0",
 ]
 
-albumentations = {version=">=2.0.0", optional=true}
+[project.urls]
+Documentation = "https://nrtk.readthedocs.io/"
 
-# Optional for Water droplet perturber
-scipy = {version = ">=1.10.0", optional = true}
-shapely = {version = ">=2.0.7", optional = true}
-geopandas = {version = "^0.14", optional = true}
+[project.scripts]
+nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 
-#################################
-# nrtk.interop.maite dependencies
-#################################
-maite = {version = "^0.8.2", optional = true}
-# REST API deps
-fastapi = {version = ">=0.110.0", optional = true}
-# httpx = {version = ">=0.27.0", optional = true}
-uvicorn = {version = ">=0.29.0", optional = true}
-# JSON Schema
-pydantic = {version = ">=2.6.4", optional = true}
-pydantic_settings = {version = ">=2.2.1", optional = true}
-
-# Optional for tools extra
-kwcoco = {version = ">=0.2.18", optional = true}
-
-# Optional for notebook static type checking tests
-datasets = {version = ">=3.3.2", optional = true}
-matplotlib = {version = ">=3.7.1", optional = true}
-numba = {version = ">=0.56.4", optional = true}
-tabulate = {version = ">=0.9.0", optional = true}
-torch = {version = ">=2.2.0", optional = true}
-torchmetrics = {version = ">=1.0.0", optional = true}
-torchvision = {version = ">=0.21.0", optional = true}
-transformers = {version = ">=4.52.1", optional = true} # CVE-2025-3777
-diffusers = {version = ">=0.21.0", optional = true}
-accelerate = {version = ">=0.20.0", optional = true}
-ultralytics = {version = ">=8.3.85", optional = true}
-jupytext = {version = ">=1.16.7", optional = true}
-protobuf = {version = ">=3.2", optional = true}
-
-[tool.poetry.extras]
-graphics = ["opencv-python"]
-headless = ["opencv-python-headless"]
-pybsm = ["pybsm"]
-maite =["maite", "fastapi", "pydantic", "pydantic_settings", "uvicorn"]
-tools = ["kwcoco", "Pillow"]
-scikit-image = ["scikit-image"]
-Pillow = ["Pillow"]
-albumentations = ["albumentations"]
-waterdroplet = ["scipy", "shapely", "geopandas"]
-diffusion = ["torch", "diffusers", "accelerate", "Pillow", "transformers", "protobuf"]
-notebook-testing = [
-    "datasets", "matplotlib", "numba", "tabulate", "torch",
-    "torchmetrics", "torchvision", "transformers", "ultralytics",
-    "jupytext", "albumentations"
-]
-
-# :auto linting:
-# Linting
-[tool.poetry.group.linting]
-optional = true
-
-[tool.poetry.group.linting.dependencies]
-pre-commit = ">=2.20"
-ruff = "^0.11.0"
-types-setuptools = ">=65.6.0.1"
-sphinx-lint = ">=1.0.0"
-pyright = {version=">=1.1.320",extras=["nodejs"]}
-# :auto linting:
-types-requests = ">=2.31.0.10"
-
-# :auto docs:
-# Docs
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-Sphinx = ">=5.3.0"
-sphinx-copybutton = "^0.5.2"
-sphinx-rtd-theme = ">=1.1.1"
-sphinx-prompt = ">=1.5.0"
-sphinx-click = ">=5.0.0"
-sphinx-design = ">=0.6.1"
-livereload = ">=2.6.3"
-myst-nb = "^1.1.2"
-# :auto docs:
-
-# :auto tests:
-# Testing
-[tool.poetry.group.tests]
-optional = true
-
-[tool.poetry.group.tests.dependencies]
-coverage = ">=6.5.0"
-pytest = ">=7.2.0"
-pytest-cov = ">=4.0.0"
-syrupy = ">=4.0.0"
-# Jupyter notebook testing
-notebook = ">=7.2.2"
-papermill = ">=2.4.0"
-pyright = {version=">=1.1.320",extras=["nodejs"]}
-# :auto tests:
-#########################################
-# nrtk.interop.maite testing dependencies
-#########################################
-starlette = ">=0.47.2" # CVE-2025-54121
-responses = ">=0.25.0"
-Pillow = ">=10.3.0" # CVE-2024-28219
-
-[tool.poetry.plugins."smqtk_plugins"]
+[project.entry-points."smqtk_plugins"]
 # Add implementation sub-module exposure here.
-"impls.gen_object_detector_blackbox_response.simple_generic_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_generic_generator"
-"impls.gen_object_detector_blackbox_response.simple_pybsm_generator" = "nrtk.impls.gen_object_detector_blackbox_response.simple_pybsm_generator"
-"impls.perturb_image.generic.albumentations_perturber" = "nrtk.impls.perturb_image.generic.albumentations_perturber"
-"impls.perturb_image.generic.compose_perturber" = "nrtk.impls.perturb_image.generic.compose_perturber"
-"impls.perturb_image.generic.nop_perturber" = "nrtk.impls.perturb_image.generic.nop_perturber"
-"impls.perturb_image.generic.random_crop_perturber" = "nrtk.impls.perturb_image.generic.random_crop_perturber"
-"impls.perturb_image.generic.random_rotation_perturber" = "nrtk.impls.perturb_image.generic.random_rotation_perturber"
-"impls.perturb_image.generic.random_scale_perturber" = "nrtk.impls.perturb_image.generic.random_scale_perturber"
-"impls.perturb_image.generic.random_translation_perturber" = "nrtk.impls.perturb_image.generic.random_translation_perturber"
-"impls.perturb_image.generic.haze_perturber" = "nrtk.impls.perturb_image.generic.haze_perturber"
-"impls.perturb_image.generic.water_droplet_perturber" = "nrtk.impls.perturb_image.generic.water_droplet_perturber"
-"impls.perturb_image.generic.diffusion_perturber" = "nrtk.impls.perturb_image.generic.diffusion_perturber"
-"impls.perturb_image.generic.radial_distortion_perturber" = "nrtk.impls.perturb_image.generic.radial_distortion_perturber"
-"impls.perturb_image.generic.PIL.enhance" = "nrtk.impls.perturb_image.generic.PIL.enhance"
-"impls.perturb_image.generic.cv2.blur" = "nrtk.impls.perturb_image.generic.cv2.blur"
-"impls.perturb_image.generic.skimage.random_noise" = "nrtk.impls.perturb_image.generic.skimage.random_noise"
-"impls.perturb_image.pybsm.pybsm_perturber" = "nrtk.impls.perturb_image.pybsm.pybsm_perturber"
-"impls.perturb_image.pybsm.jitter_otf_perturber" = "nrtk.impls.perturb_image.pybsm.jitter_otf_perturber"
-"impls.perturb_image.pybsm.detector_otf_perturber" = "nrtk.impls.perturb_image.pybsm.detector_otf_perturber"
-"impls.perturb_image.pybsm.turbulence_aperture_otf_perturber" = "nrtk.impls.perturb_image.pybsm.turbulence_aperture_otf_perturber"
-"impls.perturb_image.pybsm.circular_aperture_otf_perturber" = "nrtk.impls.perturb_image.pybsm.circular_aperture_otf_perturber"
-"impls.perturb_image_factory.generic.step" = "nrtk.impls.perturb_image_factory.generic.step"
-"impls.perturb_image_factory.generic.one_step" = "nrtk.impls.perturb_image_factory.generic.one_step"
-"impls.perturb_image_factory.generic.linspace" = "nrtk.impls.perturb_image_factory.generic.linspace"
-"impls.perturb_image_factory.pybsm" = "nrtk.impls.perturb_image_factory.pybsm"
-"impls.score_detections.class_agnostic_pixelwise_iou_scorer" = "nrtk.impls.score_detections.class_agnostic_pixelwise_iou_scorer"
-"impls.score_detections.coco_scorer" = "nrtk.impls.score_detections.coco_scorer"
-"impls.score_detections.nop_scorer" = "nrtk.impls.score_detections.nop_scorer"
-"impls.score_detections.random_scorer" = "nrtk.impls.score_detections.random_scorer"
-"impls.image_metric.snr_image_metric" = "nrtk.impls.image_metric.snr_image_metric"
+"nrtk.impls.perturb_image.photometric.blur" = "nrtk.impls.perturb_image.photometric.blur"
+"nrtk.impls.perturb_image.photometric.enhance" = "nrtk.impls.perturb_image.photometric.enhance"
+"nrtk.impls.perturb_image.photometric.noise" = "nrtk.impls.perturb_image.photometric.noise"
+"nrtk.impls.perturb_image" = "nrtk.impls.perturb_image"
+"nrtk.impls.perturb_image.geometric.random" = "nrtk.impls.perturb_image.geometric.random"
+"nrtk.impls.perturb_image.environment" = "nrtk.impls.perturb_image.environment"
+"nrtk.impls.perturb_image.generative" = "nrtk.impls.perturb_image.generative"
+"nrtk.impls.perturb_image.optical" = "nrtk.impls.perturb_image.optical"
+"nrtk.impls.perturb_image.optical.otf" = "nrtk.impls.perturb_image.optical.otf"
+"nrtk.impls.perturb_image_factory" = "nrtk.impls.perturb_image_factory"
 
-[tool.poetry.scripts]
-nrtk-perturber = "nrtk.interop.maite.utils.bin.nrtk_perturber_cli:nrtk_perturber_cli"
+[project.optional-dependencies]
+graphics = ["opencv-python>=4.8.1.78"]  # CVE-2023-4863
+headless = ["opencv-python-headless>=4.8.1.78"]  # CVE-2023-4863
+pybsm = ["pybsm>=0.14.3"]
+maite = [
+    "maite>=0.9.2,<0.10.0",
+]
+tools = [
+    "kwcoco>=0.2.18",
+    "Pillow>=12.1.1",  # GHSA-cfh3-3jmp-rvhc
+    "click>=8.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.29.0",
+    "pydantic>=2.6.4",
+    "pydantic-settings>=2.2.1",
+    "python-json-logger>=3.0.0",
+]
+skimage = [
+    "scikit-image>=0.20; python_version < '3.12'",
+    "scikit-image>=0.22; python_version >= '3.12'"
+]
+pillow = ["Pillow>=12.1.1"]  # GHSA-cfh3-3jmp-rvhc
+albumentations = ["nrtk-albumentations>=2.2.1"]
+waterdroplet = ["scipy>=1.10.0", "numba>=0.56.4"]
+diffusion = [
+    "torch>=2.6.0",  # GHSA-53q9-r3pm-6pq6
+    "diffusers>=0.21.0",
+    "accelerate>=0.20.0",
+    "Pillow>=12.1.1",  # GHSA-cfh3-3jmp-rvhc
+    "transformers>=4.53.0",  # CVE-2025-6921
+    "protobuf>=6.33.5",  # GHSA-8qvm-5x2c-j2w7, CVE-2026-0994
+]
 
-# :auto pytest:
+[tool.poetry]
+# Poetry-specific configuration
+packages = [{include = "nrtk", from="src"}]
+
+[dependency-groups]
+# Linting
+linting = [
+    "ruff>=0.11.0,<0.12.0",
+    "types-setuptools>=65.6.0.1",
+    "sphinx-lint>=1.0.0",
+    "types-requests>=2.31.0.10",
+    # required for pre-commit hook
+    "pre-commit>=2.20",
+    "pyright[nodejs]>=1.1.320",
+]
+
+# Docs
+docs = [
+    "Sphinx>=5.3.0",
+    "sphinx-copybutton>=0.5.2,<0.6.0",
+    "pydata-sphinx-theme>=0.16.1",
+    "sphinx-prompt>=1.5.0",
+    "sphinx-click>=5.0.0",
+    "sphinx-design>=0.6.1",
+    "sphinx-datatables>=0.3.1,<0.4.0",
+    "livereload>=2.6.3",
+    "myst-nb>=1.1.2,<2.0.0",
+]
+
+# Testing
+tests = [
+    # pytest unittesting
+    "pytest>=7.2.0",
+    "pytest-cov>=4.0.0", # reports code coverage
+    "pytest-xdist>=3.8.0", # allows -n auto|# to be used to run pytests in parallel
+    "syrupy>=5.0.0", # required for snapshot/regression testing
+    "Pillow>=12.1.1",  # GHSA-cfh3-3jmp-rvhc  # required for custom conftest.py fixtures
+    "responses>=0.25.0", # rquired to test FastAPI (used by entrypoint app)
+    "httpx>=0.22.0", # required by starlette.testclient.TestClient (optional dep of starlette, not installed by default)
+]
+
 [tool.pytest.ini_options]
 addopts = [
     "-lv",                              # Show local in trace-backs.
-    "--doctest-modules",                # Increased verbosity.
     "--tb=long",                        # Trace-back print mode.
     "--cov=./src/nrtk",          # Cover our package specifically
     "--cov=./tests",                    # Also cover our tests for dead spots
@@ -215,22 +141,36 @@ addopts = [
     "--cov-report=xml:coverage.xml",    # for external tool reporting
     "--snapshot-warn-unused",           # Prevent test failure when skipping tests
 ]
+# NOTE: --doctest-modules removed from addopts. To run doctests, use:
+#   pytest --doctest-modules src/nrtk
+# Doctests require optional dependencies to be installed.
 testpaths = [
     "tests",
-    "src/nrtk",
 ]
 doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
     "IGNORE_EXCEPTION_DETAIL",
 ]
-# :auto pytest:
+markers = [
+    "core: Run tests that only require core functionality",
+    "opencv: Run tests that require the graphics or headless extra",
+    "albumentations: Run tests that require the albumentations extra",
+    "waterdroplet: Run tests that require the waterdroplet extra",
+    "notebooks: Run notebook-related tests (pyright checks)",
+    "pillow: Run tests that require the pillow extra",
+    "skimage: Run tests that require the skimage extra",
+    "diffusion: Run tests that require the diffusion extra",
+    "pybsm: Run tests that require the pybsm extra",
+    "maite: Run tests that require the maite extra",
+    "tools: Run tests that require the tools extra",
+]
+
 [tool.coverage.run]
 omit = [
     "src/nrtk/utils/_extras.py",
     "src/nrtk/utils/_extras.yml",
 ]
 
-# :auto ruff:
 [tool.ruff]
 # Exclude content as appropriate.
 extend-exclude = [
@@ -238,6 +178,7 @@ extend-exclude = [
     "scripts",
     "docs/_build",
     "docs/_implementations",
+    ".tox",
     ".dev",
 ]
 
@@ -252,7 +193,7 @@ extend-include = ["*.ipynb"]
 [tool.ruff.lint]
 select = [
     "F", "E", "W", "C90", "I", "N", "D", "UP",
-    "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PYI", "PT", "Q",
+    "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PLR0917", "PYI", "PT", "Q",
     "RSE", "RET", "SLF", "SIM", "TID252", "ARG", "FIX", "PD", "FLY", "NPY", "RUF027",
     "RUF100", "PERF", "UP045", "RUF013"
 ]
@@ -260,7 +201,8 @@ preview = true  # needed for RUF027
 explicit-preview-rules = true
 
 # From program suggested config
-ignore = ["ANN101","ANN102","C408","C416"]
+ignore = ["C416"]
+external = ["FKA100"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -273,7 +215,11 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "tests/*.py" = [
   "S101",  # Allow asserts in tests
   "SLF001",  # Allow private member access for introspection in tests
-  "D100", "D101", "D102", "D103", "D104", "D105", "D107"  # Allow missing docstring in test dir
+  "D100", "D101", "D102", "D103", "D104", "D105", "D107",  # Allow missing docstring in test dir
+  "PLR0917"  # Allow more than one positional arg in tests
+]
+"docs/examples/*.ipynb" = [
+   "PLR0917"  # Allow more than one positional arg in notebooks
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -292,6 +238,9 @@ convention = "google"
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 120
 
+[tool.ruff.lint.pylint]
+max-positional-args = 1
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
@@ -299,9 +248,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
-# :auto ruff:
 
-# :auto pyright:
 [tool.pyright]
 pythonVersion = "3.10"
 reportMissingImports = "warning"
@@ -316,6 +263,6 @@ exclude = [
     "**/__pycache__",
     "docs/_build",
     "docs/_implementations",
+    ".tox",
     ".dev",
     ]
-# :auto pyright:

@@ -16,8 +16,6 @@ from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
-from nrtk.utils._exceptions import NotebookTestingImportError
-
 _found_path = shutil.which("pyright")
 PYRIGHT_PATH = Path(_found_path) if _found_path else None
 del _found_path
@@ -83,9 +81,6 @@ class PyrightOutput(TypedDict):
 
 
 def notebook_to_py_text(path_to_nb: Path) -> str:
-    from nrtk.utils._import_guard import import_guard
-
-    import_guard("jupytext", NotebookTestingImportError)
     import jupytext
 
     ntbk = jupytext.read(path_to_nb, fmt="ipynb")
@@ -97,7 +92,7 @@ def get_docstring_examples(doc: str) -> str:
 
     # contains input lines of docstring examples with all indentation
     # and REPL markers removed
-    src_lines: list[str] = list()
+    src_lines: list[str] = []
 
     for source, indent in docstring_re.findall(doc):
         source: str
@@ -120,7 +115,7 @@ def _validate_path_to_pyright(path_to_pyright: Path | None) -> None:
 
 def _format_outputs(scan: PyrightOutput) -> PyrightOutput:
     out = scan["generalDiagnostics"]
-    diagnostics: list[Diagnostic] = list()
+    diagnostics: list[Diagnostic] = []
 
     if out:
         item = out[0]
@@ -152,6 +147,7 @@ def _format_outputs(scan: PyrightOutput) -> PyrightOutput:
 
 
 def pyright_analyze(
+    *,
     notebook_path_str: str,
     path_to_pyright: Path | None = PYRIGHT_PATH,
 ) -> PyrightOutput:

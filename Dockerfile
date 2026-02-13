@@ -1,4 +1,4 @@
-FROM python:3.11-slim as python-base
+FROM python@sha256:5be45dbade29bebd6886af6b438fd7e0b4eb7b611f39ba62b430263f82de36d2 AS python-base
 
 ENV PYTHONUNBUFFERED=1 \
     # prevents python from creating .pyc
@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     # poetry
-    POETRY_VERSION=1.8.2 \
+    POETRY_VERSION=2.2.1 \
     # change default poetry install location to make it easier to copy to different stages
     POETRY_HOME="/opt/poetry" \
     # install at system level, since in a docker container
@@ -23,7 +23,7 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # 'builder-base' stage is used to build deps + create virtual environment
 
-FROM python-base as builder-base
+FROM python-base AS builder-base
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update \
@@ -33,9 +33,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # `development` image is used during development / testing
-FROM builder-base as development
+FROM builder-base AS development
 ENV FASTAPI_ENV=development
 WORKDIR $PYSETUP_PATH
+
+# Setup numba cache for non-root user
+ENV NUMBA_CACHE_DIR=/tmp/numba_cache
+RUN mkdir -p /tmp/numba_cache && chmod 777 /tmp/numba_cache
 
 # copy in our built poetry
 COPY . ./src
@@ -45,15 +49,23 @@ WORKDIR $PYSETUP_PATH/src
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     --mount=type=cache,target=/root/.cache/pypoetry,sharing=locked \
     poetry config virtualenvs.create false && poetry run pip \
-    install -e .[maite-cpu,tools,headless,pybsm-headless]
+    install .[pybsm,maite,tools,headless,Pillow,scikit-image,albumentations,waterdroplet,diffusion]
 
-ENTRYPOINT [ "python", "./src/nrtk_jatic/utils/bin/nrtk_perturber_cli.py"]
-# default args for nrtk_perturber_cli
-CMD ["/root/input/dataset", "/root/output/", \
-     "/root/input/nrtk_config.json", "-v"]
+# Set non-root user
+RUN useradd --uid 100 --create-home --shell /bin/bash appuser
+USER appuser
+
+# Setup environment variables with default args
+ENV INPUT_DATASET_PATH="/input/data/dataset/"
+ENV OUTPUT_DATASET_PATH="/output/data/result/"
+ENV CONFIG_FILE="/input/nrtk_config.json"
+
+
+ENTRYPOINT [ "/usr/local/bin/nrtk-perturber" ]
 
 # To run this docker container, use the following command:
-# `docker run -v /path/to/input:/root/input/:ro -v /path/to/output:/root/output/ nrtk-perturber`
+# `docker run -v /path/to/input:/input/:ro -v /path/to/output:/output/ nrtk-perturber`.
+# Make sure the output directory is writable by non-root users.
 # This will mount the inputs to the correct locations the default args are used.
 # See https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 # for more info on mounting volumes

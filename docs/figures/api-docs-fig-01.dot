@@ -8,7 +8,7 @@ newrank=true;  // Required to not "unbox" things out of subclusters.
 // Gridding -- Used to vertically align nodes to separate clusters as desired.
 node [style=invis]
 edge [style=invis]
-A -> B -> C -> D -> E;
+A -> B -> C;
 
 // Interfaces
 node [style=solid]
@@ -17,9 +17,6 @@ Pluggable -> Plugfigurable;
 Configurable -> Plugfigurable;
 Plugfigurable -> PerturbImage;
 Plugfigurable -> PerturbImageFactory;
-Plugfigurable -> GenerateBlackboxResponse;
-Plugfigurable -> ScoreDetections;
-Plugfigurable -> ScoreClassifications;
 
 subgraph cluster_smqtk {
   label="Package: SMQTK-Core";
@@ -34,42 +31,16 @@ subgraph cluster_nrtk {
       PerturbImage;
       PerturbImageFactory;
     }
-    subgraph cluster_generation {
-      label="Item-Response Curve (IRC) Generation";
-      GenerateBlackboxResponse;
-      GenerateObjectDetectorBlackboxResponse;
-      GenerateClassifierBlackboxResponse;
-    }
-    subgraph cluster_scoring {
-      label="Scoring";
-      ScoreDetections;
-      ScoreClassifications;
-    }
 
     PerturbImageFactory -> PerturbImage [arrowtail=diamond, constraint=false];
-    GenerateBlackboxResponse -> GenerateObjectDetectorBlackboxResponse;
-    GenerateBlackboxResponse -> GenerateClassifierBlackboxResponse;
-  }
-  subgraph cluster_impls {
-    label="Implementation Examples";
-    SimplePybsmGenerator;
-    GenerateObjectDetectorBlackboxResponse -> SimplePybsmGenerator;
-    SimplePybsmGenerator -> PerturbImageFactory [arrowtail=odiamond, constraint=false];
-    SimplePybsmGenerator -> ScoreDetections [arrowtail=odiamond, constraint=false];
   }
 }
 
 // Gridding pt. 2
 { rank=same; A; Pluggable; Configurable; }
 { rank=same; B; Plugfigurable; }
-{ rank=same; C; GenerateBlackboxResponse; }
-{ rank=same; D; PerturbImage;
-                GenerateObjectDetectorBlackboxResponse;
-                GenerateClassifierBlackboxResponse;
-                PerturbImageFactory;
-                ScoreDetections;
-                ScoreClassifications; }
-{ rank=same; E; SimplePybsmGenerator; }
+{ rank=same; C; PerturbImage;
+                PerturbImageFactory; }
 
 }
 

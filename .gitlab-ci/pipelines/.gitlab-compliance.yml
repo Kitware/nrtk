@@ -1,0 +1,71 @@
+###############################################################################
+# Stage -- A child pipeline to run the DevSecOps components
+###############################################################################
+stages:
+  # - pre-commit
+  - sr-compliance
+  - unit-test
+  - tr-compliance
+  - dr-compliance
+  - advana-compliance
+  - validate
+  - summary
+
+include:
+  # - component: gitlab.jatic.net/jatic/devsecops/components/pre-commit@0.5.0
+  #   inputs:
+  #     project_path: "jatic/kitware/nrtk"
+  #     allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/bah/components/sr-compliance@0.5.0
+    inputs:
+      stage: sr-compliance
+      poetry_image: harbor.jatic.net:443/platform-team/base-images/python-base-image:3.11
+      package_name: "${PACKAGE_NAME}"
+      full_execution_on_commit: true
+      allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/unit-test@0.5.0
+    inputs:
+      stage: unit-test
+      python_image: harbor.jatic.net:443/platform-team/base-images/python-base-image
+      full_execution_on_commit: true
+      package_name: "${PACKAGE_NAME}"
+      poetry_install_options: --only main,tests
+      allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/unit-test@0.5.0
+    inputs:
+      stage: unit-test
+      python_image: harbor.jatic.net:443/platform-team/base-images/python-base-image
+      full_execution_on_commit: true
+      package_name: "${PACKAGE_NAME}"
+      poetry_install_options: --only main,tests --extras "example"
+      allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/tr-compliance@0.5.0
+    inputs:
+      package_name: "${PACKAGE_NAME}"
+      full_execution_on_commit: true
+      allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/dr-compliance@0.5.0
+    inputs:
+      full_execution_on_commit: true
+      sast_excluded_paths: tests, README.md
+      sast_search_max_depth: "2"
+      allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/advana-compliance@0.5.0
+    inputs:
+      full_execution_on_commit: true
+      allow_failure: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/validate-pipeline@0.5.0
+    inputs:
+      full_execution_on_commit: true
+
+  - component: gitlab.jatic.net/jatic/devsecops/components/pipeline-report@0.5.0
+    inputs:
+      full_execution_on_commit: true
+      components_branch: 0.5.0

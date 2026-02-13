@@ -1,0 +1,31 @@
+{
+  "sensor": {
+    "sensor_name": "L32511x",
+    "D": 275e-3,
+    "f": 4,
+    "p_x": 0.008e-3,
+    "opt_trans_wavelengths": [5e-07, 6.6e-07],
+    "optics_transmission": [0.5, 0.5],
+    "eta": 0.4,
+    "w_x": 0.008e-3,
+    "w_y": 0.008e-3,
+    "int_time": 30.0e-3,
+    "n_tdi": 1.0,
+    "dark_current": 3994.5658425598544,
+    "read_noise": 25.0,
+    "max_n": 96000,
+    "bit_depth": 11.9,
+    "max_well_fill": 0.6,
+    "s_x": 5e-07,
+    "s_y": 5e-07,
+    "qe_wavelengths": [3e-07, 4e-07, 5e-07, 6e-07, 7e-07, 8e-07, 9e-07, 1e-06, 1.1e-06],
+    "qe": [0.05, 0.6, 0.75, 0.85, 0.85, 0.75, 0.5, 0.2, 0.0]
+  },
+  "scenario": {
+    "scenario_name": "niceday",
+    "ihaze": 1,
+    "altitude": 9000.0,
+    "ground_range": 60000.0,
+    "aircraft_speed": 100.0
+  }
+}

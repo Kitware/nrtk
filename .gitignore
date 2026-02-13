@@ -72,8 +72,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/_implementations
-docs/maite/_implementations
+docs/**/_implementations
 
 # PyBuilder
 .pybuilder/
@@ -148,3 +147,9 @@ cython_debug/
 # Example notebooks
 docs/examples/data
 docs/examples/pybsm/data
+
+# cosign private key
+cosign.key
+
+# pytest junit output files from tox
+.junit.*.xml

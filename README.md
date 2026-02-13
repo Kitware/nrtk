@@ -20,13 +20,13 @@ The `nrtk` package evaluates the natural robustness of computer vision
 algorithms to various perturbations, including sensor-specific changes to camera
 focal length, aperture diameter, etc.
 
-We have also created `nrtk.interop.maite` module to support AI T&E use cases and
+We have also created `nrtk.interop` module to support AI T&E use cases and
 workflows, through interoperability with
 [MAITE](https://github.com/mit-ll-ai-technology/maite) and integration with
 other [JATIC](https://cdao.pages.jatic.net/public/) tools. Users seeking to use
 NRTK to perturb MAITE-wrapped datasets or evaluate MAITE-wrapped models should
 utilize this module. Explore our
-[T&E guides](https://nrtk.readthedocs.io/en/latest/testing_and_evaluation_notebooks.html)
+[T&E guides](https://nrtk.readthedocs.io/en/latest/tutorials/testing_and_evaluation_notebooks.html)
 which demonstrate how `nrtk` perturbations and `maite` can be applied to assess
 operational risks.
 
@@ -99,13 +99,13 @@ pip install nrtk[pybsm]
 
 More information on extras and related perturbers, including a complete list of
 extras, can be found
-[here](https://nrtk.readthedocs.io/en/latest/installation.html#extras).
+[here](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#extras).
 
 Details on the perturbers and their dependencies can be found
-[here](https://nrtk.readthedocs.io/en/latest/implementations.html).
+[here](https://nrtk.readthedocs.io/en/latest/reference/api/implementations.html).
 
 For more detailed installation instructions, visit the
-[installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html).
+[installation documentation](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html).
 
 <!-- :auto installation: -->
 
@@ -122,9 +122,9 @@ Jupyter notebooks provided in the `./docs/examples/` directory.
 
 Via the pyBSM package, NRTK exposes a large set of Optical Transfer Functions
 (OTFs). These OTFs can simulate different environmental and sensor-based
-effects. For example, the :ref:`JitterOTFPerturber <JitterOTFPerturber>`
-simulates different levels of sensor jitter. By modifying its input parameters,
-you can observe how sensor jitter affects image quality.
+effects. For example, the :ref:`JitterPerturber <JitterPerturber>` simulates
+different levels of sensor jitter. By modifying its input parameters, you can
+observe how sensor jitter affects image quality.
 
 #### Input Image
 
@@ -138,15 +138,15 @@ perturbation. This image represents the initial state before any transformation.
 Below is some example code that applies a Jitter OTF transformation::
 
 ```
-from nrtk.impls.perturb_image.pybsm.jitter_otf_perturber import JitterOTFPerturber
+from nrtk.impls.perturb_image.optical.otf import JitterPerturber
 import numpy as np
 from PIL import Image
 
 INPUT_IMG_FILE = 'docs/images/input.jpg'
 image = np.array(Image.open(INPUT_IMG_FILE))
 
-otf = JitterOTFPerturber(sx=8e-6, sy=8e-6, name="test_name")
-out_image = otf.perturb(image)
+otf = JitterPerturber(sx=8e-6, sy=8e-6, name="test_name")
+out_image = otf(image)
 ```
 
 This code uses default values and provides a sample input image. However, you
@@ -174,7 +174,7 @@ To build the Sphinx-based documentation locally for the latest reference:
 
 ```bash
 # Install dependencies
-poetry install --sync --with main,linting,tests,docs
+poetry sync --with main,linting,tests,docs
 # Navigate to the documentation root
 cd docs
 # Build the documentation
@@ -197,7 +197,7 @@ The following points help ensure contributions follow development practices.
   [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
 - Adopt the Git Flow branching strategy.
 - See the
-  [release process documentation](https://nrtk.readthedocs.io/en/latest/release_process.html)
+  [release process documentation](https://nrtk.readthedocs.io/en/latest/development/release_process.html)
   for detailed release information.
 - Additional contribution guidelines and issue reporting steps can be found in
   [CONTRIBUTING.md](./CONTRIBUTING.md).
@@ -214,10 +214,10 @@ Ensure the source tree is acquired locally before proceeding.
 
 You can install using [Poetry](https://python-poetry.org/):
 
-> [!IMPORTANT] NRTK currently requires `poetry<2.0`
+> [!IMPORTANT] NRTK requires Poetry 2.2 or higher.
 
 > [!WARNING] Users unfamiliar with Poetry should use caution. See
-> [installation documentation](https://nrtk.readthedocs.io/en/latest/installation.html#from-source)
+> [installation documentation](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#from-source)
 > for more information.
 
 ```bash
@@ -234,7 +234,7 @@ To install and use pre-commit hooks:
 
 ```bash
 # Install required dependencies
-poetry install --sync --with main,linting,tests,docs
+poetry sync --with main,linting,tests,docs
 # Initialize pre-commit hooks for the repository
 poetry run pre-commit install
 # Run pre-commit checks on all files
@@ -266,18 +266,13 @@ to facilitate dataset exploration. This tool uses the
 
 ## Contacts
 
-**Principal Investigator**: Brian Hu (Kitware) @brian.hu
+**Current Maintainers**: Brandon RichardWebster (@bjrichardwebster), Emily
+Veenhuis (@eveenhuis)
 
-**Project Manager / Product Owner**: Keith Fieldhouse (Kitware)
-@keith.fieldhouse
-
-**Scrum Master / Maintainer**: Brandon RichardWebster (Kitware)
-@b.richardwebster
-
-**Deputy Scrum Master / Deputy Maintainer**: Emily Veenhuis (Kitware)
-@emily.veenhuis
-
-**Program Representative**: Austin Whitesell (MITRE) @awhitesell
+We welcome contributions to NRTK! Please start discussions by opening an issue
+or pull request on GitHub. This keeps the conversation visible and helps the
+whole community benefit. Our preferred channels are public, but if you'd like to
+reach out privately first, feel free to contact us at nrtk@kitware.com.
 
 <!-- :auto contacts: -->
 

@@ -1,0 +1,49 @@
+###############################################################################
+# Stage -- Mirroring
+###############################################################################
+
+# GitLab's builtin mirroring doesn't properly
+# mirror lfs objects. This is a work around to
+# get the outcome we need.
+mirror:
+  extends: .shared-setup
+  stage: mirror
+  needs: []
+  dependencies: []
+  before_script:
+    - !reference [.shared-setup, before_script]
+    # configure ssh access
+    - apt-get install openssh-client -y
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo "$GITHUB_KITWARE_GROUP_TOKEN_B64" | base64 -d > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan github.com >> /root/.ssh/known_hosts
+  script:
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.jatic.net/jatic/kitware/${CI_PROJECT_NAME}.git
+    - cd ${CI_PROJECT_NAME}
+    # - git clone https://robot:${GITLAB_KITWARE_GROUP_TOKEN}@gitlab.jatic.net/jatic/kitware/${CI_PROJECT_NAME}.git
+    - git fetch --all
+    - git lfs fetch --all
+    - git remote set-url --add --push origin git@github.com:Kitware/${CI_PROJECT_NAME}.git
+    - git config lfs.allowincompletepush true
+    - git config push.followTags true
+    # mirror main
+    - git checkout main
+    - git pull
+    - git lfs pull
+    - git lfs push --all origin main
+    - git push --force origin main
+    # mirror release
+    - git checkout release
+    - git pull
+    - git lfs pull
+    - git lfs push --all origin release
+    - git push --force origin release
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - if: $CI_COMMIT_BRANCH == "release"
+      when: on_success
+    - when: never
