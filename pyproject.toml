@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "nrtk"
-version = "0.26.0"
+version = "0.27.0"
 description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 license = "Apache-2.0"
 readme = "README.md"
@@ -32,7 +32,7 @@ dependencies = [
     "smqtk-core>=0.21",
     "smqtk-detection>=0.23.0",
     "smqtk-image-io>=0.18.0",
-    "tqdm>=4.64",
+    "tqdm>=4.66.3",  # GHSA-g7vv-2v7x-gj9p
     "pycocotools>=2.0.10",
     "setuptools>=78.1.1",
     "typing-extensions>=4.5.0",
@@ -58,15 +58,15 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 "nrtk.impls.perturb_image_factory" = "nrtk.impls.perturb_image_factory"
 
 [project.optional-dependencies]
-graphics = ["opencv-python>=4.6"]
-headless = ["opencv-python-headless>=4.6"]
+graphics = ["opencv-python>=4.8.1.78"]  # CVE-2023-4863
+headless = ["opencv-python-headless>=4.8.1.78"]  # CVE-2023-4863
 pybsm = ["pybsm>=0.14.3"]
 maite = [
     "maite>=0.9.2,<0.10.0",
 ]
 tools = [
     "kwcoco>=0.2.18",
-    "Pillow>=10.3.0",
+    "Pillow>=12.1.1",  # GHSA-cfh3-3jmp-rvhc
     "click>=8.0.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
@@ -78,10 +78,17 @@ skimage = [
     "scikit-image>=0.20; python_version < '3.12'",
     "scikit-image>=0.22; python_version >= '3.12'"
 ]
-pillow = ["Pillow>=10.3.0"]
+pillow = ["Pillow>=12.1.1"]  # GHSA-cfh3-3jmp-rvhc
 albumentations = ["nrtk-albumentations>=2.2.1"]
 waterdroplet = ["scipy>=1.10.0", "numba>=0.56.4"]
-diffusion = ["torch>=2.2.0", "diffusers>=0.21.0", "accelerate>=0.20.0", "Pillow>=10.3.0", "transformers>=4.52.1", "protobuf>=3.2"]
+diffusion = [
+    "torch>=2.6.0",  # GHSA-53q9-r3pm-6pq6
+    "diffusers>=0.21.0",
+    "accelerate>=0.20.0",
+    "Pillow>=12.1.1",  # GHSA-cfh3-3jmp-rvhc
+    "transformers>=4.53.0",  # CVE-2025-6921
+    "protobuf>=6.33.5",  # GHSA-8qvm-5x2c-j2w7, CVE-2026-0994
+]
 
 [tool.poetry]
 # Poetry-specific configuration
@@ -119,7 +126,7 @@ tests = [
     "pytest-cov>=4.0.0", # reports code coverage
     "pytest-xdist>=3.8.0", # allows -n auto|# to be used to run pytests in parallel
     "syrupy>=5.0.0", # required for snapshot/regression testing
-    "Pillow>=10.3.0", # CVE-2024-28219  # required for custom conftest.py fixtures
+    "Pillow>=12.1.1",  # GHSA-cfh3-3jmp-rvhc  # required for custom conftest.py fixtures
     "responses>=0.25.0", # rquired to test FastAPI (used by entrypoint app)
     "httpx>=0.22.0", # required by starlette.testclient.TestClient (optional dep of starlette, not installed by default)
 ]
