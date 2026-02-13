@@ -148,24 +148,81 @@ class TestAlbumentationsPerturber:
         psnr_tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
-        ("perturber", "parameters", "seed"),
+        ("perturber", "parameters", "seed", "is_static"),
         [
-            ("RandomSnow", {"snow_point_range": (0.2, 0.4), "brightness_coeff": 2.5, "p": 1.0}, 1),
-            ("RandomSunFlare", {"flare_roi": (0, 0, 1, 0.5), "angle_range": (0.25, 0.75), "p": 1.0}, 7),
+            ("RandomSnow", {"snow_point_range": (0.2, 0.4), "brightness_coeff": 2.5, "p": 1.0}, 1, False),
+            ("RandomSunFlare", {"flare_roi": (0, 0, 1, 0.5), "angle_range": (0.25, 0.75), "p": 1.0}, 7, True),
+            ("RandomFog", {"fog_coef_range": (0.7, 0.8), "alpha_coef": 0.1, "p": 1.0}, None, False),
         ],
     )
     def test_configuration(
         self,
         perturber: str,
         parameters: dict,
-        seed: int,
+        seed: int | None,
+        is_static: bool,
     ) -> None:
         """Test configuration stability."""
-        inst = AlbumentationsPerturber(perturber=perturber, parameters=parameters, seed=seed)
+        inst = AlbumentationsPerturber(
+            perturber=perturber,
+            parameters=parameters,
+            seed=seed,
+            is_static=is_static,
+        )
         for i in configuration_test_helper(inst):
-            assert i.perturber == perturber
-            assert i.parameters == parameters
+            assert i._perturber == perturber
+            assert i._parameters == parameters
             assert i.seed == seed
+            assert i.is_static == is_static
+
+    def test_non_deterministic_default(self) -> None:
+        """Verify different results when seed=None (default)."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH).convert("RGB"))
+        inst1 = AlbumentationsPerturber(
+            perturber="RandomRain",
+            parameters={"brightness_coefficient": 0.9, "drop_width": 1, "blur_value": 5, "p": 1.0},
+        )
+        inst2 = AlbumentationsPerturber(
+            perturber="RandomRain",
+            parameters={"brightness_coefficient": 0.9, "drop_width": 1, "blur_value": 5, "p": 1.0},
+        )
+        out1, _ = inst1.perturb(image=image)
+        out2, _ = inst2.perturb(image=image)
+        assert not np.array_equal(out1, out2)
+
+    def test_seed_reproducibility(self) -> None:
+        """Verify same results with explicit seed."""
+        image = np.array(Image.open(INPUT_IMG_FILE_PATH).convert("RGB"))
+        inst1 = AlbumentationsPerturber(
+            perturber="RandomRain",
+            parameters={"brightness_coefficient": 0.9, "drop_width": 1, "blur_value": 5, "p": 1.0},
+            seed=42,
+        )
+        out1 = perturber_assertions(perturb=inst1.perturb, image=image)
+        inst2 = AlbumentationsPerturber(
+            perturber="RandomRain",
+            parameters={"brightness_coefficient": 0.9, "drop_width": 1, "blur_value": 5, "p": 1.0},
+            seed=42,
+        )
+        perturber_assertions(perturb=inst2.perturb, image=image, expected=out1)
+
+    def test_is_static(self) -> None:
+        """Verify is_static resets RNG each call."""
+        image = np.ones((30, 30, 3)).astype(np.uint8)
+        inst = AlbumentationsPerturber(
+            perturber="RandomRain",
+            parameters={"brightness_coefficient": 0.9, "drop_width": 1, "blur_value": 5, "p": 1.0},
+            seed=42,
+            is_static=True,
+        )
+        out1 = perturber_assertions(perturb=inst.perturb, image=image)
+        # Same result each call with is_static
+        perturber_assertions(perturb=inst.perturb, image=image, expected=out1)
+
+    def test_is_static_warning(self) -> None:
+        """Verify warning when is_static=True with seed=None."""
+        with pytest.warns(UserWarning, match="is_static=True has no effect"):
+            AlbumentationsPerturber(perturber="RandomRain", seed=None, is_static=True)
 
     def test_default_config(self) -> None:
         """Test default configuration when created with no parameters."""
@@ -177,5 +234,6 @@ class TestAlbumentationsPerturber:
         cfg["perturber"] = "NoOp"
         cfg["parameters"] = None
         cfg["seed"] = None
+        cfg["is_static"] = False
         assert (out_image == image).all()
         assert inst.get_config() == cfg

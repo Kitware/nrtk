@@ -32,8 +32,10 @@ class PepperNoisePerturber(SaltPepperNoisePerturberMixin):
     """Adds pepper noise to image stimulus.
 
     Attributes:
-        rng (np.random.Generator | int | None):
-            Pseudo-random number generator or seed
+        seed (int | None):
+            Random seed for reproducible results. None means non-deterministic.
+        is_static (bool):
+            If True and seed is set, resets RNG state after each perturb call.
         clip (bool):
             Decide if output is clipped between the range of [-1, 1].
         amount (float):

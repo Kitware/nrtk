@@ -10,8 +10,6 @@ Dependencies:
 
 from __future__ import annotations
 
-from nrtk.interfaces.perturb_image import PerturbImage
-
 __all__: list[str] = []
 
 import copy
@@ -27,10 +25,11 @@ from pybsm.simulation.sensor import Sensor
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
+from nrtk.impls.perturb_image._base import NumpyRandomPerturbImage
 from nrtk.impls.perturb_image.optical._pybsm._constants import DEFAULT_PYBSM_PARAMS
 
 
-class PybsmPerturberMixin(PerturbImage, ABC):
+class PybsmPerturberMixin(NumpyRandomPerturbImage, ABC):
     """Base handles common functionality shared across all pybsm-based OTF perturbers.
 
     This class handles common functionality shared across all pybsm-based OTF perturbers:
@@ -102,6 +101,8 @@ class PybsmPerturberMixin(PerturbImage, ABC):
         background_temperature: float = DEFAULT_PYBSM_PARAMS["background_temperature"],
         ha_wind_speed: float = DEFAULT_PYBSM_PARAMS["ha_wind_speed"],
         cn2_at_1m: float = DEFAULT_PYBSM_PARAMS["cn2_at_1m"],
+        seed: int | None = None,
+        is_static: bool = False,
         interp: bool = DEFAULT_PYBSM_PARAMS["interp"],
         **kwargs: Any,
     ) -> None:
@@ -205,12 +206,18 @@ class PybsmPerturberMixin(PerturbImage, ABC):
                 the refractive index structure parameter "near the ground"
                 (e.g. at h = 1 m) used to calculate the turbulence profile; the
                 default, 1.7e-14, is the HV 5/7 profile value
+            seed:
+                Random seed for reproducible results. Defaults to None for
+                non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets the random state after each
+                perturb call. Defaults to False.
             interp:
                 A flag to indicate whether atmospheric interpolation should be used.
                 Defaults to False.
             kwargs: sensor and/or scenario values to modify
         """
-        super().__init__()
+        super().__init__(seed=seed, is_static=is_static)
         self._simulator: ImageSimulator
 
         # Convert list inputs to numpy arrays (needed when loading from JSON config)
@@ -340,6 +347,9 @@ class PybsmPerturberMixin(PerturbImage, ABC):
         Raises:
             ValueError: If 'img_gsd' is None.
         """
+        # Chain through RandomPerturbImage.perturb() which handles is_static reset
+        image, boxes = super().perturb(image=image, boxes=boxes, **kwargs)
+
         if img_gsd is None:
             raise ValueError("'img_gsd' must be provided for this perturber")
 
@@ -359,41 +369,45 @@ class PybsmPerturberMixin(PerturbImage, ABC):
     @override
     def get_config(self) -> dict[str, Any]:
         """Generates a serializable config that can be used to rehydrate object."""
-        return {
-            "sensor_name": self.sensor_name,
-            "D": self.D,
-            "f": self.f,
-            "p_x": self.p_x,
-            "p_y": self.p_y,
-            "opt_trans_wavelengths": self.opt_trans_wavelengths.tolist(),
-            "optics_transmission": self.optics_transmission.tolist(),
-            "eta": self.eta,
-            "w_x": self.w_x,
-            "w_y": self.w_y,
-            "int_time": self.int_time,
-            "n_tdi": self.n_tdi,
-            "dark_current": self.dark_current,
-            "read_noise": self.read_noise,
-            "max_n": self.max_n,
-            "bit_depth": self.bit_depth,
-            "max_well_fill": self.max_well_fill,
-            "s_x": self.s_x,
-            "s_y": self.s_y,
-            "qe_wavelengths": self.qe_wavelengths.tolist(),
-            "qe": self.qe.tolist(),
-            "scenario_name": self.scenario_name,
-            "ihaze": self.ihaze,
-            "altitude": self.altitude,
-            "ground_range": self.ground_range,
-            "aircraft_speed": self.aircraft_speed,
-            "target_reflectance": self.target_reflectance,
-            "target_temperature": self.target_temperature,
-            "background_reflectance": self.background_reflectance,
-            "background_temperature": self.background_temperature,
-            "ha_wind_speed": self.ha_wind_speed,
-            "cn2_at_1m": self.cn2_at_1m,
-            "interp": self.interp,
-        }
+        cfg = super().get_config()
+        cfg.update(
+            {
+                "sensor_name": self.sensor_name,
+                "D": self.D,
+                "f": self.f,
+                "p_x": self.p_x,
+                "p_y": self.p_y,
+                "opt_trans_wavelengths": self.opt_trans_wavelengths.tolist(),
+                "optics_transmission": self.optics_transmission.tolist(),
+                "eta": self.eta,
+                "w_x": self.w_x,
+                "w_y": self.w_y,
+                "int_time": self.int_time,
+                "n_tdi": self.n_tdi,
+                "dark_current": self.dark_current,
+                "read_noise": self.read_noise,
+                "max_n": self.max_n,
+                "bit_depth": self.bit_depth,
+                "max_well_fill": self.max_well_fill,
+                "s_x": self.s_x,
+                "s_y": self.s_y,
+                "qe_wavelengths": self.qe_wavelengths.tolist(),
+                "qe": self.qe.tolist(),
+                "scenario_name": self.scenario_name,
+                "ihaze": self.ihaze,
+                "altitude": self.altitude,
+                "ground_range": self.ground_range,
+                "aircraft_speed": self.aircraft_speed,
+                "target_reflectance": self.target_reflectance,
+                "target_temperature": self.target_temperature,
+                "background_reflectance": self.background_reflectance,
+                "background_temperature": self.background_temperature,
+                "ha_wind_speed": self.ha_wind_speed,
+                "cn2_at_1m": self.cn2_at_1m,
+                "interp": self.interp,
+            },
+        )
+        return cfg
 
     @property
     def scenario_name(self) -> str:

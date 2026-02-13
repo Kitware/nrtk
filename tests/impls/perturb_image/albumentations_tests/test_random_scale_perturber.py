@@ -185,45 +185,21 @@ class TestRandomScalePerturber(PerturberTestsMixin):
             expected=out_image,
         )
 
-    def test_default_seed_reproducibility(self) -> None:
-        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+    def test_non_deterministic_default(self) -> None:
+        """Verify different results when seed=None (default)."""
         image = rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
-        limit = 0.1
+        # Use large scale limit to ensure visible differences between non-deterministic runs
+        limit = 0.5
         interpolation = cv2.INTER_LINEAR
         probability = 1.0
 
-        # Test perturb interface directly without providing seed (uses default=1)
-        inst = RandomScalePerturber(
-            limit=limit,
-            interpolation=interpolation,
-            probability=probability,
-        )
-        out_image = perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=None,
-        )
-        inst = RandomScalePerturber(  # Create new instance without seed
-            limit=limit,
-            interpolation=interpolation,
-            probability=probability,
-        )
-        perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=out_image,
-        )
-        # Test callable
-        inst = RandomScalePerturber(
-            limit=limit,
-            interpolation=interpolation,
-            probability=probability,
-        )
-        perturber_assertions(
-            perturb=inst,
-            image=image,
-            expected=out_image,
-        )
+        # Create two instances with default seed=None
+        inst1 = RandomScalePerturber(limit=limit, interpolation=interpolation, probability=probability)
+        inst2 = RandomScalePerturber(limit=limit, interpolation=interpolation, probability=probability)
+        out1, _ = inst1.perturb(image=image)
+        out2, _ = inst2.perturb(image=image)
+        # Results should (almost certainly) be different with non-deterministic default
+        assert not np.array_equal(out1, out2)
 
     @pytest.mark.parametrize(
         ("image", "seed"),
@@ -231,9 +207,10 @@ class TestRandomScalePerturber(PerturberTestsMixin):
             (rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
         ],
     )
-    def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
-        """Ensure results are reproducible when explicit seed is provided."""
-        limit = 0.1
+    def test_seed_reproducibility(self, image: np.ndarray, seed: int) -> None:
+        """Verify same results with explicit seed."""
+        # Use large scale limit to ensure visible differences between non-deterministic runs
+        limit = 0.5
         interpolation = cv2.INTER_LINEAR
         probability = 1.0
 
@@ -273,6 +250,28 @@ class TestRandomScalePerturber(PerturberTestsMixin):
             expected=out_image,
         )
 
+    def test_is_static(self) -> None:
+        """Verify is_static resets RNG each call."""
+        image = rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+        # Use large scale limit to ensure visible differences between non-deterministic runs
+        # is_static=True ensures identical results on repeated calls with the same input
+        inst = RandomScalePerturber(limit=0.5, probability=1.0, seed=42, is_static=True)
+        out_image = perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+        )
+        # Second call should produce identical output due to is_static resetting RNG
+        perturber_assertions(
+            perturb=inst.perturb,
+            image=image,
+            expected=out_image,
+        )
+
+    def test_is_static_warning(self) -> None:
+        """Verify warning when is_static=True with seed=None."""
+        with pytest.warns(UserWarning, match="is_static=True has no effect when seed=None"):
+            RandomScalePerturber(limit=0.5, probability=1.0, seed=None, is_static=True)
+
     def test_regression(self, tiff_snapshot: SnapshotAssertion) -> None:
         """Regression testing results to detect API changes."""
         grayscale_image = Image.open(INPUT_IMG_FILE_PATH)
@@ -292,15 +291,34 @@ class TestRandomScalePerturber(PerturberTestsMixin):
         tiff_snapshot.assert_match(out_img)
 
     @pytest.mark.parametrize(
-        ("perturber", "limit", "interpolation", "probability", "parameters", "seed"),
+        ("perturber", "limit", "interpolation", "probability", "parameters", "seed", "is_static"),
         [
             (
                 "RandomScale",
                 (-0.1, 0.1),
-                1.0,
                 cv2.INTER_LINEAR,
+                1.0,
                 {"scale_limit": (-0.1, 0.1), "interpolation": cv2.INTER_LINEAR, "p": 1.0},
                 1,
+                False,
+            ),
+            (
+                "RandomScale",
+                (-0.1, 0.1),
+                cv2.INTER_LINEAR,
+                1.0,
+                {"scale_limit": (-0.1, 0.1), "interpolation": cv2.INTER_LINEAR, "p": 1.0},
+                42,
+                True,
+            ),
+            (
+                "RandomScale",
+                (-0.1, 0.1),
+                cv2.INTER_LINEAR,
+                1.0,
+                {"scale_limit": (-0.1, 0.1), "interpolation": cv2.INTER_LINEAR, "p": 1.0},
+                None,
+                False,
             ),
         ],
     )
@@ -312,17 +330,20 @@ class TestRandomScalePerturber(PerturberTestsMixin):
         probability: float,
         parameters: dict[str, Any],
         seed: int | None,
+        is_static: bool,
     ) -> None:
         """Test configuration stability."""
         inst = RandomScalePerturber(
             limit=limit,
             probability=probability,
             seed=seed,
+            is_static=is_static,
         )
         for i in configuration_test_helper(inst):
-            assert i.perturber == perturber
-            assert i.limit == limit
-            assert i.interpolation == interpolation
-            assert i.probability == probability
-            assert i.parameters == parameters
+            assert i._perturber == perturber
+            assert i._limit == limit
+            assert i._interpolation == interpolation
+            assert i._probability == probability
+            assert i._parameters == parameters
             assert i.seed == seed
+            assert i.is_static == is_static

@@ -11,7 +11,7 @@ Dependencies:
 Example usage:
     >>> image = np.ones((256, 256, 3))
     >>> crop_size = (image.shape[0] // 2, image.shape[1] // 2)
-    >>> perturber = RandomCropPerturber(crop_size=crop_size)
+    >>> perturber = RandomCropPerturber(crop_size=crop_size, seed=42)
     >>> perturbed_image, _ = perturber(image=image)
 """
 
@@ -27,23 +27,24 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.impls.perturb_image._base import NumpyRandomPerturbImage
 
 
-class RandomCropPerturber(PerturbImage):
+class RandomCropPerturber(NumpyRandomPerturbImage):
     """RandomCropPerturber randomly crops an image and adjusts bounding boxes accordingly.
 
     Attributes:
         crop_size (tuple[int, int]): Target crop dimensions for the input image.
-        seed (int | numpy.random.Generator | None): Random seed or Generator instance for reproducibility.
-        rng (np.random.Generator): Numpy random generator based on seed.
+        seed (int | None): Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool): If True, resets RNG after each call for consistent results.
     """
 
     def __init__(
         self,
         *,
         crop_size: tuple[int, int] | None = None,
-        seed: int | np.random.Generator | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
     ) -> None:
         """RandomCropPerturber applies a random cropping perturbation to an input image.
 
@@ -54,13 +55,14 @@ class RandomCropPerturber(PerturbImage):
                 Target crop size as (crop_height, crop_width). If crop_size is None, it defaults
                 to the size of the input image.
             seed:
-                Random seed or Generator instance for reproducible results. Defaults to 1 for
-                deterministic behavior.
+                Random seed for reproducible results. Defaults to None for non-deterministic
+                behavior.
+            is_static:
+                If True and seed is provided, resets RNG after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
         """
-        super().__init__()
+        super().__init__(seed=seed, is_static=is_static)
         self.crop_size = crop_size
-        self.seed = seed
-        self.rng: np.random.Generator = np.random.default_rng(self.seed)
 
     @staticmethod
     def _compute_bboxes(
@@ -131,8 +133,8 @@ class RandomCropPerturber(PerturbImage):
         crop_w = min(crop_w, orig_w)
 
         # Randomly select the top-left corner of the crop
-        crop_x = self.rng.integers(low=0, high=(orig_w - crop_w))
-        crop_y = self.rng.integers(low=0, high=(orig_h - crop_h))
+        crop_x = self._rng.integers(low=0, high=(orig_w - crop_w))
+        crop_y = self._rng.integers(low=0, high=(orig_h - crop_h))
 
         # Perform the crop
         perturbed_image = perturbed_image[crop_y : crop_y + crop_h, crop_x : crop_x + crop_w].copy()
@@ -154,6 +156,5 @@ class RandomCropPerturber(PerturbImage):
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomCropPerturber instance."""
         cfg = super().get_config()
-        cfg["seed"] = self.seed
         cfg["crop_size"] = self.crop_size
         return cfg

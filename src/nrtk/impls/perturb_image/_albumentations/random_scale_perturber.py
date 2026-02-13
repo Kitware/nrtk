@@ -13,7 +13,7 @@ Dependencies:
 Example usage:
     >>> import numpy as np
     >>> limit = 0.5
-    >>> perturber = RandomScalePerturber(limit=limit)
+    >>> perturber = RandomScalePerturber(limit=limit, seed=42)
     >>> image = np.ones((256, 256, 3))
     >>> perturbed_image, _ = perturber(image=image)
 """
@@ -44,7 +44,9 @@ class RandomScalePerturber(AlbumentationsPerturber):
         probability (float):
             Probability of applying the scale transformation.
         seed (int | None):
-            Random seed for reproducibility. Defaults to 1.
+            Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool):
+            If True, resets seed after each call for consistent results.
     """
 
     def __init__(  # noqa: C901 - validation branches cannot be reduced further
@@ -53,7 +55,8 @@ class RandomScalePerturber(AlbumentationsPerturber):
         limit: float | tuple[float, float] = 0.0,
         interpolation: int = cv2.INTER_LINEAR,
         probability: float = 1.0,
-        seed: int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
     ) -> None:
         """RandomScalePerturber applies a random scale perturbation to an input image.
 
@@ -71,7 +74,10 @@ class RandomScalePerturber(AlbumentationsPerturber):
             probability:
                 Probability of applying the scale transformation.
             seed:
-                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+                Random seed for reproducible results. Defaults to None for non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets seed after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
         """
         self._allowed_interpolations = {
             cv2.INTER_NEAREST,
@@ -102,18 +108,20 @@ class RandomScalePerturber(AlbumentationsPerturber):
             perturber="RandomScale",
             parameters={"scale_limit": limit, "interpolation": interpolation, "p": probability},
             seed=seed,
+            is_static=is_static,
         )
-
-        self.limit = limit
-        self.interpolation = interpolation
-        self.probability = probability
+        self._limit = limit
+        self._interpolation = interpolation
+        self._probability = probability
 
     @override
     def get_config(self) -> dict[str, Any]:
-        """Returns the current configuration of the RandomRotationPerturber instance."""
-        cfg = {}
-        cfg["limit"] = self.limit
-        cfg["interpolation"] = self.interpolation
-        cfg["probability"] = self.probability
-        cfg["seed"] = self.seed
+        """Returns the current configuration of the RandomScalePerturber instance."""
+        cfg = super().get_config()
+        cfg["limit"] = self._limit
+        cfg["interpolation"] = self._interpolation
+        cfg["probability"] = self._probability
+        # Remove inherited Albumentations-specific keys not used by this perturber
+        cfg.pop("parameters", None)  # noqa: FKA100, RUF100 - suppress flake8-keyword-arguments; RUF100 needed since ruff doesn't recognize FKA100
+        cfg.pop("perturber", None)  # noqa: FKA100, RUF100 - suppress flake8-keyword-arguments; RUF100 needed since ruff doesn't recognize FKA100
         return cfg

@@ -12,7 +12,7 @@ Dependencies:
 
 Example usage:
     >>> limit = 90.0
-    >>> perturber = RandomRotationPerturber(limit=limit)
+    >>> perturber = RandomRotationPerturber(limit=limit, seed=42)
     >>> image = np.ones((256, 256, 3))
     >>> perturbed_image, _ = perturber(image=image)
 """
@@ -39,7 +39,9 @@ class RandomRotationPerturber(AlbumentationsPerturber):
         probability (float):
             Probability of applying the rotation transformation.
         seed (int | None):
-            An optional seed for reproducible results.
+            Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool):
+            If True, resets seed after each call for consistent results.
         fill (numpy.array):
             Background color fill for RGB image.
     """
@@ -50,7 +52,8 @@ class RandomRotationPerturber(AlbumentationsPerturber):
         limit: float | tuple[float, float] = 0.0,
         probability: float = 1.0,
         fill: Sequence[int] | None = None,
-        seed: int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
     ) -> None:
         """RandomRotationPerturber applies a Rotation transformation from Albumentations.
 
@@ -66,8 +69,11 @@ class RandomRotationPerturber(AlbumentationsPerturber):
             fill (numpy.array | None):
                 Background color fill for RGB image. (0 to 255 for each channel).
                 Default value is a black background ([0, 0, 0]).
-            seed (int | None):
-                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+            seed:
+                Random seed for reproducible results. Defaults to None for non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets seed after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
 
         Raises:
             ValueError:
@@ -88,18 +94,20 @@ class RandomRotationPerturber(AlbumentationsPerturber):
             perturber="Rotate",
             parameters={"limit": limit, "p": probability, "fill": fill},
             seed=seed,
+            is_static=is_static,
         )
-
-        self.limit = limit
-        self.probability = probability
-        self.fill = fill
+        self._limit = limit
+        self._probability = probability
+        self._fill = fill
 
     @override
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomRotationPerturber instance."""
-        cfg = {}
-        cfg["limit"] = self.limit
-        cfg["probability"] = self.probability
-        cfg["fill"] = self.fill
-        cfg["seed"] = self.seed
+        cfg = super().get_config()
+        cfg["limit"] = self._limit
+        cfg["probability"] = self._probability
+        cfg["fill"] = self._fill
+        # Remove inherited Albumentations-specific keys not used by this perturber
+        cfg.pop("parameters", None)  # noqa: FKA100, RUF100 - suppress flake8-keyword-arguments; RUF100 needed since ruff doesn't recognize FKA100
+        cfg.pop("perturber", None)  # noqa: FKA100, RUF100 - suppress flake8-keyword-arguments; RUF100 needed since ruff doesn't recognize FKA100
         return cfg

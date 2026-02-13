@@ -11,7 +11,7 @@ Dependencies:
 Example usage:
     >>> import numpy as np
     >>> sensor_and_scenario = {"f": 4, "altitude": 9000}
-    >>> perturber = PybsmPerturber(**sensor_and_scenario)
+    >>> perturber = PybsmPerturber(**sensor_and_scenario, seed=42)
     >>> image = np.ones((256, 256, 3))
     >>> img_gsd = 3.19 / 160
     >>> perturbed_image, _ = perturber(image=image, img_gsd=img_gsd)  # doctest: +SKIP
@@ -45,13 +45,18 @@ class PybsmPerturber(PybsmPerturberMixin):
     Attributes:
         reflectance_range (np.ndarray):
             Default reflectance range for image simulation.
+        seed (int | None):
+            Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool):
+            If True, recreates simulator after each call for consistent results.
     """
 
     def __init__(
         self,
         *,
         reflectance_range: np.ndarray[Any, Any] = DEFAULT_PYBSM_PARAMS["reflectance_range"],
-        rng_seed: int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
         sensor_name: str = "Sensor",
         D: float = 275e-3,  # noqa: N803 - physics convention for aperture diameter
         f: float = 4,
@@ -94,8 +99,12 @@ class PybsmPerturber(PybsmPerturberMixin):
         Args:
             reflectance_range:
                 Array of reflectances that correspond to pixel values.
-            rng_seed:
-                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+            seed:
+                Random seed for reproducible results. Defaults to None for non-deterministic
+                behavior.
+            is_static:
+                If True and seed is provided, recreates simulator after each perturb call for
+                consistent results across multiple calls (useful for video frame processing).
             sensor_name:
                 name of the sensor
             D:
@@ -215,8 +224,10 @@ class PybsmPerturber(PybsmPerturberMixin):
         if reflectance_range[0] >= reflectance_range[1]:
             raise ValueError(f"Reflectance range array values must be strictly ascending, got {reflectance_range}")
 
-        # Initialize base class (which handles kwargs application to sensor/scenario)
+        # Initialize base class (which handles seed/is_static via RandomPerturbImage)
         super().__init__(
+            seed=seed,
+            is_static=is_static,
             sensor_name=sensor_name,
             D=D,
             f=f,
@@ -252,10 +263,7 @@ class PybsmPerturber(PybsmPerturberMixin):
             interp=interp,
         )
 
-        # Store perturber-specific overrides
-        self._rng = rng_seed
         self._reflectance_range: np.ndarray[Any, Any] = reflectance_range
-
         self._simulator = self._create_simulator()
 
     @override
@@ -279,11 +287,26 @@ class PybsmPerturber(PybsmPerturberMixin):
         return self.__str__()
 
     @override
+    def _set_seed(self) -> None:
+        """Reset numpy RNG and update the simulator's RNG reference.
+
+        Directly reassigns the simulator's internal RNG rather than recreating
+        the simulator, which would wipe the cached atmospheric data.
+
+        The hasattr guard is needed because RandomPerturbImage.__init__ calls
+        _set_seed() before subclasses have created the simulator.
+        TODO: Replace with self._simulator.set_random_seed() once pyBSM
+        exposes a public API for reseeding (avoids accessing private _rng).
+        """
+        super()._set_seed()
+        if hasattr(self, "_simulator"):
+            self._simulator._rng = self._rng  # noqa: SLF001
+
+    @override
     def get_config(self) -> dict[str, Any]:
         """Get current configuration including perturber-specific parameters."""
         cfg = super().get_config()
         cfg["reflectance_range"] = self._reflectance_range.tolist()
-        cfg["rng_seed"] = self._rng
 
         return cfg
 

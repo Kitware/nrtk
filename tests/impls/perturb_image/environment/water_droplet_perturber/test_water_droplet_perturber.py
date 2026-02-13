@@ -26,33 +26,17 @@ reproduce_rng = np.random.default_rng(23456)
 class TestWaterDropletPerturber(PerturberTestsMixin):
     impl_class = WaterDropletPerturber
 
-    def test_default_seed_reproducibility(self) -> None:
-        """Ensure results are reproducible with default seed (no seed parameter provided)."""
+    def test_non_deterministic_default(self) -> None:
+        """Verify different results when seed=None (default)."""
         image = reproduce_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
-        # Test perturb interface directly without providing seed (uses default=1)
-        inst = WaterDropletPerturber()
-        out_image = perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=None,
-        )
-
-        # Create new instance without seed
-        inst = WaterDropletPerturber()
-        perturber_assertions(
-            perturb=inst.perturb,
-            image=image,
-            expected=out_image,
-        )
-
-        # Test callable
-        inst = WaterDropletPerturber()
-        perturber_assertions(
-            perturb=inst,
-            image=image,
-            expected=out_image,
-        )
+        # Create two instances with default seed=None
+        inst1 = WaterDropletPerturber()
+        inst2 = WaterDropletPerturber()
+        out1, _ = inst1.perturb(image=image)
+        out2, _ = inst2.perturb(image=image)
+        # Results should (almost certainly) be different with non-deterministic default
+        assert not np.array_equal(out1, out2)
 
     @pytest.mark.parametrize(
         ("image", "seed"),
@@ -60,8 +44,8 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
             (reproduce_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8), 2),
         ],
     )
-    def test_reproducibility(self, image: np.ndarray, seed: int) -> None:
-        """Ensure results are reproducible when explicit seed is provided."""
+    def test_seed_reproducibility(self, image: np.ndarray, seed: int) -> None:
+        """Verify same results with explicit seed."""
         # Test perturb interface directly
         inst = WaterDropletPerturber(seed=seed)
         out_image = perturber_assertions(
@@ -85,6 +69,19 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
             image=image,
             expected=out_image,
         )
+
+    def test_is_static(self) -> None:
+        """Verify is_static resets RNG each call."""
+        image = reproduce_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+        inst = WaterDropletPerturber(seed=42, is_static=True)
+        out1 = perturber_assertions(perturb=inst.perturb, image=image, expected=None)
+        # Same result each call with is_static
+        perturber_assertions(perturb=inst.perturb, image=image, expected=out1)
+
+    def test_is_static_warning(self) -> None:
+        """Verify warning when is_static=True with seed=None."""
+        with pytest.warns(UserWarning, match="is_static=True has no effect"):
+            WaterDropletPerturber(seed=None, is_static=True)
 
     @pytest.mark.parametrize(
         (
@@ -120,9 +117,10 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
         f_y: int,
         seed: int | None,
     ) -> None:
-        """Run on a dummy image to ensure multiple calls produce the same result."""
+        """Run on a dummy image to ensure multiple calls produce the same result with is_static."""
         img = np.ones((3, 3, 3)).astype(np.uint8)
 
+        # Use is_static=True to ensure consistent results across multiple calls
         inst = WaterDropletPerturber(
             size_range=size_range,
             num_drops=num_drops,
@@ -133,6 +131,7 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
             f_x=f_x,
             f_y=f_y,
             seed=seed,
+            is_static=True,
         )
 
         out_img = perturber_assertions(perturb=inst, image=img, expected=None)
@@ -200,9 +199,12 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
             "f_x",
             "f_y",
             "seed",
+            "is_static",
         ),
         [
-            ((0.0, 1.0), 20, 0.25, 90.0 / 180.0 * np.pi, 1.0, 1.33, 400, 400, 0),
+            ((0.0, 1.0), 20, 0.25, 90.0 / 180.0 * np.pi, 1.0, 1.33, 400, 400, 0, False),
+            ((0.0, 1.0), 20, 0.25, 90.0 / 180.0 * np.pi, 1.0, 1.33, 400, 400, 42, True),
+            ((0.0, 1.0), 20, 0.25, 90.0 / 180.0 * np.pi, 1.0, 1.33, 400, 400, None, False),
         ],
     )
     def test_configuration(
@@ -215,7 +217,8 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
         n_water: float,
         f_x: int,
         f_y: int,
-        seed: int,
+        seed: int | None,
+        is_static: bool,
     ) -> None:
         """Test configuration stability."""
         inst = WaterDropletPerturber(
@@ -228,9 +231,10 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
             f_x=f_x,
             f_y=f_y,
             seed=seed,
+            is_static=is_static,
         )
         for i in configuration_test_helper(inst):
-            assert i.size_range == size_range
+            assert list(i.size_range) == list(size_range)
             assert i.num_drops == num_drops
             assert i.blur_strength == blur_strength
             assert i.psi == psi
@@ -239,6 +243,7 @@ class TestWaterDropletPerturber(PerturberTestsMixin):
             assert i.f_x == f_x
             assert i.f_y == f_y
             assert i.seed == seed
+            assert i.is_static == is_static
 
     @pytest.mark.parametrize(
         "boxes",

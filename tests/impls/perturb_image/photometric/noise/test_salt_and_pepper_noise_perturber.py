@@ -14,7 +14,7 @@ from nrtk.impls.perturb_image.photometric.noise import SaltAndPepperNoisePerturb
 from tests.impls import INPUT_VISDRONE_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_tests_mixin import PerturberTestsMixin
 from tests.impls.perturb_image.perturber_utils import perturber_assertions
-from tests.impls.perturb_image.photometric.noise.noise_perturber_test_utils import rng_assertions
+from tests.impls.perturb_image.photometric.noise.noise_perturber_test_utils import seed_assertions
 
 test_rng = np.random.default_rng()
 
@@ -26,7 +26,6 @@ class TestSaltAndPepperNoisePerturber(PerturberTestsMixin):
     def test_consistency(self, psnr_tiff_snapshot: SnapshotAssertion) -> None:
         """Run on a real image to ensure output matches precomputed results."""
         image = np.array(Image.open(INPUT_IMG_FILE_PATH))
-        rng = 42
         amount = 0.5
         salt_vs_pepper = 0.5
 
@@ -35,7 +34,8 @@ class TestSaltAndPepperNoisePerturber(PerturberTestsMixin):
             perturb=SaltAndPepperNoisePerturber(
                 amount=amount,
                 salt_vs_pepper=salt_vs_pepper,
-                rng=rng,
+                seed=42,
+                is_static=True,
             ),
             image=image,
         )
@@ -75,42 +75,57 @@ class TestSaltAndPepperNoisePerturber(PerturberTestsMixin):
                 expected=image,
             )
 
-    def test_default_rng_reproducibility(self) -> None:
-        """Ensure results are reproducible with default rng (no rng parameter provided)."""
+    def test_non_deterministic_default(self) -> None:
+        """Verify different results when seed=None (default)."""
         dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
 
-        # Test without providing rng (uses default=1)
-        inst_1 = SaltAndPepperNoisePerturber()
-        out_1, _ = inst_1(image=dummy_image)
-        inst_2 = SaltAndPepperNoisePerturber()
-        out_2, _ = inst_2(image=dummy_image)
-        assert np.array_equal(out_1, out_2)
+        inst1 = SaltAndPepperNoisePerturber()
+        inst2 = SaltAndPepperNoisePerturber()
+        out1, _ = inst1(image=dummy_image)
+        out2, _ = inst2(image=dummy_image)
+        assert not np.array_equal(out1, out2)
 
-    @pytest.mark.parametrize("rng", [2])
-    def test_rng(self, rng: int) -> None:
-        """Ensure results are reproducible when explicit rng is provided."""
-        rng_assertions(perturber=SaltAndPepperNoisePerturber, rng=rng)
+    @pytest.mark.parametrize("seed", [2])
+    def test_seed_reproducibility(self, seed: int) -> None:
+        """Ensure results are reproducible when explicit seed is provided."""
+        seed_assertions(perturber=SaltAndPepperNoisePerturber, seed=seed)
+
+    def test_is_static(self) -> None:
+        """Verify is_static resets RNG each call."""
+        dummy_image = test_rng.integers(low=0, high=255, size=(256, 256, 3), dtype=np.uint8)
+        inst = SaltAndPepperNoisePerturber(seed=42, is_static=True)
+        out1, _ = inst(image=dummy_image)
+        out2, _ = inst(image=dummy_image)
+        assert np.array_equal(out1, out2)
+
+    def test_is_static_warning(self) -> None:
+        """Verify warning when is_static=True with seed=None."""
+        with pytest.warns(UserWarning, match="is_static=True has no effect when seed=None"):
+            SaltAndPepperNoisePerturber(seed=None, is_static=True)
 
     @pytest.mark.parametrize(
-        ("rng", "amount", "salt_vs_pepper", "clip"),
-        [(42, 0.8, 0.25, True), (np.random.default_rng(12345), 0.3, 0.2, False)],
+        ("seed", "is_static", "amount", "salt_vs_pepper", "clip"),
+        [(42, False, 0.8, 0.25, True), (None, False, 0.3, 0.2, False)],
     )
     def test_configuration(
         self,
-        rng: np.random.Generator | int,
+        seed: int | None,
+        is_static: bool,
         amount: float,
         salt_vs_pepper: float,
         clip: bool,
     ) -> None:
         """Test configuration stability."""
         inst = SaltAndPepperNoisePerturber(
-            rng=rng,
+            seed=seed,
+            is_static=is_static,
             amount=amount,
             salt_vs_pepper=salt_vs_pepper,
             clip=clip,
         )
         for i in configuration_test_helper(inst):
-            assert i.rng == rng
+            assert i.seed == seed
+            assert i.is_static == is_static
             assert i.amount == amount
             assert i.salt_vs_pepper == salt_vs_pepper
             assert i.clip == clip
@@ -176,6 +191,6 @@ class TestSaltAndPepperNoisePerturber(PerturberTestsMixin):
     )
     def test_perturb_with_boxes(self, boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]]) -> None:
         """Test that bounding boxes do not change during perturb."""
-        inst = SaltAndPepperNoisePerturber(rng=42, amount=0.3, salt_vs_pepper=0.5)
+        inst = SaltAndPepperNoisePerturber(seed=42, amount=0.3, salt_vs_pepper=0.5)
         _, out_boxes = inst.perturb(image=np.ones((256, 256, 3)), boxes=boxes)
         assert boxes == out_boxes

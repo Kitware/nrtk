@@ -10,7 +10,7 @@ Dependencies:
     - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
 
 Example usage:
-    >>> perturber = RandomTranslationPerturber()
+    >>> perturber = RandomTranslationPerturber(seed=42)
     >>> image = np.ones((256, 256, 3))
     >>> max_translation_limit = (image.shape[0] // 2, image.shape[1] // 2)
     >>> perturbed_image, _ = perturber(image=image, max_translation_limit=max_translation_limit)
@@ -28,15 +28,17 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.impls.perturb_image._base import NumpyRandomPerturbImage
 
 
-class RandomTranslationPerturber(PerturbImage):
+class RandomTranslationPerturber(NumpyRandomPerturbImage):
     """RandomTranslationPerturber randomly translates an image and adjusts bounding boxes accordingly.
 
     Attributes:
-        rng (numpy.random.Generator):
-            Random number generator for deterministic behavior.
+        seed (int | None):
+            Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool):
+            If True, resets RNG after each call for consistent results.
         color_fill (numpy.array):
             Background color fill for RGB image.
     """
@@ -44,7 +46,8 @@ class RandomTranslationPerturber(PerturbImage):
     def __init__(
         self,
         *,
-        seed: int | np.random.Generator | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
         color_fill: Sequence[int] | None = [0, 0, 0],
     ) -> None:
         """RandomTranslationPerturber applies a random translation perturbation to an input image.
@@ -54,14 +57,18 @@ class RandomTranslationPerturber(PerturbImage):
 
         Args:
             seed:
-                Random seed or Generator instance for reproducible results. Defaults to 1 for
-                deterministic behavior.
+                Random seed for reproducible results. Defaults to None for non-deterministic
+                behavior.
+            is_static:
+                If True and seed is provided, resets RNG after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
             color_fill:
-                Background color fill for RGB image.
+                Background color fill for RGB image. Defaults to [0, 0, 0] (black).
 
         """
-        super().__init__()
-        self.rng: np.random.Generator = np.random.default_rng(seed)
+        if color_fill is None:
+            color_fill = [0, 0, 0]
+        super().__init__(seed=seed, is_static=is_static)
         self.color_fill: np.ndarray[np.int64, Any] = np.array(color_fill)
 
     @override
@@ -102,9 +109,9 @@ class RandomTranslationPerturber(PerturbImage):
         # Randomly select the translation magnitude for each direction
         translate_x, translate_y = (0, 0)
         if translate_w > 0:
-            translate_x = self.rng.integers(low=-translate_w, high=translate_w)
+            translate_x = self._rng.integers(low=-translate_w, high=translate_w)
         if translate_h > 0:
-            translate_y = self.rng.integers(low=-translate_h, high=translate_h)
+            translate_y = self._rng.integers(low=-translate_h, high=translate_h)
 
         # Apply background color fill based on the number of image dimensions
         if perturbed_image.ndim == 3:
@@ -178,6 +185,5 @@ class RandomTranslationPerturber(PerturbImage):
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the RandomTranslationPerturber instance."""
         cfg = super().get_config()
-        cfg["seed"] = self.rng
-        cfg["color_fill"] = self.color_fill
+        cfg["color_fill"] = self.color_fill.tolist()
         return cfg
