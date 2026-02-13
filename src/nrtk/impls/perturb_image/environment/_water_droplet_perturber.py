@@ -25,13 +25,13 @@ Classes:
 Dependencies:
     - Scipy for image processing.
     - Numba for JIT-compiled point-in-polygon operations.
-    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for image perturbation.
+    - nrtk.interfaces.perturb_image.PerturbImage as the base class for perturbation.
 
 Example usage:
     >>> import numpy as np
-    >>> size_range = (0.0, 1.0)
+    >>> size_range = [0.0, 1.0]
     >>> num_drops = 20
-    >>> perturber = WaterDropletPerturber(size_range=size_range, num_drops=num_drops)
+    >>> perturber = WaterDropletPerturber(size_range=size_range, num_drops=num_drops, seed=42)
     >>> image = np.ones((256, 256, 3))
     >>> perturbed_image, _ = perturber(image=image)
 
@@ -40,8 +40,6 @@ Notes:
 """
 
 from __future__ import annotations
-
-from nrtk.interfaces.perturb_image import PerturbImage
 
 __all__ = ["WaterDropletPerturber"]
 
@@ -57,6 +55,8 @@ from scipy.spatial import KDTree
 from scipy.special import binom
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
+
+from nrtk.impls.perturb_image._base import NumpyRandomPerturbImage
 
 
 def points_in_polygon_impl(*, points: np.ndarray, polygon: np.ndarray) -> np.ndarray:
@@ -337,7 +337,7 @@ class Bezier:
         return curve
 
 
-class WaterDropletPerturber(PerturbImage):
+class WaterDropletPerturber(NumpyRandomPerturbImage):
     """Implements the physics-based, photorealistic water/rain droplet model.
 
     The `WaterDropletPerturber` class simulates the effects of rain/water droplets
@@ -362,7 +362,9 @@ class WaterDropletPerturber(PerturbImage):
         f_y (int):
             Camera focal length in y direction (cm).
         seed (int | None):
-            Random seed for reproducibility. Defaults to 1.
+            Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool):
+            If True, resets RNG after each call for consistent results.
     """
 
     def __init__(
@@ -376,13 +378,15 @@ class WaterDropletPerturber(PerturbImage):
         n_water: float = 1.33,
         f_x: int = 400,
         f_y: int = 400,
-        seed: int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
     ) -> None:
         """Initializes the WaterDropletPerturber.
 
         Args:
             size_range:
                 Range of size multiplier values used for computing the size of the water droplet.
+                Defaults to [0.0, 1.0].
             num_drops:
                 Target number of water droplets.
             blur_strength:
@@ -398,12 +402,16 @@ class WaterDropletPerturber(PerturbImage):
             f_y:
                 Camera focal length in y direction (cm).
             seed:
-                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+                Random seed for reproducible results. Defaults to None for non-deterministic
+                behavior.
+            is_static:
+                If True and seed is provided, resets RNG after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
 
             If any of the parameters are absent, the following values will be set
             as defaults:
 
-            size_range = (0.0, 1.0)
+            size_range = [0.0, 1.0]
             num_drops = 20
             blur_strength = 0.25
             psi = 90.0 / 180.0 * np.pi
@@ -411,9 +419,9 @@ class WaterDropletPerturber(PerturbImage):
             n_water = 1.33
             f_x = 400
             f_y = 400
-            seed = 1
+            seed = None
+            is_static = False
         """
-        super().__init__()
         self.size_range = size_range
         self.num_drops = num_drops
         self.blur_strength = blur_strength
@@ -422,18 +430,18 @@ class WaterDropletPerturber(PerturbImage):
         self.n_water = n_water
         self.f_x = f_x
         self.f_y = f_y
-        self.seed = seed
-        self._initialize_derived_parameters()
+        # super().__init__ is called last so that all attributes exist when
+        # _set_seed() is invoked during RandomPerturbImage.__init__.
+        super().__init__(seed=seed, is_static=is_static)
 
     def _initialize_derived_parameters(self) -> None:
-        """Derived Parameters."""
-        self.rng: np.random.Generator = np.random.default_rng(self.seed)
+        """Initialize derived parameters from RNG state."""
         # Glass plane at M centimeters ahead of the camera (value range chosen from source paper)
-        self.M = self.rng.integers(low=20, high=40)
+        self.M = self._rng.integers(low=20, high=40)
 
         # Background plane which is B centimeters from the camera
         # and lies beyond the glass plane (value range chosen from source paper)
-        self.B = self.rng.integers(low=800, high=1500)
+        self.B = self._rng.integers(low=800, high=1500)
 
         self.normal: np.ndarray[Any, Any] = np.array([0.0, -1.0 * np.cos(self.psi), np.sin(self.psi)])
 
@@ -441,6 +449,12 @@ class WaterDropletPerturber(PerturbImage):
         self.g_radius = []
         self.centers = []
         self.radius = []
+
+    @override
+    def _set_seed(self) -> None:
+        """Seed the random state and re-initialize derived parameters."""
+        super()._set_seed()
+        self._initialize_derived_parameters()
 
     @staticmethod
     def ccw_sort(points: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
@@ -610,11 +624,11 @@ class WaterDropletPerturber(PerturbImage):
 
         def _random_tau() -> int:
             """Determines angle between tangent and glass plane."""
-            return math.floor(self.rng.uniform(low=30, high=45))
+            return math.floor(self._rng.uniform(low=30, high=45))
 
         def _random_loc() -> float:
             """Determine random multiplier value that is applied to the water droplet size computation."""
-            return self.rng.uniform(low=self.size_range[0], high=self.size_range[1])
+            return self._rng.uniform(low=self.size_range[0], high=self.size_range[1])
 
         def _w_in_plane(*, u: int, v: int) -> int:
             """Estimate the "depth" value of a pixel in the coordinate system of the glass plane."""
@@ -677,8 +691,8 @@ class WaterDropletPerturber(PerturbImage):
                 self.radius.pop(index)
 
         for _ in range(self.num_drops):
-            u = left_bottom[0] + (right_bottom[0] - left_bottom[0]) * self.rng.random()
-            v = left_upper[1] + (right_bottom[1] - left_upper[1]) * self.rng.random()
+            u = left_bottom[0] + (right_bottom[0] - left_bottom[0]) * self._rng.random()
+            v = left_upper[1] + (right_bottom[1] - left_upper[1]) * self._rng.random()
             w = _w_in_plane(u=u, v=v)
 
             # Convert the angle between tangent and glass plane from degrees to radians
@@ -774,7 +788,7 @@ class WaterDropletPerturber(PerturbImage):
             # find all the pixels that fall within the Bézier shape
             all_points = _get_all_points(
                 pts_lst_array=cent,
-                rng=self.rng,
+                rng=self._rng,
                 rad=0.6,
                 scale=2 * cent_rad,
             )
@@ -961,11 +975,7 @@ class WaterDropletPerturber(PerturbImage):
         Returns:
             The perturbed image and bounding boxes scaled to perturbed image shape.
         """
-        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes)
-
-        # Reset RNG state when seed is provided to ensure deterministic results across multiple calls
-        if self.seed is not None:
-            self._initialize_derived_parameters()
+        perturbed_image, perturbed_boxes = super().perturb(image=image, boxes=boxes, **kwargs)
 
         rain_image, mask = self.render(image=perturbed_image)
         perturbed_image = self.blur(
@@ -980,7 +990,6 @@ class WaterDropletPerturber(PerturbImage):
                 orig_shape=image.shape,
                 new_shape=perturbed_image.shape,
             )
-            return perturbed_image.astype(np.uint8), perturbed_boxes
 
         return perturbed_image.astype(np.uint8), perturbed_boxes
 
@@ -997,6 +1006,13 @@ class WaterDropletPerturber(PerturbImage):
         cfg["n_water"] = self.n_water
         cfg["f_x"] = self.f_x
         cfg["f_y"] = self.f_y
-        cfg["seed"] = self.seed
 
+        return cfg
+
+    @classmethod
+    def get_default_config(cls) -> dict[str, Any]:
+        """Returns the default configuration with size_range as a list for JSON serialization."""
+        cfg = super().get_default_config()
+        # Convert tuple to list for JSON roundtrip compatibility
+        cfg["size_range"] = list(cfg["size_range"])
         return cfg

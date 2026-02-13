@@ -8,7 +8,7 @@ import numpy as np
 import skimage.util
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.impls.perturb_image._base import NumpyRandomPerturbImage
 
 __all__ = [
     "NoisePerturberMixin",
@@ -17,11 +17,10 @@ __all__ = [
 ]
 
 
-class NoisePerturberMixin(PerturbImage):
-    def __init__(self, *, rng: np.random.Generator | int | None = 1, clip: bool = True) -> None:
-        super().__init__()
-        self.rng = rng
+class NoisePerturberMixin(NumpyRandomPerturbImage):
+    def __init__(self, *, seed: int | None = None, is_static: bool = False, clip: bool = True) -> None:
         self.clip = clip
+        super().__init__(seed=seed, is_static=is_static)
 
     def _perturb(self, *, image: np.ndarray, **kwargs: Any) -> np.ndarray:
         """Call skimage.util.random_noise with appropriate arguments and convert back to input dtype.
@@ -54,7 +53,7 @@ class NoisePerturberMixin(PerturbImage):
             convert = convert_image[dtype_str]
 
         # Apply perturbation
-        image_noise = skimage.util.random_noise(image, rng=self.rng, clip=self.clip, **kwargs)
+        image_noise = skimage.util.random_noise(image, rng=self._rng, clip=self.clip, **kwargs)
 
         # Convert image back to original dtype
         return convert(image_noise).astype(image.dtype)
@@ -63,7 +62,6 @@ class NoisePerturberMixin(PerturbImage):
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the _SKImageNoisePerturber instance."""
         cfg = super().get_config()
-        cfg["rng"] = self.rng
         cfg["clip"] = self.clip
         return cfg
 
@@ -72,21 +70,26 @@ class SaltPepperNoisePerturberMixin(NoisePerturberMixin):
     def __init__(
         self,
         *,
-        rng: np.random.Generator | int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
         amount: float = 0.05,
         clip: bool = True,
     ) -> None:
         """Initializes the SPNoisePerturber.
 
         Args:
-            rng:
-                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            seed:
+                Random seed for reproducible results. Defaults to None for
+                non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets the random state after each
+                perturb call for identical results on repeated calls.
             amount:
                 Proportion of image pixels to replace with noise on range [0, 1].
             clip:
                 Decide if output is clipped between the range of [-1, 1].
         """
-        super().__init__(rng=rng, clip=clip)
+        super().__init__(seed=seed, is_static=is_static, clip=clip)
 
         if amount < 0.0 or amount > 1.0:
             raise ValueError(
@@ -107,7 +110,8 @@ class GaussianSpeckleNoisePerturberMixin(NoisePerturberMixin):
     def __init__(
         self,
         *,
-        rng: np.random.Generator | int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
         mean: float = 0.0,
         var: float = 0.05,
         clip: bool = True,
@@ -115,8 +119,12 @@ class GaussianSpeckleNoisePerturberMixin(NoisePerturberMixin):
         """Initializes the GSNoisePerturber.
 
         Args:
-            rng:
-                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            seed:
+                Random seed for reproducible results. Defaults to None for
+                non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets the random state after each
+                perturb call for identical results on repeated calls.
             mean:
                 Mean of random distribution
             var:
@@ -124,7 +132,7 @@ class GaussianSpeckleNoisePerturberMixin(NoisePerturberMixin):
             clip:
                 Decide if output is clipped between the range of [-1, 1].
         """
-        super().__init__(rng=rng, clip=clip)
+        super().__init__(seed=seed, is_static=is_static, clip=clip)
 
         if var < 0:
             raise ValueError(

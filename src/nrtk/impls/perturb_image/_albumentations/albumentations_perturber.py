@@ -28,20 +28,22 @@ from albumentations.core.bbox_utils import convert_bboxes_from_albumentations, c
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces._random_perturb_image import RandomPerturbImage
 
 
-class AlbumentationsPerturber(PerturbImage):
+class AlbumentationsPerturber(RandomPerturbImage):
     """AlbumentationsPerturber applies a BasicTransform from Albumentations.
 
     Attributes:
-        perturber (string):
+        _perturber (string):
             The name of the BasicTransform perturber to apply.
-        parameters (dict):
+        _parameters (dict):
             Keyword arguments that should be passed to the given perturber.
-        seed (int):
-            An optional seed for reproducible results.
-        transform (albumentations.Compose):
+        seed (int | None):
+            Random seed for reproducibility. None for non-deterministic behavior.
+        is_static (bool):
+            If True, resets seed after each call for consistent results.
+        _transform (albumentations.Compose):
             albumentations pipeline for the transformation
     """
 
@@ -51,6 +53,7 @@ class AlbumentationsPerturber(PerturbImage):
         perturber: str = "NoOp",
         parameters: dict[str, Any] | None = None,
         seed: int | None = None,
+        is_static: bool = False,
     ) -> None:
         """AlbumentationsPerturber applies a BasicTransform from Albumentations.
 
@@ -60,8 +63,12 @@ class AlbumentationsPerturber(PerturbImage):
                 Will apply a NoOp if not provided.
             parameters:
                 Keyword arguments that should be passed to the given perturber.
-            seed (int):
-                An optional seed for reproducible results.
+            seed:
+                Random seed for reproducible results. Defaults to None for non-deterministic
+                behavior.
+            is_static:
+                If True and seed is provided, resets seed after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
 
 
         Raises:
@@ -70,25 +77,30 @@ class AlbumentationsPerturber(PerturbImage):
             ValueError:
                 Given perturber does not inherit BasicTransform.
         """
-        super().__init__()
-        self.perturber = perturber
-        self.parameters = parameters
+        self._perturber = perturber
+        self._parameters = parameters
 
-        if not hasattr(albumentations, self.perturber):
-            raise ValueError(f'Given perturber "{self.perturber}" is not available in Albumentations')
+        if not hasattr(albumentations, self._perturber):
+            raise ValueError(f'Given perturber "{self._perturber}" is not available in Albumentations')
 
-        transformer = getattr(albumentations, self.perturber)
+        transformer = getattr(albumentations, self._perturber)
 
         if not issubclass(transformer, albumentations.BasicTransform):
-            raise ValueError(f'Given perturber "{self.perturber}" does not inherit "BasicTransform"')
+            raise ValueError(f'Given perturber "{self._perturber}" does not inherit "BasicTransform"')
 
-        self.transform: albumentations.Compose = albumentations.Compose(
-            [transformer(**self.parameters) if self.parameters else transformer()],
+        self._transform: albumentations.Compose = albumentations.Compose(
+            [transformer(**self._parameters) if self._parameters else transformer()],
         )
 
-        self.seed = seed
-        if seed:
-            self.transform.set_random_seed(seed)
+        # super().__init__ is called last so that all attributes exist when
+        # _set_seed() is invoked during RandomPerturbImage.__init__.
+        super().__init__(seed=seed, is_static=is_static)
+
+    @override
+    def _set_seed(self) -> None:
+        """Set seed on Albumentations transform."""
+        if self._seed is not None:
+            self._transform.set_random_seed(self._seed)
 
     @staticmethod
     def _aabb_to_bbox(*, box: AxisAlignedBoundingBox, image: np.ndarray[Any, Any]) -> list[int]:
@@ -143,7 +155,7 @@ class AlbumentationsPerturber(PerturbImage):
                 labels.append(box[1])
 
         # Run transform
-        output = self.transform(
+        output = self._transform(
             image=perturbed_image,
             bboxes=np.array(bboxes),
         )
@@ -164,7 +176,6 @@ class AlbumentationsPerturber(PerturbImage):
     def get_config(self) -> dict[str, Any]:
         """Returns the current configuration of the AlbumentationsPerturber instance."""
         cfg = super().get_config()
-        cfg["perturber"] = self.perturber
-        cfg["parameters"] = self.parameters
-        cfg["seed"] = self.seed
+        cfg["perturber"] = self._perturber
+        cfg["parameters"] = self._parameters
         return cfg

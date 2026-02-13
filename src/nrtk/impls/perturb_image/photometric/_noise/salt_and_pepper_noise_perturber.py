@@ -32,8 +32,10 @@ class SaltAndPepperNoisePerturber(SaltPepperNoisePerturberMixin):
     """Adds salt & pepper noise to image stimulus.
 
     Attributes:
-        rng (np.random.Generator | int | None):
-            Pseudo-random number generator or seed
+        seed (int | None):
+            Random seed for reproducible results. None means non-deterministic.
+        is_static (bool):
+            If True and seed is set, resets RNG state after each perturb call.
         clip (bool):
             Decide if output is clipped between the range of [-1, 1].
         amount (float):
@@ -45,7 +47,8 @@ class SaltAndPepperNoisePerturber(SaltPepperNoisePerturberMixin):
     def __init__(
         self,
         *,
-        rng: np.random.Generator | int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
         amount: float = 0.05,
         salt_vs_pepper: float = 0.5,
         clip: bool = True,
@@ -53,8 +56,12 @@ class SaltAndPepperNoisePerturber(SaltPepperNoisePerturberMixin):
         """Initializes the SaltAndPepperNoisePerturber.
 
         Args:
-            rng:
-                Pseudo-random number generator or seed. Defaults to 1 for deterministic behavior.
+            seed:
+                Random seed for reproducible results. Defaults to None for
+                non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets the random state after each
+                perturb call for identical results on repeated calls.
             amount:
                 Proportion of image pixels to replace with noise on range [0, 1].
             salt_vs_pepper:
@@ -63,7 +70,7 @@ class SaltAndPepperNoisePerturber(SaltPepperNoisePerturberMixin):
             clip:
                 Decide if output is clipped between the range of [-1, 1].
         """
-        super().__init__(amount=amount, rng=rng, clip=clip)
+        super().__init__(amount=amount, seed=seed, is_static=is_static, clip=clip)
 
         if salt_vs_pepper < 0.0 or salt_vs_pepper > 1.0:
             raise ValueError(

@@ -9,13 +9,13 @@ Dependencies:
     - torch for PyTorch functionality
     - diffusers for Stable Diffusion models
     - PIL for image processing
-    - nrtk.interfaces for the `PerturbImage` interface
+    - nrtk.interfaces.perturb_image.PerturbImage for the base perturbation interface
     - smqtk_image_io for bounding box handling
 
 Example:
     >>> import numpy as np
     >>> diffusion_perturber = DiffusionPerturber(
-    ...     model_name="timbrooks/instruct-pix2pix", prompt="add rain to the image"
+    ...     model_name="timbrooks/instruct-pix2pix", prompt="add rain to the image", seed=42
     ... )
     >>> image = np.ones((256, 256, 3))
     >>> perturbed_image, _ = diffusion_perturber(image=image)  # doctest: +SKIP
@@ -27,8 +27,6 @@ Note:
 """
 
 from __future__ import annotations
-
-from nrtk.interfaces.perturb_image import PerturbImage
 
 __all__ = ["DiffusionPerturber"]
 
@@ -47,8 +45,10 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from transformers import CLIPTextModel
 from typing_extensions import override
 
+from nrtk.impls.perturb_image._base import TorchRandomPerturbImage
 
-class DiffusionPerturber(PerturbImage):
+
+class DiffusionPerturber(TorchRandomPerturbImage):
     """Diffusion-based implementation of the ``PerturbImage`` interface for prompt-guided perturbations.
 
     This class uses diffusion models (specifically the Instruct Pix2Pix model) to generate realistic
@@ -59,7 +59,8 @@ class DiffusionPerturber(PerturbImage):
         model_name: Name of the pre-trained diffusion model from Hugging Face.
                    Default is "timbrooks/instruct-pix2pix".
         prompt: Text prompt describing the desired perturbation or transformation.
-        seed: Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+        seed: Random seed for reproducible results. Defaults to None for non-deterministic behavior.
+        is_static: If True, resets RNG after each call for consistent results.
         num_inference_steps: Number of denoising steps. Default is 50.
         text_guidance_scale: Guidance scale for text prompt. Default is 8.0.
         image_guidance_scale: Guidance scale for image conditioning. Default is 2.0.
@@ -79,7 +80,8 @@ class DiffusionPerturber(PerturbImage):
         *,
         model_name: str = "timbrooks/instruct-pix2pix",
         prompt: str = "do not change the image",
-        seed: int | None = 1,
+        seed: int | None = None,
+        is_static: bool = False,
         num_inference_steps: int = 50,
         text_guidance_scale: float = 8.0,
         image_guidance_scale: float = 2.0,
@@ -95,7 +97,10 @@ class DiffusionPerturber(PerturbImage):
                 "add rain to the image", "make it foggy", "add snow", "darken the scene", etc.
                 To apply a no-op, use "do not change the image". Default is "do not change the image".
             seed:
-                Random seed for reproducible results. Defaults to 1 for deterministic behavior.
+                Random seed for reproducible results. Defaults to None for non-deterministic behavior.
+            is_static:
+                If True and seed is provided, resets RNG after each perturb call for consistent
+                results across multiple calls (useful for video frame processing).
             num_inference_steps:
                 Number of denoising steps. Default is 50.
             text_guidance_scale:
@@ -106,40 +111,37 @@ class DiffusionPerturber(PerturbImage):
                 Device for computation, e.g., "cpu" or "cuda". If None, selects
                 CUDA if available, otherwise CPU. Default is None.
         """
-        super().__init__()
-
+        self._device_config = device  # original value for config serialization
+        self._device = device if device is not None else ("cuda" if torch.cuda.is_available() else "cpu")
+        super().__init__(seed=seed, is_static=is_static)
         self.model_name = model_name
         self.prompt = prompt
-        self.seed = seed
         self.num_inference_steps = num_inference_steps
         self.text_guidance_scale = text_guidance_scale
         self.image_guidance_scale = image_guidance_scale
-        self.device = device
         self._pipeline: StableDiffusionInstructPix2PixPipeline | None = None
 
     def _get_device(self) -> str:
         """Get the device to use based on user preference or CUDA availability."""
-        if self.device:
-            if self.device == "cuda" and not torch.cuda.is_available():
-                warnings.warn(
-                    "CUDA is not available, but was requested. Falling back to CPU.",
-                    UserWarning,
-                    stacklevel=2,
-                )
-                return "cpu"
-            return self.device
-        return "cuda" if torch.cuda.is_available() else "cpu"
+        if self._device == "cuda" and not torch.cuda.is_available():
+            warnings.warn(
+                "CUDA is not available, but was requested. Falling back to CPU.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return "cpu"
+        return self._device
 
     def _warn_on_cpu_fallback(self, device: str) -> None:
         """Warn user about CPU usage if CUDA is available or if CPU is fallback."""
         if device == "cpu":
-            if self.device == "cpu" and torch.cuda.is_available():
+            if self._device_config == "cpu" and torch.cuda.is_available():
                 warnings.warn(
                     "Device is set to 'cpu' but CUDA is available. This will be significantly slower.",
                     UserWarning,
                     stacklevel=2,
                 )
-            elif self.device is None and not torch.cuda.is_available():
+            elif self._device_config is None and not torch.cuda.is_available():
                 warnings.warn(
                     "CUDA not available, using CPU. This will be significantly slower.",
                     UserWarning,
@@ -251,13 +253,9 @@ class DiffusionPerturber(PerturbImage):
         # Lancoz is more computationally expensive
         return image.resize(size=(new_w, new_h), resample=Resampling.LANCZOS)
 
-    def _get_generator(self) -> torch.Generator | None:
-        """Return torch generator. If seed provided this ensures reproducible results."""
-        device = self._get_device()
-        if self.seed is None:
-            return torch.Generator(device=device)
-
-        return torch.Generator(device=device).manual_seed(self.seed)
+    def _get_generator(self) -> torch.Generator:
+        """Return torch generator from base class. Manages reproducibility."""
+        return self._generator
 
     @override
     def perturb(
@@ -329,12 +327,11 @@ class DiffusionPerturber(PerturbImage):
     @override
     def get_config(self) -> dict[str, Any]:
         """Return the current configuration of the DiffusionPerturber."""
-        return {
-            "model_name": self.model_name,
-            "prompt": self.prompt,
-            "seed": self.seed,
-            "num_inference_steps": self.num_inference_steps,
-            "text_guidance_scale": self.text_guidance_scale,
-            "image_guidance_scale": self.image_guidance_scale,
-            "device": self.device,
-        }
+        cfg = super().get_config()
+        cfg["model_name"] = self.model_name
+        cfg["prompt"] = self.prompt
+        cfg["num_inference_steps"] = self.num_inference_steps
+        cfg["text_guidance_scale"] = self.text_guidance_scale
+        cfg["image_guidance_scale"] = self.image_guidance_scale
+        cfg["device"] = self._device_config
+        return cfg
