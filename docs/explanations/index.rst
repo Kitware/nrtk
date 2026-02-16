@@ -12,3 +12,15 @@ or interpreting results.
    nrtk_overview
    nrtk_explanation
    risk_factors
+
+.. toctree::
+   :hidden:
+
+   operational_risk_modules/atmospheric_turbulence
+   operational_risk_modules/defocus
+   operational_risk_modules/extreme_illumination
+   operational_risk_modules/haze
+   operational_risk_modules/high_frequency_vibration
+   operational_risk_modules/radial_distortion
+   operational_risk_modules/sensor_noise_resolution
+   operational_risk_modules/water_droplets

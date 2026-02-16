@@ -1,3 +1,5 @@
+.. _Interoperability:
+
 ======================
 JATIC Interoperability
 ======================

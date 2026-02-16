@@ -1,5 +1,5 @@
 Sensor Noise and Resolution Effects Simulation Module
-=============================================
+======================================================
 
 Sensor noise and resolution degradation arise from physical limitations in imaging hardware.
 Thermal noise accumulates when sensors overheat, electronic noise increases with high ISO settings
@@ -35,7 +35,7 @@ Use This When...
 * You want to simulate **resolution degradation** due to coarse pixel pitch or distant targets.
 * You need a **full physics-based sensor simulation** that models realistic image formation.
 * You're performing **comprehensive robustness screening** at the sensor level to detect degradation
-   before deployment (see the full T&E Simulation Guide →
+  before deployment (see the full T&E Simulation Guide:
   :doc:`PybsmPerturber T&E guide </examples/maite/nrtk_sensor_transformation_demo>`).
 
 Minimal Code Example

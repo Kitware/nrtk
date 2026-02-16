@@ -1,9 +1,9 @@
-==================
+====================
 Validation and Trust
-==================
+====================
 
 This page summarizes how NRTK is validated today, the available evidence, the remaining gaps, and how users
-should interpret perturbation-based robustness results (see :doc:`nrtk_explanation`). It is not a full T&E
+should interpret perturbation-based robustness results (see :doc:`/explanations/nrtk_explanation`). It is not a full T&E
 manual, but a transparency resource for anyone integrating NRTK into evaluation workflows.
 
 NRTK provides rapid, cost-effective perturbation testing to identify potential model vulnerabilities and
@@ -68,8 +68,8 @@ How we validate:
 .. note::
    For module-specific validation details, see:
 
-   * :doc:`implementations` - Individual perturbation modules with implementation details
-   * :doc:`risk_factors` - Mapping between operational risks and NRTK perturbations
+   * :doc:`/reference/api/implementations` - Individual perturbation modules with implementation details
+   * :doc:`/explanations/risk_factors` - Mapping between operational risks and NRTK perturbations
 
    Each perturbation module page includes parameter documentation and usage examples.
 

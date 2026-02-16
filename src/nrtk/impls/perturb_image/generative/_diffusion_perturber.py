@@ -1,7 +1,7 @@
 """Defines DiffusionPerturber, a PerturbImage implementation that uses diffusion models for prompt-based perturbations.
 
 Classes:
-    DiffusionPerturber: An implementation of the `PerturbImage` interface that applies diffusion-based
+    DiffusionPerturber: An implementation of the ``PerturbImage`` interface that applies diffusion-based
     perturbations to input images using pre-trained models and text prompts.
 
 Dependencies:
@@ -57,7 +57,8 @@ class DiffusionPerturber(TorchRandomPerturbImage):
 
     Args:
         model_name: Name of the pre-trained diffusion model from Hugging Face.
-                   Default is "timbrooks/instruct-pix2pix".
+            Default is "timbrooks/instruct-pix2pix".
+
         prompt: Text prompt describing the desired perturbation or transformation.
         seed: Random seed for reproducible results. Defaults to None for non-deterministic behavior.
         is_static: If True, resets RNG after each call for consistent results.
@@ -65,7 +66,7 @@ class DiffusionPerturber(TorchRandomPerturbImage):
         text_guidance_scale: Guidance scale for text prompt. Default is 8.0.
         image_guidance_scale: Guidance scale for image conditioning. Default is 2.0.
         device: Device for computation, e.g., "cpu" or "cuda". If None, selects
-                CUDA if available, otherwise CPU. Default is None.
+            CUDA if available, otherwise CPU. Default is None.
 
     Note:
         The model is loaded lazily on first use and cached for subsequent operations.
@@ -276,6 +277,7 @@ class DiffusionPerturber(TorchRandomPerturbImage):
                 Input is automatically converted to RGB for processing.
             boxes: Optional iterable of tuples containing AxisAlignedBoundingBox objects
                 and their corresponding detection confidence dictionaries.
+
             kwargs: Additional perturbation keyword arguments (currently unused).
 
         Returns:

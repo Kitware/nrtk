@@ -92,7 +92,14 @@ suppress_warnings = [
 # Autosummary templates reference link:
 # https://github.com/JamesALeedham/Sphinx-Autosummary-Recursion/tree/master
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    # Pending release note fragments are collected into a versioned page at
+    # release time; they should not be processed individually by Sphinx.
+    "release_notes/pending_release/*",
+]
 
 
 # -- Options for HTML output -------------------------------------------------

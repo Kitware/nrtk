@@ -69,20 +69,19 @@ class CircularAperturePerturber(PybsmPerturberMixin):
             interp:
                 a boolean determining whether load_database_atmosphere is used with or without
                 interpolation.
-            **kwargs:
-                sensor and/or scenario values to modify
+            **kwargs: Sensor and/or scenario values to modify.
 
-            If both sensor and scenario parameters are absent, then default values
-            will be used for their parameters
+        If both sensor and scenario parameters are absent, then default values
+        will be used for their parameters.
 
-            If none of mtf_wavelengths, mtf_weights, sensor or scenario parameters are provided, the values
-            of mtf_wavelengths and mtf_weights will default to [0.50e-6, 0.66e-6] and [1.0, 1.0] respectively
+        If none of mtf_wavelengths, mtf_weights, sensor or scenario parameters are provided, the values
+        of mtf_wavelengths and mtf_weights will default to [0.50e-6, 0.66e-6] and [1.0, 1.0] respectively.
 
-            If sensor and scenario parameters are provided, but not mtf_wavelengths and mtf_weights, the
-            values of mtf_wavelengths and mtf_weights will come from the sensor and scenario objects.
+        If sensor and scenario parameters are provided, but not mtf_wavelengths and mtf_weights, the
+        values of mtf_wavelengths and mtf_weights will come from the sensor and scenario objects.
 
-            If mtf_wavelengths and mtf_weights are provided by the user, those values will be used
-            in the otf calculation.
+        If mtf_wavelengths and mtf_weights are provided by the user, those values will be used
+        in the otf calculation.
 
         Raises:
             ValueError:
