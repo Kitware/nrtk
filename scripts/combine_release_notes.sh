@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Script to generate the DEVEL-JATIC release notes.
+# Script to combine pending release note fragments into a single release
+# notes file.
 
 set -e
 
@@ -17,7 +18,8 @@ if [ "$#" -ne 1 ]; then
 fi
 
 version="$1"
-OUTPUT_FILE="${RELEASE_NOTES_DIR}/v${version}.rst"
+version_str="v${version}"
+OUTPUT_FILE="${RELEASE_NOTES_DIR}/${version_str}.rst"
 PENDING_RELEASE_NOTES_DIR="${RELEASE_NOTES_DIR}/pending_release"
 
 if [ ! -d "$PENDING_RELEASE_NOTES_DIR" ]; then
@@ -25,19 +27,35 @@ if [ ! -d "$PENDING_RELEASE_NOTES_DIR" ]; then
     exit 1
 fi
 
-> "$OUTPUT_FILE"
+# Check that there are fragment files to combine (ignore .gitkeep)
+shopt -s nullglob
+fragments=("$PENDING_RELEASE_NOTES_DIR"/*.rst)
+shopt -u nullglob
 
-echo "$version" >> "$OUTPUT_FILE"
-echo "${version//?/=}" >> "$OUTPUT_FILE"
-echo >> "$OUTPUT_FILE"
+if [ ${#fragments[@]} -eq 0 ]; then
+    echo "Error: No .rst fragments found in '$PENDING_RELEASE_NOTES_DIR'." >&2
+    exit 1
+fi
 
-for file in "$PENDING_RELEASE_NOTES_DIR"/*; do
-    grep '^[[:space:]]*[-*]' "$file" | while IFS= read -r line; do
-        echo "$line" >> "$OUTPUT_FILE"
+# Write header
+{
+    echo "$version_str"
+    echo "${version_str//?/=}"
+    echo
+} > "$OUTPUT_FILE"
+
+# Concatenate all fragments, separated by blank lines
+first=true
+for file in "${fragments[@]}"; do
+    if [ "$first" = true ]; then
+        first=false
+    else
         echo >> "$OUTPUT_FILE"
-    done
+    fi
+    cat "$file" >> "$OUTPUT_FILE"
 done
 
-truncate -s -1 "$OUTPUT_FILE"
+# Ensure file ends with a single newline
+printf '%s\n' "$(cat "$OUTPUT_FILE")" > "$OUTPUT_FILE"
 
 echo "Release notes generated: $OUTPUT_FILE"

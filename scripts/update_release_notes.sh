@@ -3,10 +3,11 @@
 # Script to help with the NRTK release process. Performs the following steps:
 #   - Poetry version (major, minor, or patch)
 #   - Combine release note fragments into one file
+#   - Update release notes index
 #   - Clean pending_release directory
 #
-# Two git commits are created. One for the version bump and one for the new
-# release notes stub file.
+# One git commit is created containing the version bump, combined release
+# notes, index update, and fragment removal.
 #
 set -e
 
@@ -15,6 +16,7 @@ PROJECT_DIR="${SCRIPT_DIR}/.."
 DOCS_DIR="${PROJECT_DIR}/docs"
 RELEASE_NOTES_DIR="${DOCS_DIR}/release_notes"
 PENDING_RELEASE_NOTES_DIR="${RELEASE_NOTES_DIR}/pending_release"
+INDEX_FILE="${RELEASE_NOTES_DIR}/index.rst"
 
 # Check args
 if [ "$#" != 1 ]
@@ -38,20 +40,25 @@ poetry version "${RELEASE_TYPE}"
 # Get version
 VERSION="$(poetry version -s)"
 VERSION_STR="v${VERSION}"
-VERSION_SEPERATOR=${VERSION_STR//?/=}
 
 # Combine release notes
-bash ${SCRIPT_DIR}/combine_release_notes.sh "${VERSION}"
+bash "${SCRIPT_DIR}/combine_release_notes.sh" "${VERSION}"
+echo "Release notes combined into ${RELEASE_NOTES_DIR}/${VERSION_STR}.rst"
 
-# Add reference to new file in release_notes.rst
-echo "   release_notes/${VERSION_STR}" >> "${DOCS_DIR}/release_notes.rst"
-echo "Reference added to release_notes.rst"
+# Add reference to new file in index.rst (insert at top of toctree)
+if [ ! -f "$INDEX_FILE" ]; then
+  echo "Error: ${INDEX_FILE} not found" >&2
+  exit 1
+fi
+# Insert the new version entry after the ":maxdepth: 1" line followed by a blank line
+sed -i "/^   :maxdepth: 1$/,/^$/ {
+  /^$/a\\   ${VERSION_STR}
+}" "$INDEX_FILE"
+echo "Reference added to ${INDEX_FILE}"
 
-# Make git commits
-git add "${PROJECT_DIR}"/pyproject.toml
-git add "${RELEASE_NOTES_DIR}"/v"${VERSION}".rst
-git commit --no-verify -m "Update version number to ${VERSION}"
-
-# Clear pending_release
-git rm "${PENDING_RELEASE_NOTES_DIR}/*.rst"
-git commit --no-verify -m "Clear release notes fragments"
+# Stage all changes and make a single commit
+git add "${PROJECT_DIR}/pyproject.toml"
+git add "${RELEASE_NOTES_DIR}/${VERSION_STR}.rst"
+git add "${INDEX_FILE}"
+git rm "${PENDING_RELEASE_NOTES_DIR}"/*.rst
+git commit --no-verify -m "Update to ${VERSION_STR}"
