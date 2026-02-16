@@ -18,6 +18,8 @@
       # If changes are made to an active merge request.
       - if: $CI_PIPELINE_SOURCE == "merge_request_event"
         when: manual
+      - if: $CI_PIPELINE_SOURCE == "schedule"
+        when: on_success
       - when: never
     before_script:
       - echo ${KITWARE_HARBOR_TOKEN} | docker login ${HARBOR_URL}:${HARBOR_PORT}/v2 --username 'robot$kitware+robot' --password-stdin || echo "Failed to login to Harbor..."

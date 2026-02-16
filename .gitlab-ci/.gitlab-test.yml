@@ -9,8 +9,6 @@
   tags:
     - autoscaler
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
     - !reference [.shared-setup, rules]
   before_script:
     - !reference [.shared-setup, before_script]
