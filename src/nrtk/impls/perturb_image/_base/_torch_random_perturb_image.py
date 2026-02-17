@@ -10,6 +10,8 @@ Note:
 
 from __future__ import annotations
 
+import warnings
+
 __all__ = ["TorchRandomPerturbImage"]
 
 from typing import Any
@@ -37,6 +39,17 @@ class TorchRandomPerturbImage(RandomPerturbImage):
     def _set_seed(self) -> None:
         """Initialize torch Generator with seed."""
         if self._seed is None:
-            self._generator = torch.Generator(device=self._device)
+            self._generator = torch.Generator(device=self._get_device())
         else:
-            self._generator = torch.Generator(device=self._device).manual_seed(self._seed)
+            self._generator = torch.Generator(device=self._get_device()).manual_seed(self._seed)
+
+    def _get_device(self) -> str:
+        """Get the device to use based on user preference or CUDA availability."""
+        if self._device == "cuda" and not torch.cuda.is_available():
+            warnings.warn(
+                "CUDA is not available, but was requested. Falling back to CPU.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return "cpu"
+        return self._device

@@ -122,17 +122,6 @@ class DiffusionPerturber(TorchRandomPerturbImage):
         self.image_guidance_scale = image_guidance_scale
         self._pipeline: StableDiffusionInstructPix2PixPipeline | None = None
 
-    def _get_device(self) -> str:
-        """Get the device to use based on user preference or CUDA availability."""
-        if self._device == "cuda" and not torch.cuda.is_available():
-            warnings.warn(
-                "CUDA is not available, but was requested. Falling back to CPU.",
-                UserWarning,
-                stacklevel=2,
-            )
-            return "cpu"
-        return self._device
-
     def _warn_on_cpu_fallback(self, device: str) -> None:
         """Warn user about CPU usage if CUDA is available or if CPU is fallback."""
         if device == "cpu":

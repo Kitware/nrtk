@@ -314,7 +314,7 @@ class TestDiffusionPerturber(PerturberTestsMixin):
         mock_torch: MagicMock,
         mock_scheduler_class: MagicMock,
         mock_pipeline_class: MagicMock,
-        mock_base_torch: MagicMock,  # noqa: ARG002
+        mock_base_torch: MagicMock,
         device_requested: str | None,
         cuda_available: bool,
         expected_device: str,
@@ -322,6 +322,7 @@ class TestDiffusionPerturber(PerturberTestsMixin):
     ) -> None:
         """Test device selection logic and associated warnings."""
         mock_torch.cuda.is_available.return_value = cuda_available
+        mock_base_torch.cuda.is_available.return_value = cuda_available
 
         mock_pipeline = MagicMock()
         mock_pipeline_class.from_pretrained.return_value = mock_pipeline
