@@ -17,3 +17,6 @@
 * Fixed diffusion notebook hardcoding ``device="cuda"`` which caused failures
   on CPU-only runners. The notebook now uses ``DiffusionPerturber``'s built-in
   auto-detection (CUDA when available, CPU otherwise).
+
+* Changed ``jatic-perturbations-saliency`` notebook using ``JitterPerturber``
+  to ``AverageBlurPerturber``.
