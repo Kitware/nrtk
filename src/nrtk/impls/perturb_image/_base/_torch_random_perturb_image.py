@@ -45,7 +45,7 @@ class TorchRandomPerturbImage(RandomPerturbImage):
 
     def _get_device(self) -> str:
         """Get the device to use based on user preference or CUDA availability."""
-        if self._device == "cuda" and not torch.cuda.is_available():
+        if self._device.startswith("cuda") and not torch.cuda.is_available():
             warnings.warn(
                 "CUDA is not available, but was requested. Falling back to CPU.",
                 UserWarning,
