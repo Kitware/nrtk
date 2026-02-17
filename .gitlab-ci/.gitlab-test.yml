@@ -183,7 +183,7 @@ tox:coverage:
 .tox:notebooks:
   extends: .test-setup
   tags:
-    - autoscaler
+    - $RUNNER_TAG
   image: python:3.10
   dependencies: []
   rules:
@@ -207,9 +207,12 @@ tox:notebooks:examples:
           "nrtk_tutorial.ipynb",
           "optical_perturbers.ipynb",
           "photometric_perturbers.ipynb",
-          "pybsm_default_config.ipynb",
-          "generative_perturbers.ipynb"
+          "pybsm_default_config.ipynb"
         ]
+        RUNNER_TAG: autoscaler
+      - NOTEBOOK_DIR: "docs/examples"
+        NOTEBOOK_FILE: "generative_perturbers.ipynb"
+        RUNNER_TAG: single-gpu
 
 tox:notebooks:maite:
   extends: .tox:notebooks
@@ -229,3 +232,4 @@ tox:notebooks:maite:
           "jatic-perturbations-saliency.ipynb",
           "nrtk_water_droplet_perturber_demo.ipynb"
         ]
+        RUNNER_TAG: autoscaler
