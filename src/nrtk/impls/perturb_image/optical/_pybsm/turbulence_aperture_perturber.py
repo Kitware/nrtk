@@ -198,8 +198,11 @@ class TurbulenceAperturePerturber(PybsmPerturberMixin):
         if self._override_aircraft_speed is not None:
             self.scenario.aircraft_speed = self._override_aircraft_speed
 
-        self.scenario.altitude = override_altitude if override_altitude else self.scenario.altitude
+        self.scenario.altitude = override_altitude if override_altitude else self.altitude
         slant_range = self._override_slant_range if self._override_slant_range else self.altitude
+
+        if slant_range < self.scenario.altitude:
+            raise ValueError("slant_range cannot be less than alititude")
 
         return TurbulenceApertureSimulator(
             sensor=self.sensor,
