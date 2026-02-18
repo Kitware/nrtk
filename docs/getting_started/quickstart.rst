@@ -38,7 +38,7 @@ your scenario to the right tools.
          from nrtk.impls.perturb_image.environment import HazePerturber
          img_out = HazePerturber(img_in)
 
-      See example outputs in our :doc:`Visual Perturbation Gallery </examples/perturbers>`.
+      See example outputs in our :doc:`Visual Perturbation Gallery </explanations/risk_factors>`.
 
    .. grid-item-card:: 🗺️ Map Your Risk to the Right Tool
       :columns: 12 12 4 4

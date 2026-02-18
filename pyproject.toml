@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "nrtk"
-version = "0.27.0"
+version = "0.27.1"
 description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 license = "Apache-2.0"
 readme = "README.md"

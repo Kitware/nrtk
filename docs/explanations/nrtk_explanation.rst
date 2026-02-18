@@ -177,7 +177,7 @@ NRTK results inform but do not replace operational validation:
   operational data and refine your understanding of model robustness.
 
 For additional context on when NRTK results should inform decisions versus when additional validation is needed,
-see :doc:`validation_and_trust`.
+see :doc:`/validation_and_trust`.
 
 NRTK Algorithms
 ---------------

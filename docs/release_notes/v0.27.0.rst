@@ -1,5 +1,5 @@
-0.27.0
-======
+v0.27.0
+=======
 
 This is the final minor release before v1.0, focusing on API stabilization, package
 restructuring, and dependency cleanup. Major changes include the removal of deprecated

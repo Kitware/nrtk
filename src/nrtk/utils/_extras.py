@@ -25,8 +25,6 @@ from typing import Any, TextIO
 
 import yaml
 
-import nrtk
-
 _IMPORT_NAME_OVERRIDES = {
     "Pillow": "PIL",
     "opencv-python": "cv2",
@@ -75,14 +73,25 @@ def _identify_cv2_package_versions() -> dict[str, str]:
     return installed
 
 
-def _try_import(module_name: str) -> tuple[bool, str | None]:
+def _try_import(module_name: str, *, package_name: str | None = None) -> tuple[bool, str | None]:
     """Try importing a module and getting its version."""
     try:
-        mod = importlib.import_module(module_name)
-        version = getattr(mod, "__version__", "installed (version unknown)")
-        return True, version
+        importlib.import_module(module_name)
     except ImportError:
         return False, None
+    # Prefer importlib.metadata for the authoritative installed version
+    if package_name:
+        try:
+            return True, version(package_name)
+        except PackageNotFoundError:
+            pass
+    try:
+        return True, version(module_name)
+    except PackageNotFoundError:
+        pass
+    mod = importlib.import_module(module_name)
+    ver = getattr(mod, "__version__", "installed (version unknown)")
+    return True, ver
 
 
 def _get_extras_status(
@@ -99,7 +108,7 @@ def _get_extras_status(
             # Extract package name from PEP 508 specifier (e.g., "numpy>=1.26" -> "numpy")
             dep = _extract_package_name(dep_spec)
             import_name = _IMPORT_NAME_OVERRIDES.get(dep, dep.replace("-", "_"))
-            ok, ver = _try_import(import_name)
+            ok, ver = _try_import(import_name, package_name=dep)
             if dep.startswith("opencv-python"):
                 dep_version = cv2_versions.get(dep)
                 if not dep_version:
@@ -133,7 +142,7 @@ def print_extras_status(file: TextIO = sys.stdout) -> None:
 
         print("\nFor details about installing NRTK extras, please visit:", file=file, flush=True)
         print(
-            f"    https://nrtk.readthedocs.io/en/v{nrtk.__version__}/installation.html#extras\n",
+            "    https://nrtk.readthedocs.io/en/stable/\n",
             file=file,
             flush=True,
         )
