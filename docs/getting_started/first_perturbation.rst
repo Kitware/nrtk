@@ -5,7 +5,7 @@ In real-world deployments, cameras mounted on vehicles, drones, or handheld plat
 vibration that blurs images and degrades model performance. Most vision models are trained on
 clean, stable imagery, leading to even mild jitter causing missed detections or poor accuracy.
 
-In this guide, you'll use NRTK's :ref:`JitterOTFPerturber <JitterOTFPerturber>` to apply your
+In this guide, you'll use NRTK's :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber` to apply your
 first physics-based perturbation and see how sensor jitter affects an image. This is a good
 starting point if you want to:
 
@@ -52,7 +52,7 @@ This code uses default values and provides a sample input image. However, you ca
 own image to visualize the perturbation. The ``s_x`` and ``s_y`` parameters (the root-mean-squared jitter amplitudes in
 radians, in the x and y directions) are the primary way to customize a jitter perturber. Larger jitter amplitudes
 generate a larger Gaussian blur kernel. The
-:doc:`how-to guide on OTF perturbations </examples/otf_visualization>` will provide more detail on selecting
+:doc:`how-to guide on OTF perturbations </examples/optical_perturbers>` will provide more detail on selecting
 specific values for these parameters.
 
 Resulting Image

@@ -49,7 +49,9 @@ class RadialDistortionPerturber(PerturbImage):
         k (Sequence[float]): A list of coefficients used to compute the radial distortion,
             should have exactly 3 values. Positive values represent a fisheye or barrel distortion,
             negative values represent a pincushion distortion.
+
         color_fill (Sequence[int]): Background color fill for RGB image.
+
     """
 
     def __init__(

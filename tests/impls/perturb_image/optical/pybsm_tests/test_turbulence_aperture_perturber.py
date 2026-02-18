@@ -148,25 +148,31 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
             _ = perturber.perturb(image=img, **kwargs)
 
     @pytest.mark.parametrize(
-        ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "expectation"),
+        ("mtf_wavelengths", "mtf_weights", "cn2_at_1m", "altitude", "slant_range", "expectation"),
         [
-            ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.1, does_not_raise()),
+            ([0.5e-6, 0.6e-6], [0.5, 0.5], 0.1, 250, 250, does_not_raise()),
             (
                 [0.5e-6, 0.6e-6],
                 [],
                 0.1,
+                250,
+                250,
                 pytest.raises(ValueError, match=r"mtf_weights is empty"),
             ),
             (
                 [],
                 [0.5, 0.5],
                 0.1,
+                250,
+                250,
                 pytest.raises(ValueError, match=r"mtf_wavelengths is empty"),
             ),
             (
                 [0.5e-6, 0.6e-6],
                 [0.5],
                 0.1,
+                250,
+                250,
                 pytest.raises(
                     ValueError,
                     match=r"mtf_wavelengths and mtf_weights are not the same length",
@@ -176,9 +182,22 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
                 [0.5e-6, 0.6e-6],
                 [0.5, 0.5],
                 0,
+                250,
+                250,
                 pytest.raises(
                     ValueError,
                     match=r"Turbulence effect cannot be applied at ground level",
+                ),
+            ),
+            (
+                [0.5e-6, 0.6e-6],
+                [0.5, 0.5],
+                0.1,
+                250,
+                200,
+                pytest.raises(
+                    ValueError,
+                    match=r"slant_range cannot be less than alititude",
                 ),
             ),
         ],
@@ -188,6 +207,8 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
         mtf_wavelengths: Sequence[float],
         mtf_weights: Sequence[float],
         cn2_at_1m: float,
+        altitude: float,
+        slant_range: float,
         expectation: AbstractContextManager,
     ) -> None:
         """Raise appropriate errors for specific parameters."""
@@ -196,6 +217,8 @@ class TestTurbulenceAperturePerturber(PerturberTestsMixin):
                 mtf_wavelengths=mtf_wavelengths,
                 mtf_weights=mtf_weights,
                 cn2_at_1m=cn2_at_1m,
+                altitude=altitude,
+                slant_range=slant_range,
             )
 
     @pytest.mark.parametrize(

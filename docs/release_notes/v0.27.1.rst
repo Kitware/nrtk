@@ -1,0 +1,90 @@
+v0.27.1
+=======
+
+This patch release contains fixes to CI/CD pipelines, documentation builds, notebook
+execution, and several runtime bugs. Key areas include resolving nightly CI pipeline
+issues, fixing ~150 Sphinx build warnings, standardizing notebook setup cells across
+all CI-tracked notebooks, correcting GPU device detection and seed handling in
+perturbers, and adding slant range validation for ``TurbulenceAperturePerturber``.
+
+Fixes
+-----
+
+* Fixed README images and links not rendering on PyPI by replacing relative
+  paths with absolute URLs pointing to the public GitHub repository.
+
+* Fixed ~150 Sphinx documentation build warnings including malformed RST
+  tables, missing toctree entries, broken cross-references, non-consecutive
+  header levels, incorrect notebook cross-reference links, and docstring
+  formatting issues.
+
+* Fixed ``scripts/update_release_notes.sh`` to produce a single commit instead of two,
+  and to correctly update ``docs/release_notes/index.rst`` (previously wrote to a
+  nonexistent ``docs/release_notes.rst`` file).
+
+* Fixed ``scripts/combine_release_notes.sh`` to use the ``v`` prefix in release note
+  titles for consistency, and to concatenate full fragment content instead of only
+  extracting bullet-point lines.
+
+* Fixed nightly scheduled CI pipeline wiping the coverage badge by removing
+  the schedule exclusion from test and coverage jobs.
+
+* Fixed nightly scheduled CI builds to run the full MR pipeline (tests,
+  quality, docs, security, containers). Mirror and publish stages remain
+  unaffected.
+
+* Fixed compliance trigger job running on tag-initiated publish pipelines by
+  scoping its rules to MR events and default branch pushes only.
+
+* Fixed notebook rendering being out of sync with releases by redesigning
+  the ``tox`` ``papermill`` environment to build a local wheel and install it
+  with ``--no-index``, so notebook ``%pip install`` commands use the local
+  build instead of PyPI. Added ``nbstripout`` to strip personal metadata from
+  executed notebooks. Changed ``base_python`` to ``py313``.
+
+* Fixed ``print_extras_status()`` showing ``unknown`` for package versions by
+  updating ``_try_import()`` to use ``importlib.metadata.version()`` instead
+  of the module ``__version__`` attribute. Changed the readthedocs URL from a
+  version-pinned path to ``/en/stable/``.
+
+* Fixed inconsistent notebook setup cells across all 17 CI-tracked notebooks
+  by standardizing ``%pip install`` format, correcting per-notebook extras,
+  removing unnecessary ``numpy<2.0`` pins, and consolidating scattered install
+  cells into a single setup cell per notebook.
+
+* Fixed diffusion notebook hardcoding ``device="cuda"`` which caused failures
+  on CPU-only runners. The notebook now uses ``DiffusionPerturber``'s built-in
+  auto-detection (CUDA when available, CPU otherwise).
+
+* Fixed ``jatic-perturbations-saliency`` notebook by replacing
+  ``JitterPerturber`` with ``AverageBlurPerturber``.
+
+* Fixed PDF docs CI job failing by switching ``latex_engine`` to
+  ``lualatex`` which handles Unicode/emoji characters natively,
+  installing ``texlive-luatex`` and ``fonts-freefont-ttf`` in CI,
+  using ``-pdflua`` latexmk flag, and overriding Sphinx's default
+  ``fontpkg`` to use Latin Modern fonts bundled with texlive.
+
+* Fixed notebook CI jobs using a shared runner tag, which prevented
+  GPU-dependent notebooks from being tested on CUDA. Each notebook now
+  specifies its own runner tag so that GPU notebooks run on GPU runners.
+
+* Fixed ``tox`` blanket ``CUDA_VISIBLE_DEVICES`` override hiding GPUs from
+  the ``papermill`` environment. The ``papermill`` environment now passes
+  through the host's ``CUDA_VISIBLE_DEVICES`` so that GPU-dependent
+  notebooks can access CUDA when run on a GPU runner.
+
+* Fixed a bug with ``TorchRandomPerturbImage._set_seed`` not selecting the correct device before setting seed.
+
+* Fixed diffusion tests to match changes from the ``_set_seed`` bug fix.
+
+* Fixed ``_get_device`` CUDA availability check to support specific GPU
+  device strings (e.g., ``"cuda:0"``, ``"cuda:1"``). Previously only the
+  bare ``"cuda"`` string was matched, so requests for a specific GPU would
+  bypass the fallback-to-CPU logic when CUDA was unavailable.
+
+* Fixed ``TurbulenceAperturePerturber._create_simulator`` to validate that
+  ``slant_range`` is greater than or equal to ``altitude``.
+
+* Fixed ``TestTurbulenceAperturePerturber.test_configuration_bounds`` to test
+  for slant range less than altitude.

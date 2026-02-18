@@ -2,7 +2,7 @@
 
 This directory hosts the NRTK examples.
 
-### Implementation Guide
+## Implementation Guide
 
 Example notebooks should have an "Open in Colab" button. See other example
 notebooks for information on how to add a Colab cell.
@@ -10,7 +10,7 @@ notebooks for information on how to add a Colab cell.
 Example notebooks that download or generate data should place that data in the
 `data` sub-directory.
 
-### Requirements
+## Requirements
 
 Most of the examples require [Jupyter Notebook](https://jupyter.org/) and
 [PyTorch](https://pytorch.org/).
@@ -25,7 +25,7 @@ Some notebooks may require additional dependencies. See the first cell of each
 notebook ("Set Up the Environment") for instructions on how to install the
 relevant packages.
 
-### Additional Installs & Extras
+## Additional Installs & Extras
 
 Many notebooks depend on optional extras from `nrtk`, which must be installed
 for the notebook to run correctly. These installs are included at the top of
@@ -59,7 +59,7 @@ print_extras_status()
 
 This prints out all extras, their dependencies, and whether they are installed.
 
-### Run the Notebooks from Colab
+## Run the Notebooks from Colab
 
 Most of the notebooks have an "Open in Colab" button. Right-click on the button
 and select "Open Link in New Tab" to start a Colab page with the corresponding
@@ -87,13 +87,13 @@ have access to.
 **Note that after setting up the environment, you may need to "Restart**
 **Runtime" to resolve package version conflicts.**
 
-### Data
+## Data
 
 Some notebooks may require additional data. Most of this data will be downloaded
 when running the notebook. However, some notebooks rely on
 [Git LFS](https://git-lfs.com/) being installed for data access.
 
-### Encountering Issues
+## Encountering Issues
 
 For issues relating to NRTK functionality or running an example, create an issue
 on the [repository](https://github.com/Kitware/nrtk/issues).

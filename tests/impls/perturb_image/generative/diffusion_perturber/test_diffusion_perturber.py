@@ -43,7 +43,7 @@ class TestDiffusionPerturber(PerturberTestsMixin):
             ],
         ],
     )
-    @pytest.mark.parametrize("device", ["cuda", "cpu", None])
+    @pytest.mark.parametrize("device", ["cuda", "cuda:0", "cuda:1", "cpu", None])
     @patch(_BASE_TORCH)
     @patch(_DIFFUSION_TORCH)
     @patch(_DIFFUSION_PIPELINE)
@@ -299,6 +299,10 @@ class TestDiffusionPerturber(PerturberTestsMixin):
         [
             ("cuda", True, "cuda", False),
             ("cuda", False, "cpu", True),
+            ("cuda:0", True, "cuda:0", False),
+            ("cuda:0", False, "cpu", True),
+            ("cuda:1", True, "cuda:1", False),
+            ("cuda:1", False, "cpu", True),
             ("cpu", True, "cpu", True),
             ("cpu", False, "cpu", False),
             (None, True, "cuda", False),
@@ -314,7 +318,7 @@ class TestDiffusionPerturber(PerturberTestsMixin):
         mock_torch: MagicMock,
         mock_scheduler_class: MagicMock,
         mock_pipeline_class: MagicMock,
-        mock_base_torch: MagicMock,  # noqa: ARG002
+        mock_base_torch: MagicMock,
         device_requested: str | None,
         cuda_available: bool,
         expected_device: str,
@@ -322,6 +326,7 @@ class TestDiffusionPerturber(PerturberTestsMixin):
     ) -> None:
         """Test device selection logic and associated warnings."""
         mock_torch.cuda.is_available.return_value = cuda_available
+        mock_base_torch.cuda.is_available.return_value = cuda_available
 
         mock_pipeline = MagicMock()
         mock_pipeline_class.from_pretrained.return_value = mock_pipeline

@@ -205,7 +205,7 @@ Installing with OpenCV
 ^^^^^^^^^^^^^^^^^^^^^^
 One of the optional packages for nrtk is OpenCV, which is required for
 :py:mod:`~nrtk.impls.perturb_image.photometric.blur` perturbers and
-:doc:`Optical Transfer Function perturbations </examples/otf_visualization>`.
+:doc:`Optical Transfer Function perturbations </examples/optical_perturbers>`.
 
 OpenCV receives dedicated installation guidance due to its unique dual-installation options.
 Unlike other optional dependencies that have single-path installations,
