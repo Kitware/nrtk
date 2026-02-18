@@ -68,12 +68,12 @@ pdf-build:
   allow_failure: true
   before_script:
     - !reference [.docs-setup, before_script]
-    - apt-get install latexmk texlive texlive-latex-extra -y
+    - apt-get install latexmk texlive texlive-latex-extra texlive-luatex fonts-freefont-ttf -y
   script:
     - cd docs
     - poetry run python -m sphinx -T -b latex -d _build/doctrees -D language=en . ./_pdf
     - cd _pdf
-    - latexmk -r latexmkrc -pdf -f -dvi- -ps- -interaction=nonstopmode
+    - latexmk -r latexmkrc -pdflua -f -dvi- -ps- -interaction=nonstopmode
 
 check-markdown-links:
   extends: .docs-setup

@@ -20,3 +20,9 @@
 
 * Changed ``jatic-perturbations-saliency`` notebook using ``JitterPerturber``
   to ``AverageBlurPerturber``.
+
+* Fixed PDF docs CI job failing by switching ``latex_engine`` to
+  ``lualatex`` which handles Unicode/emoji characters natively,
+  installing ``texlive-luatex`` and ``fonts-freefont-ttf`` in CI,
+  using ``-pdflua`` latexmk flag, and overriding Sphinx's default
+  ``fontpkg`` to use Latin Modern fonts bundled with texlive.

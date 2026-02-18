@@ -189,6 +189,15 @@ nb_execution_mode = "off"
 
 # -- LaTeX engine ------------------------------------------------------------
 latex_engine = "lualatex"
+latex_elements = {
+    # Use fontspec with default Latin Modern fonts (bundled with texlive)
+    # instead of Sphinx's default FreeSerif/FreeSans/FreeMono which may
+    # not be found by luaotfload's font resolver.
+    "fontpkg": r"\usepackage{fontspec}",
+}
+# Use makeindex instead of xindy (Sphinx's default for lualatex) since
+# xindy may not be available in all CI environments.
+latex_use_xindy = False
 
 # -- Datatables --------------------------------------------------------------
 # set the version to use for DataTables plugin
