@@ -163,6 +163,7 @@ markers = [
     "pybsm: Run tests that require the pybsm extra",
     "maite: Run tests that require the maite extra",
     "tools: Run tests that require the tools extra",
+    "optional: Run all tests except notebooks",
 ]
 
 [tool.coverage.run]

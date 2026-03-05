@@ -5,6 +5,8 @@ from typing import Any
 
 import numpy as np
 import pytest
+from _pytest.config import Config
+from _pytest.nodes import Item
 from PIL import Image
 from syrupy.assertion import SnapshotAssertion
 from syrupy.extensions.json import JSONSnapshotExtension
@@ -27,6 +29,13 @@ def set_numpy_printoptions() -> None:
         formatter=None,
         legacy=False,
     )
+
+
+# PyTest all marker for DSO unit test component. PyTest requires the Config param, even though it's unused
+def pytest_collection_modifyitems(config: Config, items: list[Item]) -> None:  # noqa: ARG001
+    for item in items:
+        if "notebooks" not in {mark.name for mark in item.iter_markers()}:
+            item.add_marker(pytest.mark.optional)
 
 
 class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
