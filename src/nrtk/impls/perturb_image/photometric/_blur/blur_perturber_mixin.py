@@ -11,7 +11,7 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 
 class BlurPerturberMixin(PerturbImage):

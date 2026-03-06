@@ -18,7 +18,7 @@ from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
 from nrtk.impls.perturb_image import ComposePerturber
 from nrtk.impls.perturb_image.geometric.random import RandomCropPerturber
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 from tests.fakes import FakePerturber
 from tests.impls.perturb_image.perturber_utils import perturber_assertions
 

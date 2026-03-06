@@ -6,7 +6,7 @@ Classes:
 Dependencies:
     - numpy: For numerical operations and random number generation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
-    - nrtk.interfaces.perturb_image.PerturbImage: Base class for perturbation algorithms.
+    - nrtk.interfaces.PerturbImage: Base class for perturbation algorithms.
 
 Example usage:
     >>> image = np.ones((256, 256, 3))

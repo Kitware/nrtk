@@ -25,7 +25,7 @@ Classes:
 Dependencies:
     - Scipy for image processing.
     - Numba for JIT-compiled point-in-polygon operations.
-    - nrtk.interfaces.perturb_image.PerturbImage as the base class for perturbation.
+    - nrtk.interfaces.PerturbImage as the base class for perturbation.
 
 Example usage:
     >>> import numpy as np

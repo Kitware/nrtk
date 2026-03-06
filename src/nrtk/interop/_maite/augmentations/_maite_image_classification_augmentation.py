@@ -17,7 +17,7 @@ from maite.protocols.image_classification import (
     TargetType,
 )
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 from nrtk.interop._maite.metadata import NRTKDatumMetadata
 from nrtk.interop._maite.metadata._nrtk_datum_metadata import _forward_md_keys
 

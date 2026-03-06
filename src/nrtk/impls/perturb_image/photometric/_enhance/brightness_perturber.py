@@ -16,7 +16,7 @@ Note:
 
 from __future__ import annotations
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 __all__ = ["BrightnessPerturber"]
 

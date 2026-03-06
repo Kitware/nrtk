@@ -10,7 +10,7 @@ import os
 from kwcoco import CocoDataset
 from smqtk_core.configuration import from_config_dict
 
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interfaces import PerturbImageFactory
 from nrtk.interop._maite.api._nrtk_perturb_input_schema import NRTKPerturbInputSchema
 from nrtk.interop._maite.datasets import COCOMAITEObjectDetectionDataset
 

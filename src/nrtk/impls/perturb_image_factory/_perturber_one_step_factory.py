@@ -7,7 +7,7 @@ Classes:
 Dependencies:
     - nrtk.impls.perturb_image_factory.PerturberStepFactory for the base
       factory functionality.
-    - nrtk.interfaces.perturb_image.PerturbImage as the interface for the perturber.
+    - nrtk.interfaces.PerturbImage as the interface for the perturber.
 
 Example usage:
     >>> from nrtk.impls.perturb_image.photometric.enhance import BrightnessPerturber
@@ -19,7 +19,7 @@ __all__ = ["PerturberOneStepFactory"]
 from typing import Any
 
 from nrtk.impls.perturb_image_factory._perturber_step_factory import PerturberStepFactory
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 
 class PerturberOneStepFactory(PerturberStepFactory):

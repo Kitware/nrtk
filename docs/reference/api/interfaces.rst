@@ -25,7 +25,7 @@ Image Perturbation
 
 Interface: PerturbImage
 -----------------------
-.. autoclass:: nrtk.interfaces.perturb_image.PerturbImage
+.. autoclass:: nrtk.interfaces.PerturbImage
    :members:
    :special-members:
 
@@ -35,6 +35,6 @@ Perturbation Factory
 
 Interface: PerturbImageFactory
 ------------------------------
-.. autoclass:: nrtk.interfaces.perturb_image_factory.PerturbImageFactory
+.. autoclass:: nrtk.interfaces.PerturbImageFactory
    :members:
    :special-members:

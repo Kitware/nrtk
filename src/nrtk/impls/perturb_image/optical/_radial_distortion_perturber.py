@@ -19,7 +19,7 @@ Classes:
 Dependencies:
     - numpy: For numerical operations and array manipulation.
     - smqtk_image_io.AxisAlignedBoundingBox: For handling and adjusting bounding boxes.
-    - nrtk.interfaces.perturb_image.PerturbImage: Base class for image perturbation algorithms.
+    - nrtk.interfaces.PerturbImage: Base class for image perturbation algorithms.
 
 Example usage:
     >>> k = [0.5, 0.3, 0.1]
@@ -39,7 +39,7 @@ import numpy as np
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 
 class RadialDistortionPerturber(PerturbImage):

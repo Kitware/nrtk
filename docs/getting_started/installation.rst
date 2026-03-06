@@ -302,7 +302,7 @@ Optical Perturbers
         - Image (RGB, Grayscale)
         - ``pybsm``
         - ``pyBSM``
-      * - :class:`~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber`
+      * - :class:`~nrtk.impls.perturb_image.optical.RadialDistortionPerturber`
         - Image (RGB, Grayscale)
         - ---
         - ---

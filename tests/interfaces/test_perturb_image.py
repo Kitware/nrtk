@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 
 @pytest.mark.core

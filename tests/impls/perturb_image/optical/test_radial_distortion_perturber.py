@@ -5,7 +5,7 @@ import pytest
 from PIL import Image
 from syrupy.assertion import SnapshotAssertion
 
-from nrtk.impls.perturb_image.optical.radial_distortion_perturber import RadialDistortionPerturber
+from nrtk.impls.perturb_image.optical import RadialDistortionPerturber
 from tests.impls import INPUT_TANK_IMG_FILE_PATH as INPUT_IMG_FILE_PATH
 from tests.impls.perturb_image.perturber_utils import perturber_assertions
 
