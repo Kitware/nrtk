@@ -9,6 +9,7 @@ and release updates to the toolkit.
    :maxdepth: 1
 
    contributing
+   test-architecture
    live_doc_preview
    release_process
    style_sheet
