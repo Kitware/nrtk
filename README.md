@@ -37,14 +37,15 @@ to real-world operational conditions beyond what traditional image augmentation
 libraries cover. T&E engineers need precise methods to assess how models respond
 to sensor-specific variables (focal length, aperture diameter, pixel pitch) and
 environmental factors without the prohibitive costs of exhaustive data
-collection. NRTK leverages pyBSM's physics-based models to rigorously simulate
-how imaging sensors capture and process light, enabling systematic robustness
-testing across parameter sweeps, identification of performance boundaries, and
-visualization of model degradation. This capability is particularly valuable for
-satellite and aerial imaging applications, where engineers can simulate
-hypothetical sensor configurations to support cost-performance trade-off
-analysis during system design—ensuring AI models maintain reliability when
-deployed on actual hardware facing natural perturbations in the field.
+collection. NRTK leverages [pyBSM](https://pybsm.readthedocs.io)'s physics-based
+models to rigorously simulate how imaging sensors capture and process light,
+enabling systematic robustness testing across parameter sweeps, identification
+of performance boundaries, and visualization of model degradation. This
+capability is particularly valuable for satellite and aerial imaging
+applications, where engineers can simulate hypothetical sensor configurations to
+support cost-performance trade-off analysis during system design—ensuring AI
+models maintain reliability when deployed on actual hardware facing natural
+perturbations in the field.
 
 ## Target Audience
 
@@ -76,8 +77,8 @@ additional dependencies.
 
 ### Installation with Optional Features (Extras)
 
-NRTK uses optional "extras" to avoid installing unncessary dependencies. You can
-install extras with square brackets:
+NRTK uses optional "extras" to avoid installing unnecessary dependencies. You
+can install extras with square brackets:
 
 ```bash
 # Install with extras (note: no spaces after commas)
@@ -90,7 +91,7 @@ pip install nrtk[<extra1>,<extra2>]
 # For basic OpenCV image perturbations
 pip install nrtk[graphics]
 # For basic Pillow image perturbations
-pip install nrtk[Pillow]
+pip install nrtk[pillow]
 # For pybsm's sensor-based perturbations
 pip install nrtk[pybsm]
 ```
@@ -99,7 +100,7 @@ pip install nrtk[pybsm]
 
 More information on extras and related perturbers, including a complete list of
 extras, can be found
-[here](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#perturber-dependencies).
+[here](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#perturber-requirements).
 
 Details on the perturbers and their dependencies can be found
 [here](https://nrtk.readthedocs.io/en/latest/reference/api/implementations.html).
@@ -138,7 +139,7 @@ perturbation. This image represents the initial state before any transformation.
 
 Below is some example code that applies a Jitter OTF transformation:
 
-```
+```python
 from nrtk.impls.perturb_image.optical.otf import JitterPerturber
 import numpy as np
 from PIL import Image
