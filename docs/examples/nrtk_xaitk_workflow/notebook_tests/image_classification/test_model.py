@@ -1,22 +1,33 @@
-"""Tests for image classification model utilities."""
+"""Tests for image classification model import guards."""
 
 import pytest
 
-from nrtk.utils._exceptions import NRTKXAITKHelperImportError
-from nrtk.utils._import_guard import import_guard
-
-PIL_available: bool = import_guard(module_name="PIL", exception=NRTKXAITKHelperImportError)
-maite_available: bool = import_guard(
-    module_name="maite",
-    exception=NRTKXAITKHelperImportError,
-    submodules=["protocols.image_classification"],
-    objects=["Dataset", "DatumMetadataType", "InputType", "TargetType"],
-)
-datasets_available: bool = import_guard(module_name="datasets", exception=NRTKXAITKHelperImportError)
-nrtk_xaitk_helpers_available: bool = maite_available and PIL_available and datasets_available
+from tests._utils.import_guard_tests_mixin import ImportGuardTestsMixin
 
 
-@pytest.mark.skipif(not nrtk_xaitk_helpers_available, reason=str(NRTKXAITKHelperImportError()))
-def test_hugging_face_maite_model() -> None:
-    """Test stub for HuggingFace MAITE model."""
-    pass
+class TestICModelImportGuard(ImportGuardTestsMixin):
+    """Test import guard for IC model helpers when dependencies are unavailable."""
+
+    MODULE_PATH = "image_classification.model"
+    DEPS_TO_MOCK = ["torch", "maite", "PIL", "transformers"]
+    CLASSES = ["HuggingFaceMaiteModel"]
+    ERROR_MATCH = r"{class_name} requires additional dependencies"
+
+
+@pytest.mark.xaitk
+def test_ic_model_public_imports() -> None:
+    """Canary test: FAIL if xaitk marker is used but IC model helpers can't be imported.
+
+    When running ``pytest -m xaitk``, this test asserts that the environment was
+    built with the required dependencies. If they are not installed, this test
+    FAILS (not skips) to indicate a CI/environment configuration error.
+    """
+    try:
+        from image_classification.model import HuggingFaceMaiteModel
+
+        del HuggingFaceMaiteModel
+    except ImportError as e:
+        pytest.fail(
+            f"Running with xaitk marker but IC model helpers not importable: {e}. "
+            f"Ensure dependencies are installed: pip install nrtk[maite,pillow] torch transformers",
+        )
