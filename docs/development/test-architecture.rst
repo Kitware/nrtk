@@ -309,17 +309,42 @@ specialized purposes.
    a local wheel of ``nrtk`` and installs it (simulating a PyPI install) so
    notebooks exercise the same code path users would see.
 
+``ruff``
+   Runs the `ruff <https://docs.astral.sh/ruff/>`_ linter and formatter in
+   check mode. Combines what were previously two separate CI jobs
+   (``ruff-lint`` and ``ruff-format``) into a single invocation.
+
+``pyright``
+   Runs `pyright <https://github.com/microsoft/pyright>`_ type checking.
+   By default (``tox -e pyright``), it runs internal type checking across the
+   source tree. Pass ``--verifytypes`` via posargs for public API completeness
+   checking:
+
+   .. prompt:: bash
+
+       tox -e pyright -- --verifytypes nrtk --ignoreexternal src/nrtk
+
+``sphinx``
+   Lints Sphinx/RST documentation using
+   `sphinx-lint <https://github.com/sphinx-contrib/sphinx-lint>`_.
+
 
 How CI Uses Tox
 ===============
 
-The GitLab CI pipeline (defined in :file:`.gitlab-ci/.gitlab-test.yml`) uses
-the same :file:`tox.ini`, ensuring that local and CI test execution are
-identical. The pipeline works as follows:
+The GitLab CI pipeline uses the same :file:`tox.ini`, ensuring that local and
+CI execution are identical. A shared ``.tox-setup`` base
+(in :file:`.gitlab-ci/.gitlab-shared.yml`) installs tox and is extended by
+both the test and quality stages.
+
+Test Stage
+----------
+
+Defined in :file:`.gitlab-ci/.gitlab-test.yml`:
 
 1. **Parallel test matrix** — For each Python version (3.10–3.13), CI runs
-   all tox factors in parallel as separate jobs. Each job installs tox,
-   invokes ``tox -e py<version>-<factor>``, and uploads ``.coverage.*``
+   all tox factors in parallel as separate jobs. Each job invokes
+   ``tox -e py<version>-<factor>`` and uploads ``.coverage.*``
    artifacts and JUnit XML reports. Jobs are assigned to different runner
    tags based on resource requirements:
 
@@ -332,13 +357,27 @@ identical. The pipeline works as follows:
    version finish, a follow-up job combines their ``.coverage.*`` files
    into a single ``.coverage.<version>`` file.
 
-3. **Final coverage report** — A final job combines all per-version coverage
-   files, generates a Cobertura XML report, and enforces the 90% threshold.
-   This combined report is used by GitLab's coverage visualization.
+3. **Final coverage report** — A final job runs ``tox -e coverage`` to
+   combine all per-version coverage files, generate a Cobertura XML report,
+   and enforce the 90% threshold. This combined report is used by GitLab's
+   coverage visualization.
 
 4. **Notebook execution** — Notebooks are run via ``tox -e papermill`` in
    separate jobs, triggered manually on merge requests and automatically on
    scheduled pipelines.
+
+Quality Stage
+-------------
+
+Defined in :file:`.gitlab-ci/.gitlab-quality.yml`:
+
+1. **Ruff** — Runs ``tox -e ruff`` (linting + format checking).
+2. **Pyright internal** — Runs ``tox -e pyright`` for full source type checking.
+3. **Pyright external** — Runs ``tox -e pyright -- --verifytypes ...`` and
+   validates 100% public API type completeness. The completeness validation
+   logic (score parsing, threshold enforcement, artifact generation) remains
+   in the CI script.
+4. **Sphinx lint** — Runs ``tox -e sphinx`` to lint RST documentation.
 
 
 Numba Parallelization Note

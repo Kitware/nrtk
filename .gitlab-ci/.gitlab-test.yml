@@ -4,15 +4,14 @@
 ###############################################################################
 
 .test-setup:
-  extends: .shared-setup
+  extends: .tox-setup
   stage: test
   tags:
     - autoscaler
   rules:
     - !reference [.shared-setup, rules]
   before_script:
-    - !reference [.shared-setup, before_script]
-    - pip install --root-user-action=ignore --user -U "tox>=4.2" -q
+    - !reference [.tox-setup, before_script]
 
 .tox:pytest:
   extends: .test-setup
@@ -158,18 +157,8 @@ tox:coverage:
       artifacts: true
     - job: tox:coverage:py3.13
       artifacts: true
-  before_script:
-    - !reference [.shared-setup, before_script]
-    # Install dependencies (coverage is in the tests dependency group)
-    - poetry sync --only tests -q
   script:
-    # Combine all per-version coverage reports into a single database file.
-    - poetry run coverage combine ./.coverage.*
-    # This converts the now combined `.coverage` database file into a single
-    # `coverage.xml` file
-    - poetry run coverage xml
-    # 90% is defined under JATIC SDP requirements
-    - poetry run coverage report --precision=2 --fail-under=90 --skip-covered
+    - tox -e coverage
   artifacts:
     when: always
     paths:
