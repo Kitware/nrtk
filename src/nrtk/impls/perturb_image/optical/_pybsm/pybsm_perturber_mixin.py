@@ -5,7 +5,7 @@ Classes:
 
 Dependencies:
     - pyBSM for OTF and radiance calculations.
-    - nrtk.interfaces.perturb_image.PerturbImage for base functionality.
+    - nrtk.interfaces.PerturbImage for base functionality.
 """
 
 from __future__ import annotations

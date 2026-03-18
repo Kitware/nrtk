@@ -66,7 +66,7 @@ from typing import Any
 import pytest
 from smqtk_core.configuration import configuration_test_helper, from_config_dict, to_config_dict
 
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interfaces import PerturbImageFactory
 from tests.fakes import FakePerturber
 from tests.utils import deep_equals
 

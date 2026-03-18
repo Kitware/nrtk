@@ -28,8 +28,8 @@ additional details, please refer to the [`nrtk` README](README.md).
    ```
 
    - Ensure that your commits include an update to the
-     `docs/release_notes/pending_release.rst` file (or a relevant patch release
-     notes file).
+     `docs/release_notes/pending_release/` directory (or a relevant patch
+     release notes directory).
    - Provide a concise summary of the feature, update, or fix being added. This
      is generally required for approval.
 
@@ -56,7 +56,7 @@ ______________________________________________________________________
 
 `nrtk` uses GitLab for code reviews and GitLab CI/CD for automated testing.
 
-- New MRs trigger CI workflows for `master` and `release` branches.
+- New MRs trigger CI workflows for `main` and `release` branches.
 - All CI checks must pass before an MR can be merged.
 
 We use [Sphinx](https://www.sphinx-doc.org/) for API documentation, both manual

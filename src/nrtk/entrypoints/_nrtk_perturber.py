@@ -9,7 +9,7 @@ from collections.abc import Iterable
 import numpy as np
 from maite.protocols.object_detection import Dataset
 
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interfaces import PerturbImageFactory
 from nrtk.interop import MAITEObjectDetectionAugmentation
 from nrtk.interop._maite.datasets import MAITEObjectDetectionDataset
 from nrtk.utils._logging import setup_logging

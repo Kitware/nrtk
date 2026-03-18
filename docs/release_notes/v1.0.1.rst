@@ -1,0 +1,76 @@
+v1.0.1
+======
+
+This patch release contains fixes to CI/CD pipelines, container builds,
+documentation, public/private API visibility, and notebook execution. Key areas
+include completing the tox migration for CI quality jobs, fixing the container
+build pipeline, correcting documentation errors and metadata, and resolving
+notebook path and import guard issues.
+
+Fixes
+-----
+
+* Fixed incomplete tox migration in the CI quality stage by migrating
+  ``ruff``, ``pyright``, and ``sphinx-lint`` jobs from ``poetry run`` to tox,
+  adding a ``.tox-setup`` CI base to centralize the tox version pin, combining
+  ``ruff-lint`` and ``ruff-format`` into a single ``ruff`` job, and migrating
+  the coverage job to ``tox -e coverage``.
+
+* Fixed container CI pipeline by redesigning it with separate build jobs for
+  branch (``build-branch``), main (``build-main``), and release
+  (``build-release``) builds. Restructured the ``Dockerfile`` into a
+  multi-stage build with ``build-from-source`` and ``build-from-pypi`` targets,
+  removing the Poetry dependency. Switched to CPU-only PyTorch, reducing image
+  size from ~9.2 GB to ~2.7 GB. Added a versioned image tagging scheme and
+  switched ``.dockerignore`` to a whitelist approach.
+
+* Fixed missing container security and lifecycle tooling by adding SBOM
+  generation (Syft), vulnerability scanning (Trivy), cosign image signing, and
+  SBOM attestation to all build jobs. Added a ``verify`` job for signature
+  verification and smoke testing, a nightly scheduled sweep to remove stale
+  branch images and cosign artifacts, and stale artifact cleanup when
+  overwriting existing tags. Added ``.trivyignore`` for vulnerability scan
+  exceptions.
+
+* Fixed missing container documentation by adding
+  ``docs/containers/nrtk-perturber.rst`` with image tag reference, usage
+  instructions, input arguments, error codes, and cosign verification commands.
+
+* Fixed documentation errors including a typo, broken anchor link, extras case,
+  and missing pyBSM hyperlink in ``README.md``; stale ``master`` branch
+  reference and release notes path in ``CONTRIBUTING.md``; Alpha development
+  status classifier in ``pyproject.toml``; and a broken reference to
+  non-existent ``docs/review_process.rst`` in ``release_process.rst``.
+
+* Fixed missing ``poetry2conda`` section in ``pyproject.toml``.
+
+* Fixed incorrect public/private API visibility for
+  ``nrtk.impls.perturb_image.optical.RadialDistortionPerturber``,
+  ``nrtk.impls.perturb_image.optical.otf``, ``nrtk.interfaces.PerturbImage``,
+  and ``nrtk.interfaces.PerturbImageFactory``.
+
+* Fixed missing developer documentation by adding a ``Testing Architecture``
+  guide with a Quick Start for running tox, the environment-to-extras mapping
+  table, and a checklist for adding new implementations. The guide also covers
+  how import guards, pytest markers, canary tests, the
+  ``ImportGuardTestsMixin``, tox environments, and the GitLab CI pipeline work
+  together to validate NRTK's modular dependency model.
+
+* Fixed outdated ``JitterPerturber`` code sample and broken link in
+  ``README.md``.
+
+* Fixed unlinked Related Resources section in ``validation_and_trust.rst`` by
+  adding ``:doc:`` cross-references and removing the unused Parameter Defaults
+  entry.
+
+* Fixed XAITK-Saliency notebook execution errors including incorrect path
+  resolution when running via papermill, keyword argument and visualization
+  errors in the object detection notebook, and import guards not aligned with
+  current codebase patterns. Enabled GPU-accelerated PyTorch in notebook install
+  cells.
+
+* Fixed missing XAITK-Saliency notebook test coverage by adding import guard
+  unit tests under ``docs/examples/nrtk_xaitk_workflow/notebook_tests/``, an
+  ``xaitk-notebook-tests`` CI job across Python 3.10–3.13, and broadening the
+  ``ruff`` per-file-ignores pattern to ``**/*tests/*.py`` so notebook tests
+  receive test-file lint exemptions.

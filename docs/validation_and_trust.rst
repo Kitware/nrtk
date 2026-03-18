@@ -201,10 +201,9 @@ required. Validation evidence grows continuously, and this page is updated quart
 Related Resources
 =================
 
-* **Operational Risk Factors** - Which perturbations map to which operational risks
-* **Parameter Defaults Documentation** - Why specific defaults were chosen
-* **T&E Guides** - Examples of NRTK in realistic testing workflows
-* **Release Notes** - Validation updates and known issue resolutions
+* :doc:`/explanations/risk_factors` - Which perturbations map to which operational risks
+* :doc:`/tutorials/testing_and_evaluation_notebooks` - Examples of NRTK in realistic testing workflows
+* :doc:`/release_notes/index` - Validation updates and known issue resolutions
 
 Publications & Presentations
 =============================

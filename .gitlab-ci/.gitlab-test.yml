@@ -4,15 +4,14 @@
 ###############################################################################
 
 .test-setup:
-  extends: .shared-setup
+  extends: .tox-setup
   stage: test
   tags:
     - autoscaler
   rules:
     - !reference [.shared-setup, rules]
   before_script:
-    - !reference [.shared-setup, before_script]
-    - pip install --root-user-action=ignore --user -U "tox>=4.2" -q
+    - !reference [.tox-setup, before_script]
 
 .tox:pytest:
   extends: .test-setup
@@ -158,18 +157,8 @@ tox:coverage:
       artifacts: true
     - job: tox:coverage:py3.13
       artifacts: true
-  before_script:
-    - !reference [.shared-setup, before_script]
-    # Install dependencies (coverage is in the tests dependency group)
-    - poetry sync --only tests -q
   script:
-    # Combine all per-version coverage reports into a single database file.
-    - poetry run coverage combine ./.coverage.*
-    # This converts the now combined `.coverage` database file into a single
-    # `coverage.xml` file
-    - poetry run coverage xml
-    # 90% is defined under JATIC SDP requirements
-    - poetry run coverage report --precision=2 --fail-under=90 --skip-covered
+    - tox -e coverage
   artifacts:
     when: always
     paths:
@@ -233,3 +222,39 @@ tox:notebooks:maite:
           "nrtk_water_droplet_perturber_demo.ipynb"
         ]
         RUNNER_TAG: autoscaler
+
+# NRTK-XAITK workflow utility tests
+# These tests verify the import guard behavior of the notebook helper modules
+# in docs/examples/nrtk_xaitk_workflow/. They are lightweight unit tests
+# (not notebook execution) and run on every MR push.
+# The "core"-marked tests mock missing dependencies to verify import guards.
+# The "xaitk"-marked canary tests verify real imports work when deps are present.
+xaitk-notebook-tests:
+  extends: .test-setup
+  tags:
+    - small-gpu
+  parallel:
+    matrix:
+      - PYTHON_IMAGE: ["python:3.10", "python:3.11", "python:3.12", "python:3.13"]
+  image: $PYTHON_IMAGE
+  before_script:
+    - !reference [.test-setup, before_script]
+    # Install nrtk (no optional extras yet) + test runner
+    - poetry install --only-root --sync -q
+    - poetry run pip install -q pytest
+  script:
+    # Import guard tests — deps are NOT installed; mixin mocks missing packages
+    - poetry run pytest -rfE --tb=short -q --no-header --disable-warnings
+        -m "core"
+        docs/examples/nrtk_xaitk_workflow/notebook_tests/
+        -o "addopts=" -o "testpaths="
+    # Install optional deps for canary tests
+    - poetry run pip install -q maite xaitk-saliency torch ultralytics datasets transformers
+    # opencv-python-headless avoids libGL.so.1 requirement on headless CI images
+    - poetry run pip uninstall -y -q opencv-python opencv-python-headless
+    - poetry run pip install -q opencv-python-headless
+    # Canary tests — FAIL if deps are installed but imports still break
+    - poetry run pytest -rfE --tb=short -q --no-header --disable-warnings
+        -m "xaitk"
+        docs/examples/nrtk_xaitk_workflow/notebook_tests/
+        -o "addopts=" -o "testpaths="

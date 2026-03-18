@@ -16,7 +16,7 @@ Shared Test Cases:
 
 from typing import ClassVar
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 
 class PerturberTestsMixin:

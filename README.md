@@ -37,14 +37,15 @@ to real-world operational conditions beyond what traditional image augmentation
 libraries cover. T&E engineers need precise methods to assess how models respond
 to sensor-specific variables (focal length, aperture diameter, pixel pitch) and
 environmental factors without the prohibitive costs of exhaustive data
-collection. NRTK leverages pyBSM's physics-based models to rigorously simulate
-how imaging sensors capture and process light, enabling systematic robustness
-testing across parameter sweeps, identification of performance boundaries, and
-visualization of model degradation. This capability is particularly valuable for
-satellite and aerial imaging applications, where engineers can simulate
-hypothetical sensor configurations to support cost-performance trade-off
-analysis during system design—ensuring AI models maintain reliability when
-deployed on actual hardware facing natural perturbations in the field.
+collection. NRTK leverages [pyBSM](https://pybsm.readthedocs.io)'s physics-based
+models to rigorously simulate how imaging sensors capture and process light,
+enabling systematic robustness testing across parameter sweeps, identification
+of performance boundaries, and visualization of model degradation. This
+capability is particularly valuable for satellite and aerial imaging
+applications, where engineers can simulate hypothetical sensor configurations to
+support cost-performance trade-off analysis during system design—ensuring AI
+models maintain reliability when deployed on actual hardware facing natural
+perturbations in the field.
 
 ## Target Audience
 
@@ -76,8 +77,8 @@ additional dependencies.
 
 ### Installation with Optional Features (Extras)
 
-NRTK uses optional "extras" to avoid installing unncessary dependencies. You can
-install extras with square brackets:
+NRTK uses optional "extras" to avoid installing unnecessary dependencies. You
+can install extras with square brackets:
 
 ```bash
 # Install with extras (note: no spaces after commas)
@@ -90,7 +91,7 @@ pip install nrtk[<extra1>,<extra2>]
 # For basic OpenCV image perturbations
 pip install nrtk[graphics]
 # For basic Pillow image perturbations
-pip install nrtk[Pillow]
+pip install nrtk[pillow]
 # For pybsm's sensor-based perturbations
 pip install nrtk[pybsm]
 ```
@@ -99,7 +100,7 @@ pip install nrtk[pybsm]
 
 More information on extras and related perturbers, including a complete list of
 extras, can be found
-[here](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#extras).
+[here](https://nrtk.readthedocs.io/en/latest/getting_started/installation.html#perturber-requirements).
 
 Details on the perturbers and their dependencies can be found
 [here](https://nrtk.readthedocs.io/en/latest/reference/api/implementations.html).
@@ -122,9 +123,10 @@ Jupyter notebooks provided in the `./docs/examples/` directory.
 
 Via the pyBSM package, NRTK exposes a large set of Optical Transfer Functions
 (OTFs). These OTFs can simulate different environmental and sensor-based
-effects. For example, the :ref:`JitterPerturber <JitterPerturber>` simulates
-different levels of sensor jitter. By modifying its input parameters, you can
-observe how sensor jitter affects image quality.
+effects. For example, the
+[JitterPerturber](https://nrtk.readthedocs.io/en/latest/reference/api/_implementations/nrtk.impls.perturb_image.optical.otf.JitterPerturber.html#nrtk.impls.perturb_image.optical.otf.JitterPerturber)
+simulates different levels of sensor jitter. By modifying its input parameters,
+you can observe how sensor jitter affects image quality.
 
 #### Input Image
 
@@ -135,9 +137,9 @@ perturbation. This image represents the initial state before any transformation.
 
 #### Code Sample
 
-Below is some example code that applies a Jitter OTF transformation::
+Below is some example code that applies a Jitter OTF transformation:
 
-```
+```python
 from nrtk.impls.perturb_image.optical.otf import JitterPerturber
 import numpy as np
 from PIL import Image
@@ -145,15 +147,15 @@ from PIL import Image
 INPUT_IMG_FILE = 'docs/images/input.jpg'
 image = np.array(Image.open(INPUT_IMG_FILE))
 
-otf = JitterPerturber(sx=8e-6, sy=8e-6, name="test_name")
-out_image = otf(image)
+perturber = JitterPerturber(s_x=8e-6, s_y=8e-6)
+out_image, _ = perturber(image=image, img_gsd=0.03)
 ```
 
 This code uses default values and provides a sample input image. However, you
 can adjust the parameters and use your own image to visualize the perturbation.
-The sx and sy parameters (the root-mean-squared jitter amplitudes in radians, in
-the x and y directions) are the primary way to customize a jitter perturber.
-Larger jitter amplitude generate a larger Gaussian blur kernel.
+The `s_x` and `s_y` parameters (the root-mean-squared jitter amplitudes in the x
+and y directions) are the primary way to customize a jitter perturber. Larger
+jitter amplitudes generate a larger Gaussian blur kernel.
 
 #### Resulting Image
 
@@ -240,6 +242,9 @@ poetry run pre-commit install
 # Run pre-commit checks on all files
 poetry run pre-commit run --all-files
 ```
+
+For running the test suite, see the
+[Testing Architecture guide](https://nrtk.readthedocs.io/en/latest/development/test-architecture.html).
 
 <!-- :auto developer-tools: -->
 

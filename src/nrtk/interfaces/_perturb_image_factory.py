@@ -6,7 +6,7 @@ Classes:
 
 Dependencies:
     - smqtk_core.Plugfigurable for plug-and-play configuration support.
-    - nrtk.interfaces.perturb_image.PerturbImage as the base interface for perturbing images.
+    - nrtk.interfaces.PerturbImage as the base interface for perturbing images.
 
 Example usage:
     factory = PerturbImageFactory(perturber=SomePerturbImageClass, theta_key="altitude")
@@ -16,7 +16,7 @@ Example usage:
 
 from __future__ import annotations
 
-__all__ = []
+__all__ = ["PerturbImageFactory"]
 
 import abc
 from collections.abc import Iterator, Sequence
@@ -24,8 +24,8 @@ from typing import Any
 
 from typing_extensions import Self, override
 
+from nrtk.interfaces import PerturbImage
 from nrtk.interfaces._plugfigurable import Plugfigurable
-from nrtk.interfaces.perturb_image import PerturbImage
 
 
 class PerturbImageFactory(Plugfigurable):
@@ -69,7 +69,7 @@ class PerturbImageFactory(Plugfigurable):
         self.perturber_kwargs: dict[str, Any] = {} if perturber_kwargs is None else perturber_kwargs
 
     def _create_perturber(self, kwargs: dict[str, Any]) -> PerturbImage:
-        """Returns PerturberImage implementation with given input args."""
+        """Returns PerturbImage implementation with given input args."""
         input_kwargs = self.perturber_kwargs | kwargs
         return self.perturber(**input_kwargs)
 

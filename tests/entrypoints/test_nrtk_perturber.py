@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from nrtk.entrypoints import nrtk_perturber
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interfaces import PerturbImageFactory
 from nrtk.interop._maite.datasets import (
     MAITEObjectDetectionDataset,
     MAITEObjectDetectionTarget,

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from maite.protocols.image_classification import DatumMetadataType
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 from nrtk.interop import MAITEImageClassificationAugmentation
 from tests.fakes import FakePerturber
 from tests.interop.maite.perturber_fixtures import ResizePerturber
