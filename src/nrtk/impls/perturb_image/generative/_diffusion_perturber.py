@@ -9,7 +9,7 @@ Dependencies:
     - torch for PyTorch functionality
     - diffusers for Stable Diffusion models
     - PIL for image processing
-    - nrtk.interfaces.perturb_image.PerturbImage for the base perturbation interface
+    - nrtk.interfaces.PerturbImage for the base perturbation interface
     - smqtk_image_io for bounding box handling
 
 Example:

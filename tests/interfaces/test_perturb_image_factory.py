@@ -27,7 +27,7 @@ from typing import Any
 import pytest
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image_factory import PerturbImageFactory
+from nrtk.interfaces import PerturbImageFactory
 from tests.fakes import FakePerturber, PerturberFakeFactory
 from tests.impls.perturb_image_factory import PerturberFactoryMixin
 

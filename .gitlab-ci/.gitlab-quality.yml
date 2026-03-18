@@ -3,34 +3,23 @@
 ###############################################################################
 
 .quality-setup:
-  extends: .shared-setup
+  extends: .tox-setup
   stage: quality
   before_script:
-    - !reference [.shared-setup, before_script]
-    # Install dependencies: if EXTRAS equals "extras", install additional optional deps.
-    - |
-      if [ -n "$EXTRAS" ]; then
-        poetry sync --only main,linting,tests --extras "$EXTRAS"
-      else
-        poetry sync --only main,linting,tests
-      fi
+    - !reference [.tox-setup, before_script]
 
 pyright-internal:
   extends: .quality-setup
-  variables:
-    EXTRAS: "pybsm maite tools headless pillow skimage albumentations waterdroplet diffusion"
   script:
-    - poetry run pyright
+    - tox -e pyright
 
 pyright-external:
   extends: .quality-setup
-  variables:
-    EXTRAS: "pybsm maite tools headless pillow skimage albumentations waterdroplet diffusion"
   before_script:
     - !reference [.quality-setup, before_script]
     - apt-get update && apt-get install bc
   script:
-    - COMPLETENESS_STRING=$(echo "$(poetry run pyright --verifytypes ${CI_PROJECT_NAME/-/_} --ignoreexternal src/${CI_PROJECT_NAME/-/_})" | tee outfile.txt | grep completeness)
+    - COMPLETENESS_STRING=$(echo "$(tox -e pyright -- --verifytypes ${CI_PROJECT_NAME/-/_} --ignoreexternal src/${CI_PROJECT_NAME/-/_})" | tee outfile.txt | grep completeness)
     - cat outfile.txt
     - NUM_SYMBOLS_STRING=$(cat outfile.txt | grep "Symbols exported by \"${CI_PROJECT_NAME/-/_}\"")
     - NUM_SYMBOLS=$(echo "${NUM_SYMBOLS_STRING}" | grep -o '[0-9]\+')
@@ -60,20 +49,13 @@ pyright-external:
     reports:
       metrics: pyright-completeness-metric.txt
 
-ruff-lint:
+ruff:
   extends: .quality-setup
   script:
-    - poetry run ruff check --config pyproject.toml
-
-ruff-format:
-  extends: .quality-setup
-  script:
-    - poetry run ruff format --config pyproject.toml --check
+    - tox -e ruff
 
 # Job to lint sphinx docs
 sphinx-lint:
   extends: .quality-setup
   script:
-    # Only looks at the docs directory, ignoring docs/_implementations
-    # sphinx-lint does not currently support configuration via pyproject.toml
-    - poetry run sphinx-lint --enable all --disable leaked-markup --max-line-length 120 docs
+    - tox -e sphinx

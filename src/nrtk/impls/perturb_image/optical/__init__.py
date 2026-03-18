@@ -1,6 +1,7 @@
 """Module for optical implementations of PerturbImage."""
 
-from nrtk.impls.perturb_image.optical.radial_distortion_perturber import (
+import nrtk.impls.perturb_image.optical.otf as otf
+from nrtk.impls.perturb_image.optical._radial_distortion_perturber import (
     RadialDistortionPerturber as RadialDistortionPerturber,
 )
 
@@ -10,7 +11,7 @@ _PYBSM_CLASSES = [
     "PybsmPerturber",
 ]
 
-__all__: list[str] = ["RadialDistortionPerturber"]
+__all__: list[str] = ["RadialDistortionPerturber", "otf"]
 
 _import_error: ImportError | None = None
 

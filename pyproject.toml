@@ -4,14 +4,14 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "nrtk"
-version = "1.0.0"
+version = "1.0.1"
 description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 license = "Apache-2.0"
 readme = "README.md"
 authors = [{name = "Kitware, Inc.", email = "nrtk@kitware.com"}]
 requires-python = ">=3.10,<3.14"
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'Intended Audience :: Science/Research',
     'Operating System :: MacOS :: MacOS X',
@@ -212,7 +212,7 @@ unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*.py" = [
+"**/*tests/*.py" = [
   "S101",  # Allow asserts in tests
   "SLF001",  # Allow private member access for introspection in tests
   "D100", "D101", "D102", "D103", "D104", "D105", "D107",  # Allow missing docstring in test dir
@@ -266,3 +266,7 @@ exclude = [
     ".tox",
     ".dev",
     ]
+
+[tool.poetry2conda]
+name = "conda-test"
+channels = ["conda-forge", "defaults"]

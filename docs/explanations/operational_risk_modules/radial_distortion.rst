@@ -39,7 +39,7 @@ Minimal Code Example
 
 .. code-block:: python
 
-   from nrtk.impls.perturb_image.optical.radial_distortion_perturber import RadialDistortionPerturber
+   from nrtk.impls.perturb_image.optical import RadialDistortionPerturber
 
    # Fisheye (barrel) distortion - positive k values
    perturber = RadialDistortionPerturber(k=[0.3, 0.0, 0.0])
@@ -97,7 +97,7 @@ Limitations and Next Steps
 ---------------------------
 
 * API Reference:
-  :class:`RadialDistortionPerturber<nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber>`
+  :class:`RadialDistortionPerturber<nrtk.impls.perturb_image.optical.RadialDistortionPerturber>`
 * Uses a **polynomial distortion model**; does not simulate other lens aberrations like
   chromatic aberration or vignetting.
 * Bounding boxes are automatically adjusted to account for the geometric transformation.

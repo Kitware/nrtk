@@ -13,7 +13,7 @@ from PIL import Image
 from PIL.Image import Image as PILImage
 from typing_extensions import override
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 
 
 @runtime_checkable

@@ -104,7 +104,7 @@ Installing nrtk
         $ poetry sync --with linting,tests,docs
 
     .. note::
-      Developers should also ensure their enviroment has Git LFS installed
+      Developers should also ensure their environment has Git LFS installed
       before their first commit. See the `Git LFS documentation <https://git-lfs.com/>`_
       for more details.
 
@@ -142,7 +142,7 @@ Installing nrtk
 
     .. seealso::
       Developers looking to contribute to NRTK should check out our
-      `additional development resources </development>`_.
+      :doc:`additional development resources </development/index>`.
 
 .. _perturber-requirements:
 
@@ -302,7 +302,7 @@ Optical Perturbers
         - Image (RGB, Grayscale)
         - ``pybsm``
         - ``pyBSM``
-      * - :class:`~nrtk.impls.perturb_image.optical.radial_distortion_perturber.RadialDistortionPerturber`
+      * - :class:`~nrtk.impls.perturb_image.optical.RadialDistortionPerturber`
         - Image (RGB, Grayscale)
         - ---
         - ---
@@ -314,7 +314,7 @@ Optical Perturbers
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. dropdown:: Model physics-based sensor and optical phenomena
+.. dropdown:: Generate perturbations using diffusion models
 
   .. list-table::
       :widths: 45 20 25 30
@@ -354,4 +354,4 @@ Utility Perturbers
 .. _Poetry: https://python-poetry.org
 .. _installation: https://python-poetry.org/docs/#installation
 .. _usage: https://python-poetry.org/docs/basic-usage/
-.. _reStructuredText: http://docutils.sourceforge.net/rst.html
+.. _reStructuredText: https://docutils.sourceforge.io/rst.html

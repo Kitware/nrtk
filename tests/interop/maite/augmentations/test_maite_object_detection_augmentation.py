@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from maite.protocols.object_detection import DatumMetadataType, TargetType
 
-from nrtk.interfaces.perturb_image import PerturbImage
+from nrtk.interfaces import PerturbImage
 from nrtk.interop import MAITEObjectDetectionAugmentation
 from nrtk.interop._maite.datasets import MAITEObjectDetectionTarget
 from tests.fakes import FakePerturber
