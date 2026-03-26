@@ -18,6 +18,7 @@ class TestDiffusionImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.diffusion
+@pytest.mark.usefixtures("require_marker")
 def test_diffusion_public_imports() -> None:
     """Canary test: FAIL if diffusion marker is used but classes can't be imported.
 

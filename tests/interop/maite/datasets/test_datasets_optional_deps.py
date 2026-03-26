@@ -35,6 +35,7 @@ class TestDatasetsToolsImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.maite
+@pytest.mark.usefixtures("require_marker")
 def test_datasets_maite_public_imports() -> None:
     """Canary test: FAIL if maite marker is used but maite classes can't be imported."""
     try:
@@ -55,6 +56,7 @@ def test_datasets_maite_public_imports() -> None:
 
 @pytest.mark.maite
 @pytest.mark.tools
+@pytest.mark.usefixtures("require_marker")
 def test_datasets_tools_public_imports() -> None:
     """Canary test: FAIL if tools marker is used but tools classes can't be imported."""
     try:

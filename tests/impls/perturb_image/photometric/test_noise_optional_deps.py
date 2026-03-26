@@ -24,6 +24,7 @@ class TestNoiseImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.skimage
+@pytest.mark.usefixtures("require_marker")
 def test_skimage_public_imports() -> None:
     """Canary test: FAIL if skimage marker is used but noise perturbers can't be imported.
 

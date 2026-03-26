@@ -38,6 +38,7 @@ class TestOtfImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.pybsm
+@pytest.mark.usefixtures("require_marker")
 def test_pybsm_public_imports() -> None:
     """Canary test: FAIL if pybsm marker is used but perturbers can't be imported.
 

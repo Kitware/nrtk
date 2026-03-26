@@ -19,6 +19,7 @@ class TestInteropImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.maite
+@pytest.mark.usefixtures("require_marker")
 def test_maite_public_imports() -> None:
     """Canary test: FAIL if marker is used but classes can't be imported."""
     try:
