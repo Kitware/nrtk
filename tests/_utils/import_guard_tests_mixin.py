@@ -108,14 +108,33 @@ def _evict_dep_tree(dep: str) -> None:
             sys.modules.pop(mod, None)
 
 
+def _relink_parent_attributes(saved: dict[str, Any]) -> None:
+    """Re-link parent package attributes after restoring ``sys.modules``.
+
+    During a test, re-importing a module causes the import machinery to set
+    a *new* module object as an attribute on the parent package.  Restoring
+    ``sys.modules`` alone does not undo that ``setattr``, so the parent
+    still references the tainted module.  Without this fix,
+    ``unittest.mock.patch`` on dotted paths through the parent resolves to
+    the stale (tainted) module object.
+    """
+    for mod, m in saved.items():
+        if m is not None and "." in mod:
+            parent_key, child_name = mod.rsplit(sep=".", maxsplit=1)
+            parent_mod = sys.modules.get(parent_key)
+            if parent_mod is not None:
+                setattr(parent_mod, child_name, m)
+
+
 def _restore_modules(saved: dict[str, Any], deps_to_mock: list[str], prefixes: list[str]) -> None:
     """Undo all ``sys.modules`` mutations made during the test.
 
-    This does three things in order:
+    This does four things in order:
     1. Evicts any modules that were imported *during* the test (they hold
        references to mocked/missing dependencies and are not safe to reuse).
     2. Removes the ``None`` sentinels injected for mocked dependencies.
     3. Puts back the original module objects that were saved before the test.
+    4. Re-links parent package attributes (see ``_relink_parent_attributes``).
     """
     _remove_modules_by_prefix(prefixes=prefixes)
     for dep in deps_to_mock:
@@ -123,6 +142,7 @@ def _restore_modules(saved: dict[str, Any], deps_to_mock: list[str], prefixes: l
     for mod, m in saved.items():
         if m is not None:
             sys.modules[mod] = m
+    _relink_parent_attributes(saved=saved)
 
 
 @contextmanager

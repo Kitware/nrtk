@@ -24,6 +24,7 @@ class TestOtfImportGuard(ImportGuardTestsMixin):
 
     MODULE_PATH = "nrtk.impls.perturb_image.optical.otf"
     DEPS_TO_MOCK = ["pybsm"]
+    ADDITIONAL_MODULES = ["nrtk.impls.perturb_image.optical._pybsm"]
     CLASSES = [
         "CircularAperturePerturber",
         "DefocusPerturber",
