@@ -18,6 +18,7 @@ class TestEnhanceImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.pillow
+@pytest.mark.usefixtures("require_marker")
 def test_pillow_public_imports() -> None:
     """Canary test: FAIL if pillow marker is used but enhance perturbers can't be imported.
 

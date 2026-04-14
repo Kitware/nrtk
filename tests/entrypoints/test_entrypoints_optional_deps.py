@@ -30,6 +30,7 @@ class TestEntrypointsToolsImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.maite
+@pytest.mark.usefixtures("require_marker")
 def test_maite_entrypoint_imports() -> None:
     """Canary test: FAIL if marker is used but entrypoint can't be imported."""
     try:
@@ -44,6 +45,7 @@ def test_maite_entrypoint_imports() -> None:
 
 @pytest.mark.maite
 @pytest.mark.tools
+@pytest.mark.usefixtures("require_marker")
 def test_tools_entrypoint_imports() -> None:
     """Canary test: FAIL if marker is used but CLI entrypoint can't be imported."""
     try:

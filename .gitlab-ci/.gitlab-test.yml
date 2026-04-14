@@ -39,6 +39,8 @@
         RUNNER_TAG: medium-cpu
       - TOX_ENV: diffusion
         RUNNER_TAG: autoscaler
+      - TOX_ENV: optional
+        RUNNER_TAG: autoscaler
       - TOX_ENV: doctests
         RUNNER_TAG: autoscaler
       - TOX_ENV: notebooks

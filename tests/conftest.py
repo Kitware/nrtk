@@ -29,6 +29,20 @@ def set_numpy_printoptions() -> None:
     )
 
 
+@pytest.fixture
+def require_marker(pytestconfig: pytest.Config) -> None:
+    markexpr = pytestconfig.getoption("-m")
+    if not markexpr or markexpr == "optional":
+        pytest.skip("Test requires marker specified")
+
+
+# PyTest all marker for DSO unit test component. PyTest requires the Config param, even though it's unused
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:  # noqa: ARG001
+    for item in items:
+        if "notebooks" not in {mark.name for mark in item.iter_markers()}:
+            item.add_marker(pytest.mark.optional)
+
+
 class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
     def __init__(self, *, rtol: float = 1e-4, atol: float = 1e-5, **kwargs: Any) -> None:
         super().__init__(**kwargs)

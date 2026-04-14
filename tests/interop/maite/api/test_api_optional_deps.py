@@ -18,6 +18,7 @@ class TestAPIImportGuard(ImportGuardTestsMixin):
 
 @pytest.mark.maite
 @pytest.mark.tools
+@pytest.mark.usefixtures("require_marker")
 def test_api_public_imports() -> None:
     """Canary test: FAIL if marker is used but API handlers can't be imported."""
     try:
