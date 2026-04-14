@@ -191,3 +191,30 @@ class TestNRTKPerturberCLI:
             ],
         )
         assert result.exit_code == 101
+
+    @mock.patch("nrtk.entrypoints._nrtk_perturber_cli.from_config_dict")
+    @mock.patch(
+        "nrtk.interop._maite.datasets._coco_maite_object_detection_dataset.COCOMAITEObjectDetectionDataset.__len__",
+        return_value=0,
+    )
+    def test_empty_dataset(
+        self,
+        from_config_dict_patch: MagicMock,  # noqa: ARG002
+        coco_dataset_patch: MagicMock,  # noqa: ARG002
+        config_file: Path,
+        tmpdir: py.path.local,
+    ) -> None:
+        """Check that the CLI exits with code 102 if the input dataset is empty."""
+        output_dir = tmpdir.join(Path("out"))
+
+        runner = CliRunner()
+        result = runner.invoke(
+            nrtk_perturber_cli,
+            [
+                f"--dataset_dir={str(DATASET_FOLDER)}",
+                f"--output_dir={str(output_dir)}",
+                f"--config_file={str(config_file)}",
+                "-v",
+            ],
+        )
+        assert result.exit_code == 102
