@@ -47,7 +47,7 @@ def _safe_discover_via_entrypoints(entrypoint_ns: str) -> set[type]:
             ):
                 warnings.simplefilter("ignore")
                 m = ep.load()
-        except Exception:  # noqa: BLE001 - intentionally broad to tolerate any broken entrypoint
+        except Exception:
             LOG.debug(  # noqa: FKA100 - %-style logging format
                 "Skipping broken entrypoint %r (%s)",
                 ep,

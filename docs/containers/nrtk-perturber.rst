@@ -85,6 +85,8 @@ Error Codes
 
 ``101``: Could not identify an annotations file for COCO dataset.
 
+``102``: Input dataset is empty.
+
 
 Image Verification and SBOM
 ---------------------------

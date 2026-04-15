@@ -61,5 +61,3 @@ include:
 trigger_compliance:
   extends: .trigger_compliance
   rules: !reference [.trigger_compliance, rules]
-  variables:
-    PACKAGE_NAME: "nrtk"
