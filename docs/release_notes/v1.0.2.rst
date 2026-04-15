@@ -1,0 +1,34 @@
+v1.0.2
+======
+
+This patch release hardens the ``nrtk_perturber_cli`` entrypoint against empty
+input datasets, fixes two cross-test pollution bugs in the import-guard test
+infrastructure, and resolves linting failures surfaced by a ``ruff`` upgrade.
+It also closes a gap in the test matrix where per-extra tox environments were
+missing cross-extras pollution issues.
+
+Fixes
+-----
+
+* Fixed ``nrtk_perturber_cli`` crashing on empty input datasets by adding an
+  explicit check before attempting to perturb.
+
+* Fixed ``mock_missing_deps`` not restoring parent package attributes after
+  re-importing modules, causing ``mock.patch`` on dotted paths through guarded
+  packages to fail with ``AttributeError`` in subsequent tests.
+
+* Fixed ``TestOtfImportGuard`` not evicting cached ``_pybsm`` submodules,
+  allowing the import guard in ``otf.py`` to be bypassed when ``pybsm`` was
+  mocked as missing.
+
+* Fixed a gap in the test matrix where per-extra tox environments could not
+  catch cross-test pollution between extras. Introduced an ``optional`` tox
+  environment and CI job that runs all non-notebook tests in a single session
+  with every extra installed.
+
+* Fixed pytest collecting marker-gated tests when no marker was specified, by
+  adding a ``require_marker`` fixture that properly excludes them, and by
+  defining an ``optional`` marker that aggregates all other markers except
+  ``notebooks`` so the new cross-extras session can select them.
+
+* Fixed linting failures surfaced by upgrading ``ruff``.

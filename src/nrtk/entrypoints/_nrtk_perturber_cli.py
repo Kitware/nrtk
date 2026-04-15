@@ -87,6 +87,8 @@ def nrtk_perturber_cli(
     Exits:
         101:
             COCO annotations file is not found
+        102:
+            Input dataset is empty
     """
     _set_logging(verbose)
 
@@ -113,6 +115,10 @@ def nrtk_perturber_cli(
         kwcoco_dataset=kwcoco_dataset,
         image_metadata=metadata,
     )
+
+    if len(input_dataset) == 0:
+        logger.error("Input dataset is empty.")
+        sys.exit(102)
 
     # Augment input dataset
     augmented_datasets = nrtk_perturber(maite_dataset=input_dataset, perturber_factory=perturber_factory)

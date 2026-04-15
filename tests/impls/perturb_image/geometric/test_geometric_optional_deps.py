@@ -27,6 +27,7 @@ class TestGeometricImportGuard(ImportGuardTestsMixin):
 
 @pytest.mark.opencv
 @pytest.mark.albumentations
+@pytest.mark.usefixtures("require_marker")
 def test_albumentations_public_imports() -> None:
     """Canary test: FAIL if markers are used but geometric perturbers can't be imported.
 

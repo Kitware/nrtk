@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "nrtk"
-version = "1.0.1"
+version = "1.0.2"
 description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 license = "Apache-2.0"
 readme = "README.md"
@@ -97,7 +97,7 @@ packages = [{include = "nrtk", from="src"}]
 [dependency-groups]
 # Linting
 linting = [
-    "ruff>=0.11.0,<0.12.0",
+    "ruff>=0.15.0,<0.16.0",
     "types-setuptools>=65.6.0.1",
     "sphinx-lint>=1.0.0",
     "types-requests>=2.31.0.10",
@@ -163,6 +163,7 @@ markers = [
     "pybsm: Run tests that require the pybsm extra",
     "maite: Run tests that require the maite extra",
     "tools: Run tests that require the tools extra",
+    "optional: Run all tests except notebooks",
 ]
 
 [tool.coverage.run]

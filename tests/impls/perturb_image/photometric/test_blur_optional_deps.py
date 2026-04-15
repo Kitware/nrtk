@@ -18,6 +18,7 @@ class TestBlurImportGuard(ImportGuardTestsMixin):
 
 
 @pytest.mark.opencv
+@pytest.mark.usefixtures("require_marker")
 def test_opencv_public_imports() -> None:
     """Canary test: FAIL if opencv marker is used but blur perturbers can't be imported.
 
