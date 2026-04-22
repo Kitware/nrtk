@@ -179,6 +179,11 @@ extend-exclude = [
     "scripts",
     "docs/_build",
     "docs/_implementations",
+    # Webinar notebooks are live-coded demo material; they intentionally relax
+    # library conventions (e.g. mAP domain naming, env-var cells before imports,
+    # narrative-driven class stubs without docstrings) and are excluded rather
+    # than littered with per-rule noqa directives.
+    "docs/tutorials/webinars",
     ".tox",
     ".dev",
 ]

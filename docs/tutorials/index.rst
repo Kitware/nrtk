@@ -51,6 +51,12 @@ Continue Learning
       Combine perturbations with XAITK saliency maps to understand
       model behavior under degradation.
 
+   .. grid-item-card:: :material-regular:`event` Webinars
+      :link: /tutorials/webinars/index
+      :link-type: doc
+
+      Recordings and hands-on notebooks from NRTK webinar sessions.
+
 
 .. toctree::
    :hidden:
@@ -58,3 +64,4 @@ Continue Learning
    /examples/nrtk_tutorial
    testing_and_evaluation_notebooks
    saliency_notebooks
+   webinars/index
