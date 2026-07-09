@@ -242,6 +242,7 @@ tox:notebooks:examples:
       - NOTEBOOK_DIR: "docs/examples"
         NOTEBOOK_FILE: [
           "albumentations_perturber.ipynb",
+          "codec_macroblock_perturber.ipynb",
           "end_to_end_overview.ipynb",
           "optical_perturbers.ipynb",
           "photometric_perturbers.ipynb",

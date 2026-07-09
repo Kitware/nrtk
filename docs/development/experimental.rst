@@ -75,6 +75,9 @@ Implementations
 .. autoclass:: nrtk.impls.perturb_video.CodecMacroblockPerturber
    :members:
 
+   .. seealso::
+      :doc:`/examples/codec_macroblock_perturber`
+
 .. autoclass:: nrtk.impls.perturb_video.burn_in.MISBST1909BurnInPerturber
    :members:
 
