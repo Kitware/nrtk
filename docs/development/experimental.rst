@@ -40,6 +40,9 @@ To summarize, up to two steps may be required to use an experimental feature:
 1. Opt in to globally enable **all** of NRTK's experimental features.
 2. Install any extras that are required for the desired experimental feature.
 
+.. seealso::
+   :doc:`/examples/experimental_perturbers`
+
 Current Experimental Features
 =============================
 

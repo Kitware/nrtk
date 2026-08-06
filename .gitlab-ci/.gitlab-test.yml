@@ -246,7 +246,8 @@ tox:notebooks:examples:
           "optical_perturbers.ipynb",
           "photometric_perturbers.ipynb",
           "pybsm_default_config.ipynb",
-          "misb_st1909_burn_in_perturber.ipynb"
+          "misb_st1909_burn_in_perturber.ipynb",
+          "experimental_guard.ipynb"
         ]
         RUNNER_TAG: autoscaler
 

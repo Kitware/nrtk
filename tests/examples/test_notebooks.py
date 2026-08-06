@@ -19,6 +19,7 @@ from .test_notebook_utils import list_error_messages, pyright_analyze
         ("docs/examples/optical_perturbers.ipynb", 0),
         ("docs/examples/photometric_perturbers.ipynb", 0),
         ("docs/examples/pybsm_default_config.ipynb", 0),
+        ("docs/examples/experimental_guard.ipynb", 0),
         ("docs/examples/maite/affine_transformations.ipynb", 0),
         ("docs/examples/maite/extreme_illumination.ipynb", 0),
         ("docs/examples/maite/visual_focus.ipynb", 0),
