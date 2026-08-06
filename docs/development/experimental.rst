@@ -78,6 +78,9 @@ Implementations
    .. seealso::
       :doc:`/examples/codec_macroblock_perturber`
 
+   .. seealso::
+      :doc:`/examples/maite/transport_packet_loss`
+
 .. autoclass:: nrtk.impls.perturb_video.burn_in.MISBST1909BurnInPerturber
    :members:
 

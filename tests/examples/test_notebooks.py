@@ -30,6 +30,7 @@ from .test_notebook_utils import list_error_messages, pyright_analyze
         ("docs/examples/maite/atmospheric_turbulence.ipynb", 0),
         ("docs/examples/maite/water_droplets.ipynb", 0),
         ("docs/examples/maite/framewise_video.ipynb", 0),
+        ("docs/examples/maite/transport_packet_loss.ipynb", 0),
         # https://gitlab.jatic.net/jatic/kitware/nrtk/-/issues/698
         # ("docs/examples/xaitk_saliency_workflow/image_classification_perturbation_saliency.ipynb", 0),
         # ("docs/examples/xaitk_saliency_workflow/object_detection_perturbation_saliency.ipynb", 0),

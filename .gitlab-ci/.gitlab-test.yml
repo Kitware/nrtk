@@ -296,7 +296,8 @@ tox:notebooks:maite:
       - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
           "water_droplets.ipynb",
-          "framewise_video.ipynb"
+          "framewise_video.ipynb",
+          "transport_packet_loss.ipynb"
         ]
         RUNNER_TAG: k8s-large-cpu
 
