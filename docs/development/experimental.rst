@@ -75,6 +75,9 @@ Implementations
 .. autoclass:: nrtk.impls.perturb_video.burn_in.MISBST1909BurnInPerturber
    :members:
 
+   .. seealso::
+      :doc:`/examples/misb_st1909_burn_in_perturber`
+
 Interoperability
 ----------------
 
