@@ -24,7 +24,7 @@ from maite.protocols.object_detection import (
     TargetType,
 )
 from PIL import Image
-from typing_extensions import ReadOnly
+from typing_extensions import ReadOnly, override
 
 from nrtk.interop._maite.datasets._maite_object_detection_dataset import (
     MAITEObjectDetectionTarget,
@@ -129,10 +129,12 @@ class COCOMAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGenera
             index2label={c["id"]: c["name"] for c in kwcoco_dataset.cats.values()},
         )
 
+    @override
     def __len__(self) -> int:
         """Returns the number of images in the dataset."""
         return len(self._image_ids)
 
+    @override
     def __getitem__(self, index: int) -> tuple[InputType, TargetType, COCOMetadata]:  # pyright: ignore [reportInvalidTypeForm]
         """Returns the dataset object at the given index."""
         image_id = self._image_ids[index]

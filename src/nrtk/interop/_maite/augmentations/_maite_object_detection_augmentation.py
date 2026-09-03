@@ -16,6 +16,7 @@ from maite.protocols.object_detection import (
     TargetType,
 )
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces import PerturbImage
 from nrtk.interop._maite.datasets import MAITEObjectDetectionTarget
@@ -58,6 +59,7 @@ class MAITEObjectDetectionAugmentation(Augmentation):  # pyright: ignore [report
         self.augment = augment
         self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
 
+    @override
     def __call__(
         self,
         batch: OBJ_DETECTION_BATCH_T,

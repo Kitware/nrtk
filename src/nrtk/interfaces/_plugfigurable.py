@@ -25,7 +25,7 @@ from smqtk_core.plugin import (
     filter_plugin_types,
     get_ns_entrypoints,
 )
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 LOG = logging.getLogger(__name__)
 
@@ -83,6 +83,7 @@ def _is_nrtk_private(impl: type) -> bool:
 class Plugfigurable(_Plugfigurable):
     """Drop-in replacement that swaps in fault-tolerant entrypoint loading."""
 
+    @override
     @classmethod
     def get_impls(cls) -> set[type[Self]]:
         """Discover plugins, skipping broken entrypoints and nrtk's private classes."""

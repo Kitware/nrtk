@@ -15,6 +15,7 @@ from maite.protocols.image_classification import (
     InputType,
     TargetType,
 )
+from typing_extensions import override
 
 IMG_CLASSIFICATION_DATUM_T = tuple[InputType, TargetType, DatumMetadataType]
 
@@ -69,10 +70,12 @@ class MAITEImageClassificationDataset(Dataset):  # pyright: ignore [reportGenera
                 "id": dataset_id,
             }
 
+    @override
     def __len__(self) -> int:
         """Returns the number of images in the dataset."""
         return len(self.imgs)
 
+    @override
     def __getitem__(self, index: int) -> IMG_CLASSIFICATION_DATUM_T:
         """Returns the dataset object at the given index."""
         return self.imgs[index], self.labels[index], self.datum_metadata[index]

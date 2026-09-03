@@ -7,7 +7,6 @@ from typing import Any
 
 import numpy as np
 import pytest
-from smqtk_core.configuration import configuration_test_helper
 from typing_extensions import override
 
 from nrtk.impls.perturb_video._base.numpy_random_perturb_video import NumpyRandomPerturbVideo
@@ -32,6 +31,7 @@ class _ConcreteNumpyRandomPerturbVideo(NumpyRandomPerturbVideo):
 
 @pytest.mark.core
 class TestNumpyRandomPerturbVideo(TestRandomPerturbVideo):
+    @override
     def make_perturber(self, seed: int | None = None) -> NumpyRandomPerturbVideo:
         return _ConcreteNumpyRandomPerturbVideo(seed=seed)
 
@@ -62,9 +62,3 @@ class TestNumpyRandomPerturbVideo(TestRandomPerturbVideo):
         inst._set_seed()
         val2 = inst._rng.random()
         assert val1 == val2
-
-    @pytest.mark.parametrize("seed", [42, None, 0])
-    def test_configuration_round_trip(self, seed: int | None) -> None:
-        inst = self.make_perturber(seed=seed)
-        for i in configuration_test_helper(inst):
-            assert i.seed == seed

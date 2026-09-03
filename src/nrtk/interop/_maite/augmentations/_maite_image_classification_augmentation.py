@@ -16,6 +16,7 @@ from maite.protocols.image_classification import (
     InputType,
     TargetType,
 )
+from typing_extensions import override
 
 from nrtk.interfaces import PerturbImage
 from nrtk.interop._maite.metadata import NRTKDatumMetadata
@@ -50,6 +51,7 @@ class MAITEImageClassificationAugmentation(Augmentation):  # pyright:  ignore [r
         self.augment = augment
         self.metadata: AugmentationMetadata = AugmentationMetadata(id=augment_id)
 
+    @override
     def __call__(
         self,
         batch: IMG_CLASSIFICATION_BATCH_T,

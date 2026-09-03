@@ -98,6 +98,7 @@ class RandomCropPerturber(NumpyRandomPerturbImage):
                 adjusted_bboxes.append((adjusted_box, deepcopy(metadata)))
         return adjusted_bboxes
 
+    @override
     def perturb(
         self,
         *,

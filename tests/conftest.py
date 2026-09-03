@@ -11,6 +11,7 @@ from PIL import Image
 from syrupy.assertion import SnapshotAssertion
 from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
+from typing_extensions import override
 
 import nrtk.experimental  # noqa: F401 - experimental features are enabled for the test suite
 from nrtk.interfaces import VideoFrame
@@ -69,6 +70,7 @@ class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
         self.rtol = rtol
         self.atol = atol
 
+    @override
     def serialize(self, data: np.ndarray | float, **_: Any) -> str:
         if isinstance(data, np.ndarray):
             return (
@@ -93,6 +95,7 @@ class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
                 return float(parsed["value"])
         raise ValueError("Unknown data type")
 
+    @override
     def matches(self, *, serialized_data: str, snapshot_data: str) -> bool:
         try:
             expected = self.deserialize(snapshot_data)
@@ -122,6 +125,7 @@ class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
         self.rtol = rtol
         self.atol = atol
 
+    @override
     def serialize(self, data: np.ndarray, **_: Any) -> bytes:
         im = Image.fromarray(data)
         byte_arr = io.BytesIO()
@@ -134,6 +138,7 @@ class TIFFImageSnapshotExtension(SingleFileSnapshotExtension):
             image.load()
             return np.array(image)
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_array = self.deserialize(snapshot_data)
         received_array = self.deserialize(serialized_data)
@@ -177,6 +182,7 @@ class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
         super().__init__(**kwargs)
         self.min_psnr = min_psnr
 
+    @override
     def serialize(self, data: np.ndarray, **_: Any) -> bytes:
         im = Image.fromarray(data)
         byte_arr = io.BytesIO()
@@ -189,6 +195,7 @@ class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
             image.load()
             return np.array(image)
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_array = self.deserialize(snapshot_data)
         received_array = self.deserialize(serialized_data)
@@ -226,6 +233,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
         super().__init__(**kwargs)
         self.min_ssim = min_ssim
 
+    @override
     def serialize(self, data: np.ndarray, **_: Any) -> bytes:
         im = Image.fromarray(data)
         byte_arr = io.BytesIO()
@@ -314,6 +322,7 @@ class SSIMImageSnapshotExtension(SingleFileSnapshotExtension):
 
         return float(np.mean(ssim_values))
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_array = self.deserialize(snapshot_data)
         received_array = self.deserialize(serialized_data)
@@ -336,6 +345,7 @@ class LosslessMP4SnapshotExtension(SingleFileSnapshotExtension):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
+    @override
     def serialize(self, data: Iterator[VideoFrame], **_: Any) -> bytes:
         buffer = io.BytesIO()
         write_video(file=buffer, frames=data, format_name="mp4")
@@ -344,6 +354,7 @@ class LosslessMP4SnapshotExtension(SingleFileSnapshotExtension):
     def deserialize(self, data: bytes) -> Iterator[VideoFrame]:
         yield from read_video(io.BytesIO(data), format_name="mp4")
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_frames = self.deserialize(snapshot_data)
         received_frames = self.deserialize(serialized_data)
@@ -395,6 +406,7 @@ class PSNRVideoSnapshotExtension(LosslessMP4SnapshotExtension):
             return False
         return _compute_psnr(img_a=expected.image, img_b=received.image) >= self.min_psnr
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_frames = self.deserialize(snapshot_data)
         received_frames = self.deserialize(serialized_data)
@@ -441,6 +453,7 @@ class SSIMVideoSnapshotExtension(LosslessMP4SnapshotExtension):
         )
         return ssim >= self.min_ssim
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_frames = self.deserialize(snapshot_data)
         received_frames = self.deserialize(serialized_data)

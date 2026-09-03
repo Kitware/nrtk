@@ -1023,6 +1023,7 @@ class WaterDropletPerturber(NumpyRandomPerturbImage):
 
         return cfg
 
+    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
         """Returns the default configuration with size_range as a list for JSON serialization."""

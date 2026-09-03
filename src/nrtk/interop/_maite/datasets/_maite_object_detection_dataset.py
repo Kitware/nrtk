@@ -25,6 +25,7 @@ from maite.protocols.object_detection import (
     InputType,
     TargetType,
 )
+from typing_extensions import override
 
 from nrtk.utils._logging import setup_logging
 
@@ -95,10 +96,12 @@ class MAITEObjectDetectionDataset(Dataset):  # pyright: ignore [reportGeneralTyp
                 "id": dataset_id,
             }
 
+    @override
     def __len__(self) -> int:
         """Returns the number of images in the dataset."""
         return len(self.imgs)
 
+    @override
     def __getitem__(self, index: int) -> OBJ_DETECTION_DATUM_T:
         """Returns the dataset object at the given index."""
         return self.imgs[index], self.dets[index], self.datum_metadata[index]

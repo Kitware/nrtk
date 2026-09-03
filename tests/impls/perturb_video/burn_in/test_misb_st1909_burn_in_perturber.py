@@ -16,6 +16,7 @@ from PIL import ImageFont
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
+from typing_extensions import override
 
 from nrtk.impls.perturb_video.burn_in import MISBST1909BurnInPerturber, _misb_st1909_burn_in_perturber
 from nrtk.impls.perturb_video.burn_in._misb_st1909_burn_in_perturber import (
@@ -74,12 +75,14 @@ def host_timezone(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatc
 class TestMISBST1909BurnInPerturber(PerturbVideoTestsMixin):
     impl_class = MISBST1909BurnInPerturber
 
+    @override
     def make_perturber(self, **kwargs: Any) -> MISBST1909BurnInPerturber:
         """Create a MISBST1909BurnInPerturber with defaults suitable for fast testing."""
         defaults: dict[str, Any] = {"seed": 42}
         defaults.update(kwargs)
         return MISBST1909BurnInPerturber(**defaults)
 
+    @override
     def make_frames(
         self,
         n: int = 2,

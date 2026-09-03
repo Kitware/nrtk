@@ -15,6 +15,7 @@ from maite.protocols.image_classification import (
 )
 from PIL import Image
 from transformers import AutoModelForImageClassification, AutoProcessor
+from typing_extensions import override
 
 __all__ = ["HuggingFaceMaiteModel"]
 
@@ -102,6 +103,7 @@ class HuggingFaceMaiteModel(Model):
             output.append(dataset_probs)
         return output
 
+    @override
     def __call__(
         self,
         batch: Sequence[InputType],  # pyright: ignore [reportInvalidTypeForm]

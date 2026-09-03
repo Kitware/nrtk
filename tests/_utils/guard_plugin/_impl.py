@@ -8,12 +8,15 @@ vacuously.
 
 from typing import Any
 
+from typing_extensions import override
+
 from tests._utils.guard_plugin._interface import GuardedThing
 
 
 class GuardedThingImpl(GuardedThing):
     """Stand-in for an experimental implementation with no optional dependency."""
 
+    @override
     def get_config(self) -> dict[str, Any]:
         """Return an empty configuration; nothing here is configurable."""
         return {}

@@ -165,6 +165,7 @@ class PerturberMultivariateFactory(PerturbImageFactory):
     @deprecated(
         "Use get_config() instead.",
     )
+    @override
     def perturber(self) -> type[PerturbImage]:
         return self._new_impl.perturber
 
