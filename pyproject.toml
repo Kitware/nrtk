@@ -57,9 +57,9 @@ nrtk-perturber = "nrtk.entrypoints:nrtk_perturber_cli"
 # closed their `__dir__` advertises nothing, so discovery never reaches a gated name.
 "nrtk.impls.perturb_video" = "nrtk.impls.perturb_video"
 "nrtk.impls.perturb_video.optical" = "nrtk.impls.perturb_video.optical"
+"nrtk.impls.perturb_video.burn_in" = "nrtk.impls.perturb_video.burn_in"
 # Deprecated modules
 "nrtk.impls.perturb_image_factory" = "nrtk.impls.perturb_image_factory"
-
 
 [project.entry-points."maite.protocols.image_classification.Augmentation"]
 nrtk_MAITEImageClassificationAugmentation = "nrtk.interop:MAITEImageClassificationAugmentation"
