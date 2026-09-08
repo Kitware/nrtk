@@ -19,7 +19,7 @@ __all__: list[str]
 
 __getattr__, __dir__, __all__ = guard(
     namespace=globals(),
-    submodules=["optical"],
+    submodules=["optical", "burn_in"],
     groups=[
         Group(
             symbols={"FramewisePerturber": "nrtk.impls.perturb_video._framewise_perturber"},

@@ -72,6 +72,9 @@ Implementations
 .. autoclass:: nrtk.impls.perturb_video.CodecMacroblockPerturber
    :members:
 
+.. autoclass:: nrtk.impls.perturb_video.burn_in.MISBST1909BurnInPerturber
+   :members:
+
 Interoperability
 ----------------
 
