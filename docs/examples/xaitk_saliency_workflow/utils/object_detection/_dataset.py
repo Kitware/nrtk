@@ -14,7 +14,7 @@ from maite.protocols import DatasetMetadata, DatumMetadata
 from maite.protocols.object_detection import Dataset, DatumMetadataType, InputType, TargetType
 from PIL import Image
 from torch.utils.data import Subset
-from typing_extensions import ReadOnly
+from typing_extensions import ReadOnly, override
 
 __all__ = ["VisDroneObjectDetectionDataset", "stratified_sample_dataset", "YOLODetectionTarget"]
 
@@ -103,11 +103,13 @@ class VisDroneObjectDetectionDataset(Dataset):
             },
         )
 
+    @override
     def __len__(self) -> int:
         """Return length of the dataset."""
         # The dataset length is the number of images we have
         return len(self.image_files)
 
+    @override
     def __getitem__(
         self,
         index: int,

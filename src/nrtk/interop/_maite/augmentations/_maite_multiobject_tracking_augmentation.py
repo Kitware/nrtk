@@ -19,6 +19,7 @@ from maite.protocols.multiobject_tracking import (
 )
 from maite.protocols.multiobject_tracking import VideoFrame as MAITEVideoFrameProtocol
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 from nrtk.interfaces import PerturbVideo, VideoFrame
 from nrtk.interop._maite.metadata import NRTKDatumMetadata
@@ -148,6 +149,7 @@ class MAITEMultiobjectTrackingAugmentation(Augmentation):
 
         return maite_frame, maite_single_frame_target
 
+    @override
     def __call__(
         self,
         batch: MULTIOBJECT_TRACKING_BATCH_T,

@@ -295,6 +295,7 @@ pythonVersion = "3.10"
 reportMissingImports = "warning"
 reportDeprecated = "warning"
 typeCheckingMode = "standard"
+reportImplicitOverride = "error"
 include = [
     "src/nrtk",
     "tests",

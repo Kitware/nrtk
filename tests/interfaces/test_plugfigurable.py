@@ -7,6 +7,7 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+from typing_extensions import override
 
 from nrtk.interfaces._plugfigurable import Plugfigurable, _safe_discover_via_entrypoints
 
@@ -87,6 +88,7 @@ def test_safe_discover_logs_broken_entrypoint(
 class _ConcretePlugfigurable(Plugfigurable):
     """Minimal concrete subclass used to exercise get_impls."""
 
+    @override
     def get_config(self) -> dict[str, Any]:
         return {}  # pragma: no cover
 

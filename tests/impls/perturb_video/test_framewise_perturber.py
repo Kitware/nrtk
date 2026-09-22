@@ -13,6 +13,7 @@ from PIL import Image
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
+from typing_extensions import override
 
 import nrtk.experimental  # noqa: F401 - enable experimental features
 from nrtk.impls.perturb_video import FramewisePerturber
@@ -43,9 +44,11 @@ m_dummy.side_effect = _perturb
 class TestFramewisePerturber(PerturbVideoTestsMixin):
     impl_class = FramewisePerturber
 
+    @override
     def make_perturber(self) -> FramewisePerturber:
         return FramewisePerturber(FakeImagePerturber())
 
+    @override
     def make_frames(self) -> list[VideoFrame]:
         return [
             VideoFrame(image=np.ones((8, 8, 3), dtype=np.uint8), timestamp=0.0),

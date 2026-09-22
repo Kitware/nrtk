@@ -1284,6 +1284,7 @@ class MISBST1909BurnInPerturber(NumpyRandomPerturbVideo):
 
         return cfg
 
+    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
         """Retrieves the default configuration for MISBST1909BurnInPerturber instances."""

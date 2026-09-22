@@ -15,6 +15,7 @@ import pytest
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
+from typing_extensions import override
 
 from nrtk.impls.perturb_video.optical import TurbulenceVideoPerturber
 from nrtk.interfaces import VideoFrame
@@ -33,12 +34,14 @@ SMALL_GRID = 32
 class TestTurbulenceVideoPerturber(PerturbVideoTestsMixin):
     impl_class = TurbulenceVideoPerturber
 
+    @override
     def make_perturber(self, **kwargs: Any) -> TurbulenceVideoPerturber:
         """Create a TurbulenceVideoPerturber with small defaults for fast testing."""
         defaults: dict[str, Any] = {"grid_size": SMALL_GRID, "seed": 42}
         defaults.update(kwargs)
         return TurbulenceVideoPerturber(**defaults)
 
+    @override
     def make_frames(
         self,
         n: int = 2,

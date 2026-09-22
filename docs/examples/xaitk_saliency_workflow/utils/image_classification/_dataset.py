@@ -12,6 +12,7 @@ from datasets import load_dataset
 from maite.protocols import ModelMetadata
 from maite.protocols.image_classification import Dataset, DatumMetadataType, InputType, TargetType
 from PIL import Image
+from typing_extensions import override
 
 __all__ = ["HuggingFaceMaiteDataset", "create_data_subset"]
 
@@ -99,6 +100,7 @@ class HuggingFaceMaiteDataset(Dataset):
             "index2label": {i: self.index2label(i) for i in range(self.num_classes)},
         }
 
+    @override
     def __len__(self) -> int:
         """The input dataset size.
 
@@ -107,6 +109,7 @@ class HuggingFaceMaiteDataset(Dataset):
         """
         return len(self.hf_dataset)
 
+    @override
     def __getitem__(
         self,
         idx: int,

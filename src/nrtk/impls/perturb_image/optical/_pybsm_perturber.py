@@ -321,10 +321,12 @@ class PybsmPerturber(PybsmPerturberMixin):
             reflectance_range=self._reflectance_range,
         )
 
+    @override
     def __str__(self) -> str:
         """Returns a string representation combining sensor and scenario names."""
         return self.sensor.name + " " + self.scenario.name
 
+    @override
     def __repr__(self) -> str:
         """Returns a representation of the perturber including sensor and scenario names."""
         return self.__str__()
@@ -354,6 +356,7 @@ class PybsmPerturber(PybsmPerturberMixin):
 
         return cfg
 
+    @override
     @classmethod
     def get_default_config(cls) -> dict[str, Any]:
         """Retrieves the default configuration for PybsmPerturber instances."""
@@ -362,6 +365,7 @@ class PybsmPerturber(PybsmPerturberMixin):
         cfg["reflectance_range"] = cfg["reflectance_range"].tolist()
         return cfg
 
+    @override
     def _handle_boxes_and_format(
         self,
         *,

@@ -10,6 +10,7 @@ from maite.protocols import ModelMetadata
 from maite.protocols.object_detection import InputType, Model
 from object_detection._dataset import YOLODetectionTarget
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
+from typing_extensions import override
 
 __all__ = ["MaiteYOLODetector"]
 
@@ -39,6 +40,7 @@ class MaiteYOLODetector(Model):
         # Dummy model metadata type to pass type checking
         self.metadata: ModelMetadata = ModelMetadata(id="0")
 
+    @override
     def __call__(self, batch: Sequence[InputType]) -> Sequence[YOLODetectionTarget]:
         """Processes a batch of images using the YOLO model and converts the predictions to `YOLODetectionTarget`s.
 

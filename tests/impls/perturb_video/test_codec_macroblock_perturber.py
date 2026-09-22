@@ -11,6 +11,7 @@ import pytest
 from smqtk_core.configuration import configuration_test_helper
 from smqtk_image_io.bbox import AxisAlignedBoundingBox
 from syrupy.assertion import SnapshotAssertion
+from typing_extensions import override
 
 from nrtk.impls.perturb_video import CodecMacroblockPerturber
 from nrtk.impls.perturb_video._codec_macroblock_perturber import _DecodedVideoFrame
@@ -48,10 +49,12 @@ def _make_random_frames(
 class TestCodecMacroblockPerturber(PerturbVideoTestsMixin):
     impl_class: ClassVar[type[PerturbVideo]] = CodecMacroblockPerturber
 
+    @override
     def make_perturber(self) -> PerturbVideo:
         """Return a codec perturber for shared video interface tests."""
         return CodecMacroblockPerturber(frame_rate=30.0)
 
+    @override
     def make_frames(self) -> list[VideoFrame]:
         """Return fresh frames for shared video interface tests."""
         return list(_make_random_frames(n=3))
