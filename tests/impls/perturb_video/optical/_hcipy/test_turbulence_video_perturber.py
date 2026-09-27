@@ -8,7 +8,7 @@ from collections.abc import Hashable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from itertools import islice
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 import pytest
@@ -18,10 +18,10 @@ from syrupy.assertion import SnapshotAssertion
 from typing_extensions import override
 
 from nrtk.impls.perturb_video.optical import TurbulenceVideoPerturber
-from nrtk.interfaces import VideoFrame
+from nrtk.interfaces import PerturbVideo, VideoFrame
 from tests.conftest import PSNRVideoSnapshotExtension
 from tests.impls import INPUT_DRONE_VIDEO_FILE_PATH
-from tests.impls.perturb_video.perturber_tests_mixin import PerturbVideoTestsMixin
+from tests.impls.perturb_video.perturber_tests_mixin import ImageConversionTestsMixin, PerturbVideoTestsMixin
 from tests.impls.perturb_video.test_perturber_utils import FrameRepeater, perturber_assertions
 from tests.utils.video_io import read_video
 
@@ -31,8 +31,21 @@ SMALL_GRID = 32
 
 
 @pytest.mark.hcipy
-class TestTurbulenceVideoPerturber(PerturbVideoTestsMixin):
-    impl_class = TurbulenceVideoPerturber
+class TestTurbulenceVideoPerturber(
+    PerturbVideoTestsMixin,
+    ImageConversionTestsMixin,
+):
+    convert_options: ClassVar[dict[str, bool]] = {
+        "convert_to_rgb": False,
+        "normalize_floats": False,
+    }
+    restore_options: ClassVar[dict[str, bool]] = {
+        "normalize_floats": False,
+    }
+    working_dtype: ClassVar[type] = np.float64
+    expected_conversion = (0.0, 0.5, 1.0)
+    keeps_rgb = False
+    impl_class: ClassVar[type[PerturbVideo]] = TurbulenceVideoPerturber
 
     @override
     def make_perturber(self, **kwargs: Any) -> TurbulenceVideoPerturber:
@@ -151,7 +164,7 @@ class TestTurbulenceVideoPerturber(PerturbVideoTestsMixin):
         frames1 = self.make_frames(n=2)
         frames2 = self.make_frames(n=2)
 
-        inst = self.make_perturber(seed=None)
+        inst = self.make_perturber(seed=None, path_avg_cn2=1e-12)
         results1 = list(inst.perturb(frames=iter(frames1)))
         results2 = list(inst.perturb(frames=iter(frames2)))
 
@@ -507,7 +520,7 @@ class TestTurbulenceVideoPerturber(PerturbVideoTestsMixin):
             VideoFrame(image=image.copy(), timestamp=1.0),
             VideoFrame(image=image.copy(), timestamp=2.0),
         ]
-        inst = self.make_perturber(seed=42)
+        inst = self.make_perturber(seed=42, path_avg_cn2=1e-12)
         results = list(inst.perturb(frames=iter(frames)))
         assert len(results) == 3
         assert not np.array_equal(results[0].image, results[1].image)

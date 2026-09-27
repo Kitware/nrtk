@@ -17,7 +17,7 @@ from nrtk.impls.perturb_video import CodecMacroblockPerturber
 from nrtk.impls.perturb_video._codec_macroblock_perturber import _DecodedVideoFrame
 from nrtk.interfaces import PerturbVideo, VideoFrame
 from tests.impls import INPUT_DRONE_VIDEO_FILE_PATH as INPUT_VIDEO_FILE_PATH
-from tests.impls.perturb_video.perturber_tests_mixin import PerturbVideoTestsMixin
+from tests.impls.perturb_video.perturber_tests_mixin import ImageConversionTestsMixin, PerturbVideoTestsMixin
 from tests.impls.perturb_video.test_perturber_utils import perturber_assertions
 from tests.utils.video_io import read_video
 
@@ -46,7 +46,15 @@ def _make_random_frames(
 
 
 @pytest.mark.pyav
-class TestCodecMacroblockPerturber(PerturbVideoTestsMixin):
+class TestCodecMacroblockPerturber(
+    PerturbVideoTestsMixin,
+    ImageConversionTestsMixin,
+):
+    convert_options: ClassVar[dict[str, bool]] = {}
+    restore_options: ClassVar[dict[str, bool]] = {}
+    working_dtype: ClassVar[type] = np.uint8
+    expected_conversion = (0, 128, 255)
+    keeps_rgb = False
     impl_class: ClassVar[type[PerturbVideo]] = CodecMacroblockPerturber
 
     @override
@@ -206,29 +214,6 @@ class TestCodecMacroblockPerturber(PerturbVideoTestsMixin):
             frame.timestamp = timestamp
 
         assert CodecMacroblockPerturber()._get_frame_rate(frames=frames) == Fraction(numerator=25, denominator=1)
-
-    @pytest.mark.parametrize("dtype", [np.float32, np.float64])
-    def test_float_frames_are_converted_through_uint8_and_restored(self, dtype: np.dtype) -> None:
-        """Verify normalized float inputs are restored to their original dtype."""
-        frames = [
-            VideoFrame(
-                image=(frame.image.astype(dtype) / np.array(255, dtype=dtype)).astype(dtype),
-                timestamp=frame.timestamp,
-                boxes=frame.boxes,
-                additional_params=frame.additional_params,
-            )
-            for frame in _make_random_frames(n=3)
-        ]
-        inst = CodecMacroblockPerturber(quantizer=20, frame_rate=30.0)
-
-        out_frames = list(perturber_assertions(perturb=inst, frames=iter(frames)))
-
-        assert len(out_frames) == len(frames)
-        for frame in out_frames:
-            assert frame.image.dtype == dtype
-            assert frame.image.shape == (32, 32, 3)
-            assert np.all(frame.image >= 0.0)
-            assert np.all(frame.image <= 1.0)
 
     @pytest.mark.parametrize(
         ("kwargs", "expectation"),

@@ -268,7 +268,7 @@ class CodecMacroblockPerturber(PerturbVideo):
 
         for frame, decoded_image in zip(input_frames, decoded_images, strict=True):
             yield VideoFrame(
-                image=self._restore_image_shape_and_dtype(decoded_image=decoded_image, reference_image=frame.image),
+                image=self._restore_image(image=decoded_image, original_image=frame.image),
                 timestamp=frame.timestamp,
                 boxes=deepcopy(frame.boxes),
                 additional_params=deepcopy(frame.additional_params),
@@ -435,35 +435,12 @@ class CodecMacroblockPerturber(PerturbVideo):
     ) -> list[np.ndarray[Any, Any]]:
         if self.frame_count_policy == "strict":
             return [frame.image for frame in decoded_frames]
-        frame_shape = CodecMacroblockPerturber._prepare_image_for_encoding(input_frames[0].image).shape
+        frame_shape = self._prepare_image_for_encoding(input_frames[0].image).shape
         return CodecMacroblockPerturber._fill_missing_frames_with_black(
             decoded_frames=decoded_frames,
             input_frame_count=len(input_frames),
             frame_shape=frame_shape,
         )
-
-    @staticmethod
-    def _restore_image_shape_and_dtype(
-        *,
-        decoded_image: np.ndarray[Any, Any],
-        reference_image: np.ndarray[Any, Any],
-    ) -> np.ndarray[Any, Any]:
-        cropped = decoded_image[: reference_image.shape[0], : reference_image.shape[1], :]
-        if len(reference_image.shape) == 2:
-            image = cropped[:, :, 0].astype(np.uint8, copy=True)
-        elif reference_image.shape[2] == 1:
-            image = cropped[:, :, :1].astype(np.uint8, copy=True)
-        else:
-            image = cropped.astype(np.uint8, copy=True)
-
-        # Convert back to original dtype for float inputs
-        if np.issubdtype(reference_image.dtype, np.floating):
-            image = image.astype(reference_image.dtype, copy=False) / np.array(255, dtype=reference_image.dtype)
-            return image.astype(
-                reference_image.dtype,
-                copy=False,
-            )
-        return image
 
     def _encode(
         self,
@@ -790,26 +767,14 @@ class CodecMacroblockPerturber(PerturbVideo):
         median_delta = float(np.median(timestamp_deltas))
         return Fraction(str(1.0 / median_delta)).limit_denominator(1_000_000)
 
-    @staticmethod
-    def _prepare_image_for_encoding(image: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
-        if np.issubdtype(image.dtype, np.floating):
-            # normalize to 0 - 255
-            image = np.round(np.clip(image, 0.0, 1.0) * 255).astype(np.uint8)
-        else:
-            image = image.astype(np.uint8, copy=False)
-
-        # convert to 3-channel
-        if image.ndim == 2:
-            image = np.repeat(image[:, :, np.newaxis], repeats=3, axis=2)
-        elif image.shape[2] == 1:
-            image = np.repeat(image, repeats=3, axis=2)
-
+    def _prepare_image_for_encoding(self, image: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+        image = self._convert_image(image=image)
         # yuv420p-style encoders need even dimensions, so we will pad here
         # Decoded frames are cropped back later
         pad_h = image.shape[0] % 2
         pad_w = image.shape[1] % 2
         if pad_h == 0 and pad_w == 0:
-            return image.copy()
+            return image
 
         return np.pad(
             image,

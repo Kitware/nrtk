@@ -340,24 +340,6 @@ class MISBST1909BurnInPerturber(NumpyRandomPerturbVideo):
         """
         return _load_font(font_path=self.font_path, size=max(size, 1.0))
 
-    def _copy_image(self, image: np.ndarray) -> np.ndarray:
-        """Converts an image's shape to [H, W, 3] and returns a copy.
-
-        Args:
-            image: numpy array from a VideoFrame
-
-        Returns:
-                A copy of the image with shape [H, W, 3]
-        """
-        if image.ndim == 2:
-            image = np.repeat(image[:, :, np.newaxis], repeats=3, axis=2)
-        elif image.shape[2] == 1:
-            image = np.repeat(image, 3, axis=2)
-        else:
-            image = image.copy()
-
-        return image
-
     @override
     @_perturb_guard
     def perturb(
@@ -385,9 +367,7 @@ class MISBST1909BurnInPerturber(NumpyRandomPerturbVideo):
         """
         _generated_metadata = self._generate_metadata()
         for frame in frames:
-            original_dtype = frame.image.dtype
-            # Copy either way: the burn-ins are drawn in place and inputs must be left alone.
-            image = self._copy_image(frame.image.astype(np.uint8))
+            image = self._convert_image(image=frame.image, normalize_floats=False)
 
             metadata: MISBST1909Metadata = frame.additional_params.get("misb_st1909", {})
             if self.generate_missing_metadata:
@@ -398,7 +378,12 @@ class MISBST1909BurnInPerturber(NumpyRandomPerturbVideo):
             self._render_burn_ins(image=image, metadata=metadata)
 
             yield VideoFrame(
-                image=image.astype(original_dtype),
+                image=self._restore_image(
+                    image=image,
+                    original_image=frame.image,
+                    restore_channels=False,
+                    normalize_floats=False,
+                ),
                 timestamp=frame.timestamp,
                 boxes=deepcopy(frame.boxes),
                 additional_params=deepcopy(frame.additional_params),
