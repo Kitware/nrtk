@@ -16,6 +16,7 @@ from .test_notebook_utils import list_error_messages, pyright_analyze
         ("docs/examples/generative_perturbers.ipynb", 0),
         ("docs/examples/end_to_end_overview.ipynb", 0),
         ("docs/examples/misb_st1909_burn_in_perturber.ipynb", 0),
+        ("docs/examples/codec_macroblock_perturber.ipynb", 0),
         ("docs/examples/optical_perturbers.ipynb", 0),
         ("docs/examples/photometric_perturbers.ipynb", 0),
         ("docs/examples/pybsm_default_config.ipynb", 0),
