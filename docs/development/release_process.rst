@@ -202,7 +202,7 @@ a. Add an admonition at the top of
          requirements associated with JATIC Maturity Level I.
 
 b. Title the GitLab release ``v{NEW_VERSION} — JATIC Maturity I`` when
-   `Drafting a New Release on GitLab`_.
+   :ref:`drafting a new release on GitLab <release-process-draft-gitlab>`.
 
 c. Update the maturity admonition in the ``Acknowledgment`` section of the
    docs landing page (``docs/index.rst``) and in the ``Acknowledgment``
@@ -237,6 +237,8 @@ current, just-updated package version.
    $ VERSION="v$(poetry version -s)"
    $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
    $ git push UPSTREAM "$VERSION"
+
+.. _release-process-draft-gitlab:
 
 Draft a New Release on GitLab
 -----------------------------

@@ -6,3 +6,6 @@
 
 * Update contributor branch and notebook paths, and remove the nonexistent
   ``example_deps`` installation extra.
+
+* Repair documentation destinations and missing link targets, and normalize
+  table wording.

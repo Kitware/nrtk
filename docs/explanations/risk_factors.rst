@@ -121,7 +121,7 @@ Photometric Risk Factors
   Bright reflections due to lighting, target materials, or angles.
 
   +-------------------------+--------------------------------------------------------------------------------------------------+
-  | **Impact**              | Can obscure targets and skew autoexposure or detection.                                          |
+  | **Impact**              | Can obscure targets and skew auto exposure or detection.                                         |
   +-------------------------+--------------------------------------------------------------------------------------------------+
   | **Root Cause**          | Target                                                                                           |
   +-------------------------+--------------------------------------------------------------------------------------------------+

@@ -72,7 +72,7 @@ Poor Candidates
 Perturbations that model time-varying physical phenomena or transformations that depend on scene content are generally
 poor candidates for independent frame-by-frame application. Examples include:
 
-* :class:`~nrtk.impls.perturb_image.photometric.environment.WaterDropletPerturber`
+* :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber`
 
   * Note this perturber may be reasonable in limited scenarios, such as a short stream where gravitational effects
     are negligible and ``is_static=True``.
