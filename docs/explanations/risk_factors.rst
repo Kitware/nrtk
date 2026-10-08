@@ -395,7 +395,7 @@ Optical Risk Factors
 Data Integrity Risk Factors
 ---------------------------
 
-.. dropdown:: Compromises in accuracy, consistentency, or completeness of data
+.. dropdown:: Compromises in accuracy, consistency, or completeness of data
 
   .. _metadata-incorrect:
 

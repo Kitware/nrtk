@@ -57,7 +57,7 @@ Indicates that the MR is resolved or discarded.
 Continuous Integration (JATIC GitLab)
 =====================================
 The following checks are included in the automated portion of the review
-process, and are triggered whenever a merge-request is made or changes, a tag is
+process, and are triggered whenever a merge request is created or updated, a tag is
 created, or when the ``main`` branch is updated.
 These are run as part of the CI/CD pipeline driven by GitLab CI pipelines, and
 defined by the :file:`.gitlab-ci.yml` file.
@@ -120,8 +120,8 @@ The default preference is that all Jupyter Notebooks be included in execution
 of the Notebook CI job (listed under the ``parallel:matrix`` section).
 If a notebook is added in the MR, it should be verified that it has been added
 to the list of notebooks to be run.
-If it has not been, the addition should be requested or for a rationale as to
-why it has not been.
+If it has not been, either its addition or a rationale for its exclusion should
+be requested.
 Rationale for excluding specific notebooks from the CI job should be added to
 the relevant section in ``docs/examples/README.md``.
 

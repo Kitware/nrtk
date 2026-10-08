@@ -2,7 +2,7 @@ Saliency Analysis with XAITK-Saliency
 =====================================
 
 While NRTK focuses on realistic image perturbations to reveal model degradation at the evaluation level, it is just as
-important to investigate **why** this performance degradation may be occuring. A workflow combining NRTK with
+important to investigate **why** this performance degradation may be occurring. A workflow combining NRTK with
 `XAITK-Saliency <https://github.com/XAITK/xaitk-saliency>`_ enables this analysis by generating saliency maps which
 reveal how model focus changes as perturbations are varied.
 

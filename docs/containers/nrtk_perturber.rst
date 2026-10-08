@@ -11,7 +11,7 @@ should be saved to disk and then the container will shut down.
 In order to support this workflow, the ``nrtk-perturber`` container was created.
 
 Given a ``datamaite`` dataset and an NRTK factory configuration file, the ``nrtk-perturber`` container is able to
-generate perturbed data for each item in the dataset. Each perturbed data will be saved
+generate perturbed data for each item in the dataset. Each perturbed item will be saved
 to a given output directory. Once all perturbed data is saved, the container will terminate.
 
 .. seealso::
@@ -119,13 +119,13 @@ Error Codes
 Notes
 -----
 
-All images datasets are written out as ``PNG`` formatted images.
+All image datasets are written out as ``PNG`` formatted images.
 
-If an existing image metadata contains area and/or segmentation attributes, both attributes
+If existing image metadata contains area and/or segmentation attributes, both attributes
 will be set to ``None`` in the augmented dataset(s).
 
 If a user wants to pass datum metadata (i.e. ``img_gsd`` for an image), a file named
-``datum_metadata.json`` should exists in the ``dataset_dir``.
+``datum_metadata.json`` should exist in the ``dataset_dir``.
 
 
 Image Verification and SBOM

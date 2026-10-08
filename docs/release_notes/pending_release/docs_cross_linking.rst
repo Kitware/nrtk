@@ -9,3 +9,6 @@
 
 * Repair documentation destinations and missing link targets, and normalize
   table wording.
+
+* Fix spelling, grammar, capitalization, and duplicate wording across
+  documentation.

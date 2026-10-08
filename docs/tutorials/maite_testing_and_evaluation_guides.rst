@@ -191,7 +191,7 @@ Perturbations from sensor optics, camera physics, and atmospheric distortion.
    .. grid-item-card:: :material-regular:`waves` Atmospheric Turbulence
       :class-card: sd-border-1
 
-      Simulate atmospheric distortion effects and assess its impact on image quality and model inference.
+      Simulate atmospheric distortion effects and assess their impact on image quality and model inference.
 
       +++
 
