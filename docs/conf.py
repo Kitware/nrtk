@@ -220,6 +220,7 @@ html_js_files = [
 ]
 
 # -- MyST-NB settings---------------------------------------------------------
+myst_enable_extensions = ["dollarmath"]
 nb_execution_mode = "off"
 
 # -- LaTeX engine ------------------------------------------------------------
