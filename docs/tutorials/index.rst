@@ -58,6 +58,12 @@ Continue Learning
       Recordings and hands-on notebooks from NRTK webinar sessions.
 
 
+.. seealso::
+   Choose perturbations for your deployment conditions using the
+   :doc:`Operational Risk Guide </explanations/risk_factors>`.
+   For individual tasks, see the :doc:`How-To Guides </how_to_guides/index>`;
+   for class parameters and behavior, see the :doc:`API Implementations </reference/api/implementations>`.
+
 .. toctree::
    :hidden:
 

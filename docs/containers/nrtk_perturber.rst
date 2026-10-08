@@ -56,7 +56,7 @@ The container accepts eight input arguments:
 * ``input_dataset_format``: input dataset format
 * ``output_dir``: directory to store the generated perturbed data
 * ``output_dataset_format``: output dataset format
-* ``config_file``: configuration file specifying the ``PerturbFactory`` params for perturbation
+* ``config_file``: configuration file specifying the :class:`~nrtk.interfaces.PerturbFactory` params for perturbation
 * ``combine_output``: boolean to control if output should be combined to one dataset or not
 * ``overwrite``: Boolean to control ``datamaite.write`` mode. If enabled, ``datamaite.write`` will use
   ``mode="replace"`` when writing dataset(s). This will delete all files/folders in the output directory.

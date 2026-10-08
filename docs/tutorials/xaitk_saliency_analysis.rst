@@ -15,11 +15,6 @@ these tutorials, you'll be able to:
 - Quantify saliency changes and understand what they indicate.
 - Make informed decisions about model deployment and improvement.
 
-.. seealso::
-  To explore the underlying perturber APIs used below (Gaussian blur and
-  salt/pepper noise), see the
-  :doc:`Photometric Perturbers </examples/photometric_perturbers>` how-to guide.
-
 .. grid:: 1 1 2 2
    :gutter: 3
    :padding: 2 2 0 0
@@ -37,6 +32,15 @@ these tutorials, you'll be able to:
 
       Extend the saliency workflow to object detection, visualizing
       shifts in detector attention and bounding boxes.
+
+.. seealso::
+  To apply the Gaussian blur and salt/pepper-noise perturbations used in these tutorials, see the
+  :doc:`Photometric Perturbers </examples/photometric_perturbers>` how-to guide.
+  Parameter details are in the :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
+  and :class:`~nrtk.impls.perturb_image.photometric.noise.SaltNoisePerturber` APIs.
+  For related operational context and physics-based alternatives, see
+  :doc:`Target Out of Focus </explanations/operational_risk_modules/defocus>` and
+  :doc:`Sensor Noise and Resolution </explanations/operational_risk_modules/sensor_noise_resolution>`.
 
 .. toctree::
    :hidden:

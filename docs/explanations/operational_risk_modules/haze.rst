@@ -13,7 +13,8 @@ shift: the pixel statistics of the scene change in ways the model has not learne
 generalize to. This makes the risk both frequent in real operations and highly impactful
 to performance.
 
-NRTK's ``HazePerturber`` approximates this risk by reducing contrast and introducing
+NRTK's :class:`~nrtk.impls.perturb_image.environment.HazePerturber`
+approximates this risk by reducing contrast and introducing
 scattering-like effects guided by a depth map and estimated sky color. This does not
 attempt full atmospheric physics, but it provides an efficient way to probe model
 sensitivity to visibility loss during early-stage robustness screening.

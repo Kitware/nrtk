@@ -14,7 +14,8 @@ handle. The degradation depends on viewing geometry, atmospheric conditions, and
 making it highly variable across operational scenarios. This variability makes turbulence a
 critical friction to assess during robustness testing.
 
-NRTK's ``TurbulenceAperturePerturber`` models these effects using physics-based simulation
+NRTK's :class:`~nrtk.impls.perturb_image.optical.otf.TurbulenceAperturePerturber`
+models these effects using physics-based simulation
 that accounts for turbulence strength, wind speed, and viewing geometry. While it does not
 capture all aspects of real turbulence (such as anisoplanatic effects), it provides an efficient
 means to probe model sensitivity to atmospheric degradation during early-stage robustness
@@ -117,3 +118,7 @@ Limitations and Next Steps
 * Related Risks: :ref:`Target Out of Focus <target-out-of-focus>`,
   :ref:`Sensor Noise <noise-and-resolution>`,
   :ref:`High-Frequency Vibration <high-frequency-vibration>`.
+
+.. seealso::
+   Follow the :doc:`Atmospheric Turbulence T&E notebook </examples/maite/atmospheric_turbulence>` to apply
+   turbulence perturbations and evaluate their impact on object detection with MAITE.

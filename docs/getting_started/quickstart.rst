@@ -87,7 +87,8 @@ The ``factor`` parameter controls haze intensity. Here's what different levels l
 
 .. seealso::
   These images demonstrate how NRTK simulates real-world visibility degradation.
-  For the full parameter reference, see the
+  For parameter details, see the :class:`~nrtk.impls.perturb_image.environment.HazePerturber` API.
+  For operational context, see the
   :doc:`Haze Simulation Module </explanations/operational_risk_modules/haze>`.
 
 Step 4: Map Your Risk to the Right Tool
