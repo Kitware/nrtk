@@ -15,6 +15,9 @@ these tutorials, you'll be able to:
 - Quantify saliency changes and understand what they indicate.
 - Make informed decisions about model deployment and improvement.
 
+The examples use Gaussian blur and salt noise. These generic image corruptions do not model the underlying
+optical or sensor physics.
+
 .. grid:: 1 1 2 2
    :gutter: 3
    :padding: 2 2 0 0
@@ -34,7 +37,7 @@ these tutorials, you'll be able to:
       shifts in detector attention and bounding boxes.
 
 .. seealso::
-  To apply the Gaussian blur and salt/pepper-noise perturbations used in these tutorials, see the
+  To apply the Gaussian blur and salt-noise perturbations used in these tutorials, see the
   :doc:`Photometric Perturbers </examples/photometric_perturbers>` how-to guide.
   Parameter details are in the :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
   and :class:`~nrtk.impls.perturb_image.photometric.noise.SaltNoisePerturber` APIs.
