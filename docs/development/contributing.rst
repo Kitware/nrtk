@@ -23,7 +23,7 @@ Merge Request (MR)
 
 An MR is initiated by a user intending to integrate a branch from their forked
 repository.
-Before the branch is integrated into the nrtk master branch, it must
+Before the branch is integrated into the nrtk main branch, it must
 first go through a series of checks and a review to ensure that the branch is
 consistent with the rest of the repository and doesn't contain any issues.
 
@@ -123,7 +123,7 @@ to the list of notebooks to be run.
 If it has not been, the addition should be requested or for a rationale as to
 why it has not been.
 Rationale for excluding specific notebooks from the CI job should be added to
-the relevant section in ``examples/README.md``.
+the relevant section in ``docs/examples/README.md``.
 
 Resolving a Branch
 ==================

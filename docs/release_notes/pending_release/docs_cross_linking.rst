@@ -3,3 +3,6 @@
 
 * Correct detector-pitch units and perturbation terminology, and clarify
   configured perturbers versus factories that explore parameter values.
+
+* Update contributor branch and notebook paths, and remove the nonexistent
+  ``example_deps`` installation extra.

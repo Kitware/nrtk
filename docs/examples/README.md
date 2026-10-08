@@ -15,11 +15,7 @@ Example notebooks that download or generate data should place that data in the
 Most of the examples require [Jupyter Notebook](https://jupyter.org/) and
 [PyTorch](https://pytorch.org/).
 
-Install these manually using `pip` or with the following command:
-
-```bash
-poetry install -E example_deps
-```
+Install these manually using `pip`.
 
 Some notebooks may require additional dependencies. See the first cell of each
 notebook ("Set Up the Environment") for instructions on how to install the
