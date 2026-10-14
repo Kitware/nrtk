@@ -8119,4 +8119,4 @@ waterdroplet = ["numba", "scipy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "f673fe4c94eca690302191c3eccbc866e6a20ce5b03e1a3a1d041bf4cf9e949d"
+content-hash = "faea4bc2cd1dd59d2d38b042c065ba3d1f938317118fcd33e697adae99a09f60"
