@@ -8,7 +8,6 @@ import re
 import shutil
 import subprocess
 import tempfile
-from collections import Counter
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
@@ -114,35 +113,18 @@ def _validate_path_to_pyright(path_to_pyright: Path | None) -> None:
 
 
 def _format_outputs(scan: PyrightOutput) -> PyrightOutput:
-    out = scan["generalDiagnostics"]
     diagnostics: list[Diagnostic] = []
 
-    if out:
-        item = out[0]
-        file_str = item["file"]
-        if "SCAN_DIR" in file_str:
-            name = Path(file_str).name
-        else:
-            file_path_all = Path(file_str)
-            name = file_path_all.name
-
+    for item in scan["generalDiagnostics"]:
         diagnostic = item.copy()
-        diagnostic["file"] = name
+        diagnostic["file"] = Path(item["file"]).name
         diagnostics.append(diagnostic)
 
-    severities = Counter(d["severity"] for d in diagnostics)
-    summary = Summary(
-        filesAnalyzed=1,
-        errorCount=severities["error"],
-        warningCount=severities["warning"],
-        informationCount=severities["information"],
-        timeInSec=scan["summary"]["timeInSec"],
-    )
     return PyrightOutput(
         version=scan["version"],
         time=scan["time"],
         generalDiagnostics=diagnostics,
-        summary=summary,
+        summary=scan["summary"].copy(),
     )
 
 
