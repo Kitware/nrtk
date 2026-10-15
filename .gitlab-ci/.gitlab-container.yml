@@ -3,10 +3,11 @@
 #
 # Pipeline structure:
 #   .container-setup    -- shared variables, Harbor auth, and base config
-#   .build-setup        -- shared build/scan/sign/push logic (extends .container-setup)
+#   .build-setup        -- shared build/scan/push logic (extends .container-setup)
 #   build-branch        -- MR builds: tagged with branch slug, manual trigger
 #   build-main          -- main/scheduled builds: tagged "main"
 #   build-release       -- release builds: installed from PyPI, tagged with semver
+#   sign                -- signs the registry image and attests its SBOM
 #   verify              -- pulls image, verifies cosign signature, smoke-tests
 #   cleanup             -- nightly sweep of stale branch images from Harbor
 ###############################################################################
@@ -49,29 +50,25 @@
       - docker logout ${HARBOR_URL}:${HARBOR_PORT} || echo "Failed to logout from Harbor..."
     allow_failure: true
     tags:
-      - docker
+      - k8s-small-cpu
     image: docker:25.0.5-git
 
 ###############################################################################
-# Shared build template. Handles the full build pipeline:
+# Shared build template. Signing runs separately after the image is pushed:
 #   1. Build image with Docker buildx (with registry cache)
 #   2. Generate SBOM with Syft (SPDX format)
 #   3. Scan SBOM with Trivy for HIGH/CRITICAL vulnerabilities
 #   4. Push image (and any extra tags) to Harbor
 #   5. Clean up previous digest's cosign artifacts if the tag was overwritten
-#   6. Sign image and attest SBOM with cosign
-#   7. Export IMAGE_PATH and IMAGE_DIGEST via dotenv for downstream jobs
+#   6. Export the SBOM, IMAGE_PATH, and IMAGE_DIGEST for downstream jobs
 #
 # Concrete build jobs set IMAGE_TAG, CACHE_TAG, and optionally BUILD_TARGET,
 # BUILD_EXTRA_ARGS, EXTRA_TAGS, and PUSH_EXTRA_TAGS to customize behavior.
 ###############################################################################
 .build-setup:
   extends: .container-setup
-  variables:
-    # The signing key has an empty passphrase. cosign only reads one from stdin
-    # when it decides stdin is not a terminal, so setting this explicitly keeps
-    # signing deterministic regardless of how the runner attaches stdin.
-    COSIGN_PASSWORD: ""
+  tags:
+    - k8s-medium-cpu
   before_script:
     - !reference [.container-setup, before_script]
     # Resolve image path and cache references from job-level variables
@@ -79,7 +76,7 @@
       IMAGE_PATH="${IMAGE_BASE}:${IMAGE_TAG}"
       CACHE_REF="${IMAGE_BASE}:${CACHE_TAG:-${IMAGE_TAG}}"
       CACHE_FALLBACK_REF="${IMAGE_BASE}:${CACHE_FALLBACK_TAG:-}"
-    - apk add --no-cache jq cosign
+    - apk add --no-cache jq
     # Record the current digest for IMAGE_TAG before we push. If the push
     # overwrites the tag with a new digest, we delete the old artifact's
     # cosign signature (.sig) and SBOM attestation (.att) to avoid orphans.
@@ -156,19 +153,14 @@
           done
         fi
       fi
-    # Sign the image and attest the SBOM using cosign. The private key is
-    # stored base64-encoded in CI variable COSIGN_PRIVATE_KEY_B64.
-    - printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > cosign.key
-    - chmod 600 cosign.key
-    - cosign sign --key cosign.key --yes "$IMAGE_DIGEST"
-    - cosign attest --predicate sbom.spdx.json --key cosign.key --yes "$IMAGE_DIGEST"
-    # Export image path and digest for the verify job via dotenv artifact
+    # Export the registry image path and digest for signing and verification.
     - echo "IMAGE_PATH=${IMAGE_PATH}" > build.env
     - echo "IMAGE_DIGEST=${IMAGE_DIGEST}" >> build.env
   artifacts:
     when: always
     paths:
       - gl-container-scanning-report.json
+      - sbom.spdx.json
     reports:
       dotenv: build.env
       container_scanning: gl-container-scanning-report.json
@@ -244,7 +236,7 @@ build-release:
       BUILD_EXTRA_ARGS="--build-arg NRTK_VERSION=${NRTK_VERSION}"
       EXTRA_TAGS="--tag=${IMAGE_BASE}:${MAJOR}.${MINOR} --tag=${IMAGE_BASE}:${MAJOR} --tag=${IMAGE_BASE}:latest"
       PUSH_EXTRA_TAGS="${MAJOR}.${MINOR} ${MAJOR} latest"
-    - apk add --no-cache jq cosign
+    - apk add --no-cache jq
     # Skip OLD_DIGEST — previous release artifacts must be preserved
     - OLD_DIGEST=""
     - echo "Installing Syft..."
@@ -254,7 +246,44 @@ build-release:
     - curl -sSfL -o gitlab.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/gitlab.tpl
 
 ###############################################################################
-# Verify image signature and smoke test. Runs after any build job, pulling
+# Sign the pushed registry image and attest the build job's SBOM. The digest
+# arrives via build.env and the SBOM via a job artifact; no local image or
+# Docker build cache is needed. Run on the small CPU runner used for signing.
+###############################################################################
+sign:
+  extends: .container-setup
+  variables:
+    # The signing key has an empty passphrase. Setting it explicitly avoids
+    # prompting regardless of how the runner attaches stdin.
+    COSIGN_PASSWORD: ""
+  dependencies:
+    - build-branch
+    - build-main
+    - build-release
+  needs:
+    - job: build-branch
+      optional: true
+    - job: build-main
+      optional: true
+    - job: build-release
+      optional: true
+  before_script:
+    - !reference [.container-setup, before_script]
+    - apk add --no-cache cosign
+  script:
+    - |
+      if [ -z "${IMAGE_DIGEST}" ]; then
+        echo "No build job produced an image. Skipping signing."
+        exit 0
+      fi
+    # The private key is provided independently to this job by the CI variable.
+    - printf '%s' "$COSIGN_PRIVATE_KEY_B64" | base64 -d > cosign.key
+    - chmod 600 cosign.key
+    - cosign sign --key cosign.key --yes "$IMAGE_DIGEST"
+    - cosign attest --predicate sbom.spdx.json --key cosign.key --yes "$IMAGE_DIGEST"
+
+###############################################################################
+# Verify image signature and smoke test. Runs after signing, pulling
 # the image from Harbor, verifying its cosign signature against the public
 # key (cosign.pub), and running the container to confirm it starts cleanly.
 # All build jobs are optional dependencies — only the one that ran in this
@@ -273,6 +302,8 @@ verify:
       optional: true
     - job: build-release
       optional: true
+    - job: sign
+      artifacts: false
   before_script:
     - !reference [.container-setup, before_script]
     - apk add --no-cache cosign
@@ -303,7 +334,7 @@ cleanup:
     - job: build-main
       optional: true
   tags:
-    - autoscaler
+    - k8s-large-cpu
   before_script:
     - apk add --no-cache curl jq
     - ARTIFACT_API="https://${HARBOR_URL}/api/v2.0/projects/${HARBOR_PROJECT}/repositories/${HARBOR_REPO}%252F${CONTAINER_NAME}/artifacts"

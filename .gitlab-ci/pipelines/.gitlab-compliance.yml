@@ -73,7 +73,6 @@ include:
       dependency: required   # Only used for job name
       marker: all
       posargs: ""
-      tags: CPU
       coverage_threshold: 90
       full_execution_on_commit: true
       allow_failure: true
@@ -89,7 +88,6 @@ include:
       dependency: required   # Only used for job name
       marker: optional
       posargs: ""
-      tags: CPU
       coverage_threshold: 90
       full_execution_on_commit: true
       allow_failure: true
@@ -105,7 +103,6 @@ include:
       dependency: optional  # Only used for job name
       marker: optional
       posargs: ""
-      tags: CPU
       coverage_threshold: 90
       full_execution_on_commit: true
       allow_failure: true
