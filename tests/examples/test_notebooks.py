@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 from .test_notebook_utils import list_error_messages, pyright_analyze
@@ -31,16 +29,7 @@ from .test_notebook_utils import list_error_messages, pyright_analyze
         ("docs/examples/maite/sensor_resolution_and_noise.ipynb", 0),
         ("docs/examples/maite/atmospheric_turbulence.ipynb", 0),
         ("docs/examples/maite/water_droplets.ipynb", 0),
-        # Issue with trackeval and numpy version requirements produce a type error on
-        # 3.12 and 3.13
-        pytest.param(
-            "docs/examples/maite/framewise_video.ipynb",
-            1,
-            marks=pytest.mark.skipif(
-                sys.version_info >= (3, 14),
-                reason="framewise_video notebook dependencies are not yet supported on Python 3.14",
-            ),
-        ),
+        ("docs/examples/maite/framewise_video.ipynb", 0),
         # https://gitlab.jatic.net/jatic/kitware/nrtk/-/issues/698
         # ("docs/examples/xaitk_saliency_workflow/image_classification_perturbation_saliency.ipynb", 0),
         # ("docs/examples/xaitk_saliency_workflow/object_detection_perturbation_saliency.ipynb", 0),
