@@ -218,7 +218,7 @@ tox:coverage:
   extends: .test-setup
   tags:
     - $RUNNER_TAG
-  image: python:3.10
+  image: python:3.13
   dependencies: []
   before_script:
     - !reference [.test-setup, before_script]
