@@ -22,7 +22,7 @@ pillow:
 pyav:
 - av>=17.1.0,<18.0.0
 pybsm:
-- pybsm>=0.16.0
+- pybsm>=0.16.1
 skimage:
 - scikit-image>=0.20; python_version < '3.12'
 - scikit-image>=0.22; python_version >= '3.12'

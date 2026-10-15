@@ -26,10 +26,10 @@ classifiers = [
 dependencies = [
     # CVE-2021-34141 (numpy < 1.26)
     "numpy>=1.26",
-    "smqtk-classifier>=0.20.0",
-    "smqtk-core>=0.21",
-    "smqtk-detection>=0.23.0",
-    "smqtk-image-io>=0.18.0",
+    "smqtk-classifier>=0.21.0",
+    "smqtk-core>=0.22.0",
+    "smqtk-detection>=0.24.0",
+    "smqtk-image-io>=0.19.0",
     "tqdm>=4.66.3",  # GHSA-g7vv-2v7x-gj9p
     "pycocotools>=2.0.10",
     "typing-extensions>=4.5.0",
@@ -71,7 +71,7 @@ nrtk_MAITEObjectDetectionAugmentation = "nrtk.interop:MAITEObjectDetectionAugmen
 [project.optional-dependencies]
 graphics = ["opencv-python>=4.8.1.78"]  # CVE-2023-4863
 headless = ["opencv-python-headless>=4.8.1.78"]  # CVE-2023-4863
-pybsm = ["pybsm>=0.16.0"]
+pybsm = ["pybsm>=0.16.1"]
 maite = [
     "maite>=0.9.5,<1.0.0",
 ]
