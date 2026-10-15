@@ -10,12 +10,28 @@ notebooks for information on how to add a Colab cell.
 Example notebooks that download or generate data should place that data in the
 `data` sub-directory.
 
+Notebooks should also be included in the CI jobs so their execution is checked
+automatically. Document any exceptions in the section below.
+
+### Notebook CI Exclusions
+
+For each excluded notebook, record its repository-relative path and the
+rationale for exclusion.
+
+<!-- Add an entry for each excluded notebook:
+- `docs/examples/path/to/notebook.ipynb`: Rationale for exclusion.
+-->
+
 ## Requirements
 
 Most of the examples require [Jupyter Notebook](https://jupyter.org/) and
 [PyTorch](https://pytorch.org/).
 
-Install these manually using `pip`.
+Install these manually using the following `pip` command:
+
+```bash
+pip install notebook torch
+```
 
 Some notebooks may require additional dependencies. See the first cell of each
 notebook ("Set Up the Environment") for instructions on how to install the
