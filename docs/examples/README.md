@@ -24,18 +24,40 @@ rationale for exclusion.
 
 ## Requirements
 
-Most of the examples require [Jupyter Notebook](https://jupyter.org/) and
-[PyTorch](https://pytorch.org/).
-
-Install these manually using the following `pip` command:
+To run a notebook locally, install [Jupyter Notebook](https://jupyter.org/):
 
 ```bash
-pip install notebook torch
+python -m pip install notebook
 ```
 
-Some notebooks may require additional dependencies. See the first cell of each
-notebook ("Set Up the Environment") for instructions on how to install the
-relevant packages.
+Run the notebook's setup cells before the rest of the example. These cells
+install its Python dependencies, including PyTorch when needed.
+
+## Download and Run Locally
+
+On a notebook's documentation page, select **Jupyter notebook** at the top of
+the page to save the `.ipynb` file. Open the downloaded file with Jupyter:
+
+```bash
+jupyter notebook path/to/notebook.ipynb
+```
+
+Read the notebook's setup and data instructions before running the example.
+
+### Notebooks with Repository Helper Files
+
+Some notebooks currently need helper files from this repository in addition to
+the `.ipynb` file:
+
+- [Framewise Video](maite/framewise_video.ipynb) uses
+  `docs/examples/notebook_utils/`.
+- The [saliency workflows](xaitk_saliency_workflow/README.md) use
+  `docs/examples/xaitk_saliency_workflow/utils/`.
+
+For these notebooks, download or clone the repository and keep its directory
+structure intact. Open the notebook with Jupyter and run its setup cells as
+above. For contributing to NRTK, follow the
+[source installation instructions](../getting_started/installation.rst).
 
 ## Additional Installs & Extras
 

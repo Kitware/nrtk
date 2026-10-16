@@ -90,7 +90,7 @@ Perturbations that change spatial layout through rotation, scaling, or translati
    For related operational context, see :ref:`Look Angle Different from Training Data <look-angle-variation>`.
    The affine transformations in this tutorial modify images in ways that can be used to evaluate model robustness to
    geometric variations. Consult the
-   `Geometric Perturber APIs <../reference/api/implementations.html#geometric-perturbers>`_ for parameters.
+   :ref:`Geometric Perturber APIs <api-geometric-perturbers>` for parameters.
 
 ----
 
@@ -219,7 +219,7 @@ Perturbations from sensor optics, camera physics, and atmospheric distortion.
   :doc:`Optical Perturbers </examples/optical_perturbers>` how-to guide.
   Use the :doc:`Operational Risk Guide </explanations/risk_factors>` to connect the optical effects in these tutorials
   to deployment conditions, and consult the
-  `Optical Perturber APIs <../reference/api/implementations.html#optical-perturbers>`_
+  :ref:`Optical Perturber APIs <api-optical-perturbers>`
   for parameter details.
 
 ----
