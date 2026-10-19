@@ -65,6 +65,11 @@ revisiting background concepts.
 
          Open Guide →
 
+.. seealso::
+   Use the :doc:`Operational Risk Guide </explanations/risk_factors>` to select a perturbation for your scenario.
+   Follow the :doc:`Tutorials </tutorials/index>` for complete evaluation workflows, and consult the
+   :doc:`API Implementations </reference/api/implementations>` for class parameters and behavior.
+
 .. toctree::
    :hidden:
 

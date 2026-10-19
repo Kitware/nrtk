@@ -18,3 +18,5 @@ as well as the source files in :file:`src/nrtk/`, for changes.
 This will serve the resulting HTML files at http://localhost:5500.
 Having this URL open in a browser will provide you with an up-to-date
 preview of the rendered documentation.
+
+.. _reStructuredText: https://docutils.sourceforge.io/rst.html

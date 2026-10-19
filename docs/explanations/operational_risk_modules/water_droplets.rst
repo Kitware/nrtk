@@ -14,7 +14,8 @@ irregular distortion patterns in unpredictable locations, which can confuse both
 and recognition algorithms. This risk is therefore particularly relevant for real-world deployments
 where weather conditions cannot be controlled.
 
-NRTK's ``WaterDropletPerturber`` simulates this risk using physics-based modeling to create
+NRTK's :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber`
+simulates this risk using physics-based modeling to create
 realistic refraction and blur effects. The perturbation accounts for droplet size, position,
 and optical properties to generate operationally representative test conditions for robustness
 screening.

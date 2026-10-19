@@ -13,7 +13,8 @@ the edges experience more distortion than those at the center, creating position
 variations that models may not generalize to. This is particularly relevant for systems
 using wide-angle cameras for an increased field of view.
 
-NRTK's ``RadialDistortionPerturber`` applies configurable radial distortion using a polynomial
+NRTK's :class:`~nrtk.impls.perturb_image.optical.RadialDistortionPerturber`
+applies configurable radial distortion using a polynomial
 model with three coefficients. This provides an efficient way to test model robustness to
 lens distortion effects across a range of severities and distortion types during T&E.
 
@@ -110,3 +111,7 @@ Limitations and Next Steps
 * Bounding boxes are automatically adjusted to account for the geometric transformation.
 * No additional dependencies required beyond base NRTK installation.
 * See :doc:`/validation_and_trust` for cross-perturber validation status.
+
+.. seealso::
+   Follow the :doc:`Radial Distortion T&E notebook </examples/maite/radial_distortion>` to apply lens distortion
+   and evaluate its impact on object detection with MAITE.

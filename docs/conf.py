@@ -187,6 +187,7 @@ html_theme_options = {
     "footer_end": ["sphinx-version", "theme-version"],
     "secondary_sidebar_items": ["page-toc", "edit-this-page"],
     "use_edit_page_button": False,
+    "article_header_end": ["notebook-download.html"],
 }
 
 # Configure sidebar templates
@@ -220,6 +221,7 @@ html_js_files = [
 ]
 
 # -- MyST-NB settings---------------------------------------------------------
+myst_enable_extensions = ["dollarmath"]
 nb_execution_mode = "off"
 
 # -- LaTeX engine ------------------------------------------------------------

@@ -33,6 +33,11 @@ Albumentations with NRTK.
 Some of the risk factors listed don't have any associated functionality or documentation in NRTK but may be covered in
 the future.
 
+.. seealso::
+   Follow the :doc:`T&E Guides with MAITE </tutorials/maite_testing_and_evaluation_guides>` to evaluate models
+   under these conditions. For examples of applying individual perturbations, see the
+   :doc:`How-To Guides </how_to_guides/index>`.
+
 Interactive Risk Matrix
 -----------------------
 
@@ -116,7 +121,7 @@ Photometric Risk Factors
   Bright reflections due to lighting, target materials, or angles.
 
   +-------------------------+--------------------------------------------------------------------------------------------------+
-  | **Impact**              | Can obscure targets and skew autoexposure or detection.                                          |
+  | **Impact**              | Can obscure targets and skew auto exposure or detection.                                         |
   +-------------------------+--------------------------------------------------------------------------------------------------+
   | **Root Cause**          | Target                                                                                           |
   +-------------------------+--------------------------------------------------------------------------------------------------+
@@ -390,7 +395,7 @@ Optical Risk Factors
 Data Integrity Risk Factors
 ---------------------------
 
-.. dropdown:: Compromises in accuracy, consistentency, or completeness of data
+.. dropdown:: Compromises in accuracy, consistency, or completeness of data
 
   .. _metadata-incorrect:
 
