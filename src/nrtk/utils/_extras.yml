@@ -4,8 +4,9 @@ diffusion:
 - torch>=2.10.0
 - diffusers>=0.38.0
 - accelerate>=0.20.0
-- Pillow>=12.3.0
-- transformers>=4.53.0
+- Pillow>=12.3.0; python_version < '3.11'
+- Pillow>=13.0.0; python_version >= '3.11'
+- transformers>=5.10.0
 - protobuf>=6.33.5
 graphics:
 - opencv-python>=4.8.1.78
@@ -18,7 +19,8 @@ headless:
 maite:
 - maite>=0.9.5,<1.0.0
 pillow:
-- Pillow>=12.3.0
+- Pillow>=12.3.0; python_version < '3.11'
+- Pillow>=13.0.0; python_version >= '3.11'
 pyav:
 - av>=17.1.0,<18.0.0
 pybsm:
@@ -28,7 +30,8 @@ skimage:
 - scikit-image>=0.22; python_version >= '3.12'
 tools:
 - kwcoco>=0.2.18
-- Pillow>=12.3.0
+- Pillow>=12.3.0; python_version < '3.11'
+- Pillow>=13.0.0; python_version >= '3.11'
 - click>=8.0.0
 - fastapi>=0.110.0
 - uvicorn>=0.29.0
