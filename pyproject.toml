@@ -77,7 +77,8 @@ maite = [
 ]
 tools = [
     "kwcoco>=0.2.18",
-    "Pillow>=12.3.0",  # CVE-2026-54058
+    "Pillow>=12.3.0; python_version < '3.11'",  # CVE-2026-54058
+    "Pillow>=13.0.0; python_version >= '3.11'",  # CVE-2026-112400
     "click>=8.0.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
@@ -90,7 +91,10 @@ skimage = [
     "scikit-image>=0.20; python_version < '3.12'",
     "scikit-image>=0.22; python_version >= '3.12'"
 ]
-pillow = ["Pillow>=12.3.0"]  # CVE-2026-54058
+pillow = [
+  "Pillow>=12.3.0; python_version < '3.11'",  # CVE-2026-54058
+  "Pillow>=13.0.0; python_version >= '3.11'",  # CVE-2026-112400
+]  # CVE-2026-54058
 albumentations = ["nrtk-albumentations>=2.2.1"]
 hcipy = [
     "hcipy>=0.7.0",
@@ -106,8 +110,9 @@ diffusion = [
     "torch>=2.10.0",  # CVE-2025-3001
     "diffusers>=0.38.0",  # CVE-2026-44513
     "accelerate>=0.20.0",
-    "Pillow>=12.3.0",  # CVE-2026-54058
-    "transformers>=4.53.0",  # CVE-2025-6921
+    "Pillow>=12.3.0; python_version < '3.11'",  # CVE-2026-54058
+    "Pillow>=13.0.0; python_version >= '3.11'",  # CVE-2026-112400
+    "transformers>=5.10.0",  # CVE-2026-9856
     "protobuf>=6.33.5",  # GHSA-8qvm-5x2c-j2w7, CVE-2026-0994
 ]
 
@@ -143,15 +148,17 @@ docs = [
 # Testing
 tests = [
     # pytest unittesting
-    "pytest>=7.2.0,<9.0.0", # temporary upper bound until pytest-codeblock patches its deprecated pytest_collect_file hook for pytest 9
+    "pytest>=9.0.3", # CVE-2025-71176
     "pytest-cov>=4.0.0", # reports code coverage
     "pytest-xdist>=3.8.0", # allows -n auto|# to be used to run pytests in parallel
     "syrupy>=5.0.0", # required for snapshot/regression testing
-    "Pillow>=12.3.0",  # CVE-2026-54058  # required for custom conftest.py fixtures
+    # required for custom conftest.py fixtures
+    "Pillow>=12.3.0; python_version < '3.11'",  # CVE-2026-54058
+    "Pillow>=13.0.0; python_version >= '3.11'",  # CVE-2026-112400
     "responses>=0.25.0", # rquired to test FastAPI (used by entrypoint app)
     "pyyaml>=6.0", # read by the guard declaration tests and the extras pre-commit hook; only transitive otherwise
     "httpx>=0.22.0", # required by starlette.testclient.TestClient (optional dep of starlette, not installed by default)
-    "pytest-codeblock (>=0.5.8,<0.6.0)", # required for code block testing in docs
+    "pytest-codeblock (>=0.5.10,<0.6.0)", # required for code block testing in docs
     "av (>=17.1.0,<18.0.0)", # required for pyav testing
 ]
 
