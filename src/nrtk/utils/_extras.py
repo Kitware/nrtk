@@ -23,6 +23,7 @@ Developed with assistance from AI (ChatGPT and GitHub Copilot).
 __all__ = ["print_extras_status"]
 
 import importlib
+import importlib.util
 import sys
 from collections import OrderedDict, defaultdict
 from importlib.metadata import PackageNotFoundError, version
@@ -79,12 +80,19 @@ def _identify_cv2_package_versions() -> dict[str, str]:
     return installed
 
 
-def _try_import(module_name: str, *, package_name: str | None = None) -> tuple[bool, str | None]:
-    """Try importing a module and getting its version."""
+def _is_module_available(module_name: str) -> bool:
+    """Check whether Python can locate a module."""
     try:
-        importlib.import_module(module_name)
-    except ImportError:
+        return importlib.util.find_spec(module_name) is not None
+    except (ImportError, ValueError):
+        return False
+
+
+def _try_import(module_name: str, *, package_name: str | None = None) -> tuple[bool, str | None]:
+    """Check whether a module is installed and get its version."""
+    if not _is_module_available(module_name):
         return False, None
+
     # Prefer importlib.metadata for the authoritative installed version
     if package_name:
         try:
@@ -95,6 +103,7 @@ def _try_import(module_name: str, *, package_name: str | None = None) -> tuple[b
         return True, version(module_name)
     except PackageNotFoundError:
         pass
+
     mod = importlib.import_module(module_name)
     ver = getattr(mod, "__version__", "installed (version unknown)")
     return True, ver
