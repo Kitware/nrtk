@@ -6,6 +6,8 @@
 vcrm:
   stage: vcrm
   image: python:3.10
+  tags:
+    - k8s-large-cpu
   interruptible: true
   allow_failure: true
   needs: []
