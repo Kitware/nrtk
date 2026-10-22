@@ -16,7 +16,9 @@ release-notes:
   extends: .docs-setup
   needs: [] # Don't wait for previous stages/jobs
   allow_failure: true
-  before_script: [] # We don't need poetry, git, or git-lfs
+  # We don't need poetry or git-lfs.
+  before_script:
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
   script:
     - git fetch origin ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --depth 1
     - scripts/check_for_release_notes.sh origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
@@ -106,7 +108,7 @@ check-links:
   script:
     - lychee --version
     # Check all markdown files and built html
-    - find . -name "*.md" -not -path "docs/*" -print0 | xargs -0 lychee --config lychee.toml docs/_build/html/ src/
+    - find . -name "*.md" -not -path "./docs/*" -print0 | xargs -0 lychee --config lychee.toml docs/_build/html/ src/
   rules:
     # Don't run this rule if on main branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
