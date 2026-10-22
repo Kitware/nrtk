@@ -13,5 +13,9 @@ precommit:
   # Overrides the shared python:3.10 image: the linting environment resolves numpy
   # differently below 3.12, so the type checks must run on the newer interpreter.
   image: python:3.13
+  before_script:
+    - !reference [.quality-setup, before_script]
+    # The Kubernetes helper may own the checkout; persist trust for Git inside tox.
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
   script:
     - tox -e precommit
