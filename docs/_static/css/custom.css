@@ -377,7 +377,7 @@ header form.bd-search:not(#pst-search-dialog form.bd-search) {
 }
 
 /* Full sidebar navigation — all sections visible, only current expanded
- * pydata_sphinx_theme's collapse_navigation handles expand/collapse natively.
+ * pydata_sphinx_theme's show_nav_level controls which branches start expanded.
  * We just bold the active page link for visibility.
  */
 nav.bd-links ul.bd-sidenav > li.toctree-l1 > a {
