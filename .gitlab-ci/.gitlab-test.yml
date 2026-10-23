@@ -16,6 +16,18 @@
     - !reference [.shared-setup, rules]
   before_script:
     - !reference [.tox-setup, before_script]
+    # Keep CPU detection, but cap pytest workers to fit the runner's memory.
+    - |
+      case "$CI_RUNNER_TAGS" in
+        *k8s-small-cpu*) pytest_maxprocesses=1 ;;
+        *k8s-medium-cpu*) pytest_maxprocesses=2 ;;
+        *k8s-large-cpu*) pytest_maxprocesses=8 ;;
+        *) pytest_maxprocesses=4 ;;
+      esac
+      if [ "${TOX_ENV:-}" = "notebooks" ] && [ "$pytest_maxprocesses" -gt 4 ]; then
+        pytest_maxprocesses=4
+      fi
+      export PYTEST_ADDOPTS="${PYTEST_ADDOPTS:+$PYTEST_ADDOPTS }--maxprocesses=$pytest_maxprocesses"
 
 .tox:pytest:
   extends: .test-setup
@@ -306,10 +318,10 @@ xaitk-notebook-tests:
     - !reference [.test-setup, before_script]
     # Install nrtk (no optional extras yet) + test runner
     - poetry install --only-root --sync -q
-    - poetry run pip install -q pytest
+    - poetry run pip install -q pytest "pytest-xdist>=3.8.0"
   script:
     # Import guard tests — deps are NOT installed; mixin mocks missing packages
-    - poetry run pytest -rfE --tb=short -q --no-header --disable-warnings
+    - poetry run pytest -n auto -rfE --tb=short -q --no-header --disable-warnings
         -m "core"
         docs/examples/xaitk_saliency_workflow/notebook_tests/
         -o "addopts=" -o "testpaths="
@@ -319,7 +331,7 @@ xaitk-notebook-tests:
     - poetry run pip uninstall -y -q opencv-python opencv-python-headless
     - poetry run pip install -q opencv-python-headless
     # Canary tests — FAIL if deps are installed but imports still break
-    - poetry run pytest -rfE --tb=short -q --no-header --disable-warnings
+    - poetry run pytest -n auto -rfE --tb=short -q --no-header --disable-warnings
         -m "xaitk"
         docs/examples/xaitk_saliency_workflow/notebook_tests/
         -o "addopts=" -o "testpaths="

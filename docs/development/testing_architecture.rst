@@ -370,6 +370,13 @@ Each environment:
 5. Writes coverage to a per-environment file (``.coverage.<envname>``).
 6. Runs ``pytest -m "<marker>" -n auto`` with JUnit XML output.
 
+In CI, ``PYTEST_ADDOPTS`` sets ``--maxprocesses`` from the runner's tags:
+small CPU runners allow up to 1 worker, medium CPU runners up to 2, and
+large CPU runners up to 8. Notebook jobs additionally cap the count at 4,
+while retaining any lower runner limit. Other runner tags use a cap of 4.
+Tox passes ``PYTEST_ADDOPTS`` through to pytest; local runs retain automatic
+CPU detection without these CI limits unless the variable is set explicitly.
+
 See the :ref:`Environment-to-Extras Mapping <env-extras-table>` section for
 more on how factors map to extras.
 

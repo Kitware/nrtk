@@ -105,6 +105,53 @@ class PerturbVideo(PerturbData):
         """Calls ``perturb()`` with the given input video."""
         return self.perturb(frames=frames, **additional_params)
 
+    def _convert_image(
+        self,
+        *,
+        image: np.ndarray[Any, Any],
+        convert_to_rgb: bool = True,
+        normalize_floats: bool = True,
+    ) -> np.ndarray[Any, Any]:
+        """Return a uint8 copy with the requested channel layout."""
+        if normalize_floats and np.issubdtype(image.dtype, np.floating):
+            working = np.round(np.clip(image, 0.0, 1.0) * 255).astype(np.uint8)
+        else:
+            working = image.astype(np.uint8, copy=True)
+
+        if convert_to_rgb:
+            if working.ndim == 2:
+                working = np.repeat(working[:, :, np.newaxis], repeats=3, axis=2)
+            elif working.shape[2] == 1:
+                working = np.repeat(working, repeats=3, axis=2)
+
+        return working
+
+    def _restore_image(
+        self,
+        *,
+        image: np.ndarray[Any, Any],
+        original_image: np.ndarray[Any, Any],
+        restore_channels: bool = True,
+        normalize_floats: bool = True,
+    ) -> np.ndarray[Any, Any]:
+        """Restore dimensions and dtype, optionally restoring channels and scaling."""
+        height, width = original_image.shape[:2]
+        restored = image[:height, :width]
+
+        if restore_channels and restored.ndim == 3:
+            if original_image.ndim == 2:
+                restored = restored[:, :, 0]
+            elif original_image.shape[2] == 1:
+                restored = restored[:, :, :1]
+
+        if normalize_floats and restored.dtype == np.uint8 and np.issubdtype(original_image.dtype, np.floating):
+            return restored.astype(original_image.dtype) / np.array(
+                255,
+                dtype=original_image.dtype,
+            )
+
+        return restored.astype(original_image.dtype, copy=True)
+
 
 S = TypeVar("S", bound=PerturbVideo)
 P = ParamSpec("P")

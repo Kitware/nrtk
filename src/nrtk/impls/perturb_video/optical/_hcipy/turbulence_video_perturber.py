@@ -558,8 +558,8 @@ class TurbulenceVideoPerturber(NumpyRandomPerturbVideo):
 
         return resampled
 
-    @staticmethod
     def _convolve(
+        self,
         *,
         image: np.ndarray[Any, Any],
         psf: np.ndarray[Any, Any],
@@ -573,8 +573,7 @@ class TurbulenceVideoPerturber(NumpyRandomPerturbVideo):
         Returns:
             Convolved image with same shape and dtype as input.
         """
-        original_dtype = image.dtype
-        img_float = image.astype(np.float64)
+        img_float = self._convert_image(image=image)
 
         if img_float.ndim == 2:
             result = fftconvolve(in1=img_float, in2=psf, mode="same")
@@ -583,11 +582,7 @@ class TurbulenceVideoPerturber(NumpyRandomPerturbVideo):
             for c in range(img_float.shape[2]):
                 result[:, :, c] = fftconvolve(in1=img_float[:, :, c], in2=psf, mode="same")
 
-        if np.issubdtype(original_dtype, np.integer):
-            info = np.iinfo(original_dtype)
-            result = np.clip(result, info.min, info.max)
-
-        return result.astype(original_dtype)
+        return self._restore_image(image=result, original_image=image)
 
     def _resolve_fill(self, image: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         """Resolve color_fill to match image channel count.
@@ -658,7 +653,9 @@ class TurbulenceVideoPerturber(NumpyRandomPerturbVideo):
             return image.copy()
 
         fill = self._resolve_fill(original_image)
-        img_f64 = image.astype(np.float64)
+        img_f64 = self._convert_image(
+            image=image,
+        )
 
         if img_f64.ndim == 2:
             shifted = ndi_shift(
@@ -680,11 +677,7 @@ class TurbulenceVideoPerturber(NumpyRandomPerturbVideo):
                     cval=float(fill[c]),
                     prefilter=True,
                 )
-
-        if np.issubdtype(image.dtype, np.integer):
-            info = np.iinfo(image.dtype)
-            shifted = np.clip(shifted, info.min, info.max)
-        return shifted.astype(image.dtype)
+        return self._restore_image(image=shifted, original_image=image)
 
     def _apply_shift_integer(  # noqa: C901
         self,
@@ -856,6 +849,50 @@ class TurbulenceVideoPerturber(NumpyRandomPerturbVideo):
                 boxes=shifted_boxes,
                 additional_params=deepcopy(frame.additional_params),
             )
+
+    @override
+    def _convert_image(
+        self,
+        *,
+        image: np.ndarray[Any, Any],
+        convert_to_rgb: bool = False,
+        normalize_floats: bool = False,
+    ) -> np.ndarray[Any, Any]:
+        """Return a float64 copy without scaling pixel values."""
+        working = image.astype(np.float64, copy=True)
+
+        if convert_to_rgb:
+            if working.ndim == 2:
+                working = np.repeat(working[:, :, np.newaxis], repeats=3, axis=2)
+            elif working.shape[2] == 1:
+                working = np.repeat(working, repeats=3, axis=2)
+
+        return working
+
+    @override
+    def _restore_image(
+        self,
+        *,
+        image: np.ndarray[Any, Any],
+        original_image: np.ndarray[Any, Any],
+        restore_channels: bool = True,
+        normalize_floats: bool = False,
+    ) -> np.ndarray[Any, Any]:
+        """Restore shape and dtype, clipping integer outputs before casting."""
+        height, width = original_image.shape[:2]
+        restored = image[:height, :width]
+
+        if restore_channels and restored.ndim == 3:
+            if original_image.ndim == 2:
+                restored = restored[:, :, 0]
+            elif original_image.shape[2] == 1:
+                restored = restored[:, :, :1]
+
+        if np.issubdtype(original_image.dtype, np.integer):
+            info = np.iinfo(original_image.dtype)
+            restored = np.clip(restored, info.min, info.max)
+
+        return restored.astype(original_image.dtype, copy=True)
 
     @override
     def get_config(self) -> dict[str, Any]:

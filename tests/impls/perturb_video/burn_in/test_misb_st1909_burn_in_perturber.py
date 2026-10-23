@@ -8,7 +8,7 @@ from collections.abc import Generator
 from datetime import datetime, timedelta, timezone
 from itertools import islice
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 import pytest
@@ -23,9 +23,9 @@ from nrtk.impls.perturb_video.burn_in._misb_st1909_burn_in_perturber import (
     _FONT_CACHE_SIZE,
     MISBST1909Metadata,
 )
-from nrtk.interfaces import VideoFrame
+from nrtk.interfaces import PerturbVideo, VideoFrame
 from tests.impls import INPUT_DRONE_VIDEO_FILE_PATH
-from tests.impls.perturb_video.perturber_tests_mixin import PerturbVideoTestsMixin
+from tests.impls.perturb_video.perturber_tests_mixin import ImageConversionTestsMixin, PerturbVideoTestsMixin
 from tests.impls.perturb_video.test_perturber_utils import perturber_assertions
 from tests.utils.video_io import read_video
 
@@ -72,8 +72,21 @@ def host_timezone(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatc
 
 
 @pytest.mark.pillow
-class TestMISBST1909BurnInPerturber(PerturbVideoTestsMixin):
-    impl_class = MISBST1909BurnInPerturber
+class TestMISBST1909BurnInPerturber(
+    PerturbVideoTestsMixin,
+    ImageConversionTestsMixin,
+):
+    convert_options: ClassVar[dict[str, bool]] = {
+        "normalize_floats": False,
+    }
+    restore_options: ClassVar[dict[str, bool]] = {
+        "normalize_floats": False,
+        "restore_channels": False,
+    }
+    working_dtype: ClassVar[type] = np.uint8
+    expected_conversion = (0, 0, 1)
+    keeps_rgb = True
+    impl_class: ClassVar[type[PerturbVideo]] = MISBST1909BurnInPerturber
 
     @override
     def make_perturber(self, **kwargs: Any) -> MISBST1909BurnInPerturber:
