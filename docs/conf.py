@@ -159,7 +159,8 @@ html_theme_options = {
     },
     "show_nav_level": 1,  # Show only top-level navigation initially
     "navigation_depth": 3,  # Navigation hierarchy depth in sidebar
-    "collapse_navigation": True,  # Enable collapse/expand functionality
+    # Retain inactive branches so their expand/collapse arrows are available before visiting them.
+    "collapse_navigation": False,
     "show_toc_level": 1,  # Table of contents depth on page
     "navigation_with_keys": True,
     "header_links_before_dropdown": 6,
