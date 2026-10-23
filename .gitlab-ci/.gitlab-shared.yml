@@ -45,4 +45,4 @@
   extends: .shared-setup
   before_script:
     - !reference [.shared-setup, before_script]
-    - pip install --root-user-action=ignore --user -U "tox>=4.2" -q
+    - pip install --root-user-action=ignore --user -U "tox>=4.22" -q

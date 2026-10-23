@@ -33,7 +33,7 @@
   before_script:
     # Standard CI setup first: installs git-lfs, git config, poetry and tox.
     - !reference [.tox-setup, before_script]
-    - pip install --root-user-action=ignore --user -U "tox>=4.2" -q
+    - pip install --root-user-action=ignore --user -U "tox>=4.22" -q
     # Check out the release ref. $NRTK_RELEASE_REF comes from the prod
     # schedule's CI/CD variables, and is available here and in script (GitLab
     # runs before_script + script in one shell).
