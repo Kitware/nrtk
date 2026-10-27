@@ -85,7 +85,7 @@ tools = [
     "pydantic>=2.6.4",
     "pydantic-settings>=2.14.2",
     "python-json-logger>=3.0.0",
-    "datamaite[od]>=0.5.0,<0.6.0",
+    "datamaite[od]>=0.7.0",
 ]
 skimage = [
     "scikit-image>=0.20; python_version < '3.12'",

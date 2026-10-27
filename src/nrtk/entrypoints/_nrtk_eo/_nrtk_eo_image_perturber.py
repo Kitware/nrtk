@@ -32,7 +32,7 @@ def nrtk_eo_image_perturber(  # noqa: C901 ignore too complex
     *,
     dataset: ObjectDetectionDataset,
     perturber_factory: PerturbFactory[PerturbImage],
-    metadata: dict[int, dict[str, Any]] | None = None,
+    metadata: dict[int | str, dict[str, Any]] | None = None,
 ) -> Iterable[tuple[str, ObjectDetectionDataset]]:
     """Generate augmented datamaite ``ObjectDetectionDataset``(s) from an OD dataset.
 
@@ -79,9 +79,10 @@ def nrtk_eo_image_perturber(  # noqa: C901 ignore too complex
         for idx in range(len(dataset)):
             image, target, meta = dataset[idx]
             src = dataset.samples[idx]
+            merged_meta: dict[str, Any] = {**meta}
             if metadata:
-                meta = {**meta, **metadata.get(meta["id"], {})}
-            md = DatumMetadataType(**meta)
+                merged_meta.update(metadata.get(meta["id"], {}))
+            md = DatumMetadataType(**merged_meta)
             aug_img, aug_det, _ = maite_perturber(
                 batch=(
                     [image],
