@@ -176,7 +176,7 @@ def nrtk_eo_video_perturber(  # noqa: C901 ignore too complex
     dataset: BoxTrackDataset,
     perturber_factory: PerturbFactory[PerturbImage | PerturbVideo],
     staging_dir: str,
-    metadata: dict[int, dict[str, Any]] | None = None,
+    metadata: dict[int | str, dict[str, Any]] | None = None,
 ) -> Iterable[tuple[str, BoxTrackDataset]]:
     """Generate augmented datamaite ``BoxTrackDataset``(s) from a MOT dataset.
 
@@ -235,9 +235,12 @@ def nrtk_eo_video_perturber(  # noqa: C901 ignore too complex
         sequences: list[VideoSequence] = []
         for idx in range(len(dataset)):
             stream, target, meta = dataset[idx]
+
+            merged_meta: dict[str, Any] = {**meta}
             if metadata:
-                meta = {**meta, **metadata.get(meta["id"], {})}
-            md = DatumMetadata(**meta)
+                merged_meta.update(metadata.get(meta["id"], {}))
+
+            md = DatumMetadata(**merged_meta)
             aug_streams, aug_targets, _aug_md = maite_perturber(
                 batch=(
                     [stream],
