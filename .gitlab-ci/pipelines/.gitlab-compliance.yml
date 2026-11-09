@@ -1,6 +1,12 @@
 ###########################################################
 # Stage -- A child pipeline to run the DevSecOps components
 ###########################################################
+
+# Child pipelines do not inherit defaults from the parent pipeline.
+default:
+  tags:
+    - k8s-small-cpu
+
 stages:
   # - pre-commit
   - sr-compliance
@@ -113,3 +119,41 @@ include:
       maite_interop_scope: provider
       full_execution_on_commit: true
       allow_failure: true
+
+# DSO 1.2.0 explicitly tags these jobs with CPU, overriding the default.
+# Its component inputs do not support the Kubernetes runner tags.
+find📍-pyright🐍✅-config🔧:
+  tags:
+    - k8s-small-cpu
+
+verify🔍-pyright🐍✅-config🔧:
+  tags:
+    - k8s-small-cpu
+
+execute🔄-pyright🐍✅:
+  tags:
+    - k8s-small-cpu
+
+verify🔍-ruff🐕-config🔧:
+  tags:
+    - k8s-small-cpu
+
+lint🧹-with-ruff🐕:
+  tags:
+    - k8s-small-cpu
+
+format🗄-with-ruff🐕:
+  tags:
+    - k8s-small-cpu
+
+all-tests-with-required-deps-using-poetry:
+  tags:
+    - k8s-small-cpu
+
+optional-tests-with-required-deps-using-poetry:
+  tags:
+    - k8s-small-cpu
+
+optional-tests-with-optional-deps-using-poetry:
+  tags:
+    - k8s-large-cpu
