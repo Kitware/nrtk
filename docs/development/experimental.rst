@@ -85,6 +85,9 @@ Implementations
    :members:
 
    .. seealso::
+      :doc:`/examples/maite/misb_st1909_burn_in`
+
+   .. seealso::
       :doc:`/examples/misb_st1909_burn_in_perturber`
 
 Interoperability
@@ -92,3 +95,9 @@ Interoperability
 
 .. autoclass:: nrtk.interop.MAITEMultiobjectTrackingAugmentation
    :members:
+
+.. toctree::
+   :hidden:
+
+   /examples/maite/framewise_video
+   /examples/maite/misb_st1909_burn_in
