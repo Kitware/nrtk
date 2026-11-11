@@ -72,6 +72,9 @@ Implementations
 .. autoclass:: nrtk.impls.perturb_video.optical.TurbulenceVideoPerturber
    :members:
 
+   .. seealso::
+      :doc:`/examples/maite/turbulence_video`
+
 .. autoclass:: nrtk.impls.perturb_video.CodecMacroblockPerturber
    :members:
 
@@ -101,3 +104,4 @@ Interoperability
 
    /examples/maite/framewise_video
    /examples/maite/misb_st1909_burn_in
+   /examples/maite/turbulence_video

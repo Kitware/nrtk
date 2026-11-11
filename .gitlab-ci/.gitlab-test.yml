@@ -298,7 +298,8 @@ tox:notebooks:maite:
           "water_droplets.ipynb",
           "framewise_video.ipynb",
           "transport_packet_loss.ipynb",
-          "misb_st1909_burn_in.ipynb"
+          "misb_st1909_burn_in.ipynb",
+          "turbulence_video.ipynb"
         ]
         RUNNER_TAG: k8s-large-cpu
 
