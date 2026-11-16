@@ -16,6 +16,8 @@ from syrupy.assertion import SnapshotAssertion
 from syrupy.extensions.json import JSONSnapshotExtension
 
 from nrtk.entrypoints import nrtk_perturber_cli
+from nrtk.entrypoints._nrtk_perturber_cli import _load_metadata
+from tests.entrypoints import DATUM_METADATA
 from tests.impls import INPUT_DRONE_VIDEO_FILE_PATH
 from tests.interop.maite import DATASET_FOLDER, NRTK_BRIGHTNESS_CONFIG
 from tests.utils.video_io import read_video
@@ -658,3 +660,13 @@ class TestNRTKPerturberCLI:
         video_path = snippet_dir / "seq_mp4" / "out_000000_000001.mp4"
         assert video_path.exists()
         psnr_mp4_snapshot.assert_match(itertools.islice(read_video(str(video_path)), 5))  # noqa: FKA100 - islice is a C function
+
+    def test_load_metadata_preserves_id_types(self) -> None:
+        """Load JSON metadata while keeping integer and string IDs distinct."""
+        metadata = _load_metadata(dataset_dir=str(DATUM_METADATA.parent))
+
+        assert metadata == {
+            1: {"img_gsd": 0.25},
+            "1": {"img_gsd": 0.50},
+            "frame-a": {"img_gsd": 0.75},
+        }

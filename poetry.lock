@@ -1162,15 +1162,15 @@ tests = ["pytest", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "datamaite"
-version = "0.5.0"
+version = "0.7.0"
 description = "A unified framework for dataset loading, conversion, and quality validation."
 optional = true
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 markers = "extra == \"tools\""
 files = [
-    {file = "datamaite-0.5.0-py3-none-any.whl", hash = "sha256:3a8d8510dc227e27602f3cdf4294b7777d4bfdf719e8eb970a933958a26db8bd"},
-    {file = "datamaite-0.5.0.tar.gz", hash = "sha256:5c3d30034b80d1c6b4ef7f77bb5cfcda8a786e74c4269c4f61012081e5d332af"},
+    {file = "datamaite-0.7.0-py3-none-any.whl", hash = "sha256:85df8c6b03b28d2c5df1a9dfe7adda0157ca0452b06d52d38872ed6fc8fae2ca"},
+    {file = "datamaite-0.7.0.tar.gz", hash = "sha256:e7ba4178580d091c9095d44f4812fe55c878fa9bcb761a8fbeaa22d2f1bf79ea"},
 ]
 
 [package.dependencies]
@@ -1185,21 +1185,24 @@ pydantic = [
     {version = ">=2.0", markers = "python_version < \"3.14\""},
     {version = ">=2.12", markers = "python_version >= \"3.14\""},
 ]
+pyyaml = ">=6.0"
+tifffile = {version = ">=2023.7.10", optional = true, markers = "extra == \"od\""}
+typing-extensions = ">=4.13"
 universal-pathlib = ">=0.3.8"
 
 [package.extras]
-all = ["av (>=11) ; python_version < \"3.14\"", "av (>=15.1) ; python_version >= \"3.14\"", "opencv-python-headless (>=4.8)"]
+all = ["av (>=11) ; python_version < \"3.14\"", "av (>=15.1) ; python_version >= \"3.14\"", "opencv-python-headless (>=4.8)", "tifffile (>=2023.7.10)"]
 aws = ["s3fs (>=2023.1.0)"]
 azure = ["adlfs (>=2023.1.0)"]
 cloud = ["adlfs (>=2023.1.0)", "gcsfs (>=2023.1.0)", "s3fs (>=2023.1.0)"]
-dev = ["bandit[toml] (>=1.7)", "maite (>=0.9,<0.10)", "pre-commit (>=3.6)", "pyright (>=1.1)", "pytest (>=8.0)", "pytest-cov (>=4.1)", "ruff (>=0.4)"]
+dev = ["bandit[toml] (>=1.7)", "maite (>=0.9,<0.10)", "pre-commit (>=3.6)", "pyright (>=1.1)", "pytest (>=8.0)", "pytest-cov (>=4.1)", "ruff (>=0.4)", "safetensors (>=0.4)"]
 docs = ["av (>=11) ; python_version < \"3.14\"", "av (>=15.1) ; python_version >= \"3.14\"", "ipykernel (>=7.2)", "maite (>=0.9)", "myst-nb (>=1.0)", "numpy (>=1.24)", "opencv-python-headless (>=4.8)", "pydata-sphinx-theme (>=0.15)", "sphinx (>=7.0)", "sphinx-autobuild (>=2024.0)", "sphinx-design (>=0.5)", "sphinxcontrib-mermaid (>=0.9)"]
 fmv = ["av (>=11) ; python_version < \"3.14\"", "av (>=15.1) ; python_version >= \"3.14\"", "opencv-python-headless (>=4.8)"]
 gcs = ["gcsfs (>=2023.1.0)"]
-ic = ["opencv-python-headless (>=4.8)"]
+ic = ["opencv-python-headless (>=4.8)", "tifffile (>=2023.7.10)"]
 maite = ["av (>=11) ; python_version < \"3.14\"", "av (>=15.1) ; python_version >= \"3.14\"", "maite (>=0.9)", "numpy (>=1.24) ; python_version < \"3.13\"", "numpy (>=2.1) ; python_version == \"3.13\"", "numpy (>=2.3.2) ; python_version >= \"3.14\""]
 notebook = ["ipykernel (>=7.2)", "jupyterlab"]
-od = ["opencv-python-headless (>=4.8)"]
+od = ["opencv-python-headless (>=4.8)", "tifffile (>=2023.7.10)"]
 
 [[package]]
 name = "debugpy"
@@ -1641,7 +1644,7 @@ description = "Lightweight in-process concurrent programming"
 optional = false
 python-versions = ">=3.10"
 groups = ["docs"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\" or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\" or platform_machine == \"ppc64le\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\")"
+markers = "(platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") and python_version < \"3.14\" or python_version < \"3.12\" and sys_platform == \"linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\" or platform_machine == \"ppc64le\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\") or platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\" or platform_machine == \"x86_64\""
 files = [
     {file = "greenlet-3.5.0-cp310-cp310-macosx_11_0_universal2.whl", hash = "sha256:29ea813b2e1f45fa9649a17853b2b5465c4072fbcb072e5af6cd3a288216574a"},
     {file = "greenlet-3.5.0-cp310-cp310-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:804a70b328e706b785c6ef16187051c394a63dd1a906d89be24b6ad77759f13f"},
@@ -3693,7 +3696,7 @@ description = "CUDA profiling tools runtime libs."
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_cuda_cupti-13.0.85-py3-none-manylinux_2_25_aarch64.whl", hash = "sha256:796bd679890ee55fb14a94629b698b6db54bcfd833d391d5e94017dd9d7d3151"},
     {file = "nvidia_cuda_cupti-13.0.85-py3-none-manylinux_2_25_x86_64.whl", hash = "sha256:4eb01c08e859bf924d222250d2e8f8b8ff6d3db4721288cf35d14252a4d933c8"},
@@ -3721,7 +3724,7 @@ description = "CUDA Runtime native Libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55"},
     {file = "nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548"},
@@ -3752,7 +3755,7 @@ description = "CUFFT native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_cufft-12.0.0.61-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2708c852ef8cd89d1d2068bdbece0aa188813a0c934db3779b9b1faa8442e5f5"},
     {file = "nvidia_cufft-12.0.0.61-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:6c44f692dce8fd5ffd3e3df134b6cdb9c2f72d99cf40b62c32dde45eea9ddad3"},
@@ -3769,7 +3772,7 @@ description = "cuFile GPUDirect libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "sys_platform == \"linux\" and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "sys_platform == \"linux\" and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_cufile-1.15.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:08a3ecefae5a01c7f5117351c64f17c7c62efa5fffdbe24fc7d298da19cd0b44"},
     {file = "nvidia_cufile-1.15.1.6-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:bdc0deedc61f548bddf7733bdc216456c2fdb101d020e1ab4b88d232d5e2f6d1"},
@@ -3782,7 +3785,7 @@ description = "CURAND native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_curand-10.4.0.35-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:133df5a7509c3e292aaa2b477afd0194f06ce4ea24d714d616ff36439cee349a"},
     {file = "nvidia_curand-10.4.0.35-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:1aee33a5da6e1db083fe2b90082def8915f30f3248d5896bcec36a579d941bfc"},
@@ -3796,7 +3799,7 @@ description = "CUDA solver native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:02c2457eaa9e39de20f880f4bd8820e6a1cfb9f9a34f820eb12a155aa5bc92d2"},
     {file = "nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:0a759da5dea5c0ea10fd307de75cdeb59e7ea4fcb8add0924859b944babf1112"},
@@ -3815,7 +3818,7 @@ description = "CUSPARSE native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:80bcc4662f23f1054ee334a15c72b8940402975e0eab63178fc7e670aa59472c"},
     {file = "nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2b3c89c88d01ee0e477cb7f82ef60a11a4bcd57b6b87c33f789350b59759360b"},
@@ -3859,7 +3862,7 @@ description = "Nvidia JIT LTO Library"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_nvjitlink-13.0.88-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl", hash = "sha256:13a74f429e23b921c1109976abefacc69835f2f433ebd323d3946e11d804e47b"},
     {file = "nvidia_nvjitlink-13.0.88-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:e931536ccc7d467a98ba1d8b89ff7fa7f1fa3b13f2b0069118cd7f47bff07d0c"},
@@ -3886,7 +3889,7 @@ description = "NVIDIA Tools Extension"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and extra == \"diffusion\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\")"
+markers = "(sys_platform == \"linux\" or sys_platform == \"win32\") and (sys_platform == \"linux\" or platform_machine == \"x86_64\") and platform_system == \"Linux\" and (platform_machine == \"aarch64\" or platform_machine == \"x86_64\") and extra == \"diffusion\""
 files = [
     {file = "nvidia_nvtx-13.0.85-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:4936d1d6780fbe68db454f5e72a42ff64d1fd6397df9f363ae786930fd5c1cd4"},
     {file = "nvidia_nvtx-13.0.85-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:cb7780edb6b14107373c835bf8b72e7a178bac7367e23da7acb108f973f157a6"},
@@ -8119,4 +8122,4 @@ waterdroplet = ["numba", "scipy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "faea4bc2cd1dd59d2d38b042c065ba3d1f938317118fcd33e697adae99a09f60"
+content-hash = "b370abc7934f6d40576e5480682691d857a3277f0f4ce2aca9d9aba21de00424"
