@@ -41,11 +41,11 @@ if rtd_version:
     # Building on ReadTheDocs - use their version identifier
     # "latest" -> main branch builds
     # "stable" -> latest release
-    # "v0.26.0" -> specific tagged version
+    # "v0.26.0" -> "0.26" for tagged versions
     switcher_version = rtd_version
     if rtd_version.startswith("v"):
-        # Remove 'v' prefix for version matching (e.g., "v0.26.0" -> "0.26.0")
-        switcher_version = rtd_version[1:]
+        # Match tagged builds to the major/minor entries in switcher.json.
+        switcher_version = ".".join(rtd_version[1:].split(".")[:2])
 else:
     try:
         git_path = shutil.which("git")
@@ -61,11 +61,11 @@ else:
         branch = result.stdout.strip()
 
         # Map branches to switcher versions
-        # main branch -> "latest", other branches -> package release version
-        switcher_version = "latest" if branch == "main" else release
+        # main branch -> "latest", other branches -> major/minor package version
+        switcher_version = "latest" if branch == "main" else version
     except (subprocess.CalledProcessError, FileNotFoundError):
-        # Git not available or not in a repo - use release version
-        switcher_version = release
+        # Git not available or not in a repo - use major/minor package version
+        switcher_version = version
 
 # -- Contextual date label for landing page ----------------------------------
 # Provide a contextual label for the build date shown on the landing page.
