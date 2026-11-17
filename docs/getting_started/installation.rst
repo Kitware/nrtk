@@ -317,8 +317,12 @@ Optical Perturbers
         - ``pyBSM``
       * - :class:`~nrtk.impls.perturb_video.optical.TurbulenceVideoPerturber`
         - Video frames (RGB, Grayscale)
-        - ``hcipy``
+        - ``hcipy``, ``scipy``
         - ``HCIPy``, ``SciPy``
+      * - :class:`~nrtk.impls.perturb_video.optical.JitterVideoPerturber`
+        - Video frames (RGB, Grayscale)
+        - ``scipy``
+        - ``SciPy``
 
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^

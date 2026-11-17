@@ -1,6 +1,6 @@
 """Pytest configuration for HCIPy video perturber tests.
 
-Skips this directory if hcipy extra is not installed.
+Skips this directory if the hcipy and scipy extras are not installed.
 """
 
 

@@ -1,0 +1,19 @@
+{
+  "tones": [
+    [68.0, 1.0],
+    [102.0, 0.5],
+    [136.0, 0.25]
+  ],
+  "residual_rms": 10.0,
+  "units": "urad",
+  "pixel_pitch": 5e-06,
+  "focal_length": 0.5,
+  "integration_time": 0.004,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.15,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": false,
+  "citation": "MIL-STD-810H Method 514.8 Category 13 (propeller aircraft sine-on-random, Table 514.8D-II; the 68 Hz 4-blade and 102 Hz 6-blade blade-passage fundamentals are that table's footnote example values).",
+  "notes": "68 Hz 4-blade fundamental + 136 Hz harmonic; 102 Hz adds the 6-blade-variant fundamental. Pass tones= to from_platform for a specific prop configuration."
+}

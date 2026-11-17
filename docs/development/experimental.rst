@@ -93,6 +93,9 @@ Implementations
    .. seealso::
       :doc:`/examples/misb_st1909_burn_in_perturber`
 
+.. autoclass:: nrtk.impls.perturb_video.optical.JitterVideoPerturber
+   :members:
+
 Interoperability
 ----------------
 

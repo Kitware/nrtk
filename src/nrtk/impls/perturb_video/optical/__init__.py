@@ -9,6 +9,9 @@ if TYPE_CHECKING:
     from nrtk.impls.perturb_video.optical._hcipy.turbulence_video_perturber import (
         TurbulenceVideoPerturber as TurbulenceVideoPerturber,
     )
+    from nrtk.impls.perturb_video.optical._jitter.jitter_video_perturber import (
+        JitterVideoPerturber as JitterVideoPerturber,
+    )
 
 __getattr__: Callable[[str], Any]
 __dir__: Callable[[], list[str]]
@@ -21,7 +24,14 @@ __getattr__, __dir__, __all__ = guard(
             symbols={
                 "TurbulenceVideoPerturber": "nrtk.impls.perturb_video.optical._hcipy.turbulence_video_perturber",
             },
-            extras=["hcipy"],
+            extras=["hcipy", "scipy"],
+            experimental=True,
+        ),
+        Group(
+            symbols={
+                "JitterVideoPerturber": "nrtk.impls.perturb_video.optical._jitter.jitter_video_perturber",
+            },
+            extras=["scipy"],
             experimental=True,
         ),
     ],

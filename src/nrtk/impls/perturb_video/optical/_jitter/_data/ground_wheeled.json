@@ -1,0 +1,20 @@
+{
+  "tones": [
+    [7.5, 1.0],
+    [14.0, 0.5],
+    [2.0, 0.4],
+    [30.0, 0.2]
+  ],
+  "residual_rms": 25.0,
+  "units": "urad",
+  "pixel_pitch": 6e-06,
+  "focal_length": 0.5,
+  "integration_time": 0.008,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.4,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "MIL-STD-810H Method 514.8 Category 4 composite wheeled-vehicle exposure (Tables 514.8C-VII/VIII), adapted for installed equipment per Category 20 (Annex D para 2.9; its exposure-levels paragraph 20.c points wheeled vehicles at the Category 4 curves). Cat 4 is a secured-cargo category, and the 7-8 Hz dominant / 14-16 Hz secondary peak labels are this design's reading of the table break points.",
+  "notes": "Suspension/wheel-hop/body-bounce class. Parallax validity: at ranges under ~1 km, suspension heave (~cm) contributes angular motion comparable to this preset; the pure-rotation model under-represents short-range ground-to-ground FMV."
+}

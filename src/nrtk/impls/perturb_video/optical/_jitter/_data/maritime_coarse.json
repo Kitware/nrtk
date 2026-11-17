@@ -1,0 +1,19 @@
+{
+  "tones": [
+    [0.09, 1.0],
+    [0.13, 0.55],
+    [0.7, 0.1]
+  ],
+  "residual_rms": 150.0,
+  "units": "urad",
+  "pixel_pitch": 8e-06,
+  "focal_length": 1.0,
+  "integration_time": 0.008,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.06,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "Sea-state roll/pitch band (~0.04-0.3 Hz small-craft/ship motion; shape traceable to standard ship-motion spectra). Representative amplitude; unstabilized mounts run to mrad.",
+  "notes": "Unstabilized coarse mount: slow rocking. Clips shorter than ~1 roll period (11 s) under-sample it."
+}

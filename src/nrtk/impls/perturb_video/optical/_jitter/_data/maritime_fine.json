@@ -1,0 +1,19 @@
+{
+  "tones": [
+    [11.7, 1.0],
+    [23.3, 0.4],
+    [2.9, 0.2]
+  ],
+  "residual_rms": 30.0,
+  "units": "urad",
+  "pixel_pitch": 8e-06,
+  "focal_length": 1.0,
+  "integration_time": 0.008,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.15,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "Blade-rate frequency basis: MIL-STD-167-1A para 5.1.2.4.4 (variable-frequency test to 1.15 x max rpm x blade count / 60 \u2014 a test-frequency ceiling, not an amplitude spectrum; ~175 rpm 4-blade class -> ~11.7 Hz).",
+  "notes": "Stabilized turret: sea-state roll rejected, high-frequency propeller residual remains."
+}

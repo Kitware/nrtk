@@ -19,7 +19,6 @@ from typing_extensions import override
 
 from nrtk.impls.perturb_video.optical import TurbulenceVideoPerturber
 from nrtk.interfaces import PerturbVideo, VideoFrame
-from tests.conftest import PSNRVideoSnapshotExtension
 from tests.impls import INPUT_DRONE_VIDEO_FILE_PATH
 from tests.impls.perturb_video.perturber_tests_mixin import ImageConversionTestsMixin, PerturbVideoTestsMixin
 from tests.impls.perturb_video.test_perturber_utils import FrameRepeater, perturber_assertions
@@ -31,6 +30,7 @@ SMALL_GRID = 32
 
 
 @pytest.mark.hcipy
+@pytest.mark.scipy
 class TestTurbulenceVideoPerturber(
     PerturbVideoTestsMixin,
     ImageConversionTestsMixin,
@@ -610,23 +610,13 @@ class TestTurbulenceVideoPerturber(
         (cn2, slant, D, grid_size) config so any regression in the FFT /
         propagation / convolution / shift pipeline is caught directly.
         """
-        frames = islice(read_video(INPUT_DRONE_VIDEO_FILE_PATH), 5)  # noqa: FKA100 - islice is a C function
+        # bitexact: the default SIMD YUV->RGB decode differs by a gray level between CPU architectures
+        frames = islice(read_video(INPUT_DRONE_VIDEO_FILE_PATH, bitexact=True), 5)  # noqa: FKA100 - islice is a C function
         inst = TurbulenceVideoPerturber(grid_size=32, seed=42)
         # Materialize so both snapshot assertions can re-iterate over the same frames.
         results = list(perturber_assertions(perturb=inst, frames=frames))
 
-        # The default min_psnr=48.13 dB (≈ 1 gray-level RMSE) is unachievable across
-        # platforms for this pipeline: HCIPy and scipy FFTs produce float64-epsilon-different
-        # results between Apple's vecLib (darwin/arm64) and OpenBLAS (linux/x86_64), which
-        # compounds through the float→uint8 cast to ~47.7 dB worst-frame PSNR cross-platform.
-        # 40 dB (~2.5 gray-level RMSE) absorbs that drift while still catching real
-        # regressions, which typically drop PSNR by 15+ dB.
-        class _RelaxedPSNRVideoSnapshotExtension(PSNRVideoSnapshotExtension):
-            def __init__(self, **kwargs: Any) -> None:
-                super().__init__(min_psnr=40.0, **kwargs)
-
-        relaxed_psnr = psnr_mp4_snapshot.use_extension(_RelaxedPSNRVideoSnapshotExtension)
-        relaxed_psnr.assert_match(iter(results))
+        psnr_mp4_snapshot.assert_match(iter(results))
         ssim_mp4_snapshot.assert_match(iter(results))
 
     def test_zero_wind_speed_freezes_atmosphere(self) -> None:
