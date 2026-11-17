@@ -6085,7 +6085,7 @@ description = "Fundamental algorithms for scientific computing in Python"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "python_version == \"3.10\" and (extra == \"pybsm\" or extra == \"tools\" or extra == \"skimage\" or extra == \"albumentations\" or extra == \"hcipy\" or extra == \"waterdroplet\")"
+markers = "python_version == \"3.10\" and (extra == \"pybsm\" or extra == \"tools\" or extra == \"skimage\" or extra == \"albumentations\" or extra == \"hcipy\" or extra == \"scipy\" or extra == \"waterdroplet\")"
 files = [
     {file = "scipy-1.15.3-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:a345928c86d535060c9c2b25e71e87c39ab2f22fc96e9636bd74d1dbf9de448c"},
     {file = "scipy-1.15.3-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:ad3432cb0f9ed87477a8d97f03b763fd1d57709f1bbde3c9369b1dff5503b253"},
@@ -6150,7 +6150,7 @@ description = "Fundamental algorithms for scientific computing in Python"
 optional = true
 python-versions = ">=3.11"
 groups = ["main"]
-markers = "(extra == \"pybsm\" or extra == \"tools\" or extra == \"skimage\" or extra == \"albumentations\" or extra == \"hcipy\" or extra == \"waterdroplet\") and python_version >= \"3.11\""
+markers = "(extra == \"pybsm\" or extra == \"tools\" or extra == \"skimage\" or extra == \"albumentations\" or extra == \"hcipy\" or extra == \"scipy\" or extra == \"waterdroplet\") and python_version >= \"3.11\""
 files = [
     {file = "scipy-1.17.1-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:1f95b894f13729334fb990162e911c9e5dc1ab390c58aa6cbecb389c5b5e28ec"},
     {file = "scipy-1.17.1-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:e18f12c6b0bc5a592ed23d3f7b891f68fd7f8241d69b7883769eb5d5dfb52696"},
@@ -8323,12 +8323,13 @@ type = ["pytest-mypy"]
 albumentations = ["nrtk-albumentations"]
 diffusion = ["Pillow", "Pillow", "accelerate", "diffusers", "protobuf", "torch", "transformers"]
 graphics = ["opencv-python"]
-hcipy = ["hcipy", "scipy", "xxhash"]
+hcipy = ["hcipy", "xxhash"]
 headless = ["opencv-python-headless"]
 maite = ["maite"]
 pillow = ["Pillow", "Pillow"]
 pyav = ["av"]
 pybsm = ["pybsm"]
+scipy = ["scipy"]
 skimage = ["scikit-image", "scikit-image"]
 tools = ["Pillow", "Pillow", "click", "datamaite", "fastapi", "kwcoco", "pydantic", "pydantic-settings", "python-json-logger", "uvicorn"]
 waterdroplet = ["numba", "scipy"]
@@ -8336,4 +8337,4 @@ waterdroplet = ["numba", "scipy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "be5e706f23448f26454c45e998bee4428769696d57407d695dd45762fc522e0b"
+content-hash = "f47ff3215f1cb40e0d65b7950f0a0599094733f09dfb134c3d7d87274663e572"

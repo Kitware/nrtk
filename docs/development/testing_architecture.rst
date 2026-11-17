@@ -357,7 +357,7 @@ The default matrix is:
 
 .. code-block:: ini
 
-   py{310,311,312,313,314}-{core,opencv,albumentations,pillow,waterdroplet,skimage,diffusion,pybsm,hcipy,maite,tools,optional,doctests}
+   py{310,311,312,313,314}-{core,opencv,albumentations,pillow,waterdroplet,skimage,diffusion,pybsm,hcipy,scipy,maite,tools,optional,doctests}
 
 Each environment:
 
@@ -441,10 +441,10 @@ Defined in :file:`.gitlab-ci/.gitlab-test.yml`:
    artifacts and JUnit XML reports. Jobs are assigned to different runner
    tags based on resource requirements:
 
-   - ``small-cpu``: core, opencv, albumentations, pillow, skimage
-   - ``medium-cpu``: pybsm, hcipy, maite, tools, waterdroplet
-   - ``autoscaler``: diffusion, optional, doctests, notebooks
-   - ``single-gpu``: generative notebook (requires GPU)
+   - ``k8s-small-cpu``: core, opencv, albumentations, pillow, skimage
+   - ``k8s-medium-cpu``: pybsm, maite, tools; doctests (separate job)
+   - ``k8s-large-cpu``: hcipy, pyav, waterdroplet, diffusion, scipy, optional, notebooks
+   - ``k8s-single-gpu``: diffusion-gpu; generative notebook
 
 2. **Per-version coverage combine** — After all factor jobs for a Python
    version finish, a follow-up job combines their ``.coverage.*`` files

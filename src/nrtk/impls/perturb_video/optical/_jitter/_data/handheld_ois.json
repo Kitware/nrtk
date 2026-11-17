@@ -1,0 +1,19 @@
+{
+  "tones": [
+    [10.0, 1.0],
+    [22.0, 0.35],
+    [0.3, 0.15]
+  ],
+  "residual_rms": 400.0,
+  "units": "urad",
+  "pixel_pitch": 3e-06,
+  "focal_length": 0.003,
+  "integration_time": 0.004,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.3,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "Optical stabilization suppresses low-frequency sway more than tremor; residual is representative.",
+  "notes": "~10x suppression of the unstabilized default; tune with residual_rms= for a specific OIS class."
+}

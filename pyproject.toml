@@ -98,13 +98,13 @@ pillow = [
 albumentations = ["nrtk-albumentations>=2.2.1"]
 hcipy = [
     "hcipy>=0.7.0",
-    "scipy>=1.10.0",
     # temporary upper bound until hcipy releases 0.7.1; xxhash 4.0.0 rejects str
     # input to update(), which hcipy's Grid.__hash__ passes it
     # (https://github.com/ehpor/hcipy/issues/365)
     "xxhash>=3.6.0,<4.0.0",
 ]
 pyav = ["av>=17.1.0,<18.0.0"]
+scipy = ["scipy>=1.10.0"]
 waterdroplet = ["scipy>=1.10.0", "numba>=0.56.4"]
 diffusion = [
     "torch>=2.10.0",  # CVE-2025-3001
@@ -194,6 +194,7 @@ markers = [
     "diffusion: Run tests that require the diffusion extra",
     "hcipy: Run tests that require the hcipy extra",
     "pyav: Run tests that require the pyav extra",
+    "scipy: Run tests that require the scipy extra",
     "pybsm: Run tests that require the pybsm extra",
     "maite: Run tests that require the maite extra",
     "tools: Run tests that require the tools extra",

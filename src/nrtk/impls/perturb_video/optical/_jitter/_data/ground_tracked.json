@@ -1,0 +1,21 @@
+{
+  "tones": [
+    [57.7, 1.0],
+    [115.5, 0.4],
+    [23.1, 0.3],
+    [5.9, 0.2],
+    [30.0, 0.25]
+  ],
+  "residual_rms": 35.0,
+  "units": "urad",
+  "pixel_pitch": 5e-06,
+  "focal_length": 0.5,
+  "integration_time": 0.008,
+  "broadband_beta": 1.5,
+  "broadband_weight": 0.3,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "MIL-STD-810H Method 514.8 Annex F para 5.2 track-patter f=0.28*v/p with v in km/h and p in m (40 km/h, 0.194 m track pitch -> ~57.7 Hz) + harmonics. LOS-stabilization context: US 4,796,090 ('Reconnaissance system', airborne LOS stabilization; NOTE: its ~10 urad figure is explicitly PEAK-TO-PEAK; divide by ~2.8 for RMS comparisons).",
+  "notes": "High-frequency track-patter buzz; smear-dominated at the default exposure. The 35 urad default reads the low end of the 25-250 urad medium-quality-gimbal class (Miller, Mooty & Hilkert, in Rodin et al. 2019) as a stabilized-sight ground-vehicle residual."
+}

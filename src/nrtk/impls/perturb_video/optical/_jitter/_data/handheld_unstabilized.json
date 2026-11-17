@@ -1,0 +1,19 @@
+{
+  "tones": [
+    [0.3, 0.5],
+    [10.0, 1.0],
+    [22.0, 0.25]
+  ],
+  "residual_rms": 4000.0,
+  "units": "urad",
+  "pixel_pitch": 3e-06,
+  "focal_length": 0.003,
+  "integration_time": 0.004,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.45,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "Tremor peak 7-11 Hz in 90% of 237 subjects (Lakie 1994; open-access summary in PMC4594250); secondary 20-25 Hz tremor component: Vaillancourt & Newell 2000. The low-frequency sway/breathing tone is a design assumption.",
+  "notes": "Wide-FOV consumer optics (~1 mrad/px): roll and keystone are visibly significant here."
+}

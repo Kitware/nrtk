@@ -1,0 +1,21 @@
+{
+  "tones": [
+    [4.86, 0.3],
+    [19.44, 1.0],
+    [38.88, 0.5],
+    [58.32, 0.25],
+    [23.6, 0.3]
+  ],
+  "residual_rms": 15.0,
+  "units": "urad",
+  "pixel_pitch": 5e-06,
+  "focal_length": 1.0,
+  "integration_time": 0.008,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.15,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": false,
+  "citation": "Tones: MIL-STD-810H Method 514.8 Table 514.8D-IIIa rotor parameters (frequency formulas in Table 514.8D-IIIb; 1P 4.86 Hz, blade-pass 19.44 Hz + harmonics, tail 1T 23.60 Hz). Residual RMS: within the <25 urad RMS high-quality-gimbal class (Miller, Mooty & Hilkert, as summarized in Rodin et al. 2019, Sensors, PMC6864454).",
+  "notes": "Tone weights are design assumptions; RMS is a published spec-ceiling-class figure read as per-axis RMS."
+}

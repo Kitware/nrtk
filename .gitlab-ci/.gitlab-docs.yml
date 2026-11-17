@@ -9,7 +9,7 @@
     - k8s-small-cpu
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry sync --only main,docs,tests,linting --extras "pybsm headless maite tools skimage pillow albumentations waterdroplet diffusion hcipy pyav"
+    - poetry sync --only main,docs,tests,linting --extras "pybsm headless maite tools skimage pillow albumentations waterdroplet diffusion hcipy pyav scipy"
 
 # Job to check the release notes folder
 release-notes:

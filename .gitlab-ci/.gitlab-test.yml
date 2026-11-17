@@ -62,6 +62,8 @@
       - TOX_ENV: diffusion-gpu
         RUNNER_TAG: k8s-single-gpu
         CUDA_VISIBLE_DEVICES: "0"
+      - TOX_ENV: scipy
+        RUNNER_TAG: k8s-large-cpu
       - TOX_ENV: optional
         RUNNER_TAG: k8s-large-cpu
       - TOX_ENV: notebooks

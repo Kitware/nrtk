@@ -1,0 +1,21 @@
+{
+  "tones": [
+    [50.0, 1.0],
+    [100.0, 0.5],
+    [150.0, 0.3],
+    [60.0, 0.4],
+    [400.0, 0.2]
+  ],
+  "residual_rms": 103.0,
+  "units": "mas",
+  "pixel_pitch": 6e-06,
+  "focal_length": 20.0,
+  "integration_time": 0.001,
+  "broadband_beta": 2.0,
+  "broadband_weight": 0.1,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": null,
+  "shape_provisional": true,
+  "citation": "Reaction-wheel harmonic comb with fundamental amplitude ~ wheel-speed^2 and structural cage modes ~300-480 Hz across surveyed CubeSat wheels, 400-480 Hz for the largest (Shields et al. 2017, JoSS). Pointing-stability figures 0.7/8/12 mas are the requirement / ACS class / passive-jitter design class quoted for WFIRST-CGI (NASA NTRS 20200002690, Dennehy & Alvarez-Salazar 2019). Default is a deliberately coarse upper-end residual.",
+  "notes": "At the cited ~12 mas passive-jitter class, this preset's optics (~0.3 urad/px) give ~0.2 px RMS: deeply sub-pixel. The 103 mas default is a deliberately coarse ~10x figure (~1.7 px RMS) so rendered effects are demonstrable; override residual_rms for a specific mission class."
+}

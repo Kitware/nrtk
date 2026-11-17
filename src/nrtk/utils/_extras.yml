@@ -12,7 +12,6 @@ graphics:
 - opencv-python>=4.8.1.78
 hcipy:
 - hcipy>=0.7.0
-- scipy>=1.10.0
 - xxhash>=3.6.0,<4.0.0
 headless:
 - opencv-python-headless>=4.8.1.78
@@ -25,6 +24,8 @@ pyav:
 - av>=17.1.0,<18.0.0
 pybsm:
 - pybsm>=0.16.1
+scipy:
+- scipy>=1.10.0
 skimage:
 - scikit-image>=0.20; python_version < '3.12'
 - scikit-image>=0.22; python_version >= '3.12'

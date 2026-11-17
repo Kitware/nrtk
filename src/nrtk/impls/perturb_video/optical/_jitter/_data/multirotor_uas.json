@@ -1,0 +1,20 @@
+{
+  "tones": [
+    [86.0, 0.5],
+    [172.0, 1.0],
+    [344.0, 0.4],
+    [130.0, 0.3]
+  ],
+  "residual_rms": 80.0,
+  "units": "urad",
+  "pixel_pitch": 3e-06,
+  "focal_length": 0.2,
+  "integration_time": 0.002,
+  "broadband_beta": 1.5,
+  "broadband_weight": 0.2,
+  "roll_ratio": 1.0,
+  "rolling_shutter_readout_s": 0.016,
+  "shape_provisional": true,
+  "citation": "Amplitude class: medium-quality gimbal regime, 25-250 urad RMS (Miller, Mooty & Hilkert, in Rodin et al. 2019, PMC6864454). Comb structure: rotating-element physics (shaft rate + blade-pass + harmonics), MIL-STD-810H 514.8 framework.",
+  "notes": "~5160 rpm 2-blade quad class: shaft 86 Hz, BPF 172 Hz, arm mode 130 Hz. CMOS rolling shutter on by default."
+}
