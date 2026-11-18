@@ -67,7 +67,7 @@ Implementations
       :doc:`/examples/maite/framewise_video`
 
    .. seealso::
-      :doc:`/development/framewise_perturber`
+      :doc:`/explanations/framewise_perturber`
 
 .. autoclass:: nrtk.impls.perturb_video.optical.TurbulenceVideoPerturber
    :members:
