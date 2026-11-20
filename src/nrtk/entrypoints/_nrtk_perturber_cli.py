@@ -37,7 +37,7 @@ def _set_logging(verbose: bool) -> None:
         logger.setLevel(logging.INFO)
 
 
-def _load_metadata(*, dataset_dir: str) -> dict[int, dict[str, Any]]:
+def _load_metadata(*, dataset_dir: str) -> dict[int | str, dict[str, Any]]:
     metadata_file = Path(dataset_dir) / "datum_metadata.json"
     if not metadata_file.is_file():
         logger.warning(
@@ -46,7 +46,7 @@ def _load_metadata(*, dataset_dir: str) -> dict[int, dict[str, Any]]:
         return {}
     logger.info(f"Loading metadata from {metadata_file}")
     entries = json.loads(metadata_file.read_text())
-    return {int(entry["id"]): {k: v for k, v in entry.items() if k != "id"} for entry in entries if "id" in entry}
+    return {entry["id"]: {k: v for k, v in entry.items() if k != "id"} for entry in entries if "id" in entry}
 
 
 def _combine_object_detection(

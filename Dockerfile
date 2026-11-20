@@ -1,4 +1,4 @@
-FROM python@sha256:ccc7089399c8bb65dd1fb3ed6d55efa538a3f5e7fca3f5988ac3b5b87e593bf0 AS python-base
+FROM python@sha256:e695ab189fa2d082b1c61c69a6b888a5adeca61ceeccad107b1ed2a125721a9e AS python-base
 
 ENV PYTHONUNBUFFERED=1 \
     # prevents python from creating .pyc
@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get purge -y linux-libc-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python -m pip install --upgrade pip==26.1.2
+RUN python -m pip install --upgrade pip==26.3.0
 
 # 'wheel-builder' stage builds a wheel from local source (used by build-from-source)
 FROM builder-base AS wheel-builder

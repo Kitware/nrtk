@@ -106,9 +106,16 @@ If a patch release for an older release version is being created, see the
    d. If the release is at JATIC Maturity Level I or higher, apply the
       maturity label (see `Maturity Labeling`_).
 
-   e. Ensure the ``python-versions`` and the tox environment matrix in
-   ``nightly:tox:pytest`` (in ``.gitlab-ci/.gitlab-prod.yml``) are updated for
-   the new release.
+   e. Set an explicit minimum NRTK version in the setup cells of notebooks
+      included in CI, using the earliest released version that provides the
+      APIs used by those notebooks. Refresh their stored outputs against the
+      release candidate.
+
+   f. Verify the supported Python versions and tox environments in
+      ``.gitlab-ci/.gitlab-test.yml`` and ``.gitlab-ci/.gitlab-prod.yml``.
+      Production jobs reuse the regular pytest matrix and script; the
+      ``NRTK_RELEASE_REF`` schedule variable selects the released code and
+      ``tox.ini`` to test.
 
 2. Push the created branch to the upstream repository, not your fork (this is
    an exception to the normal forking workflow).
@@ -172,15 +179,15 @@ When releasing:
 
 * **Patch releases**: do not add a new entry. Update the URL on the
   existing major/minor entry so it points at the new patch's tag (e.g.
-  ``1.0`` URL bumped from ``/en/v1.0.3/`` to ``/en/v1.0.4/``).
+  ``1.1`` URL bumped from ``/en/v1.1.0/`` to ``/en/v1.1.1/``).
 
 Entries follow the pattern:
 
 .. code-block:: json
 
    {
-       "version": "1.0",
-       "url": "https://nrtk.readthedocs.io/en/v1.0.4/"
+       "version": "1.1",
+       "url": "https://nrtk.readthedocs.io/en/v1.1.1/"
    }
 
 Maturity Labeling
@@ -199,10 +206,11 @@ a. Add an admonition at the top of
          :class: note
 
          Release v{NEW_VERSION} has been assessed against and meets the
-         requirements associated with JATIC Maturity Level I.
+         requirements associated with JATIC Maturity Level I under JATIC
+         program standards v1.0.
 
 b. Title the GitLab release ``v{NEW_VERSION} — JATIC Maturity I`` when
-   `Drafting a New Release on GitLab`_.
+   :ref:`drafting a new release on GitLab <release-process-draft-gitlab>`.
 
 c. Update the maturity admonition in the ``Acknowledgment`` section of the
    docs landing page (``docs/index.rst``) and in the ``Acknowledgment``
@@ -237,6 +245,8 @@ current, just-updated package version.
    $ VERSION="v$(poetry version -s)"
    $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
    $ git push UPSTREAM "$VERSION"
+
+.. _release-process-draft-gitlab:
 
 Draft a New Release on GitLab
 -----------------------------

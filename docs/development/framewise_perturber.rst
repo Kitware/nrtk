@@ -27,13 +27,13 @@ parameter controls whether the perturber's random state is reset between frames.
 .. important::
   Repeating the same perturbation across frames does **not** guarantee a temporally realistic video.
 
-In particular, ``is_static=True`` does **not** mean that adjacent frames guaranteed to be physically consistent or
+In particular, ``is_static=True`` does **not** mean that adjacent frames are guaranteed to be physically consistent or
 plausible.
 
 Choosing a Perturbation
 -----------------------
 
-The suitabilty of an image perturbation for the Framewise Perturber depends on the real-world effect being
+The suitability of an image perturbation for the Framewise Perturber depends on the real-world effect being
 modeled.
 
 Before using an image perturbation with FMV data, consider:
@@ -57,7 +57,6 @@ individual frames. Examples include:
 * :class:`~nrtk.impls.perturb_image.photometric.blur.AverageBlurPerturber`
 * :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
 * :class:`~nrtk.impls.perturb_image.photometric.blur.MedianBlurPerturber`
-* :class:`~nrtk.impls.perturb_image.photometric.blur.GaussianBlurPerturber`
 * :class:`~nrtk.impls.perturb_image.geometric.random.RandomCropPerturber` when ``is_static=True``
 * :class:`~nrtk.impls.perturb_image.geometric.random.RandomRotationPerturber` when ``is_static=True``
 * :class:`~nrtk.impls.perturb_image.geometric.random.RandomScalePerturber` when ``is_static=True``
@@ -72,7 +71,7 @@ Poor Candidates
 Perturbations that model time-varying physical phenomena or transformations that depend on scene content are generally
 poor candidates for independent frame-by-frame application. Examples include:
 
-* :class:`~nrtk.impls.perturb_image.photometric.environment.WaterDropletPerturber`
+* :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber`
 
   * Note this perturber may be reasonable in limited scenarios, such as a short stream where gravitational effects
     are negligible and ``is_static=True``.

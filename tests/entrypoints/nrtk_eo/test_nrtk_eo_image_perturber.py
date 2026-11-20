@@ -2,6 +2,7 @@ import io
 import logging
 from collections.abc import Hashable, Iterable
 from copy import deepcopy
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -22,10 +23,10 @@ from nrtk.entrypoints._nrtk_eo._nrtk_eo_image_perturber import nrtk_eo_image_per
 from tests.fakes import FakeImagePerturber, FakePerturbFactory
 from tests.utils import random_image
 
-DETECTIONS: dict[int, list[tuple[float, float, float, float]]] = {
+DETECTIONS: dict[int | str, list[tuple[float, float, float, float]]] = {
     0: [(1.0, 2.0, 3.0, 4.0)],
     1: [(0.0, 0.0, 10.0, 5.0), (5.0, 5.0, 2.0, 2.0), (8.0, 1.0, 4.0, 7.0)],
-    2: [(20.0, 30.0, 6.0, 6.0), (2.5, 3.5, 1.5, 2.5)],
+    "1": [(20.0, 30.0, 6.0, 6.0), (2.5, 3.5, 1.5, 2.5)],
 }
 LOGGER = "nrtk.entrypoints._nrtk_eo._nrtk_eo_image_perturber"
 SHIFT = (10.0, 20.0)
@@ -75,6 +76,28 @@ class _ShiftingImagePerturber(FakeImagePerturber):
         return np.copy(image), shifted
 
 
+class _GSDImagePerturber(_ShiftingImagePerturber):
+    """Shift boxes horizontally by the supplied GSD."""
+
+    @override
+    def perturb(
+        self,
+        *,
+        image: np.ndarray[Any, Any],
+        boxes: Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None = None,
+        img_gsd: float = 0.0,
+        **_: Any,
+    ) -> tuple[
+        np.ndarray[Any, Any],
+        Iterable[tuple[AxisAlignedBoundingBox, dict[Hashable, float]]] | None,
+    ]:
+        return super().perturb(
+            image=image,
+            boxes=boxes,
+            shift=(img_gsd, 0.0),
+        )
+
+
 def _png_bytes(image: np.ndarray) -> bytes:
     buffer = io.BytesIO()
     Image.fromarray(image).save(buffer, format="PNG")
@@ -85,7 +108,7 @@ def _make_od_dataset(with_metadata: bool = False) -> ObjectDetectionDataset:
     """Build a small datamaite object-detection dataset backed by in-memory PNGs."""
     samples = [
         ImageObjectDetectionSample(
-            image_id=idx,
+            image_id=image_id,
             file_name=f"images/{idx}.png",
             image_bytes=_png_bytes(random_image(size=(64, 64, 3), seed=idx)),
             width=64,
@@ -98,10 +121,10 @@ def _make_od_dataset(with_metadata: bool = False) -> ObjectDetectionDataset:
                     area=bbox[2] * bbox[3] if with_metadata else None,
                     segmentation=[list(bbox)] if with_metadata else None,
                 )
-                for bbox in DETECTIONS[idx]
+                for bbox in boxes
             ),
         )
-        for idx in range(len(DETECTIONS))
+        for idx, (image_id, boxes) in enumerate(DETECTIONS.items())
     ]
     taxonomy = Taxonomy(entries=(CategoryEntry(source_id=1, name="cat"),))
     return ObjectDetectionDataset(
@@ -136,13 +159,13 @@ class TestNRTKEOImagePerturber:
             assert aug_dataset.dataset_metadata.taxonomy is not None
             assert aug_dataset.dataset_metadata.taxonomy == dataset.dataset_metadata.taxonomy
 
-            for sample in aug_dataset.samples:
-                assert sample.file_name == f"{sample.image_id}.png"
+            for idx, sample in enumerate(aug_dataset.samples):
+                assert sample.file_name == f"{idx}.png"
                 assert sample.image_bytes is not None
                 with Image.open(io.BytesIO(sample.image_bytes)) as image:
                     assert image.format == "PNG"
                     assert image.size == (sample.width, sample.height) == (64, 64)
-                correct_dets = DETECTIONS[int(sample.image_id)]
+                correct_dets = DETECTIONS[sample.image_id]
                 for sample_det, correct_det in zip(sample.detections, correct_dets, strict=True):
                     assert sample_det.bbox == correct_det
                     assert sample_det.category_id == 1
@@ -178,7 +201,7 @@ class TestNRTKEOImagePerturber:
             _, aug_dataset = list(nrtk_eo_image_perturber(dataset=dataset, perturber_factory=perturber_factory))[0]
 
         for sample in aug_dataset.samples:
-            source = DETECTIONS[int(sample.image_id)]
+            source = DETECTIONS[sample.image_id]
             expected = source[:-1] if len(source) > 1 else source
             assert [det.bbox for det in sample.detections] == expected
             assert all(det.category_id == 1 and det.category_name == "cat" for det in sample.detections)
@@ -199,13 +222,13 @@ class TestNRTKEOImagePerturber:
         )
         _, aug_dataset = list(nrtk_eo_image_perturber(dataset=dataset, perturber_factory=perturber_factory))[0]
         for sample in aug_dataset.samples:
-            expected = [(x + SHIFT[0], y + SHIFT[1], w, h) for x, y, w, h in DETECTIONS[int(sample.image_id)]]
+            expected = [(x + SHIFT[0], y + SHIFT[1], w, h) for x, y, w, h in DETECTIONS[sample.image_id]]
             assert [det.bbox for det in sample.detections] == expected
 
     def test_metadata_reaches_perturber(self) -> None:
         """Datum metadata is merged per image id and forwarded to the perturber as kwargs."""
         dataset = _make_od_dataset()
-        metadata = {idx: {"shift": (10.0 * (idx + 1), 5.0 * (idx + 1))} for idx in DETECTIONS}
+        metadata = {idx: {"shift": (10.0 * (int(idx) + 1), 5.0 * (int(idx) + 1))} for idx in DETECTIONS}
 
         _, aug_dataset = next(
             iter(
@@ -222,6 +245,76 @@ class TestNRTKEOImagePerturber:
         )
 
         for sample in aug_dataset.samples:
-            dx, dy = metadata[int(sample.image_id)]["shift"]
-            expected = [(x + dx, y + dy, w, h) for x, y, w, h in DETECTIONS[int(sample.image_id)]]
+            dx, dy = metadata[sample.image_id]["shift"]
+            expected = [(x + dx, y + dy, w, h) for x, y, w, h in DETECTIONS[sample.image_id]]
             assert [det.bbox for det in sample.detections] == expected
+
+    @pytest.mark.parametrize(
+        ("image_ids", "metadata", "expected_gsds"),
+        [
+            ([1], {1: {"img_gsd": 0.25}}, [0.25]),
+            (["frame-a"], {"frame-a": {"img_gsd": 0.25}}, [0.25]),
+            (["1"], {"1": {"img_gsd": 0.25}}, [0.25]),
+            ([1], {"1": {"img_gsd": 0.25}}, [0.0]),
+            (["1"], {1: {"img_gsd": 0.25}}, [0.0]),
+            (
+                [1, "1"],
+                {1: {"img_gsd": 0.25}, "1": {"img_gsd": 0.50}},
+                [0.25, 0.50],
+            ),
+            ([1, "1"], {"1": {"img_gsd": 0.50}}, [0.0, 0.50]),
+            (
+                [1],
+                {1: {"img_gsd": 0.25}, "1": {"img_gsd": 0.50}},
+                [0.25],
+            ),
+        ],
+    )
+    def test_metadata_matches_id_value_and_type(
+        self,
+        image_ids: list[int | str],
+        metadata: dict[int | str, dict[str, Any]],
+        expected_gsds: list[float],
+    ) -> None:
+        """Apply only metadata matching the image ID value and type."""
+        source = _make_od_dataset()
+        dataset = replace(
+            source,
+            samples=tuple(
+                replace(
+                    source.samples[0],
+                    image_id=image_id,
+                    file_name=f"images/{idx}.png",
+                )
+                for idx, image_id in enumerate(image_ids)
+            ),
+        )
+
+        _, augmented = next(
+            iter(
+                nrtk_eo_image_perturber(
+                    dataset=dataset,
+                    perturber_factory=FakePerturbFactory(
+                        perturber=_GSDImagePerturber,
+                        theta_key="param1",
+                        theta_values=[1],
+                    ),
+                    metadata=metadata,
+                ),
+            ),
+        )
+
+        assert len(augmented.samples) == len(image_ids)
+        for original, sample, expected_gsd in zip(
+            dataset.samples,
+            augmented.samples,
+            expected_gsds,
+            strict=True,
+        ):
+            assert sample.image_id == original.image_id
+            assert type(sample.image_id) is type(original.image_id)
+            expected_boxes = [
+                (x + expected_gsd, y, width, height)
+                for x, y, width, height in (detection.bbox for detection in original.detections)
+            ]
+            assert [det.bbox for det in sample.detections] == expected_boxes

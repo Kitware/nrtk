@@ -1,0 +1,18 @@
+v1.0.6
+======
+
+.. admonition:: JATIC Maturity I
+   :class: note
+
+   Release v1.0.6 has been assessed against and meets the requirements associated with JATIC Maturity
+   Level I under JATIC program standards v1.0.
+
+This patch release fixes production regression CI checkout failures on Kubernetes runners
+and sets the minimum NRTK version to 1.0.5 in notebooks included in CI.
+
+Fixes
+-----
+
+* Fixed production regression CI checkout failures on Kubernetes runners by trusting the job's checkout directory.
+
+* Required NRTK 1.0.5 or newer in the setup cells of notebooks included in CI.

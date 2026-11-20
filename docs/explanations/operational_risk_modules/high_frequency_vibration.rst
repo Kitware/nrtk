@@ -13,7 +13,8 @@ that the model has not learned to generalize to. This makes the risk both freque
 environments (ground vehicles, maritime platforms, handheld cameras) and highly impactful on
 performance metrics such as detection mAP and tracking stability.
 
-NRTK's ``JitterPerturber`` simulates this risk by modeling the optical transfer function (OTF)
+NRTK's :class:`~nrtk.impls.perturb_image.optical.otf.JitterPerturber`
+simulates this risk by modeling the optical transfer function (OTF)
 effects of platform vibration. This physics-based approach provides an efficient way to probe
 model sensitivity to motion blur during early-stage robustness screening.
 

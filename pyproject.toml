@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "nrtk"
-version = "1.1.0"
+version = "1.1.1"
 description = "Natural Robustness Toolkit (NRTK) is a platform for generating validated, sensor-specific perturbations and transformations used to evaluate the robustness of computer vision models."
 license = "Apache-2.0"
 readme = "README.md"
@@ -84,7 +84,7 @@ tools = [
     "pydantic>=2.6.4",
     "pydantic-settings>=2.14.2",
     "python-json-logger>=3.0.0",
-    "datamaite[od]>=0.5.0",
+    "datamaite[od]>=0.7.0",
 ]
 skimage = [
     "scikit-image>=0.20; python_version < '3.12'",
