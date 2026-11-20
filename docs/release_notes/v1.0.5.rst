@@ -1,0 +1,26 @@
+v1.0.5
+======
+
+.. admonition:: JATIC Maturity I
+   :class: note
+
+   Release v1.0.5 has been assessed against and meets the requirements associated with JATIC Maturity
+   Level I under JATIC program standards v1.0.
+
+This patch release fixes container security vulnerabilities and internal typing errors.
+It also updates the CI runner configuration and DSO compliance checks.
+
+Fixes
+-----
+
+* Addressed container security vulnerabilities by updating python base image and pip.
+
+* Fixed a type error in ``COCOMAITEObjectDetectionDataset`` when constructing its ``DatasetMetadata``.
+
+* Fixed numpy 2 typing errors in ``WaterDropletPerturber`` and ``RandomTranslationPerturber``.
+
+* Migrated CI jobs to Kubernetes runners, capped pytest workers to fit runner resources,
+  and separated container signing from image builds.
+
+* Updated DSO compliance components to 1.2.0, configured PEP 621 metadata and Conda environment
+  generation, and enabled interoperability checks.

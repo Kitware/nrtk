@@ -291,12 +291,17 @@ tox:notebooks:maite:
           "motion_jitter.ipynb",
           "lens_flare.ipynb",
           "radial_distortion.ipynb",
-          "sensor_resolution_and_noise.ipynb",
           "atmospheric_turbulence.ipynb"
         ]
         RUNNER_TAG: k8s-medium-cpu
       - NOTEBOOK_DIR: "docs/examples/maite"
         NOTEBOOK_FILE: [
+          "atmospheric_turbulence.ipynb"
+        ]
+        RUNNER_TAG: k8s-medium-cpu
+      - NOTEBOOK_DIR: "docs/examples/maite"
+        NOTEBOOK_FILE: [
+          "sensor_resolution_and_noise.ipynb",
           "water_droplets.ipynb",
           "framewise_video.ipynb",
           "transport_packet_loss.ipynb",

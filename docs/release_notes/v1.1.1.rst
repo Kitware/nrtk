@@ -1,0 +1,52 @@
+v1.1.1
+======
+
+.. admonition:: JATIC Maturity I
+   :class: note
+
+   Release v1.1.1 has been assessed against and meets the requirements associated with JATIC Maturity
+   Level I under JATIC program standards v1.0.
+
+This patch release improves documentation navigation, updates CI and container builds,
+and supports datamaite 0.7.0 and newer.
+
+Fixes
+-----
+
+* Updated the ``tools`` extra and notebook test environments to require ``datamaite>=0.7.0``,
+  with no upper version bound.
+
+* Preserved metadata ID types in the EO image/video entrypoints and CLI, so integer
+  ``1`` and string ``"1"`` remain distinct.
+
+* Cross-linked tutorials and how-to guides with operational risk explanations
+  and API references, and improved reference placement and notebook link readability.
+
+* Corrected detector-pitch units and perturbation terminology, and clarified
+  configured perturbers versus factories that explore parameter values.
+
+* Updated contributor branch and notebook paths, and removed the nonexistent
+  ``example_deps`` installation extra.
+
+* Repaired documentation destinations and missing link targets, and normalized
+  table wording.
+
+* Fixed spelling, grammar, capitalization, and duplicate wording across
+  documentation.
+
+* Fixed production regression CI checkout failures on Kubernetes runners by trusting the job's checkout directory.
+
+* Added expand/collapse arrows for documentation navigation, allowing readers to browse nested pages directly.
+
+* Migrated CI jobs to Kubernetes runners and moved container signing into a separate job.
+
+* Set pre-commit jobs to medium CPU runners, capped pytest workers by runner size,
+  and fixed pre-commit checkout trust.
+
+* Aligned notebook execution with Python 3.13 and raised the minimum tox version
+  to 4.22 for dependency groups.
+
+* Updated the container Python base image and pip pin to include security fixes.
+
+* Required NRTK 1.1.0 or newer in the setup cells of notebooks included in CI,
+  and refreshed their outputs.

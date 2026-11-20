@@ -33,6 +33,8 @@
   before_script:
     # Standard CI setup first: installs git-lfs, git config, poetry and tox.
     - !reference [.tox-setup, before_script]
+    # The Kubernetes helper can create a checkout owned by a different UID.
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
     - pip install --root-user-action=ignore --user -U "tox>=4.22" -q
     # Check out the release ref. $NRTK_RELEASE_REF comes from the prod
     # schedule's CI/CD variables, and is available here and in script (GitLab

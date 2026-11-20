@@ -8,7 +8,8 @@ focuses on realistic image perturbations, MAITE provides a standardized interfac
 across a set of test conditions. Using these tools together enables modular, reproducible assessments of AI robustness
 under simulated operational risks.
 
-The following notebooks showcase how NRTK perturbations can be applied to simulate key operational risks within a
+The following notebooks showcase how NRTK perturbations can be applied to simulate key
+:doc:`operational risks </explanations/risk_factors>` within a
 testing and evaluation (T&E) workflow. Each notebook illustrates potential impact on model performance, utilizing MAITE
 as an evaluation harness.
 
@@ -19,11 +20,6 @@ Photometric Risks
 -----------------
 
 Perturbations that alter pixel intensity, color balance, or lighting conditions.
-
-.. seealso::
-  Learn the underlying perturber APIs in
-  :doc:`Photometric Perturbers </examples/photometric_perturbers>` (brightness) and
-  :doc:`Albumentations Perturber </examples/albumentations_perturber>` (lens flare).
 
 .. grid:: 1 2 2 2
    :gutter: 3
@@ -55,6 +51,16 @@ Perturbations that alter pixel intensity, color balance, or lighting conditions.
 
          Open Notebook →
 
+.. seealso::
+  Learn how to apply these perturbations in the
+  :ref:`Brightness <howto-photometric-brightness>` and
+  :ref:`Sun Flare <howto-albumentations-sun-flare>` how-to examples.
+  See the :class:`~nrtk.impls.perturb_image.photometric.enhance.BrightnessPerturber` and
+  :class:`~nrtk.impls.perturb_image.AlbumentationsPerturber` APIs for parameters.
+  For operational context, see
+  :doc:`Extreme Illumination </explanations/operational_risk_modules/extreme_illumination>`
+  and the related :ref:`Glint / Glare <glint-glare>` risk.
+
 ----
 
 
@@ -79,6 +85,12 @@ Perturbations that change spatial layout through rotation, scaling, or translati
          :outline:
 
          Open Notebook →
+
+.. seealso::
+   For related operational context, see :ref:`Look Angle Different from Training Data <look-angle-variation>`.
+   The affine transformations in this tutorial modify images in ways that can be used to evaluate model robustness to
+   geometric variations. Consult the
+   :ref:`Geometric Perturber APIs <api-geometric-perturbers>` for parameters.
 
 ----
 
@@ -118,6 +130,13 @@ Perturbations that replicate weather and atmospheric visibility conditions.
 
          Open Notebook →
 
+.. seealso::
+   See :doc:`Haze </explanations/operational_risk_modules/haze>` and
+   :doc:`Water Droplets on Lens </explanations/operational_risk_modules/water_droplets>`
+   for operational context and modeling limitations. Parameter details are in the
+   :class:`~nrtk.impls.perturb_image.environment.HazePerturber` and
+   :class:`~nrtk.impls.perturb_image.environment.WaterDropletPerturber` APIs.
+
 ----
 
 
@@ -125,10 +144,6 @@ Optical Risks
 -------------
 
 Perturbations from sensor optics, camera physics, and atmospheric distortion.
-
-.. seealso::
-  Learn the underlying OTF perturber APIs in the
-  :doc:`Optical Perturbers </examples/optical_perturbers>` how-to guide.
 
 .. grid:: 1 2 2 2
    :gutter: 3
@@ -176,7 +191,7 @@ Perturbations from sensor optics, camera physics, and atmospheric distortion.
    .. grid-item-card:: :material-regular:`waves` Atmospheric Turbulence
       :class-card: sd-border-1
 
-      Simulate atmospheric distortion effects and assess its impact on image quality and model inference.
+      Simulate atmospheric distortion effects and assess their impact on image quality and model inference.
 
       +++
 
@@ -198,6 +213,14 @@ Perturbations from sensor optics, camera physics, and atmospheric distortion.
          :outline:
 
          Open Notebook →
+
+.. seealso::
+  Learn how to apply OTF perturbations in the
+  :doc:`Optical Perturbers </examples/optical_perturbers>` how-to guide.
+  Use the :doc:`Operational Risk Guide </explanations/risk_factors>` to connect the optical effects in these tutorials
+  to deployment conditions, and consult the
+  :ref:`Optical Perturber APIs <api-optical-perturbers>`
+  for parameter details.
 
 ----
 

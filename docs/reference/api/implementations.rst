@@ -57,6 +57,8 @@ Noise perturbers add random noise patterns using skimage.
    ~nrtk.impls.perturb_image.photometric.noise.SaltNoisePerturber
    ~nrtk.impls.perturb_image.photometric.noise.SpeckleNoisePerturber
 
+.. _api-geometric-perturbers:
+
 Geometric Perturbers
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -85,6 +87,8 @@ Environment perturbers simulate atmospheric and weather-related effects that occ
 
    ~nrtk.impls.perturb_image.environment.HazePerturber
    ~nrtk.impls.perturb_image.environment.WaterDropletPerturber
+
+.. _api-optical-perturbers:
 
 Optical Perturbers
 ^^^^^^^^^^^^^^^^^^

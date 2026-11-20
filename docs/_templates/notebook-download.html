@@ -1,0 +1,13 @@
+{% if page_source_suffix == ".ipynb" and has_source and sourcename %}
+<div class="sd-text-right">
+  <a class="sd-btn sd-btn-outline-primary sd-py-1 sd-px-2"
+     href="{{ pathto('_sources/' + sourcename, true)|e }}"
+     aria-label="{{ _("Download Jupyter notebook") }}"
+     download="{{ (pagename.rsplit('/', 1)[-1] + '.ipynb')|e }}">
+    <span class="notebook-download-label">
+      <i class="fa-solid fa-download" aria-hidden="true"></i>
+      <span>{{ _("Jupyter notebook") }}</span>
+    </span>
+  </a>
+</div>
+{% endif %}

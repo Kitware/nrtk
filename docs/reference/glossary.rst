@@ -71,7 +71,7 @@ Glossary
      distortion).
 
    theta key(s)
-     A string (or list of strings) that is the name of the pertubrer parameter to modify. A single string is used
+     A string (or list of strings) that is the name of the perturber parameter to modify. A single string is used
      for generic factories and a list of strings is used for the multivariate factory.
 
    thetas

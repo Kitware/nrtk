@@ -15,7 +15,8 @@ alter the information available to the model. This makes these risks particularl
 for evaluating robustness in real-world deployments where sensor hardware may be stressed or
 suboptimal.
 
-NRTK's ``PybsmPerturber`` simulates these risks using physics-based sensor modeling (via pyBSM) that
+NRTK's :class:`~nrtk.impls.perturb_image.optical.PybsmPerturber`
+simulates these risks using physics-based sensor modeling (via pyBSM) that
 accounts for thermal noise (dark current), electronic noise (read noise), and effective resolution
 (pixel pitch). This provides a comprehensive way to probe model sensitivity to sensor-level
 degradation during T&E.

@@ -13,7 +13,8 @@ directional, defocus blur is radially symmetric and uniformly affects all
 details at the target distance. This makes it a distinct degradation mode that should be
 tested separately.
 
-NRTK's ``DefocusPerturber`` models optical defocus using the Optical Transfer Function (OTF)
+NRTK's :class:`~nrtk.impls.perturb_image.optical.otf.DefocusPerturber`
+models optical defocus using the Optical Transfer Function (OTF)
 to simulate the characteristic blur pattern of an out-of-focus optical system. This provides
 a physics-based approach to testing model sensitivity to focus errors during robustness
 screening.
@@ -92,3 +93,7 @@ Limitations and Next Steps
 * Requires optional dependencies: install via ``pip install nrtk[pybsm]``.
 * See :doc:`/validation_and_trust` for cross-perturber validation status.
 * Related Risks: :ref:`Atmospheric Turbulence <turbulence>`, :ref:`Sensor Noise <noise-and-resolution>`
+
+.. seealso::
+   Follow the :doc:`Visual Focus T&E notebook </examples/maite/visual_focus>` to apply defocus perturbations
+   and evaluate their impact on object detection with MAITE.
