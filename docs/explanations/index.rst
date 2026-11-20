@@ -28,8 +28,17 @@ structure connects to real-world operational risk.
       (e.g. extreme illumination, vibration, weather) map to perturbations,
       parameter ranges, and severity levels within a structured risk matrix.
 
+   .. grid-item-card:: :material-regular:`movie` 3. Image Perturbations on FMV
+      :link: /explanations/framewise_perturber
+      :link-type: doc
+
+      **The temporal context.** When to apply image perturbations frame by frame,
+      when to use a video-aware perturber to model effects that evolve over time,
+      and how random state affects successive frames.
+
 .. toctree::
    :hidden:
 
    robustness_concepts
    risk_factors
+   framewise_perturber
