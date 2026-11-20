@@ -315,14 +315,6 @@ Optical Perturbers
         - Image (RGB, Grayscale)
         - ``pybsm``
         - ``pyBSM``
-      * - :class:`~nrtk.impls.perturb_video.optical.TurbulenceVideoPerturber`
-        - Video frames (RGB, Grayscale)
-        - ``hcipy``, ``scipy``
-        - ``HCIPy``, ``SciPy``
-      * - :class:`~nrtk.impls.perturb_video.optical.JitterVideoPerturber`
-        - Video frames (RGB, Grayscale)
-        - ``scipy``
-        - ``SciPy``
 
 Generative Perturbers
 ^^^^^^^^^^^^^^^^^^^^^
@@ -346,6 +338,40 @@ Generative Perturbers
      The ``diffusion`` extra runs on the CPU by default and on an NVIDIA GPU when
      one is usable. Which PyTorch releases can reach the GPU depends on the
      installed NVIDIA driver.
+
+Full-Motion Video Perturbers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. dropdown:: Apply perturbations to video frames
+
+  .. list-table::
+      :widths: 45 20 25 30
+      :header-rows: 1
+
+      * - Perturber
+        - Required Inputs
+        - Extra(s) Required
+        - Key Dependencies Provided by Extra(s)
+      * - :class:`~nrtk.impls.perturb_video.CodecMacroblockPerturber`
+        - Video frames (RGB, Grayscale)
+        - ``pyav``
+        - ``PyAV``
+      * - :class:`~nrtk.impls.perturb_video.optical.JitterVideoPerturber`
+        - Video frames (RGB, Grayscale)
+        - ``scipy``
+        - ``SciPy``
+      * - :class:`~nrtk.impls.perturb_video.burn_in.MISBST1909BurnInPerturber`
+        - Video frames (RGB, Grayscale)
+        - ``pillow``
+        - ``Pillow`` with FreeType support
+      * - :class:`~nrtk.impls.perturb_video.optical.TurbulenceVideoPerturber`
+        - Video frames (RGB, Grayscale)
+        - ``hcipy``, ``scipy``
+        - ``HCIPy``, ``SciPy``
+
+  .. note::
+     Import ``nrtk.experimental`` before importing these perturbers.
+     See :doc:`/development/experimental` for details.
 
 Utility Perturbers
 ^^^^^^^^^^^^^^^^^^
